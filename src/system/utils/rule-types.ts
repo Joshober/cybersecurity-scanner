@@ -16,9 +16,9 @@ export interface RuleContext {
 export interface Rule {
   id: string;
   message: string;
-  /** Default explanation (can use {{placeholders}}). */
+  // Default explanation (can use {{placeholders}}).
   why?: string;
-  /** Default fix guidance (can use {{placeholders}}). */
+  // Default fix guidance (can use {{placeholders}}).
   fix?: string;
   severity: Severity;
   category: "crypto" | "injection";

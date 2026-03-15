@@ -1,4 +1,4 @@
-// We flag when user input gets logged (log injection risk); plain string logs are fine.
+// The scanner flags when user input gets logged (log injection risk); plain string logs are fine.
 // Pattern rule (injection.log) + taint (injection.log.tainted-flow) both cover this.
 
 import { describe, it } from "node:test";

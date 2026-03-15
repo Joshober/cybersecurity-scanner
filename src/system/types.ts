@@ -11,17 +11,17 @@ export type Category = "crypto" | "injection";
 export interface Finding {
   ruleId: string;
   message: string;
-  /** Explanation of why this is a risk (for output). */
+  // Explanation of why this is a risk (for output).
   why?: string;
-  /** Concrete fix guidance (for output and --fix-suggestions). */
+  // Concrete fix guidance (for output and --fix-suggestions).
   fix?: string;
   severity: Severity;
-  /** CRITICAL / HIGH / MEDIUM / LOW for display. */
+  // CRITICAL / HIGH / MEDIUM / LOW for display.
   severityLabel: SeverityLabel;
   category: Category;
-  /** Taint finding: untrusted source (e.g. req.query.id). */
+  // Taint finding: untrusted source (e.g. req.query.id).
   sourceLabel?: string;
-  /** Taint finding: dangerous sink (e.g. db.query). */
+  // Taint finding: dangerous sink (e.g. db.query).
   sinkLabel?: string;
   line: number;
   column: number;
@@ -35,26 +35,26 @@ export type ScanMode = "static" | "ai";
 
 // Options for AI-based analysis (used when mode is "ai").
 export interface AiAnalyzerOptions {
-  /** API endpoint (e.g. OpenAI-compatible chat completions). */
+  // API endpoint (e.g. OpenAI-compatible chat completions).
   apiUrl?: string;
-  /** API key (or set SECURE_AI_API_KEY env var). */
+  // API key (or set SECURE_AI_API_KEY env var).
   apiKey?: string;
-  /** Model name (e.g. gpt-4o-mini). */
+  // Model name (e.g. gpt-4o-mini).
   model?: string;
 }
 
 // Options for the scanner.
 export interface ScannerOptions {
-  /** File path (for source snippets). */
+  // File path (for source snippets).
   filePath?: string;
-  /** Severity threshold: only report this and above. */
+  // Severity threshold: only report this and above.
   severityThreshold?: Severity;
-  /** Enable/disable rule categories (static mode only). */
+  // Enable/disable rule categories (static mode only).
   crypto?: boolean;
   injection?: boolean;
   // Engine: "static" = rule-based AST checks; "ai" = LLM. Default "static".
   mode?: ScanMode;
-  /** Options for AI analyzer (used when mode is "ai"). */
+  // Options for AI analyzer (used when mode is "ai").
   ai?: AiAnalyzerOptions;
 }
 

@@ -1,8 +1,4 @@
-/**
- * Vulnerable: user input flows into SQL via string concatenation.
- * Should be flagged by pattern rule and/or taint (injection.sql.string-concat or injection.sql.tainted-flow).
- */
-
+// Vulnerable: user input flows into SQL via string concatenation. Flagged by pattern rule and/or taint (injection.sql.string-concat or injection.sql.tainted-flow).
 function handler(req, res) {
   const id = req.query.id;
   const user = id;

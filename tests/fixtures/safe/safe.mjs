@@ -1,8 +1,4 @@
-/**
- * Safe equivalents: parameterized SQL, crypto.randomBytes, strong hash, env for secrets.
- * These patterns should NOT be flagged by the scanner.
- */
-
+// Safe equivalents: parameterized SQL, crypto.randomBytes, strong hash, env for secrets. These patterns should NOT be flagged.
 import crypto from "crypto";
 import path from "path";
 
