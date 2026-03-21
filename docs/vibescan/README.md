@@ -11,6 +11,7 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 | [`pitch-60s.md`](./pitch-60s.md) | 60s script + six judge cue cards. |
 | [`handout.html`](./handout.html) | A5 handout; print in grayscale to verify contrast. |
 | [`SUBMISSION-CHECKLIST.md`](./SUBMISSION-CHECKLIST.md) | Logistics (form, chair, deadlines). |
+| [`rubric-status-updated.md`](./rubric-status-updated.md) | CCSC-style rubric vs **current** repo (DVNA numbers, gaps, fixes). |
 
 ## Regenerate the QR for your real repo URL
 

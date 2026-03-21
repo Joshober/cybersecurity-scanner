@@ -281,23 +281,25 @@
 
   <h2 class="section-title">Preliminary evaluation — DVNA benchmark</h2>
   <div class="card">
+    <p class="contrib-body" style="margin-bottom:0.65rem">Manual <strong>true-positive</strong> counts on <strong>first-party</strong> DVNA app code only (vendor minified JS excluded). See <code>results/dvna-evaluation.md</code> for methodology.</p>
     <table class="eval" aria-label="DVNA benchmark comparison">
       <thead>
         <tr>
-          <th>Vulnerability class</th>
-          <th>VibeScan</th>
-          <th>eslint-plugin-security</th>
+          <th>DVNA theme (OWASP &rsquo;17)</th>
+          <th>VibeScan TPs</th>
+          <th>eslint-plugin-security TPs</th>
           <th>Bearer</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>SQL injection</td><td class="tbd">TBD (Person A)</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-        <tr><td>XSS</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-        <tr><td>Command injection</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-        <tr><td>Hardcoded secrets</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-        <tr><td>Other (aggregate)</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
+        <tr><td>Injection (e.g. SQLi, tainted flows)</td><td><strong>3</strong></td><td>1</td><td class="tbd">Pending*</td></tr>
+        <tr><td>Broken authentication</td><td><strong>2</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
+        <tr><td>Sensitive data / crypto exposure</td><td><strong>2</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
+        <tr><td>Insufficient logging / monitoring</td><td><strong>1</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
+        <tr><td>Other themes (XXE, BOLA, app XSS, etc.)</td><td>0</td><td>0</td><td class="tbd">Pending*</td></tr>
       </tbody>
     </table>
+    <p class="contrib-body" style="margin-top:0.55rem;font-size:0.82rem;color:var(--muted)"><strong>Total first-party TPs:</strong> VibeScan <strong>8</strong> vs eslint <strong>1</strong>. *Bearer not executed in the benchmark environment (Docker/Windows); reproduce via <code>results/bearer-dvna.txt</code>.</p>
   </div>
 
   <h2 class="section-title">Lessons learned</h2>
