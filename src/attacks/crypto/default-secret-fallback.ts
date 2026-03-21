@@ -2,17 +2,18 @@
 
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
-import { ALL_SECRETS } from "./secretDict.js";
-import { isLikelyRealSecret } from "./entropy.js";
+import { ALL_SECRETS, isLikelyRealSecret } from "./secretDict.js";
 
 export const defaultSecretFallbackRule: Rule = {
-  id: "crypto.secrets.env-fallback",
-  message: "Env var falls back to a known weak secret literal.",
+  id: "SEC-004",
+  message:
+    "Insecure env var fallback — if env var unset, hardcoded secret is used",
   why: "If the app runs without the env var set, a guessable default may be used in production.",
-  fix: "Do not fall back to weak defaults. Fail at startup if the env var is missing, or use a secrets manager.",
+  fix: "Remove fallback. Throw error if env var is missing at startup.",
+  remediation: "Remove fallback. Throw error if env var is missing at startup.",
   cwe: 547,
   owasp: "A02:2021",
-  severity: "error",
+  severity: "critical",
   category: "crypto",
   nodeTypes: ["LogicalExpression"],
   check(context: RuleContext, node: Node) {

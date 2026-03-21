@@ -1,8 +1,10 @@
 // ESLint plugin that runs the same security rules as the standalone scanner.
 
 import type { ESLint, Rule as ESLintRuleNamespace } from "eslint";
+import type { Node } from "estree";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import type { Rule } from "./utils/rule-types.js";
+import { buildParentMap } from "./walker.js";
 
 function createEslintRule(rule: Rule): ESLintRuleNamespace.RuleModule {
   const messageId = rule.id.replace(/\./g, "_");
@@ -19,6 +21,9 @@ function createEslintRule(rule: Rule): ESLintRuleNamespace.RuleModule {
       },
     },
     create(context: ESLintRuleNamespace.RuleContext) {
+      const ast = context.getSourceCode().ast as Node;
+      const parentMap = buildParentMap(ast);
+      const getParent = (n: Node) => parentMap.get(n) ?? null;
       const report = (node: import("estree").Node, data?: Record<string, unknown>) => {
         const n = node as import("estree").Node & { type: string };
         if (data?.message && typeof data.message === "string") {
@@ -28,7 +33,7 @@ function createEslintRule(rule: Rule): ESLintRuleNamespace.RuleModule {
         }
       };
       const getSource = () => undefined;
-      const ruleContext = { report, getSource };
+      const ruleContext = { report, getSource, getParent };
 
       const visit: Record<string, (node: import("estree").Node) => void> = {};
       for (const type of rule.nodeTypes) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// CLI: secure scan [paths...] — project scan, optional registry check, generated tests.
+// CLI: VibeScan / secure — scan [paths...] — project scan, optional registry check, generated tests.
 
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { resolve, join } from "node:path";
@@ -82,10 +82,11 @@ if (!subcommand || (subcommand === "scan" && inputPaths.length === 0)) {
 
 const showHelp = (): void => {
   console.log(`
-secure — Static analysis for crypto failures and injection risks
+VibeScan (secure) — Static analysis for crypto failures and injection risks
 
 Usage:
   secure scan [paths...] [options]
+  vibescan scan [paths...] [options]
 
 Options:
   --mode static|ai

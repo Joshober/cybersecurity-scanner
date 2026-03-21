@@ -1,0 +1,9 @@
+Bearer open-source SAST (github.com/Bearer/bearer) was not executed in this environment: Docker was unavailable and official release assets for v2.0.1 do not include a Windows binary.
+
+To reproduce locally (Docker):
+  docker run --rm -v "%CD%/dvna:/scan" bearer/bearer:latest-amd64 scan /scan --format json
+
+Or install per https://docs.bearer.com/reference/installation (Linux/macOS packages or install script), then:
+  bearer scan ./dvna --format json
+
+Record command output here for the benchmark table.

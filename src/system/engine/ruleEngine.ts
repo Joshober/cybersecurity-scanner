@@ -3,7 +3,7 @@
 import type { Program } from "estree";
 import type { Finding, ScannerOptions, Severity, SeverityLabel } from "../types.js";
 import type { Rule } from "../utils/rule-types.js";
-import { walk } from "../walker.js";
+import { buildParentMap, walk } from "../walker.js";
 
 const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 3,
@@ -27,7 +27,8 @@ function buildRuleContext(
   source: string,
   findings: Finding[],
   options: ScannerOptions,
-  rule: Rule
+  rule: Rule,
+  parentMap: WeakMap<import("estree").Node, import("estree").Node | null>
 ): import("../utils/rule-types.js").RuleContext {
   const report = (
     node: import("estree").Node,
@@ -94,7 +95,8 @@ function buildRuleContext(
       .join("\n")
       .slice(loc.start.column);
   };
-  return { report, getSource };
+  const getParent = (node: import("estree").Node) => parentMap.get(node) ?? null;
+  return { report, getSource, getParent };
 }
 
 function buildNodeTypeMap(rules: Rule[]): Map<string, Rule[]> {
@@ -125,12 +127,13 @@ export function runRuleEngine(opts: RunRuleEngineOptions): Finding[] {
   const { filePath, source, ast, rules, options } = opts;
   const findings: Finding[] = [];
   const nodeTypeMap = buildNodeTypeMap(rules);
+  const parentMap = buildParentMap(ast as import("estree").Node);
 
   walk(ast, (node) => {
     const ruleList = nodeTypeMap.get(node.type);
     if (!ruleList) return;
     for (const rule of ruleList) {
-      const context = buildRuleContext(filePath, source, findings, options, rule);
+      const context = buildRuleContext(filePath, source, findings, options, rule, parentMap);
       try {
         rule.check(context, node);
       } catch {

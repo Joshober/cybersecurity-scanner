@@ -60,6 +60,7 @@ export function formatHuman(results: ScanResult[], useColor = false): string {
       if (f.why) lines.push(`Why: ${f.why}`);
       const remed = f.remediation ?? f.fix;
       if (remed) lines.push(`Fix: ${remed}`);
+      if (f.packageName) lines.push(`Package: ${f.packageName}`);
       if (f.cveRef?.length) lines.push(`CVE: ${f.cveRef.join(", ")}`);
       lines.push("");
     }
@@ -96,6 +97,7 @@ function findingToJson(f: Finding): Record<string, unknown> {
     owasp: f.owasp,
     cveRef: f.cveRef,
     findingKind: f.findingKind,
+    packageName: f.packageName,
     generatedTest: f.generatedTest,
     line: f.line,
     column: f.column,
