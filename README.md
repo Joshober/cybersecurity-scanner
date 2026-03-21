@@ -4,6 +4,8 @@ Static analysis to detect **cryptography failures** and **injection vulnerabilit
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
+**VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
+
 ---
 
 ## Why use this tool?
