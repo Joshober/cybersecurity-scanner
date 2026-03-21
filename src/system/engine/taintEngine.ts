@@ -2,6 +2,7 @@
 
 import type {
   CallExpression,
+  Expression,
   MemberExpression,
   VariableDeclarator,
   AssignmentExpression,
@@ -17,6 +18,11 @@ import {
   getPathSinkCallee,
   getXpathSinkCallee,
   getLogSinkCallee,
+  getSsrSinkInfo,
+  isAxiosCallExpression,
+  getPrototypeMergeSink,
+  getLodashSetSink,
+  isDeepmergeCallee,
 } from "../sinks/index.js";
 import { looksParameterized } from "../sanitizers/sql.js";
 
@@ -69,7 +75,29 @@ function getSourceLabelFromMember(node: MemberExpression): string | null {
 }
 
 function nodeKey(n: Node): number {
-  return n.loc?.start?.line ?? 0 + (n.loc?.start?.column ?? 0) * 1e6;
+  const line = n.loc?.start.line ?? 0;
+  const col = n.loc?.start.column ?? 0;
+  return line * 1e6 + col;
+}
+
+function callArg(node: CallExpression, i: number): Expression | undefined {
+  const a = node.arguments[i];
+  if (!a || a.type === "SpreadElement") return undefined;
+  return a as Expression;
+}
+
+function getAxiosUrlExpression(node: CallExpression): Expression | null {
+  const arg0 = node.arguments[0];
+  if (!arg0 || arg0.type !== "ObjectExpression") return null;
+  for (const prop of arg0.properties) {
+    if (prop.type !== "Property") continue;
+    const key = prop.key;
+    const isUrl =
+      (key.type === "Identifier" && key.name === "url") ||
+      (key.type === "Literal" && key.value === "url");
+    if (isUrl) return prop.value as Expression;
+  }
+  return null;
 }
 
 export interface TaintEngineOptions {
@@ -79,6 +107,16 @@ export interface TaintEngineOptions {
   options: ScannerOptions;
 }
 
+type SinkKind =
+  | "sql"
+  | "command"
+  | "path"
+  | "xpath"
+  | "log"
+  | "ssrf"
+  | "axiosConfig"
+  | "proto";
+
 // Run taint analysis: find sources, propagate taint, report when tainted data reaches sinks.
 export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
   const { source, ast, options } = opts;
@@ -86,12 +124,12 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
 
   const sourceNodes = new Map<number, string>();
   const assignments: { node: VariableDeclarator | AssignmentExpression; key: number }[] = [];
-  type SinkKind = "sql" | "command" | "path" | "xpath" | "log";
-const sinkCalls: {
+  const sinkCalls: {
     node: CallExpression;
     sinkLabel: string;
     severity: "critical" | "error" | "warning";
     kind: SinkKind;
+    argIndex: number;
   }[] = [];
 
   walk(ast, (node) => {
@@ -110,32 +148,98 @@ const sinkCalls: {
     }
     if (node.type === "CallExpression") {
       const name = getCalleeName(node);
+      if (name === "fetch") {
+        sinkCalls.push({
+          node,
+          sinkLabel: "fetch",
+          severity: "error",
+          kind: "ssrf",
+          argIndex: 0,
+        });
+        return;
+      }
+      if (isAxiosCallExpression(node)) {
+        sinkCalls.push({
+          node,
+          sinkLabel: "axios(config)",
+          severity: "error",
+          kind: "axiosConfig",
+          argIndex: 0,
+        });
+        return;
+      }
+      if (name && isDeepmergeCallee(name)) {
+        sinkCalls.push({
+          node,
+          sinkLabel: name,
+          severity: "error",
+          kind: "proto",
+          argIndex: 1,
+        });
+        return;
+      }
       if (!name) return;
-      const [obj, method] = name.split(".");
+      const parts = name.split(".");
+      const method = parts[parts.length - 1];
+      const obj = parts.length >= 2 ? parts[parts.length - 2] : "";
       if (!method) return;
+
       const sqlSink = getSqlSinkCallee(obj, method);
       if (sqlSink) {
-        sinkCalls.push({ node, sinkLabel: sqlSink, severity: "error", kind: "sql" });
+        sinkCalls.push({ node, sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 });
         return;
       }
       const cmdSink = getCommandSinkCallee(obj, method);
       if (cmdSink) {
-        sinkCalls.push({ node, sinkLabel: cmdSink, severity: "critical", kind: "command" });
+        sinkCalls.push({ node, sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 });
         return;
       }
       const pathSink = getPathSinkCallee(obj, method);
       if (pathSink) {
-        sinkCalls.push({ node, sinkLabel: pathSink, severity: "error", kind: "path" });
+        sinkCalls.push({ node, sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 });
         return;
       }
       const xpathSink = getXpathSinkCallee(obj, method);
       if (xpathSink) {
-        sinkCalls.push({ node, sinkLabel: xpathSink, severity: "error", kind: "xpath" });
+        sinkCalls.push({ node, sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 });
         return;
       }
       const logSink = getLogSinkCallee(obj, method);
       if (logSink) {
-        sinkCalls.push({ node, sinkLabel: logSink, severity: "warning", kind: "log" });
+        sinkCalls.push({ node, sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 });
+        return;
+      }
+      const ssr = getSsrSinkInfo(name, obj, method);
+      if (ssr) {
+        sinkCalls.push({
+          node,
+          sinkLabel: ssr.label,
+          severity: "error",
+          kind: "ssrf",
+          argIndex: ssr.argIndex,
+        });
+        return;
+      }
+      const mergeSink = getPrototypeMergeSink(obj, method);
+      if (mergeSink) {
+        sinkCalls.push({
+          node,
+          sinkLabel: mergeSink.label,
+          severity: "error",
+          kind: "proto",
+          argIndex: mergeSink.taintedArgIndex,
+        });
+        return;
+      }
+      const setSink = getLodashSetSink(obj, method);
+      if (setSink) {
+        sinkCalls.push({
+          node,
+          sinkLabel: setSink.label,
+          severity: "error",
+          kind: "proto",
+          argIndex: setSink.taintedArgIndex,
+        });
       }
     }
   });
@@ -190,80 +294,118 @@ const sinkCalls: {
     ? SEVERITY_ORDER[options.severityThreshold]
     : 0;
 
-  for (const { node, sinkLabel, severity, kind } of sinkCalls) {
+  for (const { node, sinkLabel, severity, kind, argIndex } of sinkCalls) {
     const findingSeverity =
       severity === "critical" ? 3 : severity === "error" ? 2 : 1;
     if (findingSeverity < severityThreshold) continue;
 
-    const firstArg = node.arguments[0];
-    if (!firstArg) continue;
+    let targetArg: Expression | null | undefined =
+      kind === "axiosConfig" ? getAxiosUrlExpression(node) : callArg(node, argIndex);
+    if (kind === "axiosConfig" && !targetArg) continue;
+    if (targetArg === undefined || targetArg === null) continue;
 
     if (kind === "sql") {
+      const firstArg = callArg(node, 0);
       const queryLiteral =
-        firstArg.type === "Literal" && typeof firstArg.value === "string"
+        firstArg && firstArg.type === "Literal" && typeof firstArg.value === "string"
           ? firstArg.value
           : "";
       const hasSecondArg = node.arguments.length > 1;
       if (looksParameterized(queryLiteral, hasSecondArg)) continue;
     }
 
-    const sourceLabel = exprIsSourceOrTainted(firstArg);
+    const sourceLabel = exprIsSourceOrTainted(targetArg as Node);
     if (!sourceLabel) continue;
+
+    if (kind === "proto") {
+      const isReqBodyOrQuery =
+        sourceLabel.includes("req.body") ||
+        sourceLabel.includes("req.query") ||
+        sourceLabel.includes("request.body") ||
+        sourceLabel.includes("request.query");
+      if (!isReqBodyOrQuery) continue;
+    }
 
     const loc = node.loc;
     if (!loc) continue;
 
-    const ruleId =
-      kind === "command"
-        ? "injection.command.tainted-flow"
-        : kind === "sql"
-          ? "injection.sql.tainted-flow"
-          : kind === "xpath"
-            ? "injection.xpath.tainted-flow"
-            : kind === "log"
-              ? "injection.log.tainted-flow"
-              : "injection.path-traversal.tainted-flow";
+    let ruleId: string;
+    let message: string;
+    let why: string;
+    let fix: string;
+    let cwe: number | undefined;
+    let owasp: string | undefined;
 
-    const message =
-      ruleId === "injection.sql.tainted-flow"
-        ? "SQL Injection risk"
-        : ruleId === "injection.command.tainted-flow"
-          ? "Command injection risk"
-          : ruleId === "injection.xpath.tainted-flow"
-            ? "XPath injection risk"
-            : ruleId === "injection.log.tainted-flow"
-              ? "Log injection risk"
-              : "Path traversal risk";
-
-    const finding: Finding = {
-      ruleId,
-      message,
-      why:
+    if (kind === "ssrf" || kind === "axiosConfig") {
+      ruleId = "injection.ssrf.tainted-flow";
+      message = "SSRF risk: untrusted data reaches outbound request URL.";
+      why = "Attackers can make the server request internal or cloud metadata endpoints.";
+      fix = "Use an allowlist of hosts/schemes; block private IPs and link-local addresses.";
+      cwe = 918;
+      owasp = "A10:2021";
+    } else if (kind === "proto") {
+      ruleId = "injection.prototype-pollution.tainted-flow";
+      message = "Prototype pollution risk: user input in deep merge or path set.";
+      why = "Attacker-controlled objects can pollute Object.prototype.";
+      fix = "Avoid merging user input into objects with deep merge; validate keys; use Object.create(null).";
+      cwe = 1321;
+      owasp = "A03:2021";
+    } else {
+      ruleId =
+        kind === "command"
+          ? "injection.command.tainted-flow"
+          : kind === "sql"
+            ? "injection.sql.tainted-flow"
+            : kind === "xpath"
+              ? "injection.xpath.tainted-flow"
+              : kind === "log"
+                ? "injection.log.tainted-flow"
+                : "injection.path-traversal.tainted-flow";
+      message =
+        ruleId === "injection.sql.tainted-flow"
+          ? "SQL Injection risk"
+          : ruleId === "injection.command.tainted-flow"
+            ? "Command injection risk"
+            : ruleId === "injection.xpath.tainted-flow"
+              ? "XPath injection risk"
+              : ruleId === "injection.log.tainted-flow"
+                ? "Log injection risk"
+                : "Path traversal risk";
+      why =
         ruleId === "injection.sql.tainted-flow"
           ? "Untrusted input flows into a SQL query via string concatenation."
           : ruleId === "injection.log.tainted-flow"
             ? "Unsanitized input in logs can allow fake entries or impersonation via CR/LF."
-            : "Untrusted input flows into a dangerous sink.",
-      fix:
+            : "Untrusted input flows into a dangerous sink.";
+      fix =
         ruleId === "injection.sql.tainted-flow"
           ? 'Use parameterized queries: db.query("SELECT * FROM users WHERE id=?", [id])'
           : ruleId === "injection.log.tainted-flow"
             ? "Sanitize log input: strip CR/LF; limit message size."
-            : "Sanitize or allowlist user input before passing to this API.",
-      severity:
-        severity === "critical"
-          ? "critical"
-          : severity === "warning"
-            ? "warning"
-            : "error",
-      severityLabel: SEVERITY_LABEL[severity] ?? "HIGH",
+            : "Sanitize or allowlist user input before passing to this API.";
+    }
+
+    const sev: Severity =
+      severity === "critical" ? "critical" : severity === "warning" ? "warning" : "error";
+
+    const finding: Finding = {
+      ruleId,
+      message,
+      why,
+      fix,
+      severity: sev,
+      severityLabel: SEVERITY_LABEL[sev],
       category: "injection",
+      cwe,
+      owasp,
+      findingKind: kind === "proto" ? "PROTOTYPE_POLLUTION" : undefined,
       sourceLabel,
       sinkLabel,
       line: loc.start.line,
       column: loc.start.column,
       endLine: loc.end?.line,
       endColumn: loc.end?.column,
+      filePath: opts.filePath,
       source: source.split("\n")[loc.start.line - 1],
     };
     findings.push(finding);

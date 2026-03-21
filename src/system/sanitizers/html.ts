@@ -8,4 +8,5 @@ export const HTML_SANITIZER_CALLS = new Set([
   "sanitize",
   "sanitizeHtml",
   "encodeURIComponent",
+  "DOMPurify.sanitize",
 ]);

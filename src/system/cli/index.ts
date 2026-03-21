@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 
-// CLI: run as secure, npx secure, or npm exec secure. Subcommand: scan (e.g. secure scan . or secure scan src --rules injection,crypto).
+// CLI: secure scan [paths...] — project scan, optional registry check, generated tests.
 
 import { readFileSync, existsSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
 import fg from "fast-glob";
-import { scan, scanAsync } from "../scanner.js";
-import { formatHuman, formatCompact, formatJson } from "../format.js";
-import type { ScannerOptions, Severity, ScanMode } from "../types.js";
+import { scanAsync, scanProjectAsync } from "../scanner.js";
+import {
+  formatHuman,
+  formatCompact,
+  formatJson,
+  formatProjectJson,
+  projectFindingsToScanResults,
+} from "../format.js";
+import type { ScannerOptions, Severity, ScanMode, Finding } from "../types.js";
 
 const args = process.argv.slice(2);
 let subcommand = "";
@@ -15,8 +21,8 @@ let inputPaths: string[] = [];
 let options: ScannerOptions = { crypto: true, injection: true };
 let format: "human" | "compact" | "json" = "compact";
 let fixSuggestions = false;
+let useColor = process.stdout.isTTY;
 
-// Parse args: secure scan [paths...] [--mode static|ai] [--rules ...] [--format ...] [--fix-suggestions]
 for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === "scan") {
@@ -47,46 +53,53 @@ for (let i = 0; i < args.length; i++) {
     else if (f === "human") format = "human";
     else format = "compact";
   } else if (a === "--fix-suggestions") fixSuggestions = true;
-  else if (!a.startsWith("-")) {
+  else if (a === "--check-registry") options.checkRegistry = true;
+  else if (a === "--skip-registry") options.skipRegistry = true;
+  else if (a === "--generate-tests") {
+    options.generateTests = true;
+    if (args[i + 1] && !args[i + 1].startsWith("-")) {
+      options.generateTestsOutputDir = resolve(args[++i]);
+    } else {
+      options.generateTestsOutputDir = join(process.cwd(), "vibescan-generated-tests");
+    }
+  } else if (a === "--project-root" && args[i + 1]) {
+    options.projectRoot = resolve(args[++i]);
+  } else if (a === "--color" && args[i + 1]) {
+    const v = args[++i].toLowerCase();
+    useColor = v === "always" ? true : v === "never" ? false : process.stdout.isTTY;
+  } else if (!a.startsWith("-")) {
     if (subcommand === "scan") inputPaths.push(a);
-    else if (!subcommand) { subcommand = "scan"; inputPaths.push(a); }
+    else if (!subcommand) {
+      subcommand = "scan";
+      inputPaths.push(a);
+    }
   }
 }
 
-// When no subcommand or no paths given, use current dir or show help.
 if (!subcommand || (subcommand === "scan" && inputPaths.length === 0)) {
   if (subcommand === "scan") inputPaths.push(".");
 }
 
 const showHelp = (): void => {
   console.log(`
-secure — High-confidence static analysis for crypto failures and injection risks
+secure — Static analysis for crypto failures and injection risks
 
 Usage:
   secure scan [paths...] [options]
-  npx secure scan .
-  npx secure scan src --rules injection,crypto
-  npx secure scan . --mode static
-  npx secure scan . --mode ai
-  npx secure scan . --format json
-  npx secure scan . --fix-suggestions
 
 Options:
-  --mode <engine>    static (default) = LaTeX/rule-based AST checks; ai = LLM reads code and responds
-  --rules <list>     Comma-separated: crypto, injection (default: both; static mode only)
-  --no-crypto        Disable cryptography rules (static mode)
-  --no-injection     Disable injection rules (static mode)
-  --severity <level> Only report this and above: critical | error | warning | info
-  --format <type>    Output: human (Why + Fix) | compact | json
-  --fix-suggestions  Include fix guidance in output (always included in human format)
-  --ai-api-url <url> AI endpoint (or SECURE_AI_API_URL env); default OpenAI chat completions
-  --ai-api-key <key> API key (or SECURE_AI_API_KEY env)
-  --ai-model <name>  Model name (e.g. gpt-4o-mini)
-
-This tool does not promise full protection. It provides high-confidence detection,
-clear explanations, and fix guidance. Use it to find risky patterns before runtime;
-it cannot guarantee every code path is safe. OWASP treats cryptographic failures
-and injection as major application risks — this scanner helps address them.
+  --mode static|ai
+  --rules crypto,injection
+  --no-crypto / --no-injection
+  --severity critical|error|warning|info
+  --format human|compact|json
+  --fix-suggestions
+  --check-registry     HEAD npm registry for missing packages (slopsquat signal)
+  --skip-registry      Skip registry checks
+  --generate-tests [dir]  Emit stub tests under dir (default: ./vibescan-generated-tests)
+  --project-root <dir>    package.json resolution for registry check
+  --color always|never|auto
+  --ai-api-url, --ai-api-key, --ai-model
 `);
 };
 
@@ -103,7 +116,10 @@ for (const p of inputPaths) {
       const stat = statSync(resolved);
       if (stat.isFile()) files.push(resolved);
       else if (stat.isDirectory()) {
-        const found = fg.sync(["**/*.js", "**/*.ts", "**/*.mjs", "**/*.cjs"], { cwd: resolved, absolute: true });
+        const found = fg.sync(["**/*.js", "**/*.ts", "**/*.mjs", "**/*.cjs"], {
+          cwd: resolved,
+          absolute: true,
+        });
         files.push(...found);
       }
     } catch {
@@ -121,45 +137,84 @@ if (files.length === 0 && inputPaths.length > 0) {
   process.exit(1);
 }
 
-const results: import("../types.js").ScanResult[] = [];
-let exitCode = 0;
-const useAi = options.mode === "ai";
-
-async function runScan(): Promise<void> {
-  console.log(`Scanning ${files.length} file${files.length === 1 ? "" : "s"}...`);
-  for (const file of files) {
-    const path = resolve(file);
-    if (!existsSync(path)) continue;
-    const source = readFileSync(path, "utf-8");
-    const result = useAi ? await scanAsync(source, path, options) : scan(source, path, options);
-    results.push(result);
-    if (result.findings.some((f) => f.severity === "error" || f.severity === "critical")) exitCode = 1;
-  }
+function findingsFail(fs: Finding[]): boolean {
+  return fs.some((f) => f.severity === "critical" || f.severity === "error");
 }
 
+const useAi = options.mode === "ai";
+
 async function main(): Promise<void> {
-  await runScan();
-  const totalFindings = results.reduce((n, r) => n + r.findings.length, 0);
+  let exitCode = 0;
+
+  if (useAi) {
+    console.log(`Scanning ${files.length} file${files.length === 1 ? "" : "s"} (AI mode)...`);
+    const results: import("../types.js").ScanResult[] = [];
+    for (const file of files) {
+      const path = resolve(file);
+      if (!existsSync(path)) continue;
+      const source = readFileSync(path, "utf-8");
+      const result = await scanAsync(source, path, options);
+      results.push(result);
+      if (findingsFail(result.findings)) exitCode = 1;
+    }
+    const totalFindings = results.reduce((n, r) => n + r.findings.length, 0);
+    if (totalFindings === 0) {
+      console.log("No vulnerabilities found.");
+      process.exit(0);
+    }
+    console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
+    if (format === "human") console.log(formatHuman(results, useColor));
+    else if (format === "json") console.log(formatJson(results));
+    else console.log(formatCompact(results, useColor));
+    if (fixSuggestions && format !== "human" && totalFindings > 0) {
+      console.log("\n--- Fix suggestions ---");
+      for (const r of results) {
+        for (const f of r.findings) {
+          const remed = f.remediation ?? f.fix;
+          if (remed) console.log(`[${f.ruleId}] ${remed}`);
+        }
+      }
+    }
+    process.exit(exitCode);
+    return;
+  }
+
+  console.log(`Scanning ${files.length} file${files.length === 1 ? "" : "s"}...`);
+  const entries = files.map((path) => ({
+    path: resolve(path),
+    source: readFileSync(resolve(path), "utf-8"),
+  }));
+  const projectRoot =
+    options.projectRoot ??
+    (inputPaths.length > 0 ? resolve(inputPaths[0]) : process.cwd());
+  const project = await scanProjectAsync(entries, options, projectRoot);
+
+  if (findingsFail(project.findings)) exitCode = 1;
+
+  const totalFindings = project.findings.length;
   if (totalFindings === 0) {
     console.log("No vulnerabilities found.");
     process.exit(0);
   }
+
   console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
-  if (format === "human") {
-    console.log(formatHuman(results));
-  } else if (format === "json") {
-    console.log(formatJson(results));
+
+  if (format === "json") {
+    console.log(formatProjectJson(project));
   } else {
-    console.log(formatCompact(results));
+    const display = projectFindingsToScanResults(project);
+    if (format === "human") console.log(formatHuman(display, useColor));
+    else console.log(formatCompact(display, useColor));
   }
+
   if (fixSuggestions && format !== "human" && totalFindings > 0) {
     console.log("\n--- Fix suggestions ---");
-    for (const r of results) {
-      for (const f of r.findings) {
-        if (f.fix) console.log(`[${f.ruleId}] ${f.fix}`);
-      }
+    for (const f of project.findings) {
+      const remed = f.remediation ?? f.fix;
+      if (remed) console.log(`[${f.ruleId}] ${remed}`);
     }
   }
+
   process.exit(exitCode);
 }
 

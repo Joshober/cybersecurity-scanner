@@ -23,7 +23,7 @@ function interpolate(template: string, data: Record<string, unknown>): string {
 }
 
 function buildRuleContext(
-  _filePath: string,
+  filePath: string,
   source: string,
   findings: Finding[],
   options: ScannerOptions,
@@ -42,18 +42,39 @@ function buildRuleContext(
       typeof data.why === "string" ? data.why : (rule.why ? interpolate(rule.why, data) : undefined);
     const fix =
       typeof data.fix === "string" ? data.fix : (rule.fix ? interpolate(rule.fix, data) : undefined);
+    const remediation =
+      typeof data.remediation === "string"
+        ? data.remediation
+        : rule.remediation
+          ? interpolate(rule.remediation, data)
+          : undefined;
+    const cwe = typeof data.cwe === "number" ? data.cwe : rule.cwe;
+    const owasp = typeof data.owasp === "string" ? data.owasp : rule.owasp;
+    const cveRef = Array.isArray(data.cveRef) ? (data.cveRef as string[]) : undefined;
+    const findingKind =
+      typeof data.findingKind === "string" ? data.findingKind : undefined;
+    const generatedTest =
+      typeof data.generatedTest === "string" ? data.generatedTest : undefined;
+
     const finding: Finding = {
       ruleId: rule.id,
       message,
       why,
       fix,
+      remediation,
       severity: rule.severity,
       severityLabel: SEVERITY_LABEL[rule.severity],
       category: rule.category,
+      cwe,
+      owasp,
+      cveRef,
+      findingKind,
+      generatedTest,
       line: loc.start.line,
       column: loc.start.column,
       endLine: loc.end?.line,
       endColumn: loc.end?.column,
+      filePath,
       source: source.split("\n")[loc.start.line - 1],
     };
     const threshold = options.severityThreshold ? SEVERITY_ORDER[options.severityThreshold] : 0;

@@ -5,6 +5,12 @@ export interface ReportOptions {
   message?: string;
   why?: string;
   fix?: string;
+  remediation?: string;
+  cwe?: number;
+  owasp?: string;
+  cveRef?: string[];
+  findingKind?: string;
+  generatedTest?: string;
   [key: string]: unknown;
 }
 
@@ -16,10 +22,11 @@ export interface RuleContext {
 export interface Rule {
   id: string;
   message: string;
-  // Default explanation (can use {{placeholders}}).
   why?: string;
-  // Default fix guidance (can use {{placeholders}}).
   fix?: string;
+  remediation?: string;
+  cwe?: number;
+  owasp?: string;
   severity: Severity;
   category: "crypto" | "injection";
   nodeTypes: string[];

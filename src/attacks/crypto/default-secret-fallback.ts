@@ -1,13 +1,17 @@
-// Default secret fallback: process.env.X || "default" when env is missing. Fail at startup when key is missing; no silent substitution.
+// Weak literal fallback: process.env.X || "known-weak" — only flags dictionary matches (see secretDict).
 
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
+import { ALL_SECRETS } from "./secretDict.js";
+import { isLikelyRealSecret } from "./entropy.js";
 
 export const defaultSecretFallbackRule: Rule = {
   id: "crypto.secrets.env-fallback",
-  message: "Fallback default secret when env var is unset is insecure.",
-  why: "If the app runs without the env var set, the default (e.g. 'devsecret') may be used in production.",
-  fix: "Do not fall back to a default secret. Fail at startup if the env var is missing, or use a secrets manager.",
+  message: "Env var falls back to a known weak secret literal.",
+  why: "If the app runs without the env var set, a guessable default may be used in production.",
+  fix: "Do not fall back to weak defaults. Fail at startup if the env var is missing, or use a secrets manager.",
+  cwe: 547,
+  owasp: "A02:2021",
   severity: "error",
   category: "crypto",
   nodeTypes: ["LogicalExpression"],
@@ -36,11 +40,9 @@ export const defaultSecretFallbackRule: Rule = {
     }
     if (!isProcessEnv) return;
     const right = node.right;
-    if (
-      right.type === "Literal" &&
-      ((typeof right.value === "string" && right.value.length > 0) || typeof right.value === "number")
-    ) {
-      context.report(node);
-    }
+    if (right.type !== "Literal" || typeof right.value !== "string" || right.value.length === 0) return;
+    if (isLikelyRealSecret(right.value)) return;
+    if (!ALL_SECRETS.has(right.value)) return;
+    context.report(node, { findingKind: "ENV_FALLBACK", cwe: 547, owasp: "A02:2021" });
   },
 };

@@ -57,7 +57,8 @@ function extractJsonFromResponse(text: string): string {
 function parseFindings(
   raw: string,
   source: string,
-  options: ScannerOptions
+  options: ScannerOptions,
+  filePath?: string
 ): Finding[] {
   const findings: Finding[] = [];
   const jsonStr = extractJsonFromResponse(raw);
@@ -95,6 +96,7 @@ function parseFindings(
       category,
       line,
       column,
+      filePath,
       source: lines[line - 1],
     };
     findings.push(finding);
@@ -157,7 +159,7 @@ export async function scanWithAi(
   const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
   const content =
     data.choices?.[0]?.message?.content ?? "";
-  const findings = parseFindings(content, source, options);
+  const findings = parseFindings(content, source, options, filePath);
 
   return { filePath, findings, source };
 }

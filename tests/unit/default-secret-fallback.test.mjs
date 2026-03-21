@@ -4,9 +4,9 @@ import { describe, it } from "node:test";
 import { scanSource, assertHasRuleId, assertNoRuleId } from "../helpers.mjs";
 
 describe("default-secret-fallback", () => {
-  it("vulnerable: process.env.X || 'default' flagged", () => {
+  it("vulnerable: process.env.X || weak dictionary literal flagged", () => {
     assertHasRuleId(
-      scanSource("const secret = process.env.SECRET || 'devsecret';"),
+      scanSource("const secret = process.env.SECRET || 'changeme';"),
       "crypto.secrets.env-fallback"
     );
   });

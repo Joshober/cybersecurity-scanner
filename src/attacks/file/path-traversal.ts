@@ -4,6 +4,14 @@ import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
 import { getCalleeName, parseCalleeParts } from "../../system/utils/helpers.js";
 
+export const PATH_TRAVERSAL_PAYLOADS = [
+  "../../../etc/passwd",
+  "..%2F..%2F..%2Fetc%2Fshadow",
+  "....//....//etc/passwd",
+  "%252e%252e%252fetc%252fpasswd",
+  "..\\..\\..\\windows\\system32",
+] as const;
+
 const FILE_READ_METHODS = new Set(["readFile", "readFileSync", "readdir", "readdirSync", "createReadStream", "existsSync"]);
 const FS_OBJECTS = new Set(["fs", "fsPromises", "require"]);
 
