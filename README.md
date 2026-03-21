@@ -6,6 +6,8 @@
 
 **VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
 
+**Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
+
 ---
 
 ## Quick start
@@ -126,6 +128,8 @@ export default [
 
 ## Project structure
 
+See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary:
+
 ```
 src/
 ├── attacks/           # Rule definitions (crypto, injection, browser, file)
@@ -133,6 +137,10 @@ src/
 tests/
 ├── fixtures/
 └── unit/
+docs/
+├── REPO-HANDOFF.md    # Architecture + file map for handoffs
+└── vibescan/          # Poster & submission assets
+results/               # DVNA benchmark outputs (see dvna-evaluation.md)
 ```
 
 ---

@@ -4,6 +4,7 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 
 | File | Purpose |
 |------|---------|
+| [`../REPO-HANDOFF.md`](../REPO-HANDOFF.md) | **Codebase / architecture summary** for collaborators or LLMs (pipeline, paths, what’s implemented). |
 | [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table TBD). |
 | [`qr-github.svg`](./qr-github.svg) | 120×120-style QR (white modules on `#0a0a0f`) for placeholder URL `https://github.com/YOUR-USERNAME/vibescan`. |
 | [`abstract.md`](./abstract.md) | Paste-up abstract + citation checklist. |

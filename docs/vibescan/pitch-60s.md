@@ -1,13 +1,14 @@
 # VibeScan — 60-second pitch (poster competition)
 
 **Target:** ~140–150 words at conversational pace (roughly 55–65 seconds).  
+**QC:** The script below is ~142 words **before** you swap in Person A’s DVNA one-liner—time yourself and trim a clause if you run over ~65s.  
 **Practice:** Time yourself; trim or add a short clause if you run long.
 
 ---
 
 ## Spoken script
 
-Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. We are benchmarking on DVNA against eslint-plugin-security and Bearer—**[insert Person A’s one-line result here]**. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
+Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. A bogus dependency string **does not always fail at install time**, so the risk shows up as supply-chain exposure unless something checks the registry before merge. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks—**speed outruns spot-checking**. **VibeScan** is the **npm package** answer for teams that already live in JavaScript tooling: **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake packages before deploy, plus checks aimed at injection, auth, and config mistakes common in generated handlers, **without requiring an OpenAPI spec** from the author. We benchmark on **DVNA** against **eslint-plugin-security** and **Bearer**—**[insert Person A’s one-line result here]**. The fix is not cleverer prompts; it is **repeatable downstream static analysis on every commit**, the same way you would gate formatting or types—**security deserves a machine-checked diff**, not a one-off chat thread. **It’s the safety layer vibe coding never had.**
 
 ---
 
