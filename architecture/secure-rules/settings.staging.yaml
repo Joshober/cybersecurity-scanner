@@ -1,0 +1,12 @@
+environments:
+  staging:
+    database:
+      exposure: vpc
+      publiclyReachable: false
+    envIsolation:
+      sharedDatabaseAcrossEnvs: false
+    serviceCommunication:
+      allowlistEnforced: true
+      overlyPermissiveIam: false
+    network:
+      defaultDenyBetweenServices: true

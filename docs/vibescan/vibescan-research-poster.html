@@ -215,7 +215,7 @@
     <div class="stat"><strong>19.7%</strong><span>LLM npm suggestions hallucinated (Spracklen et al., USENIX Sec 2025)</span></div>
     <div class="stat"><strong>~50%</strong><span>Passing AI backends still exploitable (BaxBench, arXiv:2502.11844)</span></div>
     <div class="stat"><strong>10.5%</strong><span>SecPass rate under security prompting (SusVibes, arXiv:2512.03262)</span></div>
-    <div class="stat"><strong>1,182</strong><span>Apps with literal &lsquo;supersecretkey&rsquo; (Invicti, 2025)</span></div>
+    <div class="stat"><strong>1,182</strong><span>Apps with literal &lsquo;supersecretkey&rsquo; (Invicti, 2025 industry study)</span></div>
   </div>
 
   <div class="grid-2">
@@ -307,7 +307,7 @@
     <ul>
       <li><strong>Security prompts trade quality for little gain.</strong> SusVibes shows security-focused prompting degrades functional correctness without reliably improving security (arXiv:2512.03262).</li>
       <li><strong>Passing the benchmark is not enough.</strong> BaxBench reports ~50% of backends that pass automated checks remain exploitable (arXiv:2502.11844).</li>
-      <li><strong>Models leak predictable default secrets.</strong> Invicti found 1,182 apps using the same placeholder key—each LLM has a fingerprintable default-secret vocabulary (2025).</li>
+      <li><strong>Models leak predictable default secrets.</strong> An Invicti industry study (2025) found 1,182 apps using the same placeholder key—each LLM has a fingerprintable default-secret vocabulary.</li>
       <li><strong>Nearly one in five package suggestions are fake.</strong> Spracklen et al. measure 19.7% hallucinated npm names in LLM outputs—supply-chain risk is structural (USENIX Security 2025).</li>
     </ul>
   </div>
@@ -315,7 +315,7 @@
   <div class="footer-row">
     <div>
       <p class="takeaway"><em>Architectural lesson:</em> Ship <strong>downstream scanning</strong> in the build pipeline—not more prompt engineering—as the primary safety layer for vibe-coded systems.</p>
-      <p class="takeaway" style="margin-top:0.5rem">Tenzai (Jan 2026): 100% SSRF detection vs 0% CSRF in evaluated AI-generated stacks—coverage is uneven; static tools must fill the holes.</p>
+      <p class="takeaway" style="margin-top:0.5rem">Tenzai industry benchmark (Jan 2026): 100% SSRF detection vs 0% CSRF in evaluated AI-generated stacks—coverage is uneven; static tools must fill the holes.</p>
     </div>
     <div class="qr-block">
       <img src="qr-github.svg" alt="QR code linking to GitHub repository" width="120" height="120" />

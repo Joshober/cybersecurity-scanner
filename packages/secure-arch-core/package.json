@@ -1,0 +1,30 @@
+{
+  "name": "@secure-arch/core",
+  "version": "1.0.0",
+  "description": "Universal secure-architecture settings schema, loader, and static checks",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "schema"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test tests/"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.0",
+    "secure-code-scanner": "file:../secure-code-scanner",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

@@ -35,3 +35,12 @@ coverage/
 
 # Optional
 .cache/
+
+# BEGIN secure-arch generated ignores
+!.env.example
+*.key
+*.p12
+*.pem
+.env
+.env.*
+# END secure-arch generated ignores

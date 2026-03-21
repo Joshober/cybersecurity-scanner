@@ -8,6 +8,21 @@
 
 **Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
 
+**Universal secure-architecture CLI (AI settings + static checks):** [`docs/secure-arch/README.md`](docs/secure-arch/README.md)
+
+---
+
+## Monorepo
+
+This repository is an **npm workspaces** monorepo:
+
+| Package | Description |
+|---------|-------------|
+| [`packages/secure-code-scanner`](packages/secure-code-scanner/) | VibeScan — JS/TS static scanner (`vibescan` / `secure`) |
+| [`packages/secure-arch-core`](packages/secure-arch-core/) | Portable settings schema, architecture checks, evidence layer |
+| [`packages/secure-arch-cli`](packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
+| [`packages/secure-arch-adapters`](packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
+
 ---
 
 ## Quick start
@@ -17,8 +32,15 @@ git clone https://github.com/Joshober/cybersecurity-scanner.git
 cd cybersecurity-scanner
 npm install
 npm run build
-npx vibescan scan ./src
-# or: npx secure scan ./src
+npx vibescan scan ./packages/secure-code-scanner/src
+# or: npx secure scan ./packages/secure-code-scanner/src
+```
+
+### secure-arch (architecture settings + validation)
+
+```bash
+npx secure-arch install --root .
+npx secure-arch check --root . --code-evidence js-ts
 ```
 
 Requires **Node 18+**.
@@ -68,8 +90,8 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 ## Usage (CLI)
 
 ```bash
-npx vibescan scan .
-npx vibescan scan src --rules injection,crypto
+npx vibescan scan packages/secure-code-scanner/src
+npx vibescan scan packages/secure-code-scanner/src --rules injection,crypto
 npx vibescan scan . --format human --fix-suggestions
 npx vibescan scan . --check-registry
 npx vibescan scan . --check-registry --skip-registry   # offline: skip HEAD requests
@@ -91,7 +113,7 @@ npx vibescan scan . --generate-tests ./generated-security-tests
 
 ```bash
 npm run test
-npm run test:only   # if `dist/` is already built
+cd packages/secure-code-scanner && npm run test:only   # if that package's `dist/` is already built
 ```
 
 ---
@@ -131,14 +153,20 @@ export default [
 See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary:
 
 ```
-src/
-├── attacks/           # Rule definitions (crypto, injection, browser, file)
-└── system/            # Engine, CLI, parser, taint, format, optional AI
-tests/
-├── fixtures/
-└── unit/
+packages/secure-code-scanner/
+├── src/
+│   ├── attacks/       # Rule definitions (crypto, injection, browser, file)
+│   └── system/        # Engine, CLI, parser, taint, format, optional AI
+└── tests/
+    ├── fixtures/
+    └── unit/
+packages/secure-arch-core/   # Universal architecture rule engine
+packages/secure-arch-cli/    # secure-arch CLI
+packages/secure-arch-adapters/
+architecture/secure-rules/     # AI-maintained settings (templates via secure-arch install)
 docs/
-├── REPO-HANDOFF.md    # Architecture + file map for handoffs
+├── REPO-HANDOFF.md
+├── secure-arch/       # Portable rule system docs
 └── vibescan/          # Poster & submission assets
 results/               # DVNA benchmark outputs (see dvna-evaluation.md)
 ```

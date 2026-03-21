@@ -8,7 +8,7 @@
 
 ## Spoken script
 
-Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. On DVNA, VibeScan detected **eight** first-party true positives across Injection, Broken Authentication, Sensitive Data, and Logging themes versus **one** for eslint-plugin-security; **Bearer** is still on our to-run list for a same-environment scan. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
+Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured rate from **USENIX Security 2025** (Spracklen et al.), not a vibe. Teams are shipping whole Express backends from chat while **arXiv benchmarks** report tiny SecPass and half of “passing” backends still exploitable, and an **industry benchmark (Tenzai, Jan 2026)** highlighted uneven coverage—strong SSRF signal, **zero** CSRF—in their evaluated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. On DVNA, VibeScan detected **eight** first-party true positives across Injection, Broken Authentication, Sensitive Data, and Logging themes versus **one** for eslint-plugin-security; **Bearer** is still on our to-run list for a same-environment scan. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
 
 ---
 
@@ -42,3 +42,7 @@ Almost one in five package names that coding assistants suggest for your `packag
 
 - **Public data** (IDs, health, payments) rides on these stacks—**Tea App**, **Supabase RLS** incidents, **subscription bypass** shutdowns show **real harm**, not lab scores.
 - **Supply-chain + default secrets** are **policy-relevant** (consumer protection, gov digital services).
+
+### 7. (If asked) Are Invicti / Tenzai peer-reviewed?
+
+- **No**—treat them as **industry empirical / vendor benchmark** sources; **Spracklen (USENIX)** and the **arXiv** papers are your tier-A citations for methodology fights.

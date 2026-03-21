@@ -12,6 +12,8 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 | [`handout.html`](./handout.html) | A5 handout; print in grayscale to verify contrast. |
 | [`SUBMISSION-CHECKLIST.md`](./SUBMISSION-CHECKLIST.md) | Logistics (form, chair, deadlines). |
 | [`rubric-status-updated.md`](./rubric-status-updated.md) | CCSC-style rubric vs **current** repo (DVNA numbers, gaps, fixes). |
+| [`judge-prep-score-and-sources.md`](./judge-prep-score-and-sources.md) | **Score band**, **source tiers** (peer-reviewed vs industry), QR/repo credibility, rehearsal notes. |
+| [`research-framing.md`](./research-framing.md) | **Research question, novelty, baselines, safe claims**, six deliverables checklist—turn “scanner + stats” into “evaluated method.” |
 
 ## Regenerate the QR (if the public URL changes)
 

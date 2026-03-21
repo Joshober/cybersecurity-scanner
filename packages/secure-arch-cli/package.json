@@ -1,0 +1,25 @@
+{
+  "name": "@secure-arch/cli",
+  "version": "1.0.0",
+  "description": "Universal CLI: install rule pack, init AI adapters, run secure architecture checks",
+  "type": "module",
+  "bin": {
+    "secure-arch": "dist/cli.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@secure-arch/adapters": "file:../secure-arch-adapters",
+    "@secure-arch/core": "file:../secure-arch-core"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
