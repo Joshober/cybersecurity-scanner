@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibeScan Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <div class="brand">VibeScan</div>
+        <div class="tag">Downstream security scanning for LLM-generated Node.js apps</div>
+      </header>
+
+      <section class="panel">
+        <h2 class="h2">1) Choose a GitHub repo</h2>
+        <label class="label" for="repoUrl">Repo URL (github.com only)</label>
+        <input id="repoUrl" class="input" type="url" value="https://github.com/appsecco/dvna" spellcheck="false" />
+
+        <h2 class="h2">2) Choose a scenario</h2>
+        <div class="radioRow">
+          <label class="radio">
+            <input type="radio" name="scenario" value="original" checked />
+            <span>Original repo</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="scenario" value="simulated_hacked" />
+            <span>Simulated hacked commit</span>
+          </label>
+        </div>
+
+        <button id="scanBtn" class="btn">Scan &amp; decide</button>
+
+        <div id="status" class="status" aria-live="polite">Idle</div>
+      </section>
+
+      <section class="panel" id="results" style="display: none;">
+        <h2 class="h2">Decision</h2>
+        <div id="blockedBig" class="big">—</div>
+
+        <div class="row">
+          <div class="metric">
+            <div class="metricLabel">Findings total</div>
+            <div id="totalFindings" class="metricValue">—</div>
+          </div>
+          <div class="metric">
+            <div class="metricLabel">Critical / Error</div>
+            <div id="critErrCount" class="metricValue">—</div>
+          </div>
+        </div>
+
+        <h2 class="h2">Top findings</h2>
+        <div id="findings" class="findings"></div>
+
+        <div class="hint">
+          What this means: VibeScan blocks changes when it sees high-confidence security patterns in generated code paths.
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footerText">Backend runs VibeScan on a cloned repo.</div>
+      </footer>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
+
