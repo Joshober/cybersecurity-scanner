@@ -5,22 +5,22 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 | File | Purpose |
 |------|---------|
 | [`../REPO-HANDOFF.md`](../REPO-HANDOFF.md) | **Codebase / architecture summary** for collaborators or LLMs (pipeline, paths, what’s implemented). |
-| [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table TBD). |
-| [`qr-github.svg`](./qr-github.svg) | 120×120-style QR (white modules on `#0a0a0f`) for placeholder URL `https://github.com/YOUR-USERNAME/vibescan`. |
+| [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table per `results/dvna-evaluation.md`). |
+| [`qr-github.svg`](./qr-github.svg) | 120×120-style QR (white modules on `#0a0a0f`) for `https://github.com/Joshober/cybersecurity-scanner`. |
 | [`abstract.md`](./abstract.md) | Paste-up abstract + citation checklist. |
 | [`pitch-60s.md`](./pitch-60s.md) | 60s script + six judge cue cards. |
 | [`handout.html`](./handout.html) | A5 handout; print in grayscale to verify contrast. |
 | [`SUBMISSION-CHECKLIST.md`](./SUBMISSION-CHECKLIST.md) | Logistics (form, chair, deadlines). |
 | [`rubric-status-updated.md`](./rubric-status-updated.md) | CCSC-style rubric vs **current** repo (DVNA numbers, gaps, fixes). |
 
-## Regenerate the QR for your real repo URL
+## Regenerate the QR (if the public URL changes)
 
-Replace `YOUR-USERNAME` everywhere (poster, handout, abstract if needed), then regenerate `qr-github.svg`:
+Poster, handout, and `qr-github.svg` currently target **`https://github.com/Joshober/cybersecurity-scanner`**.
 
 **PowerShell (downloads SVG from a public API):**
 
 ```powershell
-$url = "https://YOUR-ACTUAL-REPO-URL"  # e.g. https://github.com/org/vibescan
+$url = "https://github.com/Joshober/cybersecurity-scanner"  # change if the repo moves
 $enc = [uri]::EscapeDataString($url)
 Invoke-WebRequest -Uri "https://api.qrserver.com/v1/create-qr-code/?size=116x116&data=$enc&format=svg" -OutFile qr-raw.svg
 ```
@@ -30,7 +30,7 @@ Then edit `qr-raw.svg`: set background rect to `fill:#0a0a0f` and module path to
 **With Node (if installed):**
 
 ```bash
-npx qrcode -t svg -o qr-github.svg "https://github.com/YOUR-USERNAME/vibescan"
+npx qrcode -t svg -o qr-github.svg "https://github.com/Joshober/cybersecurity-scanner"
 ```
 
 Adjust colors in the SVG to match the poster if needed.
@@ -43,5 +43,5 @@ Adjust colors in the SVG to match the poster if needed.
 
 ## Person A inputs to merge
 
-- DVNA table numbers (poster + abstract + pitch).
-- Final public GitHub URL and rule count (optional poster line).
+- **Bearer** row on the poster (optional): run and update from `results/bearer-dvna.txt`.
+- Rule count on the poster if the frozen inventory changes (optional).

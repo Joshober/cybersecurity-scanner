@@ -8,7 +8,7 @@
 
 ## Spoken script
 
-Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. On DVNA first-party code we counted **eight** adjudicated true positives versus **one** for eslint-plugin-security; **Bearer** is still on our to-run list for a same-environment scan. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
+Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. On DVNA, VibeScan detected **eight** first-party true positives across Injection, Broken Authentication, Sensitive Data, and Logging themes versus **one** for eslint-plugin-security; **Bearer** is still on our to-run list for a same-environment scan. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
 
 ---
 
@@ -22,7 +22,7 @@ Almost one in five package names that coding assistants suggest for your `packag
 ### 2. How did you evaluate it? What are your numbers?
 
 - **DVNA** (Damn Vulnerable Node Application) benchmark vs **eslint-plugin-security** and **Bearer**.
-- **Fill in:** precision/recall or counts from Person A; mention **which vulnerability classes** you measured.
+- **Eight vs one** on first-party DVNA (Injection, Broken Authentication, Sensitive Data, Logging); full adjudication in `results/dvna-evaluation.md`.
 
 ### 3. Why not just use AI to fix the security issues?
 

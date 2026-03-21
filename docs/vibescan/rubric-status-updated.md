@@ -17,13 +17,12 @@
 
 - You are **no longer at zero**: Person A produced a **DVNA preliminary benchmark** with methodology, OWASP mapping, and **manual true-positive counts** on **first-party** DVNA code only ([`results/dvna-evaluation.md`](../../results/dvna-evaluation.md)).
 - **Bearer** is still **not run** in your environment (documented in [`results/bearer-dvna.txt`](../../results/bearer-dvna.txt)) — judges who know Bearer will notice the hole; frame as *incomplete baseline*, not hidden.
-- **Poster + abstract** still show **TBD** in the DVNA table in [`vibescan-research-poster.html`](./vibescan-research-poster.html) — deliverables lag the repo; until you sync, live judges may think you have no numbers.
+- **Poster + abstract** now match **`results/dvna-evaluation.md`** (DVNA table + 8 vs 1 totals); remaining visible gap is **Bearer** still pending.
 
 ### FIX (revised)
 
-1. **Paste the real comparison into the poster and abstract**  
-   - Sound bite (first-party DVNA, TP counts from `dvna-evaluation.md`): **VibeScan 8** theme-aligned TPs across Injection (3), Broken Authentication (2), Sensitive data/crypto (2), Logging (1) vs **eslint-plugin-security 1** (Injection only).  
-   - Add one honest sentence: **Bearer TBD** (Docker/Linux repro instructions already in repo); **npm audit** is dependency-scope, not line-level app TPs — don’t conflate.
+1. **DVNA comparison** — synced in poster, abstract, and pitch; sound bite: **VibeScan 8** theme-aligned TPs across Injection (3), Broken Authentication (2), Sensitive data/crypto (2), Logging (1) vs **eslint-plugin-security 1** (Injection only).  
+   - Keep one honest sentence: **Bearer TBD** (Docker/Linux repro instructions already in repo); **npm audit** is dependency-scope, not line-level app TPs — don’t conflate.
 
 2. **Optional but powerful before Mar 27**  
    - Run Bearer once (Docker on a lab machine or WSL) and drop **Bearer TPs** into the same table — closes the biggest “incomplete” objection.
