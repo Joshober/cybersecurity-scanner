@@ -1,8 +1,7 @@
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
 import { getCalleeName } from "../../system/utils/helpers.js";
-import { ALL_SECRETS } from "./secretDict.js";
-import { isLikelyRealSecret } from "./entropy.js";
+import { ALL_SECRETS, isLikelyRealSecret } from "./secretDict.js";
 import { isJwtSignCall, getJwtSignSecretArg } from "../../system/sinks/jwtCookie.js";
 
 export const jwtWeakSecretRule: Rule = {

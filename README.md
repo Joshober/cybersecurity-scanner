@@ -1,6 +1,6 @@
-# Cybersecurity Scanner
+# VibeScan
 
-Static analysis to detect **cryptography failures** and **injection vulnerabilities** in JavaScript/TypeScript. Use it as a standalone CLI or as an ESLint plugin to defend your application before runtime.
+**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The npm package is published as `secure-code-scanner`; the CLI binaries are **`vibescan`** and **`secure`**.
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
@@ -8,48 +8,80 @@ Static analysis to detect **cryptography failures** and **injection vulnerabilit
 
 ---
 
-## Why use this tool?
-
-- **OWASP Top 10** — Cryptographic failures (A02:2021) and injection (A03:2021) are among the most critical application risks. Finding them early reduces blast radius and fix cost.
-- **Shift-left defense** — Catches risky patterns at build time or in the editor, not only in production. Fits into CI and pre-commit hooks.
-- **High-confidence, actionable output** — Reports include *why* something is risky and *how* to fix it.
-- **No runtime dependency** — Pure static analysis (plus optional AI). No agents in production; the defense runs in your pipeline.
-
----
-
-## What it detects
-
-| Category | Examples |
-|----------|----------|
-| **Crypto** | Weak hashes (MD5, SHA-1), weak/deprecated ciphers, fixed IVs, `Math.random()` for secrets, hardcoded secrets, env fallback secrets, `rejectUnauthorized: false` |
-| **Injection** | SQL/NoSQL from string concat or user input, command injection, path traversal, XSS (`innerHTML`/`document.write`), XPath injection, log injection |
-
-The engine tracks **taint flow**: when untrusted data (e.g. `req.query`, `req.body`) reaches a dangerous **sink** (e.g. `db.query`, `child_process.exec`, `fs.readFile`) without sanitization, it reports a finding. Pattern rules also flag dangerous APIs and crypto misuse.
-
----
-
-## Install
-
-From the repo (clone and build):
+## Quick start
 
 ```bash
 git clone https://github.com/Joshober/cybersecurity-scanner.git
 cd cybersecurity-scanner
 npm install
 npm run build
+npx vibescan scan ./src
+# or: npx secure scan ./src
 ```
 
 Requires **Node 18+**.
 
 ---
 
-## Build
+## Why use this tool?
+
+- **OWASP-aligned** — Focus on crypto and injection classes that drive real incidents.
+- **Shift-left** — CI, pre-commit, or ESLint integration.
+- **Actionable** — Findings include *why* and *how to fix*; several rules carry **CWE** metadata.
+- **Optional checks** — `--check-registry` for dependency names that 404 on the public npm registry; `--generate-tests` for stub security tests.
+
+---
+
+## Rule list (pattern rules + primary CWE)
+
+Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with CWE on the report where applicable.
+
+| Rule ID | CWE | Description |
+|--------|-----|-------------|
+| `crypto.hash.weak` | 327 | MD5 / SHA-1 style hashing |
+| `crypto.cipher.weak` | 327 | DES / RC4 / weak suites |
+| `crypto.cipher.deprecated` | 327 | Legacy OpenSSL APIs (`createCipher`, etc.) |
+| `crypto.cipher.fixed-iv` | 329 | Static / zero IV misuse |
+| `crypto.random.insecure` | 330 | `Math.random()` for secret material |
+| `crypto.secrets.hardcoded` | 798 | Hardcoded secret literals |
+| `SEC-004` | 547 | Weak `process.env.X \|\| 'literal'` fallback |
+| `crypto.jwt.weak-secret-literal` | 347 | JWT signed with guessable secret |
+| `crypto.tls.reject-unauthorized` | 295 | `rejectUnauthorized: false` |
+| `injection.eval` | 94 | `eval` / `new Function` |
+| `injection.sql.string-concat` | 89 | SQL via string concat / templates |
+| `injection.command` | 78 | Shell command construction |
+| `injection.path-traversal` | 22 | User-influenced file paths |
+| `injection.xss` | 79 | `innerHTML` / `document.write` with dynamic data |
+| `injection.noql` | 943 | NoSQL injection patterns |
+| `injection.xpath` | 643 | XPath injection |
+| `injection.log` | 117 | Log injection via unsanitized input |
+| `mw.cookie.missing-flags` | 614 | Session cookies missing `HttpOnly` / `Secure` |
+| `SSRF-003` | 918 | `ip.isPublic` / `ip.isPrivate` gating outbound HTTP |
+| `RULE-SSRF-002` | 918 | axios `baseURL` + user-controlled URL risk |
+
+**Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.
+
+---
+
+## Usage (CLI)
 
 ```bash
-npm run build
+npx vibescan scan .
+npx vibescan scan src --rules injection,crypto
+npx vibescan scan . --format human --fix-suggestions
+npx vibescan scan . --check-registry
+npx vibescan scan . --check-registry --skip-registry   # offline: skip HEAD requests
+npx vibescan scan . --generate-tests ./generated-security-tests
 ```
 
-Output is in `dist/`. The package entry is `dist/system/index.js`.
+| Option | Description |
+|--------|-------------|
+| `--mode static` \| `ai` | Static rules (default) or LLM-assisted analysis |
+| `--rules crypto,injection` | Rule categories |
+| `--severity critical\|error\|warning\|info` | Floor for reported findings |
+| `--format human\|compact\|json` | Output |
+| `--check-registry` | HEAD `registry.npmjs.org` for missing deps (SLOP-001) |
+| `--project-root <dir>` | Resolve `package.json` for registry check |
 
 ---
 
@@ -57,54 +89,22 @@ Output is in `dist/`. The package entry is `dist/system/index.js`.
 
 ```bash
 npm run test
-```
-
-Runs `npm run build` then the unit test suite. For faster iteration when `dist/` is up to date:
-
-```bash
-npm run test:only
+npm run test:only   # if `dist/` is already built
 ```
 
 ---
 
-## Usage
+## DVNA evaluation (research)
 
-### CLI
+Benchmark outputs and comparison table live under [`results/`](results/): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/person-b-handoff.md`](results/person-b-handoff.md).
 
-Run the scanner on paths (files or directories):
+---
 
-```bash
-npx secure scan .
-npx secure scan src --rules injection,crypto
-npx secure scan . --format human --fix-suggestions
-```
+## ESLint plugin
 
-Or use the binary after install:
-
-```bash
-./node_modules/.bin/secure scan .
-```
-
-**Options:**
-
-| Option | Description |
-|--------|-------------|
-| `--mode static` | Rule-based AST checks (default). |
-| `--mode ai` | Send code to an LLM for additional analysis (requires API key). |
-| `--rules crypto,injection` | Enable rule categories (default: both). |
-| `--no-crypto` | Disable cryptography rules. |
-| `--no-injection` | Disable injection rules. |
-| `--severity <level>` | Only report this and above: `critical`, `error`, `warning`, `info`. |
-| `--format human \| compact \| json` | Output format. `human` includes Why + Fix. |
-| `--fix-suggestions` | Include fix guidance in output. |
-| `--ai-api-url`, `--ai-api-key`, `--ai-model` | AI mode (or set `SECURE_AI_API_URL`, `SECURE_AI_API_KEY`). |
-
-### ESLint plugin
-
-Use the same rules inside ESLint:
+Same rules can run inside ESLint (rule IDs match `SEC-004`, `SSRF-003`, `crypto.*`, `injection.*`, etc.):
 
 ```javascript
-// eslint.config.js (or .eslintrc)
 import eslintPluginSecureCodeScanner from "secure-code-scanner";
 
 export default [
@@ -112,7 +112,10 @@ export default [
     plugins: { "secure-code-scanner": eslintPluginSecureCodeScanner },
     rules: {
       ...Object.fromEntries(
-        Object.keys(eslintPluginSecureCodeScanner.rules).map((id) => [`secure-code-scanner/${id}`, "error"])
+        Object.keys(eslintPluginSecureCodeScanner.rules).map((id) => [
+          `secure-code-scanner/${id}`,
+          "error",
+        ])
       ),
     },
   },
@@ -125,50 +128,18 @@ export default [
 
 ```
 src/
-├── attacks/           # Rule definitions by category
-│   ├── crypto/        # Hashing, ciphers, secrets, TLS
-│   ├── injection/     # SQL, command, NoSQL, XPath, log
-│   ├── browser/       # XSS
-│   ├── file/          # Path traversal
-│   └── index.ts
-└── system/            # Engine, CLI, and shared code
-    ├── ai/            # Optional LLM-based analysis
-    ├── cli/           # secure scan CLI
-    ├── engine/        # Rule engine + taint engine
-    ├── parser/        # AST parsing
-    ├── sanitizers/    # SQL, path, HTML
-    ├── sinks/         # SQL, command, path, XPath, log
-    ├── sources/       # Express, env
-    ├── utils/        # Helpers, rule types
-    ├── types.ts
-    ├── scanner.ts
-    ├── format.ts
-    ├── eslint-plugin.ts
-    └── index.ts       # Package entry
-
+├── attacks/           # Rule definitions (crypto, injection, browser, file)
+└── system/            # Engine, CLI, parser, taint, format, optional AI
 tests/
-├── fixtures/          # Per-category test fixtures (safe/vulnerable)
-├── unit/
-└── helpers.mjs
+├── fixtures/
+└── unit/
 ```
-
----
-
-## How to defend your application
-
-1. **CI** — Add `npx secure scan .` to your build or a security job. Fail on `critical` or `error` findings.
-2. **Pre-commit** — Run the scanner on staged files.
-3. **ESLint** — Use the plugin so developers see findings in the editor and in lint CI.
-4. **Severity** — Use `--severity error` or `--severity critical` to focus on high-impact issues.
-5. **Fix guidance** — Use `--format human` or `--fix-suggestions` for remediation steps.
 
 ---
 
 ## Scope and limitations
 
-- **High-confidence detection** — Tuned to report likely real issues with explanations and fix guidance. It does not find every vulnerability or prove code is safe.
-- **JavaScript/TypeScript** — Targets JS/TS source. Other languages or minified output are out of scope.
-- **Static + optional AI** — Static analysis cannot see all runtime data or code paths; AI mode depends on the configured model. Use as one layer in a broader defense strategy.
+Static analysis cannot prove security; it surfaces high-likelihood patterns. Optional AI mode depends on the configured model. Use as one layer alongside review, tests, and dependency scanning.
 
 ---
 

@@ -1,0 +1,504 @@
+﻿
+C:\Users\Josh\Downloads\CyberSecurity\dvna\core\appHandler.js
+  39:2  warning  Found child_process.exec() with non Literal first argument  security/detect-child-process
+
+C:\Users\Josh\Downloads\CyberSecurity\dvna\models\index.js
+  48:22  warning  Generic Object Injection Sink  security/detect-object-injection
+  49:5   warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Josh\Downloads\CyberSecurity\dvna\public\assets\jquery-3.2.1.min.js
+  2:882    warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1323   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1559   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1665   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1692   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1699   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1827   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:1862   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:2720   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:2727   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:2770   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:2777   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:3106   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:3201   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:3223   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:3311   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:3360   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:3474   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:4298   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:7028   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:7046   warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:7372   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:7594   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:8340   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:8348   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:8355   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:8360   warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:11554  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  2:11590  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  2:12545  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:12552  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:12573  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:12578  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:12584  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:12596  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:13556  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:13595  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:14873  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  2:15681  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:15833  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:15840  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:15887  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:15928  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:15960  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16014  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16052  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16059  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16106  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16160  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16247  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16254  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16299  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16391  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16478  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16617  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:16623  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16630  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16635  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16749  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16822  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16830  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:16837  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:18785  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:18833  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19220  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19235  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19245  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:19439  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19573  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19673  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19733  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19764  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19771  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19850  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19869  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:19915  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20033  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:20124  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:20215  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20308  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20328  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20553  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20563  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20573  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20633  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20647  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20696  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20715  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20726  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:20733  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21103  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21149  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21171  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21185  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21223  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21638  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21858  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21864  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:21871  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:22104  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:22110  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:22565  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:22603  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:23525  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:23839  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:24878  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:24947  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:25629  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:25638  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:25646  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:25664  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:26099  warning  Function Call Object Injection Sink               security/detect-object-injection
+  2:26228  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:26766  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:27531  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:27667  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:27826  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:28012  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:31169  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:31179  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:31333  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:31339  warning  Generic Object Injection Sink                     security/detect-object-injection
+  2:31379  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:326    warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:482    warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:500    warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:509    warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:968    warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:1397   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:2361   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:2370   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:2437   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:3927   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:4063   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:4332   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4337   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4348   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4359   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4394   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4405   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4538   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4565   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4877   warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:5009   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5079   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5128   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5158   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5216   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5242   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5299   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5306   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5325   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6262   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:6290   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:6434   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6606   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:7710   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:8427   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:8483   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:8543   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:8715   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:8725   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:8942   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9123   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:9178   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9238   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9255   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:9336   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9623   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9664   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9920   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9925   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:10708  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:10739  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:10746  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:10820  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11158  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:13583  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14139  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:14929  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14965  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:14965  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:15647  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:15722  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:15935  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:16360  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:16365  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:16433  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:16438  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:16591  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:16659  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:17673  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:18107  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:18538  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:18634  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:18636  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:18715  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:19808  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20459  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20505  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:20532  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20763  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20816  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20864  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20908  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:20956  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:21129  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:21717  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:21732  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:21800  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:21923  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22005  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22084  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22187  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22202  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22300  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22407  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:22734  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23151  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23160  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23361  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23375  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:23725  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25211  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25314  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25387  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25791  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25818  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25892  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25911  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25919  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26705  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:26721  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26742  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26850  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26857  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26890  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26909  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26923  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26931  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:26983  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27008  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27013  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27018  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27031  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27280  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27639  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27787  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27948  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:28530  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:28535  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:28550  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:28569  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29731  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29737  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29750  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:29772  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29778  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29803  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:29829  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29856  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:29873  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30170  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30188  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30205  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30255  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30261  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30274  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30370  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:30378  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30661  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30803  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:30813  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:31097  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:425    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:444    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:505    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:511    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:543    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:762    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:891    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:909    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:978    warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:1023   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4067   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4286   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:5105   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  4:5240   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:5644   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:5837   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:5863   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:5872   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:5903   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:5939   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:6459   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:6780   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:7646   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:7923   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:8896   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:8901   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:8924   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:8929   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9014   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9029   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9096   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9274   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9281   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9282   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9303   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9506   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9512   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9678   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9794   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9833   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:9857   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:10099  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:10104  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:11573  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:11730  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:11736  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:11741  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:12746  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:12804  warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:12823  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:12869  warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:13186  warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:13792  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:13847  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:14418  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:15930  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:15935  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:16124  warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:17576  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:17927  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:17932  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:18126  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:18131  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:18210  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:18217  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:19357  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:20968  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21096  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21101  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21161  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21231  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21311  warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:21458  warning  Generic Object Injection Sink                     security/detect-object-injection
+
+C:\Users\Josh\Downloads\CyberSecurity\dvna\public\assets\showdown.min.js
+  3:2950   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:2955   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:3192   warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:4247   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4405   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:4623   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:5834   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5930   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:5987   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6211   warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:6257   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6262   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6389   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6562   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6620   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6882   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:6992   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:7103   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:8013   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:8162   warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:8451   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:8575   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:8620   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:9070   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9092   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9121   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9138   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9162   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9178   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9201   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9218   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9524   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9546   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9575   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9592   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9616   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9632   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9655   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9672   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:9712   warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11118  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11315  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:11358  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:11473  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11618  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11647  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:11679  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:11688  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11734  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11749  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11787  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:11787  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:11977  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12006  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:12038  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:12428  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12437  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12498  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:12639  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12644  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12817  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12822  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12948  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:12971  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:12971  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14082  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14124  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14349  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:14395  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14400  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14543  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:14567  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14577  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:14897  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:15025  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:15048  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:15080  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:15098  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:15457  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:15530  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:15638  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:16376  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:16479  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:18147  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:18769  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:21087  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:23347  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  3:23369  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23398  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:23422  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:24619  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  3:24702  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:25688  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25716  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:25738  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27026  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:27069  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:27113  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:27360  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:27517  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:27534  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27560  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:27570  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27597  warning  Function Call Object Injection Sink               security/detect-object-injection
+  3:27607  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:27620  warning  Generic Object Injection Sink                     security/detect-object-injection
+  3:28137  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:28292  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:28427  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:30324  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  3:30518  warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  4:922    warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  4:1117   warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  4:1191   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:1236   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:1264   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:1409   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:1689   warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  4:2870   warning  Unsafe Regular Expression                         security/detect-unsafe-regex
+  4:3110   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:3174   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:3244   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:3877   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:3973   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:3973   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4375   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4383   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4388   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4435   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4443   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4448   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4654   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4674   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4787   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4838   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4846   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4864   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4869   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4953   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4953   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4971   warning  Function Call Object Injection Sink               security/detect-object-injection
+  4:4971   warning  Generic Object Injection Sink                     security/detect-object-injection
+  4:4979   warning  Function Call Object Injection Sink               security/detect-object-injection
+
+Γ£û 493 problems (0 errors, 493 warnings)
+

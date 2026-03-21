@@ -17,6 +17,8 @@ export interface ReportOptions {
 export interface RuleContext {
   report(node: Node, options?: ReportOptions): void;
   getSource(node: Node): string | undefined;
+  /** ESTree parent; set by the rule engine for rules that need ancestor context. */
+  getParent(node: Node): Node | null;
 }
 
 export interface Rule {

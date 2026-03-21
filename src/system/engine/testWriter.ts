@@ -28,13 +28,33 @@ export function generateTests(findings: Finding[], outputDir: string): string[] 
       body = `${header(f)}
 import { test } from 'node:test';
 import assert from 'node:assert';
+// npm i -D supertest @types/supertest  (optional — swap request() for fetch to your API)
+// import request from 'supertest';
+// import { app } from '../src/app.js';
 
-test('prototype pollution oracle for ${f.ruleId}', async () => {
+test('RULE-PROTO-001: no prototype pollution on POST /endpoint (chain oracle)', async () => {
   const before = Object.getOwnPropertyNames(Object.prototype);
-  // TODO: import app and POST payload — wire to your server entry
-  // await request(app).post('/endpoint').send({"__proto__": {"x": 1}});
-  assert.deepStrictEqual(Object.getOwnPropertyNames(Object.prototype), before);
-  assert.strictEqual(({} as { x?: unknown }).x, undefined);
+  // await request(app)
+  //   .post('/endpoint')
+  //   .send({ '__proto__': { 'polluted': true } });
+  const after = Object.getOwnPropertyNames(Object.prototype);
+  assert.deepStrictEqual(after, before);
+  assert.strictEqual(({}).polluted, undefined);
+});
+`;
+    } else if (f.ruleId.includes("PROTO") && f.message.toLowerCase().includes("path")) {
+      body = `${header(f)}
+import { test } from 'node:test';
+import assert from 'node:assert';
+// Path-based pollution (e.g. lodash _.set, deep merge) — use PROTO_PATH_PAYLOADS from 'vibescan/attacks/injection/prototypePollution'
+// import { PROTO_PATH_PAYLOADS } from '<your-path-to-vibescan>/src/attacks/injection/prototypePollution.js';
+
+test('RULE-PROTO-002: path key does not pollute prototype (chain oracle)', async () => {
+  const before = Object.getOwnPropertyNames(Object.prototype);
+  // await request(app).post('/endpoint').send({ 'constructor.prototype.polluted': true });
+  const after = Object.getOwnPropertyNames(Object.prototype);
+  assert.deepStrictEqual(after, before);
+  assert.strictEqual(({}).polluted, undefined);
 });
 `;
     } else if (f.ruleId === "crypto.jwt.weak-secret-literal" || f.ruleId.includes("JWT")) {

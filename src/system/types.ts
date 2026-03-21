@@ -61,6 +61,8 @@ export interface Finding {
   source?: string;
   /** When the finding targets another file (e.g. route middleware audit). */
   filePath?: string;
+  /** npm dependency name for registry-based findings (slopsquat). */
+  packageName?: string;
 }
 
 // Scan engine: static (AST rules) or AI (LLM reads code and responds).

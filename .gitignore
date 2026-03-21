@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Local DVNA clone (benchmark); clone with: git clone https://github.com/appsecco/dvna dvna
+dvna/
+
 # Build output (push source only)
 dist/
 
