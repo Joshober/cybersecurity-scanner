@@ -11,7 +11,7 @@ Copy sections into spreadsheets or the paper appendix. Definitions should match 
 | Scanner repo commit | |
 | Benchmark app + commit | |
 | Node version | |
-| `secure-code-scanner` version | |
+| `vibescan` version | |
 | ESLint version | |
 | eslint-plugin-security version | |
 | npm audit (npm CLI) version | |

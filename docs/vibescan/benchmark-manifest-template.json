@@ -15,7 +15,7 @@
     "node": "",
     "npm": "",
     "secureCodeScanner": "",
-    "vibescanCli": "same as secure-code-scanner package",
+    "vibescanCli": "same as vibescan package",
     "eslint": "",
     "eslintPluginSecurity": "",
     "bearer": "",

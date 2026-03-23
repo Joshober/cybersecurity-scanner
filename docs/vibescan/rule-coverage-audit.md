@@ -1,6 +1,6 @@
 # VibeScan — rule coverage audit (tests, fixtures, docs, benchmarks)
 
-**Scope:** Rules and project-level checks that **actually run** in static mode, as wired in [`src/attacks/index.ts`](../../src/attacks/index.ts), [`src/system/scanner.ts`](../../src/system/scanner.ts), and engine audits under [`src/system/engine/`](../../src/system/engine/).
+**Scope:** Rules and project-level checks that **actually run** in static mode, as wired in [`vibescan/src/attacks/index.ts`](../../vibescan/src/attacks/index.ts), [`vibescan/src/system/scanner.ts`](../../vibescan/src/system/scanner.ts), and engine audits under [`vibescan/src/system/engine/`](../../vibescan/src/system/engine/).
 **Date:** 2025-03-20 (repo snapshot).
 
 ## Legend
@@ -64,9 +64,9 @@
 
 | Artifact | Status |
 |----------|--------|
-| [`prototypePollution.ts`](../../src/attacks/injection/prototypePollution.ts) | Present in tree; **not** exported from `attacks/index.ts` — not part of default scan. |
-| [`jwt-weak-test.ts`](../../src/attacks/crypto/jwt-weak-test.ts) | Built to `dist/`; **not** registered in `attacks/index.ts`. |
-| [`entropy.ts`](../../src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
+| [`prototypePollution.ts`](../../vibescan/src/attacks/injection/prototypePollution.ts) | Present in tree; **not** exported from `attacks/index.ts` — not part of default scan. |
+| [`jwt-weak-test.ts`](../../vibescan/src/attacks/crypto/jwt-weak-test.ts) | Built to `dist/`; **not** registered in `attacks/index.ts`. |
+| [`entropy.ts`](../../vibescan/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
 
 ## README documentation summary
 

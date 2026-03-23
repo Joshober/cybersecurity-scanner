@@ -3,7 +3,7 @@
 - `RUN_ID`: `2026-03-23_seeded_vibescan_v1.0.0+04e93ca`
 - Corpus: `benchmarks/seeded` (2 files)
 - Command:
-  - `node dist/system/cli/index.js scan benchmarks/seeded --format json --project-root benchmarks/seeded --exclude-vendor --benchmark-metadata --export-adjudication vibescan-adjudication`
+  - `node vibescan/dist/system/cli/index.js scan benchmarks/seeded --format json --project-root benchmarks/seeded --exclude-vendor --benchmark-metadata --export-adjudication vibescan-adjudication`
 - VibeScan exit code: `1` (non-zero because at least one finding had severity `error`)
 - Findings emitted:
   - `crypto.hash.weak` in `benchmarks/seeded/crypto/pos-weak-hash.js`

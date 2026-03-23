@@ -20,7 +20,7 @@ Constraints: **no change to core detection logic** unless unavoidable; focus on 
 **Smallest fix:**
 
 - Extend `formatProjectJson` (behind `--benchmark-metadata` or include when env `VIBESCAN_BENCHMARK=1`) with a top-level `run` object: `toolVersion` from `package.json`, `scanOptions` echo, `timestamp` ISO.
-- **Version source:** read `version` from `secure-code-scanner/package.json` at build time (tsc could inject via `define` — slightly more work) or read at runtime via `readFileSync` near CLI — **small CLI-only change**.
+- **Version source:** read `version` from `vibescan/package.json` at build time (tsc could inject via `define` — slightly more work) or read at runtime via `readFileSync` near CLI — **small CLI-only change**.
 
 **Effort:** Low–medium; **behavior:** unchanged for detection.
 
@@ -37,7 +37,7 @@ Constraints: **no change to core detection logic** unless unavoidable; focus on 
 
 ## 4. Exclude vendor / minified files (flag)
 
-**Issue:** CLI globs `**/*.{js,ts,mjs,cjs}` under a directory ([`cli/index.ts`](../../src/system/cli/index.ts)), which can pull in minified bundles and skew counts.
+**Issue:** CLI globs `**/*.{js,ts,mjs,cjs}` under a directory ([`cli/index.ts`](../../vibescan/src/system/cli/index.ts)), which can pull in minified bundles and skew counts.
 
 **Smallest fix:**
 

@@ -9,7 +9,7 @@
 ## Phase 1 — Freeze the protocol (before writing final numbers)
 
 - [ ] Record DVNA **URL + commit** in manifest.
-- [ ] Record **scanner repo commit** and `secure-code-scanner` version.
+- [ ] Record **scanner repo commit** and `vibescan` version.
 - [ ] Define **in-scope paths** (e.g. exclude `node_modules/`, tests if agreed).
 - [ ] Save raw outputs: VibeScan JSON, ESLint JSON, `npm audit --json`, optional Bearer.
 

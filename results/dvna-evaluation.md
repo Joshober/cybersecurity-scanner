@@ -5,7 +5,7 @@ This file reports a **preliminary and incomplete** benchmark pass. It must not b
 ## Benchmark setup (current state)
 
 - **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`).
-- **VibeScan run:** `npm run build` then `node dist/system/cli/index.js scan ./dvna --format json --exclude-vendor --benchmark-metadata` (or `.\benchmarks\scripts\run-vibescan-dvna.ps1` / `./benchmarks/scripts/run-vibescan-dvna.sh` when DVNA is present) -> [`vibescan-dvna.txt`](./vibescan-dvna.txt).
+- **VibeScan run:** `npm run build -w vibescan` then `node vibescan/dist/system/cli/index.js scan ./dvna --format json --exclude-vendor --benchmark-metadata` (or `.\benchmarks\scripts\run-vibescan-dvna.ps1` / `./benchmarks/scripts/run-vibescan-dvna.sh` when DVNA is present) -> [`vibescan-dvna.txt`](./vibescan-dvna.txt).
 - **eslint-plugin-security run:** `npx eslint -c results/eslint-dvna.eslintrc.cjs "dvna/**/*.js"` -> [`eslint-dvna.txt`](./eslint-dvna.txt).
 - **Bearer:** **not run in this environment**; see [`bearer-dvna.txt`](./bearer-dvna.txt) and [`../benchmarks/scripts/README.md`](../benchmarks/scripts/README.md) for Docker/scripts when the daemon is available.
 - **npm audit:** `npm install --package-lock-only --ignore-scripts` in `dvna/`, then `npm audit` -> [`npm-audit-dvna.txt`](./npm-audit-dvna.txt).

@@ -38,7 +38,7 @@ Avoid sounding like: “another static analyzer.” Sound like: **deliberate thr
 ## Contribution bullets (research-style)
 
 1. **Rule set / method** — OWASP-aligned crypto + injection rules, taint-style flows, Express route graph, optional registry verification (SLOP-001), optional generated tests.  
-2. **Artifact** — Open prototype (`secure-code-scanner` / `vibescan` CLI) with reproducible build and scan commands.  
+2. **Artifact** — Open prototype (`vibescan` npm package / `vibescan` CLI) with reproducible build and scan commands.  
 3. **Evaluation** — Labeled comparison on **DVNA** vs baseline(s); methodology and logs in `results/` (extend with a **small labeled AI-generated benchmark** if time).  
 4. **Finding** — Your **headline numbers** (e.g. 8 vs 1 on adjudicated DVNA themes)—not the 10.5% / 19.7% literature figures.
 

@@ -10,9 +10,9 @@ Run from repo root on that branch:
 
 ```bash
 npm install
-npm run build
-npm test
-npx vibescan scan ./src --format compact
+npm run build -w vibescan
+npm test -w vibescan
+npx vibescan scan ./vibescan/src --format compact
 npx secure-arch check --root . --code-evidence js-ts
 ```
 
@@ -34,7 +34,7 @@ Document results in the PR that proposes merging layout changes. If any command 
 
 ### Slice 3 — Scanner package path / workspace layout
 
-- Moving `secure-code-scanner` or changing workspace names **only after** benchmarks and `reproducible-runs.md` are updated so **historical commands** still work or are clearly versioned in the manifest.
+- Moving `vibescan` or changing workspace names **only after** benchmarks and `reproducible-runs.md` are updated so **historical commands** still work or are clearly versioned in the manifest.
 
 ### Slice 4 — Root identity / monorepo branding
 

@@ -83,7 +83,7 @@ Each folder **must** include a completed **`manifest.json`** (from [`benchmark-m
 
 **Purpose:** Thin wrappers that:
 
-1. Record versions (`node -v`, `npm ls secure-code-scanner`, global CLIs).
+1. Record versions (`node -v`, `npm ls vibescan`, global CLIs).
 2. Invoke VibeScan, ESLint, `npm audit`, Bearer as in [`reproducible-runs.md`](./reproducible-runs.md).
 3. Write outputs under `benchmarks/results/<run-id>/`.
 

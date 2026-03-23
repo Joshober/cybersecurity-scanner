@@ -58,7 +58,7 @@ for (const rule of allRules) {
 
 const plugin: ESLint.Plugin = {
   meta: {
-    name: "secure-code-scanner",
+    name: "vibescan",
     version: "1.0.0",
   },
   rules,
