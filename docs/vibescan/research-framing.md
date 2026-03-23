@@ -11,8 +11,8 @@ Motivation numbers from SusVibes, Spracklen, BaxBench, etc. **support the proble
 |----------|----------------------------------|
 | **What is the research question?** | Poster title block + abstract **first** sentence (see below). |
 | **What is new here?** | One **novelty sentence** + contribution bullets (not a feature list alone). |
-| **How did you test it?** | **Dataset** (DVNA + any AI-generated benchmark), **ground truth** (manual labels), **procedure** (same machine, same commands—`results/`). |
-| **Why trust the numbers?** | Adjudication method in `results/dvna-evaluation.md`; separate **prior work** from **your** TP/FP/FN counts. |
+| **How did you test it?** | **Dataset** (DVNA + any AI-generated benchmark), **ground truth** (manual labels), **procedure** (same machine, same commands—`benchmarks/results/`). |
+| **Why trust the numbers?** | Adjudication method in `benchmarks/results/legacy/dvna-evaluation.md`; separate **prior work** from **your** TP/FP/FN counts. |
 | **Compared to what?** | Baseline table: at minimum eslint-plugin-security; **remove Bearer row** or label **“not run—N/A”** so the table is honest. |
 
 ---
@@ -39,7 +39,7 @@ Avoid sounding like: “another static analyzer.” Sound like: **deliberate thr
 
 1. **Rule set / method** — OWASP-aligned crypto + injection rules, taint-style flows, Express route graph, optional registry verification (SLOP-001), optional generated tests.  
 2. **Artifact** — Open prototype (`vibescan` npm package / `vibescan` CLI) with reproducible build and scan commands.  
-3. **Evaluation** — Labeled comparison on **DVNA** vs baseline(s); methodology and logs in `results/` (extend with a **small labeled AI-generated benchmark** if time).  
+3. **Evaluation** — Labeled comparison on **DVNA** vs baseline(s); methodology and logs under `benchmarks/results/` (extend with a **small labeled AI-generated benchmark** if time).  
 4. **Finding** — Your **headline numbers** (e.g. 8 vs 1 on adjudicated DVNA themes)—not the 10.5% / 19.7% literature figures.
 
 ---
@@ -73,9 +73,9 @@ Avoid sounding like: “another static analyzer.” Sound like: **deliberate thr
 |---|-------------|------------------|
 | A | **Benchmark appendix** — list samples + labels | Start from DVNA + add rows in a spreadsheet; optional `docs/vibescan/benchmark-appendix.md` |
 | B | **Rule ↔ source matrix** — rule ID, CWE/OWASP, rationale, example | Extend `README.md` table + one line per rule |
-| C | **Baseline comparison table** | `results/dvna-evaluation.md` + poster; **complete or drop** Bearer |
+| C | **Baseline comparison table** | `benchmarks/results/legacy/dvna-evaluation.md` + poster; **complete or drop** Bearer |
 | D | **TP / FP / FN** (by category if possible) | Add a small confusion summary once labels exist |
-| E | **Reproducibility** — repo, Node version, commands | `README.md` + `results/` raw logs |
+| E | **Reproducibility** — repo, Node version, commands | `README.md` + `benchmarks/results/` raw logs |
 | F | **Limitations** — static only, Node-focused, heuristic rules, small *n* | Poster box; increases trust |
 
 ---

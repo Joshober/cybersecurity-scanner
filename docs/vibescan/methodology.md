@@ -6,7 +6,7 @@ Evaluate whether VibeScan's implemented static-analysis pipeline (AST rules, tai
 
 ## Benchmark targets
 
-1. **Primary benchmark (current):** DVNA (`appsecco/dvna`) using the protocol documented in `results/dvna-evaluation.md`.
+1. **Primary benchmark (current):** DVNA (`appsecco/dvna`) using the protocol documented in `benchmarks/results/legacy/dvna-evaluation.md`.
 2. **Secondary benchmark (planned):** seeded Node/Express micro-cases defined in `docs/vibescan/seeded-benchmark-plan.md`.
 
 ## Tool baselines
@@ -28,7 +28,7 @@ Evaluate whether VibeScan's implemented static-analysis pipeline (AST rules, tai
   - eslint version
   - eslint-plugin-security version
   - Bearer version (when run)
-- Store exact command lines and raw outputs under `results/`.
+- Store exact command lines and raw outputs under `benchmarks/results/<run-id>/` (or `benchmarks/results/legacy/` for the historical DVNA bundle).
 - Store adjudication sheet (CSV/Markdown) linking each counted TP/FP/FN to source evidence.
 
 ## Inclusion and exclusion criteria
@@ -63,7 +63,7 @@ Notes:
    - Pass B: independent verification by reviewer 2 (or delayed second pass by same reviewer with blinded prior labels if team size constrained).
 4. Resolve disagreements with written rationale and final consensus label.
 5. Keep unresolved items separate from headline TP/FP/FN counts.
-6. Archive adjudication artifacts in `results/` for traceability.
+6. Archive adjudication artifacts under `benchmarks/results/` for traceability.
 
 ## Metrics to report
 

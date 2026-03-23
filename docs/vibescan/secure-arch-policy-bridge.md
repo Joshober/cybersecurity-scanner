@@ -1,6 +1,6 @@
-# VibeScan ↔ secure-arch policy bridge (design)
+# VibeScan ↔ secure-arch policy bridge
 
-This document proposes a small **policy file** that states architectural security expectations, and maps them to **VibeScan rule IDs** so CI can fail when code violates declared policy.
+This workflow uses a small **policy file** that states architectural security expectations, maps them to **VibeScan rule IDs**, and fails CI when code violates those expectations.
 
 ## Policy schema (JSON or YAML)
 
@@ -26,21 +26,36 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
 | `authRequiredOnAdminRoutes` | `AUTH-004` | Admin/mod-style paths without auth middleware |
 | `rateLimitRequiredOnSensitiveRoutes` | `MW-002` | Login, webhooks, upload, auth-like paths |
 | `webhookSignatureVerificationRequired` | `WEBHOOK-001` | Heuristic; false negatives if verification lives in another module |
-| `publicDatabaseDisallowed` | *(gap)* | Add future rule for public Mongo/Redis URLs |
-| `strongSecretsRequired` | `SEC-004`, `crypto.secrets.hardcoded`, `crypto.jwt.weak-secret-literal`, … | Several crypto rules |
+| `publicDatabaseDisallowed` | `ARCH-DB-001` | Reserved for secure-arch correlated findings when present in scan payload |
+| `strongSecretsRequired` | `SEC-004`, `crypto.secrets.hardcoded`, `crypto.jwt.weak-secret-literal`, `crypto.jwt.weak-secret-verify`, … | Several crypto rules |
 | `loggingRequiredOnSensitiveActions` | *(gap)* | Needs taint/route bridge |
 | `corsWildcardDisallowed` | `MW-004` | `cors({ origin: '*' })` |
 
-## Evaluation algorithm
+## Production usage
 
-1. Run `vibescan scan` with `--format json` (or consume `findings[]` from project JSON).
-2. Load policy document.
-3. For each policy key that is `true`, collect mapped rule IDs. Any finding whose `ruleId` is in that set is a **policy violation**.
-4. Exit non-zero if any violation exists (or emit SARIF / adjudication CSV for review).
+1. Run `vibescan scan` with JSON output:
+
+   ```bash
+   node vibescan/dist/system/cli/index.js scan ./src --format json > scan.json
+   ```
+
+2. Evaluate with explicit policy:
+
+   ```bash
+   node vibescan/scripts/policy-eval.mjs docs/samples/policy.sample.json scan.json
+   ```
+
+3. Or derive policy flags from secure-arch settings:
+
+   ```bash
+   node vibescan/scripts/policy-eval.mjs --from-settings architecture/secure-rules/settings.global.yaml scan.json
+   ```
+
+4. The script exits non-zero when violations are present and prints totals + per-policy counts.
 
 ## Relation to secure-arch YAML
 
-[`packages/secure-arch-core`](../../packages/secure-arch-core/) loads `architecture/secure-rules/*.yaml` into **ArchitectureFacts**. A future step is to **generate** the JSON policy above from those facts (or merge both in one CI job). This repo keeps the PoC as **standalone JSON** so it runs without building secure-arch.
+[`packages/secure-arch-core`](../../packages/secure-arch-core/) loads `architecture/secure-rules/*.yaml` into **ArchitectureFacts**. The policy evaluator now supports `--from-settings` to derive policy booleans directly from secure-arch settings, so teams can reuse one source of truth in CI.
 
 ## Limitations
 

@@ -13,6 +13,6 @@ Small snippets for regression and per-rule smoke checks. Expand over time; map f
 node vibescan/dist/system/cli/index.js scan benchmarks/seeded --format json --exclude-vendor
 ```
 
-and adjudicate findings in [`../results/`](../results/) or a dated run folder.
+and adjudicate findings in a dated folder under [`../results/`](../results/) (see [`../results/README.md`](../results/README.md)).
 
 Full fixtures also live under [`../../vibescan/tests/fixtures/`](../../vibescan/tests/fixtures/).

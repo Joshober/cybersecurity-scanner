@@ -60,14 +60,7 @@
 
 **Structured output:** project JSON includes `routeInventory` (per-route `sensitivePath`, `adminPath`, `objectScoped`, `hasAuthMiddleware`). SARIF run `properties` may include `vibescanRouteInventory`, `vibescanOpenApiSpecsUsed`, `vibescanBuildId` when present.
 
-## Optional / non-registered source (not in active rule list)
-
-| Artifact | Status |
-|----------|--------|
-| [`prototypePollution.ts`](../../vibescan/src/attacks/injection/prototypePollution.ts) | Present in tree; **not** exported from `attacks/index.ts` — not part of default scan. |
-| [`jwt-weak-test.ts`](../../vibescan/src/attacks/crypto/jwt-weak-test.ts) | Built to `dist/`; **not** registered in `attacks/index.ts`. |
-| [`entropy.ts`](../../vibescan/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
-
+## Additional source notes`r`n`r`n| Artifact | Status |`r`n|----------|--------|`r`n| [`prototypePollution.ts`](../../vibescan/src/attacks/injection/prototypePollution.ts) | Registered as `RULE-PROTO-001` in default scan. |`r`n| [`jwt-weak-test.ts`](../../vibescan/src/attacks/crypto/jwt-weak-test.ts) | Registered as `crypto.jwt.weak-secret-verify` in default scan. |`r`n| [`entropy.ts`](../../vibescan/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |`r`n
 ## README documentation summary
 
 - **Package README** ([`README.md`](../../README.md)): minimal — points to root README and build/scan commands.
@@ -96,5 +89,6 @@ Committed fixtures under `tests/fixtures/` include `crypto-safe/`, `disabled-tls
 3. Standardize **outputs** using [`reproducible-runs.md`](./reproducible-runs.md) and [`benchmark-manifest-template.json`](./benchmark-manifest-template.json).
 4. Track **ground truth** with [`adjudication-template.md`](./adjudication-template.md).
 5. Optionally implement **JSON summary** hooks described in [`output-support-audit.md`](./output-support-audit.md) and [`eval-support-changes.md`](./eval-support-changes.md).
-6. Add **Snyk Code** (`snyk code test`) as a documented SAST baseline alongside eslint; see [`results/dvna-evaluation.md`](../../results/dvna-evaluation.md).
+6. Add **Snyk Code** (`snyk code test`) as a documented SAST baseline alongside eslint; see [`benchmarks/results/legacy/dvna-evaluation.md`](../../benchmarks/results/legacy/dvna-evaluation.md).
 7. Add dedicated **unit tests** for `AUTH-005` if it becomes in-scope for the paper’s access-control claims.
+

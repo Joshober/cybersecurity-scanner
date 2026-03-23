@@ -22,7 +22,7 @@ Almost one in five package names that coding assistants suggest for your `packag
 ### 2. How did you evaluate it? What are your numbers?
 
 - **DVNA** (Damn Vulnerable Node Application) benchmark vs **eslint-plugin-security** and **Bearer**.
-- **Eight vs one** on first-party DVNA (Injection, Broken Authentication, Sensitive Data, Logging); full adjudication in `results/dvna-evaluation.md`.
+- **Eight vs one** on first-party DVNA (Injection, Broken Authentication, Sensitive Data, Logging); full adjudication in `benchmarks/results/legacy/dvna-evaluation.md`.
 
 ### 3. Why not just use AI to fix the security issues?
 

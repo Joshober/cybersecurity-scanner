@@ -1,6 +1,6 @@
 # Proposed benchmark directory layout
 
-This proposal standardizes **inputs** (vulnerable apps + synthetic seeds), **scripts** (repro runners), and **results** (timestamped raw logs + manifests) under a single `benchmarks/` tree at the repository root. It complements the existing ad hoc [`results/`](../../results/) folder used for DVNA notes and captured tool output.
+This proposal standardizes **inputs** (vulnerable apps + synthetic seeds), **scripts** (repro runners), and **results** (timestamped raw logs + manifests) under a single `benchmarks/` tree at the repository root. DVNA evaluation prose and historical tool captures live in [`benchmarks/results/legacy/`](../../benchmarks/results/legacy/).
 
 ## Goals
 
@@ -49,7 +49,7 @@ benchmarks/
   - Which paths are **in scope** for static analysis (e.g. exclude `node_modules/`, `test/`, minified vendor).
 - Prefer **git submodule** so `git clone --recurse-submodules` reproduces the benchmark; alternatively document `git clone` + `git checkout <hash>` in the manifest’s `notes`.
 
-**Relationship to legacy `results/`:** The repo already contains [`results/dvna-evaluation.md`](../../results/dvna-evaluation.md) and tool captures. When migrating, move or copy artifacts into `benchmarks/results/<run-id>/` and add a `manifest.json` retroactively.
+**Legacy DVNA bundle:** [`benchmarks/results/legacy/dvna-evaluation.md`](../../benchmarks/results/legacy/dvna-evaluation.md) plus sibling raw logs. New paper-grade runs should use `benchmarks/results/<run-id>/` with a completed `manifest.json`.
 
 ## `benchmarks/seeded/`
 

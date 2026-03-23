@@ -7,7 +7,7 @@ dvna/
 # DVNA under benchmarks layout (see benchmarks/dvna/README.md)
 benchmarks/dvna/dvna/
 
-# Build output (push source only)
+# Build output (push source only). Scanner output is vibescan/dist/; do not resurrect repo-root dist/.
 dist/
 
 # Environment and secrets

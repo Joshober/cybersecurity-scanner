@@ -41,7 +41,7 @@ Commands and folder layout: [`../vibescan/reproducible-runs.md`](../vibescan/rep
 
 | Deliverable | Location |
 |-------------|----------|
-| Raw logs | `results/` or `benchmarks/results/<run-id>/` |
+| Raw logs | `benchmarks/results/<run-id>/` (and `benchmarks/results/legacy/` for the historical DVNA bundle) |
 | Methodology prose | This file + [`methodology.md`](./methodology.md) |
 | Rule ↔ evidence | [`../vibescan/rule-coverage-audit.md`](../vibescan/rule-coverage-audit.md) |
 | Contribution boundaries | [`contribution-audit.md`](./contribution-audit.md) |

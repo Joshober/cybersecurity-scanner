@@ -1,6 +1,6 @@
 # CCSC-style rubric — **updated status** (where you are now)
 
-*Aligned with repo state: `results/dvna-evaluation.md`, `results/person-b-handoff.md`, `docs/vibescan/*` poster materials, and pushed `master`.*
+*Aligned with repo state: `benchmarks/results/legacy/dvna-evaluation.md`, `benchmarks/results/legacy/person-b-handoff.md`, `docs/vibescan/*` poster materials, and pushed `master`.*
 
 ---
 
@@ -15,9 +15,9 @@
 
 ### GAP (revised — was “zero evaluation”)
 
-- You are **no longer at zero**: Person A produced a **DVNA preliminary benchmark** with methodology, OWASP mapping, and **manual true-positive counts** on **first-party** DVNA code only ([`results/dvna-evaluation.md`](../../results/dvna-evaluation.md)).
-- **Bearer** is still **not run** in your environment (documented in [`results/bearer-dvna.txt`](../../results/bearer-dvna.txt)) — judges who know Bearer will notice the hole; frame as *incomplete baseline*, not hidden.
-- **Poster + abstract** now match **`results/dvna-evaluation.md`** (DVNA table + 8 vs 1 totals); remaining visible gap is **Bearer** still pending.
+- You are **no longer at zero**: Person A produced a **DVNA preliminary benchmark** with methodology, OWASP mapping, and **manual true-positive counts** on **first-party** DVNA code only ([`benchmarks/results/legacy/dvna-evaluation.md`](../../benchmarks/results/legacy/dvna-evaluation.md)).
+- **Bearer** is still **not run** in your environment (documented in [`benchmarks/results/legacy/bearer-dvna.txt`](../../benchmarks/results/legacy/bearer-dvna.txt)) — judges who know Bearer will notice the hole; frame as *incomplete baseline*, not hidden.
+- **Poster + abstract** now match **`benchmarks/results/legacy/dvna-evaluation.md`** (DVNA table + 8 vs 1 totals); remaining visible gap is **Bearer** still pending.
 
 ### FIX (revised)
 
@@ -66,7 +66,7 @@
 
 ### FIX (revised)
 
-1. **Sync poster DVNA table** with `results/dvna-evaluation.md` — removes cognitive dissonance (“you said you have numbers but the board says TBD”).
+1. **Sync poster DVNA table** with `benchmarks/results/legacy/dvna-evaluation.md` — removes cognitive dissonance (“you said you have numbers but the board says TBD”).
 2. **Hierarchy pass** — ensure the **hook + stat bar + four contribution titles** are the **largest** type on the sheet; consider trimming or shortening **Motivation / Approach** if you need whitespace.
 3. **Print test** — zoom to ~25–35% on a large monitor or print a draft; anything you can’t read at arm’s length, **enlarge or cut**.
 
@@ -105,4 +105,4 @@
 
 ## One-line status for teammates
 
-**Research quality:** Substance is strong; **numbers exist in `results/`** — **surface them on the poster and in the abstract before March 27** and optionally add Bearer. **Implications & artifacts:** Largely in place; **sharpen “beyond computing” in speech** and **reduce density**. **Live:** **Rehearse** with the new TP stats.
+**Research quality:** Substance is strong; **numbers exist under `benchmarks/results/legacy/`** — **surface them on the poster and in the abstract before March 27** and optionally add Bearer. **Implications & artifacts:** Largely in place; **sharpen “beyond computing” in speech** and **reduce density**. **Live:** **Rehearse** with the new TP stats.

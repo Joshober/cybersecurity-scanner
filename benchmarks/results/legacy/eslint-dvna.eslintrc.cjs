@@ -1,4 +1,4 @@
-// DVNA benchmark — from repo root: npx eslint -c results/eslint-dvna.eslintrc.cjs dvna/
+// DVNA benchmark — from repo root: npx eslint -c benchmarks/results/legacy/eslint-dvna.eslintrc.cjs dvna/
 module.exports = {
   root: true,
   env: { node: true, es2021: true },

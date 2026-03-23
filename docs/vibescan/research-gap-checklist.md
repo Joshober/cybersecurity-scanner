@@ -4,14 +4,14 @@ Use this as the master completion tracker for poster/paper-quality academic pack
 
 ## Already completed
 
-- [x] Preliminary DVNA benchmark artifacts exist in `results/`.
+- [x] Preliminary DVNA benchmark artifacts exist under `benchmarks/results/legacy/`.
 - [x] Architecture and implementation handoff document exists (`docs/REPO-HANDOFF.md`).
 - [x] Conservative research questions/hypotheses documented (`research-question.md`).
 - [x] Methodology framework documented (`methodology.md`).
 - [x] Contribution evidence audit completed (`contribution-audit.md`).
 - [x] Final evaluation and seeded benchmark plans documented (`evaluation-plan.md`, `seeded-benchmark-plan.md`).
 - [x] Fillable metrics template created (`metrics-template.md`).
-- [x] `results/dvna-evaluation.md` revised to emphasize preliminary/incomplete status.
+- [x] `benchmarks/results/legacy/dvna-evaluation.md` revised to emphasize preliminary/incomplete status.
 - [x] Abstract revised with explicit separation of motivation/implementation/measured findings/future work.
 - [x] Final paper outline prepared (`final-paper-outline.md`).
 

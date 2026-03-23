@@ -6,10 +6,10 @@ This file reports a **preliminary and incomplete** benchmark pass. It must not b
 
 - **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`).
 - **VibeScan run:** `npm run build -w vibescan` then `node vibescan/dist/system/cli/index.js scan ./dvna --format json --exclude-vendor --benchmark-metadata` (or `.\benchmarks\scripts\run-vibescan-dvna.ps1` / `./benchmarks/scripts/run-vibescan-dvna.sh` when DVNA is present) -> [`vibescan-dvna.txt`](./vibescan-dvna.txt).
-- **eslint-plugin-security run:** `npx eslint -c results/eslint-dvna.eslintrc.cjs "dvna/**/*.js"` -> [`eslint-dvna.txt`](./eslint-dvna.txt).
-- **Bearer:** **not run in this environment**; see [`bearer-dvna.txt`](./bearer-dvna.txt) and [`../benchmarks/scripts/README.md`](../benchmarks/scripts/README.md) for Docker/scripts when the daemon is available.
+- **eslint-plugin-security run:** `npx eslint -c benchmarks/results/legacy/eslint-dvna.eslintrc.cjs "dvna/**/*.js"` -> [`eslint-dvna.txt`](./eslint-dvna.txt).
+- **Bearer:** **not run in this environment**; see [`bearer-dvna.txt`](./bearer-dvna.txt) and [`../../scripts/README.md`](../../scripts/README.md) for Docker/scripts when the daemon is available.
 - **npm audit:** `npm install --package-lock-only --ignore-scripts` in `dvna/`, then `npm audit` -> [`npm-audit-dvna.txt`](./npm-audit-dvna.txt).
-- **Snyk Code:** **not run in this environment**; recommended baseline command (after `snyk auth`): `snyk code test ./dvna --json-file-output=results/snyk-code-dvna.json` — scope-aligned SAST for comparison with VibeScan’s first-party JS findings. OpenAPI drift / route inventory rules (`API-INV-*`, `routeInventory`) have **no direct Snyk equivalent** in-repo; document separately when claiming that contribution.
+- **Snyk Code:** **not run in this environment**; recommended baseline command (after `snyk auth`): `snyk code test ./dvna --json-file-output=benchmarks/results/legacy/snyk-code-dvna.json` — scope-aligned SAST for comparison with VibeScan’s first-party JS findings. OpenAPI drift / route inventory rules (`API-INV-*`, `routeInventory`) have **no direct Snyk equivalent** in-repo; document separately when claiming that contribution.
 
 ## Reproducibility TODOs (required before final paper numbers)
 

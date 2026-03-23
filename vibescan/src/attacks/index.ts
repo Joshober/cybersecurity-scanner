@@ -9,6 +9,7 @@ import { insecureRandomnessRule } from "./crypto/insecure-randomness.js";
 import { hardcodedSecretsRule } from "./crypto/hardcoded-secrets.js";
 import { defaultSecretFallbackRule } from "./crypto/default-secret-fallback.js";
 import { jwtWeakSecretRule } from "./crypto/jwt-weak-sign.js";
+import { jwtWeakVerifySecretRule } from "./crypto/jwt-weak-test.js";
 import { disabledTlsRule } from "./crypto/disabled-tls.js";
 import { codeInjectionRule } from "./injection/code-injection.js";
 import { sqlInjectionRule } from "./injection/sql-injection.js";
@@ -19,6 +20,7 @@ import { logInjectionRule } from "./injection/log-injection.js";
 import { xssRule } from "./browser/xss.js";
 import { pathTraversalRule } from "./file/path-traversal.js";
 import { insecureCookieRule } from "./injection/insecure-cookie.js";
+import { prototypePollutionRule } from "./injection/prototypePollution.js";
 import { ipGuardSsrRule } from "../system/ai/ipGuard.js";
 import { axiosBypassRule } from "../system/ai/axiosBypass.js";
 
@@ -31,6 +33,7 @@ export const cryptoRules: Rule[] = [
   hardcodedSecretsRule,
   defaultSecretFallbackRule,
   jwtWeakSecretRule,
+  jwtWeakVerifySecretRule,
   disabledTlsRule,
 ];
 
@@ -44,6 +47,7 @@ export const injectionRules: Rule[] = [
   xpathInjectionRule,
   logInjectionRule,
   insecureCookieRule,
+  prototypePollutionRule,
   ipGuardSsrRule,
   axiosBypassRule,
 ];

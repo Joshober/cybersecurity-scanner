@@ -1,0 +1,1899 @@
+﻿{
+  "summary": {
+    "totalFindings": 41,
+    "bySeverity": {
+      "critical": 2,
+      "error": 16,
+      "warning": 22,
+      "info": 1
+    },
+    "byRuleId": {
+      "MW-003": 1,
+      "MW-004": 1,
+      "AUTH-003": 2,
+      "MW-001": 11,
+      "MW-002": 2,
+      "injection.sql.string-concat": 2,
+      "injection.sql.tainted-flow": 2,
+      "AUTH-004": 1,
+      "WEBHOOK-001": 1,
+      "injection.command": 1,
+      "injection.path-traversal": 1,
+      "injection.eval": 1,
+      "crypto.hash.weak": 1,
+      "crypto.random.insecure": 1,
+      "crypto.secrets.hardcoded": 1,
+      "SEC-004": 1,
+      "crypto.jwt.weak-secret-literal": 1,
+      "crypto.jwt.weak-secret-verify": 1,
+      "crypto.tls.reject-unauthorized": 1,
+      "SSRF-003": 1,
+      "injection.ssrf.tainted-flow": 1,
+      "RULE-PROTO-001": 2,
+      "injection.prototype-pollution.tainted-flow": 1,
+      "injection.log": 2,
+      "injection.log.tainted-flow": 1
+    },
+    "byCategory": {
+      "crypto": 7,
+      "injection": 34,
+      "api_inventory": 0
+    },
+    "findingsPerFile": {
+      "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js": 41
+    }
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "fullPath": "/api/login",
+      "params": [],
+      "bodyFields": [
+        "userId"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 33,
+      "handlerSource": "(req, res) => {\r\n  const userId = req.body.userId;\r\n  db.query(`SELECT * FROM users WHERE id = ${userId}`, () => {});\r\n  res.json({ token: \"x\" });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/roles",
+      "fullPath": "/admin/roles",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 40,
+      "handlerSource": "(req, res) => {\r\n  res.json({ ok: true });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "fullPath": "/webhooks/stripe",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 45,
+      "handlerSource": "(req, res) => {\r\n  const payload = req.body;\r\n  res.json({ ok: true, echo: payload });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/run",
+      "fullPath": "/api/run",
+      "params": [],
+      "bodyFields": [
+        "name"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 51,
+      "handlerSource": "(req, res) => {\r\n  child_process.exec(`echo ${req.body.name}`, () => res.send(\"ok\"));\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/file",
+      "fullPath": "/api/file",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [
+        "name"
+      ],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 56,
+      "handlerSource": "(req, res) => {\r\n  const p = path.join(\"/data\", req.query.name);\r\n  fs.readFile(p, \"utf8\", (err, data) => {\r\n    if (err) return res.status(500).send(\"err\");\r\n    res.send(data);\r\n  });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dyn",
+      "fullPath": "/api/dyn",
+      "params": [],
+      "bodyFields": [
+        "expr"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 65,
+      "handlerSource": "(req, res) => {\r\n  const r = eval(req.body.expr);\r\n  res.json({ r });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/digest",
+      "fullPath": "/api/digest",
+      "params": [],
+      "bodyFields": [
+        "data"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 71,
+      "handlerSource": "(req, res) => {\r\n  const h = crypto.createHash(\"md5\").update(req.body.data).digest(\"hex\");\r\n  res.json({ h });\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/token-weak",
+      "fullPath": "/api/token-weak",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 77,
+      "handlerSource": "(req, res) => {\r\n  res.json({ t: Math.random().toString(36) });\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config",
+      "fullPath": "/api/config",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 82,
+      "handlerSource": "(req, res) => {\r\n  res.json({ apiKey: \"sk_live_not_really_but_looks_like_key\" });\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/session-secret",
+      "fullPath": "/api/session-secret",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 87,
+      "handlerSource": "(req, res) => {\r\n  const s = process.env.SESSION_SECRET || \"changeme\";\r\n  res.json({ secret: s });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/jwt-issue",
+      "fullPath": "/api/jwt-issue",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 93,
+      "handlerSource": "(req, res) => {\r\n  const token = jwt.sign({ sub: 1 }, \"secret\");\r\n  res.json({ token });\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/jwt-check",
+      "fullPath": "/api/jwt-check",
+      "params": [],
+      "bodyFields": [
+        "token"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 98,
+      "handlerSource": "(req, res) => {\r\n  try {\r\n    const out = jwt.verify(req.body.token, \"secret\");\r\n    res.json({ out });\r\n  } catch (e) {\r\n    res.status(400).json({ err: String(e) });\r\n  }\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/insecure-fetch",
+      "fullPath": "/api/insecure-fetch",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 108,
+      "handlerSource": "(req, res) => {\r\n  https\r\n    .get(\"https://example.com\", { rejectUnauthorized: false }, (r) => {\r\n      res.status(200).send(\"ok\");\r\n    })\r\n    .on(\"error\", () => res.status(500).send(\"err\"));\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/api/proxy",
+      "fullPath": "/api/proxy",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [
+        "url"
+      ],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 117,
+      "handlerSource": "(req, res) => {\r\n  const urlTarget = req.query.url;\r\n  if (ip.isPublic(urlTarget)) {\r\n    fetch(urlTarget).then(() => res.send(\"ok\"));\r\n  } else {\r\n    res.status(400).send(\"blocked\");\r\n  }\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/merge-profile",
+      "fullPath": "/api/merge-profile",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 127,
+      "handlerSource": "(req, res) => {\r\n  const profile = {};\r\n  Object.assign(profile, req.body);\r\n  res.json(profile);\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/deep-set",
+      "fullPath": "/api/deep-set",
+      "params": [],
+      "bodyFields": [
+        "pathKey",
+        "value"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 134,
+      "handlerSource": "(req, res) => {\r\n  const cfg = {};\r\n  _.set(cfg, req.body.pathKey, req.body.value);\r\n  res.json(cfg);\r\n}"
+    },
+    {
+      "method": "POST",
+      "path": "/api/log",
+      "fullPath": "/api/log",
+      "params": [],
+      "bodyFields": [
+        "message"
+      ],
+      "queryFields": [],
+      "paramsFields": [],
+      "middlewares": [
+        "anonymous"
+      ],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 141,
+      "handlerSource": "(req, res) => {\r\n  console.log(req.body.message);\r\n  res.send(\"ok\");\r\n}"
+    }
+  ],
+  "routeInventory": [
+    {
+      "method": "POST",
+      "path": "/api/login",
+      "fullPath": "/api/login",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 33,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [
+        "auth-sensitive"
+      ],
+      "sensitivePath": true,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/admin/roles",
+      "fullPath": "/admin/roles",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 40,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [
+        "admin"
+      ],
+      "sensitivePath": false,
+      "adminPath": true,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "fullPath": "/webhooks/stripe",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 45,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [
+        "webhook",
+        "auth-sensitive"
+      ],
+      "sensitivePath": true,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/run",
+      "fullPath": "/api/run",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 51,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/file",
+      "fullPath": "/api/file",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 56,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/dyn",
+      "fullPath": "/api/dyn",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 65,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/digest",
+      "fullPath": "/api/digest",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 71,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/token-weak",
+      "fullPath": "/api/token-weak",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 77,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [
+        "auth-sensitive"
+      ],
+      "sensitivePath": true,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/config",
+      "fullPath": "/api/config",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 82,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/session-secret",
+      "fullPath": "/api/session-secret",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 87,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/jwt-issue",
+      "fullPath": "/api/jwt-issue",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 93,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/jwt-check",
+      "fullPath": "/api/jwt-check",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 98,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/insecure-fetch",
+      "fullPath": "/api/insecure-fetch",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 108,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/proxy",
+      "fullPath": "/api/proxy",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 117,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/merge-profile",
+      "fullPath": "/api/merge-profile",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 127,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/deep-set",
+      "fullPath": "/api/deep-set",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 134,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/log",
+      "fullPath": "/api/log",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "line": 141,
+      "middlewares": [
+        "anonymous"
+      ],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    }
+  ],
+  "packageJsonPath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\package.json",
+  "findings": [
+    {
+      "ruleId": "MW-003",
+      "message": "No helmet() call detected in this file ΓÇö verify security headers are set.",
+      "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+      "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+      "severity": "info",
+      "severityLabel": "LOW",
+      "category": "injection",
+      "cwe": 693,
+      "owasp": "A05:2021",
+      "findingKind": "APP_CONFIG",
+      "line": 1,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "middleware.headers"
+    },
+    {
+      "ruleId": "MW-004",
+      "message": "CORS configured with origin: '*' ΓÇö any site can read responses.",
+      "why": "Wildcard origin removes browser same-origin protection for credentialed or sensitive responses.",
+      "fix": "Set origin to explicit allowlist or a function that validates the Origin header.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 942,
+      "owasp": "A05:2021",
+      "findingKind": "APP_CONFIG",
+      "line": 23,
+      "column": 8,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "middleware.cors"
+    },
+    {
+      "ruleId": "AUTH-003",
+      "message": "Missing auth middleware on sensitive route POST /api/login",
+      "why": "State-changing endpoints on login, registration, upload, webhook, or similar surfaces without recognizable authentication are high-risk for abuse.",
+      "fix": "Apply authentication middleware (e.g. JWT verify, passport) before the handler.",
+      "remediation": "Apply authentication middleware (e.g. JWT verify, passport) before the handler where appropriate.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 285,
+      "owasp": "A01:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 33,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/login",
+        "fullPath": "/api/login",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "auth.middleware"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/login",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 33,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/login",
+        "fullPath": "/api/login",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "MW-002",
+      "message": "Sensitive path /api/login lacks rate limiting",
+      "why": "Auth, upload, webhook, and messaging endpoints are abuse targets without throttling.",
+      "fix": "Add express-rate-limit or similar on this route.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 307,
+      "owasp": "A07:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 33,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/login",
+        "fullPath": "/api/login",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.rate_limit"
+    },
+    {
+      "ruleId": "injection.sql.string-concat",
+      "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+      "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+      "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 35,
+      "column": 2,
+      "endLine": 35,
+      "endColumn": 64,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.sql"
+    },
+    {
+      "ruleId": "injection.sql.tainted-flow",
+      "message": "SQL Injection risk",
+      "why": "Untrusted input flows into a SQL query via string concatenation.",
+      "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 35,
+      "column": 2,
+      "endLine": 35,
+      "endColumn": 64,
+      "sourceLabel": "req.body",
+      "sinkLabel": "db.query",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.sql"
+    },
+    {
+      "ruleId": "AUTH-004",
+      "message": "Missing auth on sensitive admin/mod route POST /admin/roles",
+      "why": "Admin, moderation, and abuse-handling routes must require authentication and authorization.",
+      "fix": "Require authentication and role checks (e.g. admin-only middleware) before this handler.",
+      "remediation": "Require authentication and role checks (e.g. admin-only middleware) before this handler.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 285,
+      "owasp": "A01:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 40,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/admin/roles",
+        "fullPath": "/admin/roles",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "auth.middleware"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /admin/roles",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 40,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/admin/roles",
+        "fullPath": "/admin/roles",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "AUTH-003",
+      "message": "Missing auth middleware on sensitive route POST /webhooks/stripe",
+      "why": "State-changing endpoints on login, registration, upload, webhook, or similar surfaces without recognizable authentication are high-risk for abuse.",
+      "fix": "Apply authentication middleware (e.g. JWT verify, passport) before the handler.",
+      "remediation": "Apply authentication middleware (e.g. JWT verify, passport) before the handler where appropriate.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 285,
+      "owasp": "A01:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 45,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "fullPath": "/webhooks/stripe",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "auth.middleware"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /webhooks/stripe",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 45,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "fullPath": "/webhooks/stripe",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "MW-002",
+      "message": "Sensitive path /webhooks/stripe lacks rate limiting",
+      "why": "Auth, upload, webhook, and messaging endpoints are abuse targets without throttling.",
+      "fix": "Add express-rate-limit or similar on this route.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 307,
+      "owasp": "A07:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 45,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "fullPath": "/webhooks/stripe",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.rate_limit"
+    },
+    {
+      "ruleId": "WEBHOOK-001",
+      "message": "Webhook-style route POST /webhooks/stripe may lack signature verification",
+      "why": "Payment and integration webhooks should validate HMAC or provider signatures before trusting the body.",
+      "fix": "Verify provider signatures (e.g. Stripe constructEvent) using the raw body and secret; use timing-safe comparison.",
+      "remediation": "Verify provider signatures (e.g. Stripe constructEvent) using the raw body and secret; use timing-safe comparison.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 345,
+      "owasp": "A07:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 45,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/webhooks/stripe",
+        "fullPath": "/webhooks/stripe",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "webhook.verification"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/run",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 51,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/run",
+        "fullPath": "/api/run",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "injection.command",
+      "message": "Shell command built from string concatenation or template literals can lead to command injection.",
+      "why": "User-controlled input in a shell command string can escape and run arbitrary commands.",
+      "fix": "Use execFile with an array of arguments, or strictly sanitize input.",
+      "severity": "critical",
+      "severityLabel": "CRITICAL",
+      "category": "injection",
+      "line": 52,
+      "column": 2,
+      "endLine": 52,
+      "endColumn": 67,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.command"
+    },
+    {
+      "ruleId": "injection.sql.string-concat",
+      "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+      "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+      "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 52,
+      "column": 2,
+      "endLine": 52,
+      "endColumn": 67,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.sql"
+    },
+    {
+      "ruleId": "injection.sql.tainted-flow",
+      "message": "SQL Injection risk",
+      "why": "Untrusted input flows into a SQL query via string concatenation.",
+      "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 52,
+      "column": 2,
+      "endLine": 52,
+      "endColumn": 67,
+      "sourceLabel": "req.body",
+      "sinkLabel": "child_process.exec",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.sql"
+    },
+    {
+      "ruleId": "injection.path-traversal",
+      "message": "File path may be derived from user input, enabling path traversal.",
+      "why": "If the path comes from req.query, req.params, or similar, an attacker can use '../' to read or write outside intended directories.",
+      "fix": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 58,
+      "column": 2,
+      "endLine": 61,
+      "endColumn": 4,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.path-traversal"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/dyn",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 65,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/dyn",
+        "fullPath": "/api/dyn",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "injection.eval",
+      "message": "eval() and similar enable code injection from untrusted input.",
+      "why": "Dynamic code execution from a string allows an attacker to run arbitrary code if the string is user-controlled or derived from user input.",
+      "fix": "Use JSON.parse() for data, or a safe data structure. Do not pass user input or concatenated strings into eval, Function(), or setTimeout(string).",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 66,
+      "column": 12,
+      "endLine": 66,
+      "endColumn": 31,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.eval"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/digest",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 71,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/digest",
+        "fullPath": "/api/digest",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "crypto.hash.weak",
+      "message": "Avoid weak hash algorithm 'md5'. For password storage use a password hashing function; for general hashing use SHA-256+.",
+      "why": "MD5 and SHA-1 are cryptographically broken. If this hashes passwords, they are vulnerable to brute-force. For integrity/signatures use SHA-256 or SHA-3.",
+      "fix": "For passwords: use bcrypt, scrypt, PBKDF2, or argon2 with salting (e.g. bcrypt.hashSync(password, 10)). For general hashing: crypto.createHash('sha256') or crypto.createHash('sha512').",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "crypto",
+      "line": 72,
+      "column": 12,
+      "endLine": 72,
+      "endColumn": 36,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.hash"
+    },
+    {
+      "ruleId": "crypto.random.insecure",
+      "message": "Math.random() must not be used for security-sensitive values (tokens, keys, nonces, salts).",
+      "why": "Math.random() is not cryptographically secure. Predictable values can be guessed and lead to token forgery or key recovery.",
+      "fix": "Use crypto.randomBytes(n) or crypto.getRandomValues() for tokens, keys, IVs, nonces, and salts.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "crypto",
+      "line": 78,
+      "column": 16,
+      "endLine": 78,
+      "endColumn": 29,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.random"
+    },
+    {
+      "ruleId": "crypto.secrets.hardcoded",
+      "message": "Possible hardcoded secret in source.",
+      "why": "Secrets in code get committed to version control and can be leaked. They should not live in source.",
+      "fix": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "crypto",
+      "line": 83,
+      "column": 21,
+      "endLine": 83,
+      "endColumn": 60,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.secrets"
+    },
+    {
+      "ruleId": "SEC-004",
+      "message": "Insecure env var fallback ΓÇö if env var unset, hardcoded secret is used",
+      "why": "If the app runs without the env var set, a guessable default may be used in production.",
+      "fix": "Remove fallback. Throw error if env var is missing at startup.",
+      "remediation": "Remove fallback. Throw error if env var is missing at startup.",
+      "severity": "critical",
+      "severityLabel": "CRITICAL",
+      "category": "crypto",
+      "cwe": 547,
+      "owasp": "A02:2021",
+      "findingKind": "ENV_FALLBACK",
+      "line": 88,
+      "column": 12,
+      "endLine": 88,
+      "endColumn": 52,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.secrets"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/jwt-issue",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 93,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/jwt-issue",
+        "fullPath": "/api/jwt-issue",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "crypto.jwt.weak-secret-literal",
+      "message": "JWT signed with a known weak secret literal.",
+      "why": "Attackers who guess or know this secret can forge tokens.",
+      "fix": "Use a long random secret from a vault or env; never use dictionary/example strings.",
+      "remediation": "Replace with a high-entropy secret loaded only from secure configuration.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "crypto",
+      "cwe": 347,
+      "owasp": "A07:2021",
+      "line": 94,
+      "column": 16,
+      "endLine": 94,
+      "endColumn": 46,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.jwt"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/jwt-check",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 98,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/jwt-check",
+        "fullPath": "/api/jwt-check",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "crypto.jwt.weak-secret-verify",
+      "message": "JWT verify() uses a known weak secret literal.",
+      "why": "Weak JWT verification secrets can be guessed, allowing forged tokens to pass verification.",
+      "fix": "Load a high-entropy verification secret from secure configuration (vault/KMS/env), never dictionary literals.",
+      "remediation": "Replace weak verify secret with a long random key and rotate credentials.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "crypto",
+      "cwe": 347,
+      "owasp": "A07:2021",
+      "line": 100,
+      "column": 16,
+      "endLine": 100,
+      "endColumn": 52,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.jwt"
+    },
+    {
+      "ruleId": "crypto.tls.reject-unauthorized",
+      "message": "Disabling TLS certificate verification (rejectUnauthorized: false) allows man-in-the-middle attacks.",
+      "why": "With verification disabled, an attacker can intercept and modify traffic. Only use for local debugging, never in production.",
+      "fix": "Remove rejectUnauthorized: false. Use proper CA certificates and fix certificate issues instead of disabling verification.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "crypto",
+      "line": 110,
+      "column": 54,
+      "endLine": 110,
+      "endColumn": 59,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "crypto.tls"
+    },
+    {
+      "ruleId": "SSRF-003",
+      "message": "ip.isPublic() is an insufficient SSRF defense ΓÇö bypassed by octal/hex/IPv6 IP forms",
+      "why": "The ip package misclassified several non-canonical IP shapes (CVEs below); do not rely on it as the sole SSRF control.",
+      "fix": "Use an explicit allowlist of expected hostnames instead of IP classification.",
+      "remediation": "Use an explicit allowlist of expected hostnames instead of IP classification",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "cwe": 918,
+      "owasp": "A10:2021",
+      "cveRef": [
+        "CVE-2023-42282",
+        "CVE-2024-29415",
+        "CVE-2025-59436",
+        "CVE-2025-59437"
+      ],
+      "findingKind": "INSUFFICIENT_SSRF_DEFENSE",
+      "line": 119,
+      "column": 6,
+      "endLine": 119,
+      "endColumn": 28,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.ssrf"
+    },
+    {
+      "ruleId": "injection.ssrf.tainted-flow",
+      "message": "SSRF risk: untrusted data reaches outbound request URL.",
+      "why": "Attackers can make the server request internal or cloud metadata endpoints.",
+      "fix": "Use an allowlist of hosts/schemes; block private IPs and link-local addresses.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "cwe": 918,
+      "owasp": "A10:2021",
+      "line": 120,
+      "column": 4,
+      "endLine": 120,
+      "endColumn": 20,
+      "sourceLabel": "req.query",
+      "sinkLabel": "fetch",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.ssrf"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/merge-profile",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 127,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/merge-profile",
+        "fullPath": "/api/merge-profile",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "RULE-PROTO-001",
+      "message": "Potential prototype pollution via unsafe deep merge / set with user-controlled input.",
+      "why": "Merging attacker-controlled keys like __proto__ or constructor.prototype can mutate object prototypes globally.",
+      "fix": "Validate/strip dangerous keys (__proto__, constructor, prototype), use safe merge libraries, and reject nested prototype paths.",
+      "remediation": "Block prototype keys before merge/set and avoid deep merge on untrusted objects.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "cwe": 1321,
+      "owasp": "A03:2021",
+      "findingKind": "PROTOTYPE_POLLUTION",
+      "line": 129,
+      "column": 2,
+      "endLine": 129,
+      "endColumn": 34,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/deep-set",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 134,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/deep-set",
+        "fullPath": "/api/deep-set",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "injection.prototype-pollution.tainted-flow",
+      "message": "Prototype pollution risk: user input in deep merge or path set.",
+      "why": "Attacker-controlled objects can pollute Object.prototype.",
+      "fix": "Avoid merging user input into objects with deep merge; validate keys; use Object.create(null).",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "cwe": 1321,
+      "owasp": "A03:2021",
+      "findingKind": "PROTOTYPE_POLLUTION",
+      "line": 136,
+      "column": 2,
+      "endLine": 136,
+      "endColumn": 46,
+      "sourceLabel": "req.body",
+      "sinkLabel": "_.set",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.prototype-pollution"
+    },
+    {
+      "ruleId": "RULE-PROTO-001",
+      "message": "Potential prototype pollution via unsafe deep merge / set with user-controlled input.",
+      "why": "Merging attacker-controlled keys like __proto__ or constructor.prototype can mutate object prototypes globally.",
+      "fix": "Validate/strip dangerous keys (__proto__, constructor, prototype), use safe merge libraries, and reject nested prototype paths.",
+      "remediation": "Block prototype keys before merge/set and avoid deep merge on untrusted objects.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "cwe": 1321,
+      "owasp": "A03:2021",
+      "findingKind": "PROTOTYPE_POLLUTION",
+      "line": 136,
+      "column": 2,
+      "endLine": 136,
+      "endColumn": 46,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js"
+    },
+    {
+      "ruleId": "MW-001",
+      "message": "Missing CSRF protection on POST /api/log",
+      "why": "Cross-site requests can trigger unwanted state changes without a CSRF token or SameSite strategy.",
+      "fix": "Use csrf/csurf/doubleCsrf or strict SameSite cookies for session auth.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 352,
+      "owasp": "A05:2021",
+      "findingKind": "MIDDLEWARE_MISSING",
+      "line": 141,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "route": {
+        "method": "POST",
+        "path": "/api/log",
+        "fullPath": "/api/log",
+        "middlewares": [
+          "anonymous"
+        ]
+      },
+      "ruleFamily": "middleware.order"
+    },
+    {
+      "ruleId": "injection.log",
+      "message": "Log message built from user input without sanitization can lead to log injection.",
+      "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+      "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 142,
+      "column": 2,
+      "endLine": 142,
+      "endColumn": 31,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.log"
+    },
+    {
+      "ruleId": "injection.log.tainted-flow",
+      "message": "Log injection risk",
+      "why": "Unsanitized input in logs can allow fake entries or impersonation via CR/LF.",
+      "fix": "Sanitize log input: strip CR/LF; limit message size.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 142,
+      "column": 2,
+      "endLine": 142,
+      "endColumn": 31,
+      "sourceLabel": "req.body",
+      "sinkLabel": "console.log",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.log"
+    },
+    {
+      "ruleId": "injection.log",
+      "message": "Log message built from user input without sanitization can lead to log injection.",
+      "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+      "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 150,
+      "column": 4,
+      "endLine": 150,
+      "endColumn": 47,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "ruleFamily": "injection.log"
+    }
+  ],
+  "fileResults": [
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+      "findings": [
+        {
+          "ruleId": "MW-003",
+          "message": "No helmet() call detected in this file ΓÇö verify security headers are set.",
+          "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+          "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+          "severity": "info",
+          "severityLabel": "LOW",
+          "category": "injection",
+          "cwe": 693,
+          "owasp": "A05:2021",
+          "findingKind": "APP_CONFIG",
+          "line": 1,
+          "column": 0,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "middleware.headers"
+        },
+        {
+          "ruleId": "MW-004",
+          "message": "CORS configured with origin: '*' ΓÇö any site can read responses.",
+          "why": "Wildcard origin removes browser same-origin protection for credentialed or sensitive responses.",
+          "fix": "Set origin to explicit allowlist or a function that validates the Origin header.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "cwe": 942,
+          "owasp": "A05:2021",
+          "findingKind": "APP_CONFIG",
+          "line": 23,
+          "column": 8,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "middleware.cors"
+        },
+        {
+          "ruleId": "injection.sql.string-concat",
+          "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+          "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+          "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 35,
+          "column": 2,
+          "endLine": 35,
+          "endColumn": 64,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.sql"
+        },
+        {
+          "ruleId": "injection.sql.tainted-flow",
+          "message": "SQL Injection risk",
+          "why": "Untrusted input flows into a SQL query via string concatenation.",
+          "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 35,
+          "column": 2,
+          "endLine": 35,
+          "endColumn": 64,
+          "sourceLabel": "req.body",
+          "sinkLabel": "db.query",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.sql"
+        },
+        {
+          "ruleId": "injection.command",
+          "message": "Shell command built from string concatenation or template literals can lead to command injection.",
+          "why": "User-controlled input in a shell command string can escape and run arbitrary commands.",
+          "fix": "Use execFile with an array of arguments, or strictly sanitize input.",
+          "severity": "critical",
+          "severityLabel": "CRITICAL",
+          "category": "injection",
+          "line": 52,
+          "column": 2,
+          "endLine": 52,
+          "endColumn": 67,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.command"
+        },
+        {
+          "ruleId": "injection.sql.string-concat",
+          "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+          "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+          "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 52,
+          "column": 2,
+          "endLine": 52,
+          "endColumn": 67,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.sql"
+        },
+        {
+          "ruleId": "injection.sql.tainted-flow",
+          "message": "SQL Injection risk",
+          "why": "Untrusted input flows into a SQL query via string concatenation.",
+          "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 52,
+          "column": 2,
+          "endLine": 52,
+          "endColumn": 67,
+          "sourceLabel": "req.body",
+          "sinkLabel": "child_process.exec",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.sql"
+        },
+        {
+          "ruleId": "injection.path-traversal",
+          "message": "File path may be derived from user input, enabling path traversal.",
+          "why": "If the path comes from req.query, req.params, or similar, an attacker can use '../' to read or write outside intended directories.",
+          "fix": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 58,
+          "column": 2,
+          "endLine": 61,
+          "endColumn": 4,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.path-traversal"
+        },
+        {
+          "ruleId": "injection.eval",
+          "message": "eval() and similar enable code injection from untrusted input.",
+          "why": "Dynamic code execution from a string allows an attacker to run arbitrary code if the string is user-controlled or derived from user input.",
+          "fix": "Use JSON.parse() for data, or a safe data structure. Do not pass user input or concatenated strings into eval, Function(), or setTimeout(string).",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 66,
+          "column": 12,
+          "endLine": 66,
+          "endColumn": 31,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.eval"
+        },
+        {
+          "ruleId": "crypto.hash.weak",
+          "message": "Avoid weak hash algorithm 'md5'. For password storage use a password hashing function; for general hashing use SHA-256+.",
+          "why": "MD5 and SHA-1 are cryptographically broken. If this hashes passwords, they are vulnerable to brute-force. For integrity/signatures use SHA-256 or SHA-3.",
+          "fix": "For passwords: use bcrypt, scrypt, PBKDF2, or argon2 with salting (e.g. bcrypt.hashSync(password, 10)). For general hashing: crypto.createHash('sha256') or crypto.createHash('sha512').",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "crypto",
+          "line": 72,
+          "column": 12,
+          "endLine": 72,
+          "endColumn": 36,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.hash"
+        },
+        {
+          "ruleId": "crypto.random.insecure",
+          "message": "Math.random() must not be used for security-sensitive values (tokens, keys, nonces, salts).",
+          "why": "Math.random() is not cryptographically secure. Predictable values can be guessed and lead to token forgery or key recovery.",
+          "fix": "Use crypto.randomBytes(n) or crypto.getRandomValues() for tokens, keys, IVs, nonces, and salts.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "crypto",
+          "line": 78,
+          "column": 16,
+          "endLine": 78,
+          "endColumn": 29,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.random"
+        },
+        {
+          "ruleId": "crypto.secrets.hardcoded",
+          "message": "Possible hardcoded secret in source.",
+          "why": "Secrets in code get committed to version control and can be leaked. They should not live in source.",
+          "fix": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "crypto",
+          "line": 83,
+          "column": 21,
+          "endLine": 83,
+          "endColumn": 60,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.secrets"
+        },
+        {
+          "ruleId": "SEC-004",
+          "message": "Insecure env var fallback ΓÇö if env var unset, hardcoded secret is used",
+          "why": "If the app runs without the env var set, a guessable default may be used in production.",
+          "fix": "Remove fallback. Throw error if env var is missing at startup.",
+          "remediation": "Remove fallback. Throw error if env var is missing at startup.",
+          "severity": "critical",
+          "severityLabel": "CRITICAL",
+          "category": "crypto",
+          "cwe": 547,
+          "owasp": "A02:2021",
+          "findingKind": "ENV_FALLBACK",
+          "line": 88,
+          "column": 12,
+          "endLine": 88,
+          "endColumn": 52,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.secrets"
+        },
+        {
+          "ruleId": "crypto.jwt.weak-secret-literal",
+          "message": "JWT signed with a known weak secret literal.",
+          "why": "Attackers who guess or know this secret can forge tokens.",
+          "fix": "Use a long random secret from a vault or env; never use dictionary/example strings.",
+          "remediation": "Replace with a high-entropy secret loaded only from secure configuration.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "crypto",
+          "cwe": 347,
+          "owasp": "A07:2021",
+          "line": 94,
+          "column": 16,
+          "endLine": 94,
+          "endColumn": 46,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.jwt"
+        },
+        {
+          "ruleId": "crypto.jwt.weak-secret-verify",
+          "message": "JWT verify() uses a known weak secret literal.",
+          "why": "Weak JWT verification secrets can be guessed, allowing forged tokens to pass verification.",
+          "fix": "Load a high-entropy verification secret from secure configuration (vault/KMS/env), never dictionary literals.",
+          "remediation": "Replace weak verify secret with a long random key and rotate credentials.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "crypto",
+          "cwe": 347,
+          "owasp": "A07:2021",
+          "line": 100,
+          "column": 16,
+          "endLine": 100,
+          "endColumn": 52,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.jwt"
+        },
+        {
+          "ruleId": "crypto.tls.reject-unauthorized",
+          "message": "Disabling TLS certificate verification (rejectUnauthorized: false) allows man-in-the-middle attacks.",
+          "why": "With verification disabled, an attacker can intercept and modify traffic. Only use for local debugging, never in production.",
+          "fix": "Remove rejectUnauthorized: false. Use proper CA certificates and fix certificate issues instead of disabling verification.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "crypto",
+          "line": 110,
+          "column": 54,
+          "endLine": 110,
+          "endColumn": 59,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "crypto.tls"
+        },
+        {
+          "ruleId": "SSRF-003",
+          "message": "ip.isPublic() is an insufficient SSRF defense ΓÇö bypassed by octal/hex/IPv6 IP forms",
+          "why": "The ip package misclassified several non-canonical IP shapes (CVEs below); do not rely on it as the sole SSRF control.",
+          "fix": "Use an explicit allowlist of expected hostnames instead of IP classification.",
+          "remediation": "Use an explicit allowlist of expected hostnames instead of IP classification",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "cwe": 918,
+          "owasp": "A10:2021",
+          "cveRef": [
+            "CVE-2023-42282",
+            "CVE-2024-29415",
+            "CVE-2025-59436",
+            "CVE-2025-59437"
+          ],
+          "findingKind": "INSUFFICIENT_SSRF_DEFENSE",
+          "line": 119,
+          "column": 6,
+          "endLine": 119,
+          "endColumn": 28,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.ssrf"
+        },
+        {
+          "ruleId": "injection.ssrf.tainted-flow",
+          "message": "SSRF risk: untrusted data reaches outbound request URL.",
+          "why": "Attackers can make the server request internal or cloud metadata endpoints.",
+          "fix": "Use an allowlist of hosts/schemes; block private IPs and link-local addresses.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "cwe": 918,
+          "owasp": "A10:2021",
+          "line": 120,
+          "column": 4,
+          "endLine": 120,
+          "endColumn": 20,
+          "sourceLabel": "req.query",
+          "sinkLabel": "fetch",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.ssrf"
+        },
+        {
+          "ruleId": "RULE-PROTO-001",
+          "message": "Potential prototype pollution via unsafe deep merge / set with user-controlled input.",
+          "why": "Merging attacker-controlled keys like __proto__ or constructor.prototype can mutate object prototypes globally.",
+          "fix": "Validate/strip dangerous keys (__proto__, constructor, prototype), use safe merge libraries, and reject nested prototype paths.",
+          "remediation": "Block prototype keys before merge/set and avoid deep merge on untrusted objects.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "cwe": 1321,
+          "owasp": "A03:2021",
+          "findingKind": "PROTOTYPE_POLLUTION",
+          "line": 129,
+          "column": 2,
+          "endLine": 129,
+          "endColumn": 34,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js"
+        },
+        {
+          "ruleId": "injection.prototype-pollution.tainted-flow",
+          "message": "Prototype pollution risk: user input in deep merge or path set.",
+          "why": "Attacker-controlled objects can pollute Object.prototype.",
+          "fix": "Avoid merging user input into objects with deep merge; validate keys; use Object.create(null).",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "cwe": 1321,
+          "owasp": "A03:2021",
+          "findingKind": "PROTOTYPE_POLLUTION",
+          "line": 136,
+          "column": 2,
+          "endLine": 136,
+          "endColumn": 46,
+          "sourceLabel": "req.body",
+          "sinkLabel": "_.set",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.prototype-pollution"
+        },
+        {
+          "ruleId": "RULE-PROTO-001",
+          "message": "Potential prototype pollution via unsafe deep merge / set with user-controlled input.",
+          "why": "Merging attacker-controlled keys like __proto__ or constructor.prototype can mutate object prototypes globally.",
+          "fix": "Validate/strip dangerous keys (__proto__, constructor, prototype), use safe merge libraries, and reject nested prototype paths.",
+          "remediation": "Block prototype keys before merge/set and avoid deep merge on untrusted objects.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "cwe": 1321,
+          "owasp": "A03:2021",
+          "findingKind": "PROTOTYPE_POLLUTION",
+          "line": 136,
+          "column": 2,
+          "endLine": 136,
+          "endColumn": 46,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js"
+        },
+        {
+          "ruleId": "injection.log",
+          "message": "Log message built from user input without sanitization can lead to log injection.",
+          "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+          "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 142,
+          "column": 2,
+          "endLine": 142,
+          "endColumn": 31,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.log"
+        },
+        {
+          "ruleId": "injection.log.tainted-flow",
+          "message": "Log injection risk",
+          "why": "Unsanitized input in logs can allow fake entries or impersonation via CR/LF.",
+          "fix": "Sanitize log input: strip CR/LF; limit message size.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 142,
+          "column": 2,
+          "endLine": 142,
+          "endColumn": 31,
+          "sourceLabel": "req.body",
+          "sinkLabel": "console.log",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.log"
+        },
+        {
+          "ruleId": "injection.log",
+          "message": "Log message built from user input without sanitization can lead to log injection.",
+          "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+          "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 150,
+          "column": 4,
+          "endLine": 150,
+          "endColumn": 47,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\vuln-lab\\server.js",
+          "ruleFamily": "injection.log"
+        }
+      ],
+      "routeCount": 17
+    }
+  ],
+  "run": {
+    "toolVersion": "1.0.0",
+    "timestamp": "2026-03-23T17:41:11.880Z",
+    "gitCommit": "cbbbea068f3bd1db0f866a5dc4f7016a8a578d4f",
+    "scanOptions": {
+      "format": "json",
+      "mode": "static",
+      "excludeVendor": true,
+      "checkRegistry": false,
+      "skipRegistry": false,
+      "crypto": true,
+      "injection": true,
+      "ignoreGlobs": [],
+      "benchmarkMetadata": true
+    }
+  }
+}

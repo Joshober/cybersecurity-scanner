@@ -2,7 +2,7 @@
 
 This document summarizes **what the repo is**, **how the scanner works**, **what is implemented**, and **where files live**. Paste or attach it when onboarding a new assistant.
 
-**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [results/](../results/) (DVNA benchmark, Person B stats).
+**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [benchmarks/results/legacy/](../benchmarks/results/legacy/) (DVNA evaluation markdown + raw logs).
 
 ---
 
@@ -15,7 +15,7 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 | **CLI binaries** | `vibescan`, `secure` (same `vibescan/dist/system/cli/index.js`) |
 | **Language / runtime** | TypeScript → JavaScript, **Node 18+** |
 | **Repo** | [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner) |
-| **Workspaces** | Root scanner + [`packages/secure-arch-*`](../packages/) (`npm` workspaces; see root `package.json`) |
+| **Workspaces** | Private root + [`vibescan/`](../vibescan/) + [`packages/secure-arch-*`](../packages/) (`npm` workspaces; see root `package.json`) |
 
 ---
 
@@ -74,7 +74,7 @@ CLI (cli/index.ts)
 
 Exit **non-zero** if any finding has severity **critical** or **error** (see [`cli/index.ts`](../vibescan/src/system/cli/index.ts)).
 
-**Parent pointers:** [`buildParentMap`](../src/system/walker.ts) is built once per file AST and passed into `RuleContext.getParent` for rules that need ancestors (e.g. **SSRF-003**). The ESLint wrapper builds the same map from `context.getSourceCode().ast` ([`eslint-plugin.ts`](../src/system/eslint-plugin.ts)).
+**Parent pointers:** [`buildParentMap`](../vibescan/src/system/walker.ts) is built once per file AST and passed into `RuleContext.getParent` for rules that need ancestors (e.g. **SSRF-003**). The ESLint wrapper builds the same map from `context.getSourceCode().ast` ([`eslint-plugin.ts`](../vibescan/src/system/eslint-plugin.ts)).
 
 ---
 
@@ -90,13 +90,9 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 | **SSRF-003** — `ip.isPublic`/`isPrivate` when gating `fetch`/HTTP client on same URL id | [`ipGuard.ts`](../vibescan/src/system/ai/ipGuard.ts) |
 | **RULE-SSRF-002** — axios baseURL + user URL | [`axiosBypass.ts`](../vibescan/src/system/ai/axiosBypass.ts) |
 | `envFallback` shim (re-export) | [`envFallback.ts`](../vibescan/src/system/ai/envFallback.ts) |
-| Rule registry | [`attacks/index.ts`](../vibescan/src/attacks/index.ts) — `cryptoRules` (9), `injectionRules` (11) |
+| Rule registry | [`attacks/index.ts`](../vibescan/src/attacks/index.ts) — `cryptoRules` (10), `injectionRules` (12) |
 
-## Experimental / not in default scan
-
-- `prototypePollution.ts`: present in tree but not exported from `vibescan/src/attacks/index.ts` (not part of the default scan rule list)
-- `jwt-weak-test.ts`: built to `dist/` but not registered in the active rule list
-- `entropy.ts`: helper for secret detection; not a standalone rule
+## Additional notes`r`n`r`n- `prototypePollution.ts` is now registered as `RULE-PROTO-001` in the default injection rule list.`r`n- `jwt-weak-test.ts` now exposes `crypto.jwt.weak-secret-verify` in the default crypto rule list.`r`n- `entropy.ts`: helper for secret detection; not a standalone rule
 
 **Finding extras:** `packageName`, `cveRef`, `findingKind`, `remediation` on [`Finding`](../vibescan/src/system/types.ts) where relevant.
 
@@ -105,54 +101,40 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 ## File structure
 
 ```
-CyberSecurity/
+CyberSecurity/                    ← private workspace root (not published)
 ├── docs/
 │   ├── REPO-HANDOFF.md          ← this file
+│   ├── samples/                 ← example policy JSON for policy-eval bridge
 │   ├── secure-arch/             ← secure-arch usage + AI prompts
 │   ├── research-strengthening/  ← paper/poster methodology hub
 │   └── vibescan/                ← poster HTML, abstract, pitch, QR, checklist
-├── architecture/secure-rules/   ← YAML settings (after secure-arch install)
+├── vibescan/                    ← published npm package `vibescan` (scanner src + tests + dist)
+│   ├── src/                     # attacks/, system/ (CLI, engine, rules)
+│   ├── tests/
+│   ├── scripts/                 # policy-eval.mjs, …
+│   ├── package.json
+│   └── tsconfig.json
+├── demo/                        ← conference / interactive demo (not in npm tarball)
+├── architecture/secure-rules/   ← YAML settings (default for secure-arch install)
 ├── packages/
 │   ├── secure-arch-core/
 │   ├── secure-arch-cli/
 │   └── secure-arch-adapters/
-├── benchmarks/                  ← DVNA README + seeded corpora + scripts + dated run outputs
-├── results/                     ← DVNA benchmark outputs + evaluation markdown (legacy; see benchmarks/results/archive)
-├── src/
-│   ├── attacks/
-│   │   ├── index.ts             # cryptoRules[], injectionRules[]
-│   │   ├── crypto/              # SEC-004, JWT, secretDict, entropy, ciphers, …
-│   │   ├── injection/           # SQL, command, proto payloads, …
-│   │   ├── browser/             # XSS
-│   │   └── file/                # Path traversal
-│   └── system/
-│       ├── scanner.ts           # scan, scanProject, scanProjectAsync
-│       ├── cli/index.ts
-│       ├── types.ts
-│       ├── format.ts
-│       ├── walker.ts            # walk, buildParentMap
-│       ├── parser/              # parseFile.ts, routeGraph.ts
-│       ├── engine/              # ruleEngine, taintEngine, audits, testWriter
-│       ├── sources/             # taint sources
-│       ├── sinks/               # taint sinks
-│       ├── sanitizers/
-│       ├── utils/               # rule-types, helpers, …
-│       ├── ai/                  # slopsquat, ipGuard, axiosBypass, envFallback, ai-analyzer
-│       ├── eslint-plugin.ts
-│       └── index.ts
-├── tests/
-│   ├── helpers.mjs
-│   ├── fixtures/
-│   └── unit/*.test.mjs          # node:test (51 tests)
-├── package.json
-├── tsconfig.json
+├── benchmarks/
+│   ├── dvna/                    ← clone instructions; clone lives in benchmarks/dvna/dvna/ (gitignored)
+│   ├── vuln-lab/                ← curated vulnerable Express benchmark (committable; see GROUND_TRUTH.md)
+│   ├── seeded/                  ← tiny committable snippets
+│   ├── scripts/                 ← repro runners
+│   └── results/                 ← dated runs + legacy/ (DVNA prose + raw tool logs)
+├── package.json                 # workspaces only (private)
+├── package-lock.json
 ├── README.md
-└── .gitignore                   # includes dvna/, dist/, node_modules/
+└── .gitignore                   # dvna/, benchmarks/dvna/dvna/, dist/, node_modules/, …
 ```
 
-**Build:** `npm run build -w vibescan` → **`vibescan/dist/`** (often gitignored; publish uses `files: ["dist", "README.md"]` inside `vibescan/`).
+**Build:** `npm run build -w vibescan` (or `npm run build` at root) → **`vibescan/dist/`** (gitignored; publish uses `files: ["dist", "README.md"]` inside `vibescan/`).
 
-**Local DVNA:** Clone to `./dvna` for benchmarks; folder is **gitignored** by default.
+**Local DVNA:** Prefer `benchmarks/dvna/dvna` (see [`benchmarks/dvna/README.md`](../benchmarks/dvna/README.md)); legacy `./dvna` at repo root is still supported and **gitignored**.
 
 ---
 
@@ -182,18 +164,20 @@ npx secure-arch check --root . --code-evidence js-ts
 
 | Path | Purpose |
 |------|---------|
-| [`results/dvna-evaluation.md`](../results/dvna-evaluation.md) | Tool comparison vs DVNA themes + preliminary evaluation paragraph |
-| [`results/person-b-handoff.md`](../results/person-b-handoff.md) | Secret-dict stats, rule counts for poster |
-| [`results/eslint-dvna.eslintrc.cjs`](../results/eslint-dvna.eslintrc.cjs) | eslint-plugin-security config for DVNA runs |
-| Raw logs | `vibescan-dvna.txt`, `eslint-dvna.txt`, `npm-audit-dvna.txt`, `bearer-dvna.txt` |
+| [`benchmarks/results/legacy/dvna-evaluation.md`](../benchmarks/results/legacy/dvna-evaluation.md) | Tool comparison vs DVNA themes + preliminary evaluation paragraph |
+| [`benchmarks/results/legacy/person-b-handoff.md`](../benchmarks/results/legacy/person-b-handoff.md) | Secret-dict stats, rule counts for poster |
+| [`benchmarks/results/legacy/eslint-dvna.eslintrc.cjs`](../benchmarks/results/legacy/eslint-dvna.eslintrc.cjs) | eslint-plugin-security config for DVNA runs |
+| Raw logs | Same folder: `vibescan-dvna.txt`, `eslint-dvna.txt`, `npm-audit-dvna.txt`, `bearer-dvna.txt` |
 
 ---
 
 ## Maintenance
 
 - **Rule IDs / CWE table:** Keep [`README.md`](../README.md) in sync when adding rules.
-- **New AST rule:** Add `Rule` in `vibescan/src/attacks/...`, export from [`attacks/index.ts`](../vibescan/src/attacks/index.ts), add `tests/unit/*.test.mjs` using [`tests/helpers.mjs`](../vibescan/tests/helpers.mjs).
+- **New AST rule:** Add `Rule` in `vibescan/src/attacks/...`, export from [`attacks/index.ts`](../vibescan/src/attacks/index.ts), add `vibescan/tests/unit/*.test.mjs` using [`vibescan/tests/helpers.mjs`](../vibescan/tests/helpers.mjs).
 
 ---
 
 *Last updated to match repo layout and README as of the VibeScan Person A implementation pass.*
+
+

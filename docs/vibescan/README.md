@@ -6,7 +6,7 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 |------|---------|
 | [`../REPO-HANDOFF.md`](../REPO-HANDOFF.md) | **Codebase / architecture summary** for collaborators or LLMs (pipeline, paths, what’s implemented). |
 | [`../research-strengthening/README.md`](../research-strengthening/README.md) | **Academic spine:** RQ, methodology, evaluation, seeded plan, metrics, `Jober/NewLayout` merge strategy. |
-| [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table per `results/dvna-evaluation.md`). |
+| [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table per `benchmarks/results/legacy/dvna-evaluation.md`). |
 | [`qr-github.svg`](./qr-github.svg) | 120×120-style QR (white modules on `#0a0a0f`) for `https://github.com/Joshober/cybersecurity-scanner`. |
 | [`abstract.md`](./abstract.md) | Paste-up abstract + citation checklist. |
 | [`pitch-60s.md`](./pitch-60s.md) | 60s script + six judge cue cards. |
@@ -68,5 +68,5 @@ Adjust colors in the SVG to match the poster if needed.
 
 ## Person A inputs to merge
 
-- **Bearer** row on the poster (optional): run and update from `results/bearer-dvna.txt`.
+- **Bearer** row on the poster (optional): run and update from `benchmarks/results/legacy/bearer-dvna.txt`.
 - Rule count on the poster if the frozen inventory changes (optional).

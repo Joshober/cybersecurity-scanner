@@ -10,7 +10,7 @@ VibeScan is a static JavaScript/TypeScript scanner focused on Node/Express-style
 
 ## Our measured findings (current evidence)
 
-Our current evaluation package includes a preliminary DVNA benchmark (`results/dvna-evaluation.md`). Under a first-party-code manual adjudication protocol, VibeScan produced more counted true-positive signals than `eslint-plugin-security` in this setup (8 vs 1 across listed DVNA themes). However, this result is explicitly early-stage: Bearer baseline execution is still pending in the same environment, tool scopes differ (line-level static findings vs dependency advisories), and full TP/FP/FN precision/recall reporting remains future work.
+Our current evaluation package includes a preliminary DVNA benchmark (`benchmarks/results/legacy/dvna-evaluation.md`). Under a first-party-code manual adjudication protocol, VibeScan produced more counted true-positive signals than `eslint-plugin-security` in this setup (8 vs 1 across listed DVNA themes). However, this result is explicitly early-stage: Bearer baseline execution is still pending in the same environment, tool scopes differ (line-level static findings vs dependency advisories), and full TP/FP/FN precision/recall reporting remains future work.
 
 ## Future work
 

@@ -7,7 +7,7 @@ From the repo root, with Docker running and DVNA cloned per `benchmarks/dvna/REA
 - **PowerShell:** `.\benchmarks\scripts\run-bearer-dvna.ps1`
 - **bash:** `./benchmarks/scripts/run-bearer-dvna.sh`
 
-Successful runs write `benchmarks/results/<timestamp>_dvna_bearer/bearer.json`. Summarize theme-aligned true positives into `results/dvna-evaluation.md` and keep the raw JSON for the paper appendix.
+Successful runs write `benchmarks/results/<timestamp>_dvna_bearer/bearer.json`. Summarize theme-aligned true positives into `benchmarks/results/legacy/dvna-evaluation.md` and keep the raw JSON for the paper appendix.
 
 ## Manual Docker one-liner
 

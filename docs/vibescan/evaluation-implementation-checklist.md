@@ -7,7 +7,7 @@ Use this as the working tracker for reproducible benchmarks, ground-truth adjudi
 All three strands from the unfinished-features plan are in scope, in this order:
 
 1. **Reproducible benchmarks (Phase B–D)** — Physical [`benchmarks/`](../../benchmarks/) tree, scripts, manifests, JSON metadata flags (`--benchmark-metadata`, stable finding order), and [`eval-support-changes.md`](./eval-support-changes.md) items implemented in code where listed.
-2. **Bearer baseline** — Automated in [`benchmarks/scripts/`](../../benchmarks/scripts/) when Docker (or a native Bearer install) is available; until then keep [`results/bearer-dvna.txt`](../../results/bearer-dvna.txt) as the honest “not run” record and drop `bearer.json` under [`benchmarks/results/`](../../benchmarks/results/) after a successful run.
+2. **Bearer baseline** — Automated in [`benchmarks/scripts/`](../../benchmarks/scripts/) when Docker (or a native Bearer install) is available; until then keep [`benchmarks/results/legacy/bearer-dvna.txt`](../../benchmarks/results/legacy/bearer-dvna.txt) as the honest “not run” record and drop `bearer.json` under [`benchmarks/results/`](../../benchmarks/results/) after a successful run.
 3. **Conference polish** — Poster PDF, print proof, and pitch timing stay human tasks; rubric notes remain in [`rubric-status-updated.md`](./rubric-status-updated.md).
 
 ## Phase A — Documentation and layout (this pass)
@@ -24,9 +24,9 @@ All three strands from the unfinished-features plan are in scope, in this order:
 
 - [x] Create `benchmarks/dvna/` (README + clone path; actual clone is gitignored — see [`benchmarks/dvna/README.md`](../../benchmarks/dvna/README.md))
 - [x] Create `benchmarks/seeded/` (minimal synthetic corpora per rule family — starter set committed)
-- [x] Create `benchmarks/results/` (timestamped raw outputs + manifests — see README; legacy [`results/`](../../results/) indexed under `archive/`)
+- [x] Create `benchmarks/results/` (timestamped raw outputs + manifests — see README; DVNA markdown + logs in [`legacy/`](../../benchmarks/results/legacy/), indexed from [`archive/README.md`](../../benchmarks/results/archive/README.md))
 - [x] Create `benchmarks/scripts/` (shell/PowerShell runners wrapping this repo’s tools)
-- [x] Legacy [`results/`](../../results/) cross-linked from `benchmarks/results/archive/README.md` (full migration optional)
+- [x] [`benchmarks/results/legacy/`](../../benchmarks/results/legacy/) cross-linked from `benchmarks/results/archive/README.md`
 
 ## Phase C — Ground truth and scoring
 

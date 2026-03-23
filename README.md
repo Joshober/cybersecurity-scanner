@@ -100,7 +100,7 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 
 **Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.
 
-**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs scripts/policy.sample.json vibescan-out.json`
+**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs docs/samples/policy.sample.json vibescan-out.json`
 
 ---
 
@@ -170,7 +170,7 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 | `--project-root <dir>` | Resolve `package.json`, OpenAPI discovery root, registry check, ignore globs |
 | `--openapi-spec <file>` | OpenAPI/Swagger file for drift vs Express routes (repeatable) |
 | `--no-openapi-discovery` | Skip auto-discovery of `openapi.*` / `swagger.*` under project root |
-| `--build-id <id>` | Label JSON output and `--manifest` scope for deployment correlation |
+| `--build-id <id>` | Label JSON output and `--manifest` scope for deployment correlation |`r`n| `--ai-api-url` / `--ai-api-key` / `--ai-model` | Explicit AI provider endpoint/auth/model (overrides environment) |
 
 ---
 
@@ -185,7 +185,7 @@ npm run test:arch   # @secure-arch/core (requires build:arch)
 
 ## DVNA evaluation (research)
 
-Benchmark outputs and comparison table live under [`results/`](results/) (legacy captures) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/person-b-handoff.md`](results/person-b-handoff.md). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
+Benchmark outputs live under [`benchmarks/`](benchmarks/) only: dated runs under [`benchmarks/results/`](benchmarks/results/), and legacy DVNA prose + raw logs under [`benchmarks/results/legacy/`](benchmarks/results/legacy/) (see [`dvna-evaluation.md`](benchmarks/results/legacy/dvna-evaluation.md) and [`person-b-handoff.md`](benchmarks/results/legacy/person-b-handoff.md)). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
 
 ---
 
@@ -215,7 +215,7 @@ export default [
 
 ## Project structure
 
-See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary:
+See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary (root = **private monorepo + research shell**; publishable scanner = **`vibescan/`** only):
 
 ```
 vibescan/
@@ -228,13 +228,20 @@ packages/
 ├── secure-arch-core/  # Settings schema + ARCH-* checks + evidence
 ├── secure-arch-cli/   # secure-arch CLI
 └── secure-arch-adapters/
-architecture/secure-rules/   # YAML settings (templates via secure-arch install)
+benchmarks/
+├── dvna/              # DVNA clone instructions (clone is gitignored)
+├── vuln-lab/          # Curated vulnerable Express app (committable “better DVNA” + GROUND_TRUTH.md)
+├── seeded/            # Tiny committable benchmark snippets
+├── scripts/           # Repro runners (DVNA, Bearer, …)
+└── results/           # Timestamped runs + legacy/ (DVNA markdown + raw logs)
+demo/                  # Conference / live demo app (separate from benchmarks)
+architecture/secure-rules/   # YAML settings (default path for secure-arch install)
 docs/
 ├── REPO-HANDOFF.md    # Architecture + file map for handoffs
 ├── secure-arch/       # secure-arch usage + AI prompts
 ├── research-strengthening/
+├── samples/           # Example policy JSON (policy-eval bridge)
 └── vibescan/          # Poster & submission assets
-results/               # DVNA benchmark outputs (see dvna-evaluation.md)
 ```
 
 ---
@@ -248,3 +255,6 @@ Static analysis cannot prove security; it surfaces high-likelihood patterns. Opt
 ## License
 
 MIT.
+
+
+

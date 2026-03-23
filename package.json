@@ -10,6 +10,8 @@
     "packages/secure-arch-cli"
   ],
   "scripts": {
+    "build": "npm run build -w vibescan",
+    "test": "npm test -w vibescan",
     "build:arch": "npm run build -w @secure-arch/core -w @secure-arch/adapters -w @secure-arch/cli",
     "test:arch": "npm run build:arch && npm run test -w @secure-arch/core",
     "secure-arch": "node packages/secure-arch-cli/dist/cli.js",

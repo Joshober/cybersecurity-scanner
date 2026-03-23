@@ -14,12 +14,9 @@ if [[ ! -d "$DVNA" ]]; then
   echo "DVNA not found at $DVNA." >&2
   exit 1
 fi
-if ! docker info >/dev/null 2>&1; then
-  echo "Docker daemon not running. See benchmarks/results/legacy/bearer-dvna.txt" >&2
-  exit 1
-fi
 STAMP="$(date -u +%Y-%m-%d_%H%M%S)"
-OUT="$REPO_ROOT/benchmarks/results/${STAMP}_dvna_bearer"
+OUT="$REPO_ROOT/benchmarks/results/${STAMP}_dvna_eslint"
 mkdir -p "$OUT"
-docker run --rm -v "$DVNA:/scan" bearer/bearer:latest-amd64 scan /scan --format json > "$OUT/bearer.json"
-echo "Wrote $OUT/bearer.json"
+cd "$REPO_ROOT"
+npx eslint -f json -c benchmarks/results/legacy/eslint-dvna.eslintrc.cjs "$DVNA/**/*.js" > "$OUT/eslint.json" || true
+echo "Wrote $OUT/eslint.json"

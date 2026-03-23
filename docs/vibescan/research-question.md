@@ -1,6 +1,6 @@
 # VibeScan Research Questions and Hypotheses
 
-This file defines the research framing for VibeScan using capabilities documented in `README.md`, `docs/REPO-HANDOFF.md`, `docs/vibescan/rule-coverage-audit.md`, and `results/dvna-evaluation.md`.
+This file defines the research framing for VibeScan using capabilities documented in `README.md`, `docs/REPO-HANDOFF.md`, `docs/vibescan/rule-coverage-audit.md`, and `benchmarks/results/legacy/dvna-evaluation.md`.
 
 ## Primary research question
 

@@ -10,7 +10,7 @@ Use this table to keep the **paper/poster** aligned with what is **actually eval
 | Express route extraction + middleware-style audits | `routeGraph`, `middlewareAudit`, `appLevelAudit` | Only fires on patterns the graph recognizes |
 | Optional npm registry check (slopsquat signal) | `SLOP-001`, `--check-registry` | Network-dependent; define “skip” handling |
 | Open prototype + reproducible CLI | `vibescan` / `secure`, build scripts | Maturity not same as commercial SAST |
-| Comparative evaluation vs baseline(s) on DVNA | `results/dvna-evaluation.md` + adjudication | *n*, label subjectivity |
+| Comparative evaluation vs baseline(s) on DVNA | `benchmarks/results/legacy/dvna-evaluation.md` + adjudication | *n*, label subjectivity |
 
 ## Tier B — Mention as engineering features; evaluation optional
 
@@ -41,3 +41,4 @@ Do not claim these as evaluated rules unless you wire + test + benchmark them.
 > **VibeScan** is the evaluated static scanner; **secure-arch** is a separate, portable architecture-and-settings layer that can sit beside it in a product stack but is **out of scope** for the current benchmark numbers.
 
 Adjust if you later run an evaluation that includes secure-arch checks.
+

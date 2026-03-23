@@ -78,3 +78,4 @@ Constraints: **no change to core detection logic** unless unavoidable; focus on 
 
 - Rewriting taint or middleware audit logic.
 - Registering `prototypePollution` or `jwt-weak-test` unless the paper explicitly evaluates them — that **would** change behavior.
+

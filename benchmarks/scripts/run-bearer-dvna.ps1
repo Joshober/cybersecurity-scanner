@@ -11,7 +11,7 @@ if (-not (Test-Path $DvnaRoot)) {
 
 docker info 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
-  Write-Error "Docker daemon not running or not installed. Start Docker Desktop or use WSL/Linux with Bearer; see results/bearer-dvna.txt"
+  Write-Error "Docker daemon not running or not installed. Start Docker Desktop or use WSL/Linux with Bearer; see benchmarks/results/legacy/bearer-dvna.txt"
 }
 
 $stamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
@@ -21,4 +21,4 @@ $outFile = Join-Path $outDir "bearer.json"
 
 docker run --rm -v "${DvnaRoot}:/scan" bearer/bearer:latest-amd64 scan /scan --format json | Set-Content -Path $outFile -Encoding utf8
 Write-Host "Wrote $outFile"
-Write-Host "Append TP summary to results/dvna-evaluation.md and copy bearer-dvna.txt notes if first successful run."
+Write-Host "Append TP summary to benchmarks/results/legacy/dvna-evaluation.md and copy bearer-dvna.txt notes if first successful run."

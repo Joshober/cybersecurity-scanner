@@ -8,8 +8,8 @@ This plan extends the current preliminary DVNA work into a cleaner, academically
 2. Enforce an explicit first-party scope:
    - Exclude vendor/minified assets in the primary table.
    - Optionally report vendor-inclusive sensitivity in appendix.
-3. Keep the current adjudication logic from `results/dvna-evaluation.md`, but formalize it into a reproducible adjudication sheet.
-4. Run pending baseline (Bearer) in a compatible environment and store raw logs in `results/`.
+3. Keep the current adjudication logic from `benchmarks/results/legacy/dvna-evaluation.md`, but formalize it into a reproducible adjudication sheet.
+4. Run pending baseline (Bearer) in a compatible environment and store raw logs under `benchmarks/results/<run-id>/`.
 5. Regenerate summary table with no "implied completeness" wording.
 
 ## 2) Additional seeded benchmark suite

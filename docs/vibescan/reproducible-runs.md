@@ -89,7 +89,7 @@ npx vibescan scan "$TARGET" \
 
 ## 4. Run eslint-plugin-security
 
-DVNA may not ship ESLint security rules; reuse or adapt [`results/eslint-dvna.eslintrc.cjs`](../../results/eslint-dvna.eslintrc.cjs).
+DVNA may not ship ESLint security rules; reuse or adapt [`benchmarks/results/legacy/eslint-dvna.eslintrc.cjs`](../../benchmarks/results/legacy/eslint-dvna.eslintrc.cjs).
 
 ```bash
 cd "$TARGET"

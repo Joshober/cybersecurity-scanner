@@ -24,7 +24,7 @@ Then verify the `npm pack --dry-run` file list contains only:
 
 And does **not** include:
 
-- `docs/`, `benchmarks/`, `results/`, `tests/`, `demo*`, or `legacy-*` source content
+- `docs/`, `benchmarks/` (except published scanner bits), `demo*`, `vibescan/tests/`, or `legacy-*` source content
 
 This is enforced primarily by `vibescan/package.json#files` (`["dist", "README.md"]`) plus the fact that `dist/` is generated from `vibescan/tsconfig.json` compiling only `vibescan/src/**`.
 
