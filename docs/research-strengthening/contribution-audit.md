@@ -6,7 +6,7 @@ Use this table to keep the **paper/poster** aligned with what is **actually eval
 
 | Claim | Evidence in repo | Risk if overstated |
 |-------|------------------|--------------------|
-| Static rule set for crypto + injection-oriented JS/TS patterns | `src/attacks/`, root README rule table | “Catches all bugs” |
+| Static rule set for crypto + injection-oriented JS/TS patterns | `vibescan/src/attacks/`, root README rule table | “Catches all bugs” |
 | Express route extraction + middleware-style audits | `routeGraph`, `middlewareAudit`, `appLevelAudit` | Only fires on patterns the graph recognizes |
 | Optional npm registry check (slopsquat signal) | `SLOP-001`, `--check-registry` | Network-dependent; define “skip” handling |
 | Open prototype + reproducible CLI | `vibescan` / `secure`, build scripts | Maturity not same as commercial SAST |

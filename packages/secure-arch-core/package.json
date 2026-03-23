@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.0",
-    "secure-code-scanner": "file:../..",
+    "vibescan": "file:../../vibescan",
     "yaml": "^2.6.0"
   },
   "devDependencies": {

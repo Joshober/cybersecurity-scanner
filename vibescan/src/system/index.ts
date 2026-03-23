@@ -1,4 +1,4 @@
-// secure-code-scanner: static analysis for crypto failures and injection in JS/TS. Use as CLI or ESLint plugin.
+// VibeScan: static analysis for crypto failures and injection in JS/TS. Use as CLI or ESLint plugin.
 
 export {
   scan,

@@ -18,6 +18,6 @@ STAMP="$(date -u +%Y-%m-%d_%H%M%S)"
 OUT="$REPO_ROOT/benchmarks/results/${STAMP}_dvna_vibescan"
 mkdir -p "$OUT"
 cd "$REPO_ROOT"
-npm run build
-node dist/system/cli/index.js scan "$DVNA" --format json --exclude-vendor --benchmark-metadata > "$OUT/vibescan.json"
+npm run build -w vibescan
+node vibescan/dist/system/cli/index.js scan "$DVNA" --format json --exclude-vendor --benchmark-metadata > "$OUT/vibescan.json"
 echo "Wrote $OUT/vibescan.json"

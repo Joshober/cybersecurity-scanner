@@ -6,7 +6,7 @@ This document describes **scripts and pseudocode** for repeatable evaluation. Pa
 
 - **Node.js 18+** (`node -v`)
 - Dependencies installed: `npm install` at repo root
-- **VibeScan** built: `npm run build:scanner` (or `npm run build` if defined at root)
+- **VibeScan** built: `npm run build -w vibescan` (or `npm run build` if defined at root)
 - Optional: **Bearer** CLI on `PATH` (`bearer version`)
 - Optional: **eslint-plugin-security** configured for the target project (DVNA may need a local `.eslintrc.cjs`)
 
@@ -25,7 +25,7 @@ npm -v >> OUT/node-version.txt
 git rev-parse HEAD > OUT/scanner-repo-commit.txt
 
 # Package version of the scanner workspace
-npm ls secure-code-scanner --json > OUT/npm-ls-secure-code-scanner.json
+npm ls vibescan --json > OUT/npm-ls-vibescan.json
 
 # Optional global tools
 ( bearer version || echo "bearer not installed" ) > OUT/bearer-version.txt
@@ -40,9 +40,9 @@ npm ls secure-code-scanner --json > OUT/npm-ls-secure-code-scanner.json
 ```bash
 cd /path/to/CyberSecurity
 npm install
-npm run build:scanner
+npm run build -w vibescan
 # Verify binary resolves:
-npx vibescan scan src --format compact | head -n 5
+npx vibescan scan vibescan/src --format compact | head -n 5
 ```
 
 **PowerShell:**
@@ -50,8 +50,8 @@ npx vibescan scan src --format compact | head -n 5
 ```powershell
 Set-Location C:\path\to\CyberSecurity
 npm install
-npm run build:scanner
-npx vibescan scan src --format compact | Select-Object -First 5
+npm run build -w vibescan
+npx vibescan scan vibescan/src --format compact | Select-Object -First 5
 ```
 
 ---
@@ -151,7 +151,7 @@ RUN_ID="$(date -u +%Y-%m-%d)_${SLUG}_$(git -C "$ROOT" rev-parse --short HEAD)"
 OUT="$ROOT/benchmarks/results/$RUN_ID"
 mkdir -p "$OUT"
 
-( cd "$ROOT" && npm run build:scanner )
+( cd "$ROOT" && npm run build -w vibescan )
 
 npx --prefix "$ROOT" vibescan scan "$BENCH" --format json --project-root "$BENCH" > "$OUT/vibescan-project.json"
 

@@ -11,17 +11,18 @@ on:
 jobs:
   vibescan:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: vibescan
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: vibescan/package-lock.json
+          cache-dependency-path: package-lock.json
+
       - run: npm ci
-      - run: npm test
-      - run: node src/cli.js scan ./tests/fixtures/vulnerable-express-app --json
-      - run: node src/cli.js rules
+      - run: npm test -w vibescan
+
+      - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format json > ./vibescan-fixture.out.json
+      - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format sarif > ./vibescan-fixture.out.sarif
+      - run: test -s ./vibescan-fixture.out.json
+      - run: test -s ./vibescan-fixture.out.sarif
