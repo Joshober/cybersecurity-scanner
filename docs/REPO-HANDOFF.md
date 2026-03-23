@@ -96,7 +96,8 @@ CyberSecurity/
 │   ├── secure-arch-core/
 │   ├── secure-arch-cli/
 │   └── secure-arch-adapters/
-├── results/                     ← DVNA benchmark outputs + evaluation markdown
+├── benchmarks/                  ← DVNA README + seeded corpora + scripts + dated run outputs
+├── results/                     ← DVNA benchmark outputs + evaluation markdown (legacy; see benchmarks/results/archive)
 ├── src/
 │   ├── attacks/
 │   │   ├── index.ts             # cryptoRules[], injectionRules[]

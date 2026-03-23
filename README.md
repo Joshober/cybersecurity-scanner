@@ -158,6 +158,8 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 | `--severity critical\|error\|warning\|info` | Floor for reported findings |
 | `--format human\|compact\|json\|sarif` | Output |
 | `--exclude-vendor` | Skip vendor/minified trees when collecting files |
+| `--ignore-glob <pat>` | Extra picomatch glob (relative to `--project-root` / scan root); repeatable |
+| `--benchmark-metadata` | JSON: stable-sorted findings, optional `run{}`, `summary.findingsPerFile`, `ruleFamily` per finding; or set `VIBESCAN_BENCHMARK=1` |
 | `--config <path>` | Use explicit `vibescan.config.json` |
 | `--manifest <path>` | Write run manifest JSON (tool versions, scope, outputs) |
 | `--export-adjudication <stem>` | Write `<stem>.json` and `<stem>.csv` (one row per finding) |
@@ -182,7 +184,7 @@ npm run test:arch   # @secure-arch/core (requires build:arch)
 
 ## DVNA evaluation (research)
 
-Benchmark outputs and comparison table live under [`results/`](results/): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/person-b-handoff.md`](results/person-b-handoff.md).
+Benchmark outputs and comparison table live under [`results/`](results/) (legacy captures) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/person-b-handoff.md`](results/person-b-handoff.md). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
 
 ---
 

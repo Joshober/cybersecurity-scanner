@@ -6,6 +6,7 @@ import {
   summarizeFindings,
   formatProjectJson,
   findingToJson,
+  sortFindingsStable,
 } from "../../dist/system/format.js";
 import { scanProject } from "../../dist/system/scanner.js";
 
@@ -94,5 +95,86 @@ app.post('/api/login', (req, res) => { res.send('ok'); });
       "/app/routes.js"
     );
     assert.strictEqual(row.file, "/app/routes.js");
+  });
+
+  it("formatProjectJson sorts findings deterministically by path, line, ruleId", () => {
+    const project = {
+      fileResults: [],
+      routes: [],
+      findings: [
+        {
+          ruleId: "z",
+          message: "m2",
+          severity: "warning",
+          severityLabel: "MEDIUM",
+          category: "injection",
+          line: 2,
+          column: 0,
+          filePath: "/b.js",
+        },
+        {
+          ruleId: "a",
+          message: "m1",
+          severity: "error",
+          severityLabel: "HIGH",
+          category: "crypto",
+          line: 1,
+          column: 0,
+          filePath: "/a.js",
+        },
+      ],
+    };
+    const json = JSON.parse(formatProjectJson(project));
+    assert.strictEqual(json.findings[0].filePath, "/a.js");
+    assert.strictEqual(json.findings[1].filePath, "/b.js");
+  });
+
+  it("sortFindingsStable matches formatProjectJson order", () => {
+    const findings = [
+      { ruleId: "b", message: "", severity: "info", severityLabel: "LOW", category: "crypto", line: 1, filePath: "z.js" },
+      { ruleId: "a", message: "", severity: "info", severityLabel: "LOW", category: "crypto", line: 1, filePath: "a.js" },
+    ];
+    const sorted = sortFindingsStable(findings);
+    const json = JSON.parse(
+      formatProjectJson({ findings, fileResults: [], routes: [] })
+    );
+    assert.deepStrictEqual(
+      json.findings.map((f) => f.ruleId),
+      sorted.map((f) => f.ruleId)
+    );
+  });
+
+  it("formatProjectJson benchmarkMetadata adds run, findingsPerFile, ruleFamily", () => {
+    const project = {
+      fileResults: [],
+      routes: [],
+      findings: [
+        {
+          ruleId: "crypto.hash.weak",
+          message: "weak",
+          severity: "error",
+          severityLabel: "HIGH",
+          category: "crypto",
+          line: 3,
+          column: 1,
+          filePath: "/x.js",
+        },
+      ],
+    };
+    const json = JSON.parse(
+      formatProjectJson(project, {
+        benchmarkMetadata: true,
+        includeRuleFamily: true,
+        toolVersion: "9.9.9-test",
+        gitCommit: "deadbeef",
+        scanOptions: { format: "json" },
+      })
+    );
+    assert.ok(json.run);
+    assert.strictEqual(json.run.toolVersion, "9.9.9-test");
+    assert.strictEqual(json.run.gitCommit, "deadbeef");
+    assert.ok(json.run.timestamp);
+    assert.deepStrictEqual(json.summary.findingsPerFile, { "/x.js": 1 });
+    assert.strictEqual(json.findings[0].ruleFamily, "crypto.hash");
   });
 });
