@@ -2,6 +2,8 @@
 
 **Intent:** Keep **research merges** independent of **layout/refactor** work. Academic work should land on `master` from `docs/research-strengthening` (or similar) without waiting for a megamerge.
 
+**Hybrid layout (this repo’s `main`):** The scanner remains at **repo root** (`src/`). **secure-arch** is under `packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into `packages/secure-code-scanner/`.
+
 ## What to verify on `Jober/NewLayout` first
 
 Run from repo root on that branch:
@@ -10,7 +12,7 @@ Run from repo root on that branch:
 npm install
 npm run build
 npm test
-npx vibescan scan packages/secure-code-scanner/src --format compact
+npx vibescan scan ./src --format compact
 npx secure-arch check --root . --code-evidence js-ts
 ```
 

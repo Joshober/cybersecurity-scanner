@@ -21,8 +21,12 @@ export const CSRF_MIDDLEWARE = [
 export const RATE_LIMIT_MIDDLEWARE = [
   "rateLimit",
   "expressRateLimit",
+  "express-rate-limit",
   "limiter",
   "rateLimiter",
+  "ipRateLimit",
+  "createRateLimiter",
+  "rateLimiterMiddleware",
   "slowDown",
   "bottleneck",
 ] as const;

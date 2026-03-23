@@ -4,6 +4,9 @@ node_modules/
 # Local DVNA clone (benchmark); clone with: git clone https://github.com/appsecco/dvna dvna
 dvna/
 
+# DVNA under benchmarks layout (see benchmarks/dvna/README.md)
+benchmarks/dvna/dvna/
+
 # Build output (push source only)
 dist/
 
@@ -35,3 +38,9 @@ coverage/
 
 # Optional
 .cache/
+
+# BEGIN secure-arch generated ignores (extra key material; .env already above)
+!.env.example
+*.key
+*.p12
+# END secure-arch generated ignores

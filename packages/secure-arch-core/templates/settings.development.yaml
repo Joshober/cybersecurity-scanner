@@ -1,0 +1,14 @@
+# Development environment overrides (merged with global)
+environments:
+  development:
+    database:
+      exposure: internal
+      publiclyReachable: false
+    deployment:
+      target: local
+      debugEnabledInProduction: false
+    serviceCommunication:
+      allowlistEnforced: true
+      overlyPermissiveIam: false
+    network:
+      defaultDenyBetweenServices: true

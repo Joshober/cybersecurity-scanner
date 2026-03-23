@@ -8,10 +8,13 @@ import {
   runRuleEngine,
   runTaintEngine,
   runMiddlewareAudit,
+  runWebhookAudit,
   runAppLevelAudit,
   generateTests,
   SEVERITY_ORDER,
 } from "./engine/index.js";
+import { runOpenApiDriftAudit, resolveOpenApiSpecPaths } from "./engine/openapiDrift.js";
+import { buildRouteInventory, runRoutePostureFinding } from "./engine/routeInventory.js";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import { scanWithAi } from "./ai/ai-analyzer.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";
@@ -90,10 +93,34 @@ export function scanProject(
   const mw = filterByThreshold(runMiddlewareAudit(allRoutes), options.severityThreshold);
   allFindings.push(...mw);
 
+  const specPaths = resolveOpenApiSpecPaths(
+    options.projectRoot,
+    options.openApiSpecPaths,
+    options.openApiDiscovery
+  );
+  if (specPaths.length > 0) {
+    const drift = filterByThreshold(
+      runOpenApiDriftAudit(allRoutes, specPaths),
+      options.severityThreshold
+    );
+    allFindings.push(...drift);
+  }
+
+  const posture = filterByThreshold(runRoutePostureFinding(allRoutes), options.severityThreshold);
+  allFindings.push(...posture);
+
+  const wh = filterByThreshold(runWebhookAudit(allRoutes), options.severityThreshold);
+  allFindings.push(...wh);
+
+  const routeInventory = buildRouteInventory(allRoutes);
+
   return {
     fileResults,
     routes: allRoutes,
     findings: allFindings,
+    openApiSpecsUsed: specPaths.length > 0 ? specPaths : undefined,
+    routeInventory,
+    buildId: options.buildId,
   };
 }
 
@@ -112,18 +139,19 @@ export async function scanProjectAsync(
   options: ScannerOptions = {},
   projectRoot?: string
 ): Promise<ProjectScanResult> {
-  const base = scanProject(files, options);
-  const root = projectRoot ?? process.cwd();
+  const root = projectRoot ?? options.projectRoot ?? process.cwd();
+  const opts: ScannerOptions = { ...options, projectRoot: options.projectRoot ?? root };
+  const base = scanProject(files, opts);
   let packageJsonPath = findPackageJsonNear(root);
-  if (options.projectRoot) packageJsonPath = findPackageJsonNear(options.projectRoot) ?? packageJsonPath;
+  if (opts.projectRoot) packageJsonPath = findPackageJsonNear(opts.projectRoot) ?? packageJsonPath;
 
-  if (options.checkRegistry && !options.skipRegistry && packageJsonPath) {
-    const slop = await checkDependencies(packageJsonPath, { skipRegistry: options.skipRegistry });
-    base.findings.push(...filterByThreshold(slop, options.severityThreshold));
+  if (opts.checkRegistry && !opts.skipRegistry && packageJsonPath) {
+    const slop = await checkDependencies(packageJsonPath, { skipRegistry: opts.skipRegistry });
+    base.findings.push(...filterByThreshold(slop, opts.severityThreshold));
   }
 
-  if (options.generateTests && options.generateTestsOutputDir) {
-    generateTests(base.findings, options.generateTestsOutputDir);
+  if (opts.generateTests && opts.generateTestsOutputDir) {
+    generateTests(base.findings, opts.generateTestsOutputDir);
   }
 
   return { ...base, packageJsonPath };
