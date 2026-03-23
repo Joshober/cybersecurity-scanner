@@ -15,7 +15,12 @@ export {
   formatJson,
   formatProjectJson,
   projectFindingsToScanResults,
+  summarizeFindings,
+  findingToJson,
+  findingDisplayFile,
 } from "./format.js";
+export type { FindingsSummary } from "./format.js";
+export { formatProjectSarif, scanResultsToProjectForSarif } from "./sarif.js";
 export type {
   Finding,
   ScanResult,
@@ -27,5 +32,6 @@ export type {
   AiAnalyzerOptions,
   ProjectScanResult,
   RouteNode,
+  RouteInventoryEntry,
 } from "./types.js";
 export type { Rule, RuleContext } from "./utils/rule-types.js";

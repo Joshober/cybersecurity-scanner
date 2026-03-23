@@ -2,7 +2,7 @@
 
 This document summarizes **what the repo is**, **how the scanner works**, **what is implemented**, and **where files live**. Paste or attach it when onboarding a new assistant.
 
-**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [results/](../results/) (DVNA benchmark, Person B stats).
+**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [results/](../results/) (DVNA benchmark, Person B stats).
 
 ---
 
@@ -11,10 +11,26 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 | Item | Value |
 |------|--------|
 | **Product name** | VibeScan |
-| **npm package** | `secure-code-scanner` |
+| **npm package** | `secure-code-scanner` (published from **repo root**; scanner `src/` lives here) |
 | **CLI binaries** | `vibescan`, `secure` (same `dist/system/cli/index.js`) |
 | **Language / runtime** | TypeScript → JavaScript, **Node 18+** |
 | **Repo** | [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner) |
+| **Workspaces** | Root scanner + [`packages/secure-arch-*`](../packages/) (`npm` workspaces; see root `package.json`) |
+
+---
+
+## Repository roles
+
+- **Evaluated artifact (paper):** VibeScan (`secure-code-scanner`) — the root scanner in `src/` run via `vibescan`/`secure`, with evidence in `benchmarks/results/`.
+- **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
+- **Related tooling:** the `vibescan/` package — standalone helpers (e.g. extraction/route graph tooling). Treat as related engineering unless you add it to the evaluation scope.
+
+## Maturity legend (how to avoid “scope mixing”)
+
+- **Implemented:** shipped in the default CLI/scanner path.
+- **Documented:** described in README/handoff materials.
+- **Evaluated:** covered by manifest + adjudication + frozen benchmark outputs.
+- **Future:** explicitly planned, not part of current evidence.
 
 ---
 
@@ -33,6 +49,13 @@ Mechanisms:
 4. **Optional** — `--check-registry` → **SLOP-001** ([`slopsquat.ts`](../src/system/ai/slopsquat.ts)); `--generate-tests` → [`testWriter.ts`](../src/system/engine/testWriter.ts); `--mode ai` → [`ai-analyzer.ts`](../src/system/ai/ai-analyzer.ts).
 
 **Path note:** Some task specs refer to `src/rules/system/ai/`. In this repo, that logic lives under **`src/system/ai/`**; pattern rules live under **`src/attacks/`**.
+
+### Universal secure-architecture layer
+
+- **Settings in YAML** under [`architecture/secure-rules/`](../architecture/secure-rules/) (AI tools fill templates; they do not “validate” security by themselves).
+- **Static checker** — [`@secure-arch/core`](../packages/secure-arch-core/) loads YAML, runs **ARCH-*** rules, and optionally correlates **JS/TS** evidence via **`secure-code-scanner`** (`ARCH-E*`) plus **Python/Java** heuristics (`ARCH-H*`).
+- **CLI** — [`secure-arch`](../packages/secure-arch-cli/src/cli.ts): `install`, `init --tool cursor|amazonq`, `check`.
+- **Docs** — [docs/secure-arch/README.md](secure-arch/README.md).
 
 ---
 
@@ -66,9 +89,14 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 | **SLOP-001** — npm HEAD, max 5 concurrent, workspaces by package name, `.npmrc` non-npmjs skip | [`slopsquat.ts`](../src/system/ai/slopsquat.ts) |
 | **SSRF-003** — `ip.isPublic`/`isPrivate` when gating `fetch`/HTTP client on same URL id | [`ipGuard.ts`](../src/system/ai/ipGuard.ts) |
 | **RULE-SSRF-002** — axios baseURL + user URL | [`axiosBypass.ts`](../src/system/ai/axiosBypass.ts) |
-| Prototype pollution payloads | [`prototypePollution.ts`](../src/attacks/injection/prototypePollution.ts) |
 | `envFallback` shim (re-export) | [`envFallback.ts`](../src/system/ai/envFallback.ts) |
 | Rule registry | [`attacks/index.ts`](../src/attacks/index.ts) — `cryptoRules` (9), `injectionRules` (11) |
+
+## Experimental / not in default scan
+
+- `prototypePollution.ts`: present in tree but not exported from `src/attacks/index.ts` (not part of the default scan rule list)
+- `jwt-weak-test.ts`: built to `dist/` but not registered in the active rule list
+- `entropy.ts`: helper for secret detection; not a standalone rule
 
 **Finding extras:** `packageName`, `cveRef`, `findingKind`, `remediation` on [`Finding`](../src/system/types.ts) where relevant.
 
@@ -80,8 +108,16 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 CyberSecurity/
 ├── docs/
 │   ├── REPO-HANDOFF.md          ← this file
+│   ├── secure-arch/             ← secure-arch usage + AI prompts
+│   ├── research-strengthening/  ← paper/poster methodology hub
 │   └── vibescan/                ← poster HTML, abstract, pitch, QR, checklist
-├── results/                     ← DVNA benchmark outputs + evaluation markdown
+├── architecture/secure-rules/   ← YAML settings (after secure-arch install)
+├── packages/
+│   ├── secure-arch-core/
+│   ├── secure-arch-cli/
+│   └── secure-arch-adapters/
+├── benchmarks/                  ← DVNA README + seeded corpora + scripts + dated run outputs
+├── results/                     ← DVNA benchmark outputs + evaluation markdown (legacy; see benchmarks/results/archive)
 ├── src/
 │   ├── attacks/
 │   │   ├── index.ts             # cryptoRules[], injectionRules[]
@@ -124,14 +160,20 @@ CyberSecurity/
 
 ```bash
 npm install
-npm run build              # tsc
+npm run build              # tsc (scanner at repo root)
+npm run build:arch         # build secure-arch workspaces
 npm run test               # build + node --test tests/unit/  (~51 tests)
+npm run test:arch          # secure-arch-core tests
 npm run test:only          # tests only, dist must exist
 
 # Scan application code only (avoid node_modules):
 npx vibescan scan src
 # or
 node dist/system/cli/index.js scan src --format compact
+
+# Optional architecture rulepack + checks:
+npx secure-arch install --root .
+npx secure-arch check --root . --code-evidence js-ts
 ```
 
 ---

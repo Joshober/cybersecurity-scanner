@@ -1,0 +1,3 @@
+ruleId,severity,file,line,category,cwe,message,remediation
+crypto.hash.weak,error,c:\Users\Josh\Downloads\CyberSecurity\benchmarks\seeded\crypto\pos-weak-hash.js,3,crypto,,Avoid weak hash algorithm 'md5'. For password storage use a password hashing function; for general hashing use SHA-256+.,"For passwords: use bcrypt, scrypt, PBKDF2, or argon2 with salting (e.g. bcrypt.hashSync(password, 10)). For general hashing: crypto.createHash('sha256') or crypto.createHash('sha512')."
+MW-003,info,c:\Users\Josh\Downloads\CyberSecurity\benchmarks\seeded\injection\pos-sql-concat.js,1,injection,693,No helmet() call detected in this file — verify security headers are set.,Use helmet() at app bootstrap or equivalent header middleware.

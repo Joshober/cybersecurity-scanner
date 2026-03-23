@@ -1,0 +1,30 @@
+environments:
+  production:
+    database:
+      exposure: internal
+      publiclyReachable: false
+    authentication:
+      enabled: true
+      mechanisms: [jwt]
+    authorization:
+      model: rbac
+      enforcedEverywhere: true
+    secrets:
+      storage: kms
+      embeddedInRepo: false
+    cors:
+      allowCredentials: true
+      origins:
+        - "https://app.example.com"
+    network:
+      ingressPublic: true
+      defaultDenyBetweenServices: true
+    deployment:
+      target: kubernetes
+      debugEnabledInProduction: false
+    envIsolation:
+      separateAccountsOrProjects: true
+      sharedDatabaseAcrossEnvs: false
+    serviceCommunication:
+      allowlistEnforced: true
+      overlyPermissiveIam: false

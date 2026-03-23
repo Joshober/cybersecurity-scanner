@@ -4,7 +4,7 @@ import type { CallExpression, Expression, Function as EstreeFunction, Node, Prog
 import type { RouteNode } from "../types.js";
 import { walk } from "../walker.js";
 
-const HTTP_METHODS = new Set(["get", "post", "put", "patch", "delete"]);
+const HTTP_METHODS = new Set(["get", "head", "post", "put", "patch", "delete"]);
 
 function joinPaths(base: string, segment: string): string {
   if (!segment || segment === "/") {

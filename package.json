@@ -8,15 +8,26 @@
     "secure": "dist/system/cli/index.js",
     "vibescan": "dist/system/cli/index.js"
   },
+  "workspaces": [
+    "packages/secure-arch-core",
+    "packages/secure-arch-adapters",
+    "packages/secure-arch-cli"
+  ],
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
     "build": "tsc",
+    "build:scanner": "npm run build",
+    "build:arch": "npm run build -w @secure-arch/core -w @secure-arch/adapters -w @secure-arch/cli",
+    "build:all": "npm run build && npm run build:arch",
     "test": "npm run build && node --test tests/unit/",
+    "test:arch": "npm run build:arch && npm run test -w @secure-arch/core",
     "test:only": "node --test tests/unit/",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "secure-arch": "node packages/secure-arch-cli/dist/cli.js",
+    "policy-eval": "node scripts/policy-eval.mjs"
   },
   "keywords": [
     "security",
@@ -35,12 +46,16 @@
     "@typescript-eslint/parser": "^7.0.0",
     "acorn": "^8.11.0",
     "eslint": ">=8.0.0",
-    "fast-glob": "^3.3.0"
+    "fast-glob": "^3.3.0",
+    "picomatch": "^4.0.3",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
+    "@secure-arch/cli": "file:packages/secure-arch-cli",
     "@types/eslint": "^8.56.0",
     "@types/estree": "^1.0.0",
     "@types/node": "^20.0.0",
+    "@types/picomatch": "^4.0.2",
     "eslint-plugin-security": "^2.1.1",
     "typescript": "^5.3.0"
   },
