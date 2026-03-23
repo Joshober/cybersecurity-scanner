@@ -2,6 +2,14 @@
 
 Use this as the working tracker for reproducible benchmarks, ground-truth adjudication, and machine-readable evidence. Detailed specs live in the linked docs.
 
+## Execution priority (locked for this repo)
+
+All three strands from the unfinished-features plan are in scope, in this order:
+
+1. **Reproducible benchmarks (Phase B–D)** — Physical [`benchmarks/`](../../benchmarks/) tree, scripts, manifests, JSON metadata flags (`--benchmark-metadata`, stable finding order), and [`eval-support-changes.md`](./eval-support-changes.md) items implemented in code where listed.
+2. **Bearer baseline** — Automated in [`benchmarks/scripts/`](../../benchmarks/scripts/) when Docker (or a native Bearer install) is available; until then keep [`results/bearer-dvna.txt`](../../results/bearer-dvna.txt) as the honest “not run” record and drop `bearer.json` under [`benchmarks/results/`](../../benchmarks/results/) after a successful run.
+3. **Conference polish** — Poster PDF, print proof, and pitch timing stay human tasks; rubric notes remain in [`rubric-status-updated.md`](./rubric-status-updated.md).
+
 ## Phase A — Documentation and layout (this pass)
 
 - [x] **Rule coverage audit** — [`rule-coverage-audit.md`](./rule-coverage-audit.md)
@@ -14,11 +22,11 @@ Use this as the working tracker for reproducible benchmarks, ground-truth adjudi
 
 ## Phase B — Repository layout (physical)
 
-- [ ] Create `benchmarks/dvna/` (pinned clone or submodule of DVNA / chosen fork)
-- [ ] Create `benchmarks/seeded/` (minimal synthetic corpora per rule family)
-- [ ] Create `benchmarks/results/` (timestamped raw outputs + manifests)
-- [ ] Create `benchmarks/scripts/` (shell/PowerShell runners wrapping this repo’s tools)
-- [ ] Optionally migrate legacy [`results/`](../../results/) artifacts under `benchmarks/results/archive/` with a manifest pointing to commit hashes
+- [x] Create `benchmarks/dvna/` (README + clone path; actual clone is gitignored — see [`benchmarks/dvna/README.md`](../../benchmarks/dvna/README.md))
+- [x] Create `benchmarks/seeded/` (minimal synthetic corpora per rule family — starter set committed)
+- [x] Create `benchmarks/results/` (timestamped raw outputs + manifests — see README; legacy [`results/`](../../results/) indexed under `archive/`)
+- [x] Create `benchmarks/scripts/` (shell/PowerShell runners wrapping this repo’s tools)
+- [x] Legacy [`results/`](../../results/) cross-linked from `benchmarks/results/archive/README.md` (full migration optional)
 
 ## Phase C — Ground truth and scoring
 
@@ -28,8 +36,8 @@ Use this as the working tracker for reproducible benchmarks, ground-truth adjudi
 
 ## Phase D — Scanner output (small code changes)
 
-- [ ] Implement agreed items from [`eval-support-changes.md`](./eval-support-changes.md) behind flags where possible
-- [ ] Regenerate benchmark JSON with new summary fields; keep a frozen “before” copy for paper reproducibility
+- [x] Implement agreed items from [`eval-support-changes.md`](./eval-support-changes.md): `--ignore-glob`, `--benchmark-metadata` (+ `VIBESCAN_BENCHMARK=1`), stable JSON finding order, optional `ruleFamily` on findings, [`vibescan-benchmark-output.schema.json`](./vibescan-benchmark-output.schema.json)
+- [ ] Regenerate benchmark JSON with new fields after each tool-version bump; keep a frozen “before” copy per run folder under `benchmarks/results/`
 
 ## Related repo docs
 

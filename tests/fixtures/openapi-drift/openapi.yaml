@@ -1,0 +1,14 @@
+openapi: 3.0.3
+info:
+  title: Fixture API
+  version: "1.0.0"
+paths:
+  /api/items/{id}:
+    get:
+      summary: Get item
+  /api/items:
+    post:
+      summary: Create item
+  /api/legacy/removed:
+    get:
+      summary: Documented but not implemented in Express fixture

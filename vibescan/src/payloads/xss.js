@@ -1,0 +1,8 @@
+export const xssPayloads = [
+  "<script>alert(1)</script>",
+  "<img src=x onerror=alert(1)>",
+  "<svg onload=alert(1)>",
+  "<details open ontoggle=alert(1)>",
+  "javascript:alert(1)",
+  "'-alert(1)-'",
+];

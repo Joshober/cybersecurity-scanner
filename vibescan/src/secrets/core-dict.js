@@ -1,0 +1,21 @@
+/** Tier 1 — doc-derived defaults (safe to ship). */
+export const TIER1 = [
+  "secret",
+  "SECRET",
+  "secret key",
+  "123456",
+  "your-256-bit-secret",
+  "keyboard cat",
+  "supersecretkey",
+  "supersecretjwt",
+  "your-secret-key-change-it-in-production",
+  "changeme",
+  "password",
+  "mysecret",
+  "jwt_secret",
+  "secretkey",
+  "your-secret-key",
+  "development",
+  "test-secret",
+  "placeholder",
+];

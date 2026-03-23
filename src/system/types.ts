@@ -5,7 +5,7 @@ export type Severity = "critical" | "error" | "warning" | "info";
 export type SeverityLabel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 // Category of security issue.
-export type Category = "crypto" | "injection";
+export type Category = "crypto" | "injection" | "api_inventory";
 
 /** OWASP Top 10 style id, e.g. A03:2021 */
 export type OwaspId = string;
@@ -21,9 +21,17 @@ export type FindingKind =
   | "APP_CONFIG"
   | string;
 
+/** Optional route context on graph-derived findings (JSON / SARIF consumers). */
+export interface FindingRouteRef {
+  method: "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE";
+  path: string;
+  fullPath: string;
+  middlewares: string[];
+}
+
 // Express-style route extracted for middleware audit and tooling.
 export interface RouteNode {
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method: "GET" | "HEAD" | "POST" | "PUT" | "PATCH" | "DELETE";
   path: string;
   fullPath: string;
   params: string[];
@@ -63,6 +71,8 @@ export interface Finding {
   filePath?: string;
   /** npm dependency name for registry-based findings (slopsquat). */
   packageName?: string;
+  /** When the finding is tied to an extracted Express route. */
+  route?: FindingRouteRef;
 }
 
 // Scan engine: static (AST rules) or AI (LLM reads code and responds).
@@ -91,6 +101,16 @@ export interface ScannerOptions {
   generateTestsOutputDir?: string;
   /** Workspace root for package.json / multi-file route graph. */
   projectRoot?: string;
+  /** Skip common vendor/minified paths when collecting files (CLI: --exclude-vendor). */
+  excludeVendor?: boolean;
+  /** Extra glob patterns to ignore when collecting files (from config). */
+  ignoreGlobs?: string[];
+  /** Absolute paths to OpenAPI/Swagger specs (disables discovery when set). */
+  openApiSpecPaths?: string[];
+  /** When true (default), discover openapi/swagger.* under projectRoot. */
+  openApiDiscovery?: boolean;
+  /** Optional build/deploy id for run metadata (JSON output / manifests). */
+  buildId?: string;
 }
 
 // Result of scanning a file.
@@ -101,10 +121,32 @@ export interface ScanResult {
   routes?: RouteNode[];
 }
 
+/** Enriched route row for trust-boundary / inventory reporting. */
+export interface RouteInventoryEntry {
+  method: RouteNode["method"];
+  path: string;
+  fullPath: string;
+  file: string;
+  line: number;
+  middlewares: string[];
+  /** Heuristic risk tags, e.g. admin, auth-sensitive, upload, webhook. */
+  tags: string[];
+  sensitivePath: boolean;
+  adminPath: boolean;
+  objectScoped: boolean;
+  hasAuthMiddleware: boolean;
+}
+
 /** Aggregated workspace scan (CLI / scanProject). */
 export interface ProjectScanResult {
   fileResults: ScanResult[];
   routes: RouteNode[];
   findings: Finding[];
   packageJsonPath?: string;
+  /** OpenAPI spec files used for drift analysis (if any). */
+  openApiSpecsUsed?: string[];
+  /** Labeled route inventory when project scan runs. */
+  routeInventory?: RouteInventoryEntry[];
+  /** Echo of optional ScannerOptions.buildId. */
+  buildId?: string;
 }

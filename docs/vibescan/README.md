@@ -23,6 +23,20 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 | [`adjudication-template.md`](./adjudication-template.md) | Per-finding ground-truth labeling table. |
 | [`output-support-audit.md`](./output-support-audit.md) | Where to add JSON summaries (format layer). |
 | [`eval-support-changes.md`](./eval-support-changes.md) | Smallest non-detection code changes for eval ergonomics. |
+| [`vibescan-benchmark-output.schema.json`](./vibescan-benchmark-output.schema.json) | JSON Schema for project scan output (incl. `--benchmark-metadata`). |
+| [`project-direction-update.md`](./project-direction-update.md) | Scope: trust boundaries, surface analysis, positioning vs Snyk/DAST. |
+| [`research-scope-v2.md`](./research-scope-v2.md) | Updated RQ, hypotheses (conservative). |
+| [`related-tools-positioning.md`](./related-tools-positioning.md) | Comparison table: SAST, SCA, DAST, exploit tools, platforms. |
+| [`trust-boundary-model.md`](./trust-boundary-model.md) | Express-oriented trust boundaries and static limits. |
+| [`endpoint-discovery-plan.md`](./endpoint-discovery-plan.md) | Route inventory and future spec drift. |
+| [`authz-and-surface-gap-analysis.md`](./authz-and-surface-gap-analysis.md) | What VibeScan detects vs misses (IDOR, authz, etc.). |
+| [`platform-and-api-benchmark-plan.md`](./platform-and-api-benchmark-plan.md) | Seeded benchmark case IDs (qualitative baselines). |
+| [`rule-roadmap-v2.md`](./rule-roadmap-v2.md) | Planned rules by difficulty. |
+| [`context-aware-prioritization-plan.md`](./context-aware-prioritization-plan.md) | Future prioritization design. |
+| [`snyk-baseline-plan.md`](./snyk-baseline-plan.md) | Honest Snyk comparison protocol. |
+| [`dast-comparison-plan.md`](./dast-comparison-plan.md) | Burp, ZAP, nuclei, sqlmap vs static scope. |
+| [`runtime-context-future-work.md`](./runtime-context-future-work.md) | Deployment/build correlation (future). |
+| [`webhook-verification-rule-proposal.md`](./webhook-verification-rule-proposal.md) | Webhook signature rule (v2 ideas; aligns with `WEBHOOK-001`). |
 
 ## Regenerate the QR (if the public URL changes)
 

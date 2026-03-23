@@ -18,6 +18,9 @@ Goal: define small, auditable benchmark cases mapped to **implemented** VibeScan
 | SB-10 | axios baseURL bypass pattern | API proxy uses `axios({ baseURL, url: req.query.next })` | User-controlled URL combined with baseURL assumptions | `RULE-SSRF-002` | Yes, this is specialized |
 | SB-11 | Slopsquat dependency reference | `package.json` contains non-existent dependency name | e.g. `"expresss": "^4.0.0"` and run with `--check-registry` | `SLOP-001` project-level finding | Yes, source linters generally do not do registry HEAD checks |
 | SB-12 | Prototype pollution path/key pattern | Merge/set endpoint accepts attacker-controlled path keys | e.g. `_.set(obj, req.body.path, req.body.value)` with `constructor.prototype` path | taint/prototype findings (e.g. `injection.prototype-pollution.tainted-flow`, `PROTOTYPE_POLLUTION` kind) if triggered by implementation | Often missed or inconsistently flagged |
+| SB-13 | OpenAPI drift / API inventory | Express app with routes both inside and outside published OpenAPI | Pair `app.js` + `openapi.yaml` with mismatched paths | `API-INV-001`, `API-INV-002`; optional `API-POSTURE-001`, `AUTH-005` | **Yes** — typical SAST baselines do not reconcile code routes to a spec |
+
+**SB-13 reference implementation:** [`tests/fixtures/openapi-drift/`](../../tests/fixtures/openapi-drift/) and [`tests/unit/openapi-drift.test.mjs`](../../tests/unit/openapi-drift.test.mjs).
 
 ## Benchmark execution notes
 
