@@ -1,13 +1,13 @@
 # VibeScan — rule coverage audit (tests, fixtures, docs, benchmarks)
 
-**Scope:** Rules and project-level checks that **actually run** in static mode, as wired in [`packages/secure-code-scanner/src/attacks/index.ts`](../../packages/secure-code-scanner/src/attacks/index.ts), [`packages/secure-code-scanner/src/system/scanner.ts`](../../packages/secure-code-scanner/src/system/scanner.ts), and engine audits under [`packages/secure-code-scanner/src/system/engine/`](../../packages/secure-code-scanner/src/system/engine/).  
+**Scope:** Rules and project-level checks that **actually run** in static mode, as wired in [`src/attacks/index.ts`](../../src/attacks/index.ts), [`src/system/scanner.ts`](../../src/system/scanner.ts), and engine audits under [`src/system/engine/`](../../src/system/engine/).
 **Date:** 2025-03-20 (repo snapshot).
 
 ## Legend
 
 | Column | Meaning |
 |--------|---------|
-| **Unit tests** | `packages/secure-code-scanner/tests/unit/*.test.mjs` exercises the rule (substring match on `ruleId` and/or dedicated file). |
+| **Unit tests** | `tests/unit/*.test.mjs` exercises the rule (substring match on `ruleId` and/or dedicated file). |
 | **Fixture in repo** | File exists under `tests/fixtures/**` that appears intended for the rule. |
 | **Fixture in CI** | A test calls `scanFixture(...)` on that path (today only SQL + generic safe). |
 | **README** | Documented in root [README.md](../../README.md) rule table (catalog-level, not per-rule prose). |
@@ -24,7 +24,7 @@
 | `crypto.random.insecure` | Yes (`insecure-randomness.test.mjs`) | — | No | Yes | Seeded; DVNA may vary |
 | `crypto.secrets.hardcoded` | Yes (`hardcoded-secrets.test.mjs`) | — | No | Yes | **High** on DVNA-style demos |
 | `SEC-004` | Yes (`default-secret-fallback.test.mjs`) | `env-fallback/vulnerable.js` | No | Yes | **High** on misconfigured apps |
-| `crypto.jwt.weak-secret-literal` | **No** | — | No | Yes | **High** on JWT tutorials / DVNA |
+| `crypto.jwt.weak-secret-literal` | Yes (`jwt-weak-secret.test.mjs`) | — | No | Yes | **High** on JWT tutorials / DVNA |
 | `crypto.tls.reject-unauthorized` | Yes (`disabled-tls.test.mjs`) | `disabled-tls/vulnerable.js` | No | Yes | Seeded; some integration tests |
 | `injection.eval` | Yes (`code-injection.test.mjs`) | — | No | Yes | DVNA / dynamic code patterns |
 | `injection.sql.string-concat` (+ taint IDs) | Yes (`sql-injection.test.mjs`) | `sql-injection/vulnerable.js`, `safe.js` | **Yes** | Yes | **High** on DVNA |
@@ -34,9 +34,9 @@
 | `injection.noql` | Yes (`nosql-injection.test.mjs`) | — | No | Yes | **Medium** if Mongo-style APIs present |
 | `injection.xpath` | Yes (`xpath-injection.test.mjs`) | — | No | Yes | Low unless XPath APIs used |
 | `injection.log` | Yes (`log-injection.test.mjs`) | — | No | Yes | Low–medium |
-| `mw.cookie.missing-flags` | **No** | — | No | Yes | **Medium** on Express session apps |
+| `mw.cookie.missing-flags` | Yes (`mw-cookie-missing-flags.test.mjs`) | — | No | Yes | **Medium** on Express session apps |
 | `SSRF-003` | Yes (`ip-guard-ssrf.test.mjs`) | — | No | Yes | Low unless `ip` + `fetch`/`axios` idiom |
-| `RULE-SSRF-002` | **No** | — | No | Yes | Low–medium; specific axios config shape |
+| `RULE-SSRF-002` | Yes (`rule-ssrf-002.test.mjs`) | — | No | Yes | Low–medium; specific axios config shape |
 
 ## Project-level and engine findings
 
@@ -46,7 +46,7 @@
 | `AUTH-005` | `middlewareAudit.ts` | **No** dedicated | — | Yes | Object-scoped GET/HEAD without auth (BOLA/IDOR prep) |
 | `MW-001` | `middlewareAudit.ts` | Partial (same) | — | Indirect | **High** |
 | `MW-002` | `middlewareAudit.ts` | **No** dedicated | — | Indirect | Sensitive-path dependent |
-| `MW-003` | `appLevelAudit.ts` | **No** dedicated | — | Indirect | **Medium** (helmet absent) |
+| `MW-003` | `appLevelAudit.ts` | Yes (`mw-003-missing-helmet.test.mjs`) | — | Indirect | **Medium** (helmet absent) |
 | `MW-004` | `appLevelAudit.ts` | **No** dedicated | — | Indirect | **Medium** (`cors({ origin: '*' })`) |
 | `SLOP-001` | `slopsquat.ts` (needs `--check-registry`) | Yes (`slopsquat.test.mjs`) | — | Yes | **Registry benchmark**; not DVNA code |
 
@@ -64,13 +64,13 @@
 
 | Artifact | Status |
 |----------|--------|
-| [`prototypePollution.ts`](../../packages/secure-code-scanner/src/attacks/injection/prototypePollution.ts) | Present in tree; **not** exported from `attacks/index.ts` — not part of default scan. |
-| [`jwt-weak-test.ts`](../../packages/secure-code-scanner/src/attacks/crypto/jwt-weak-test.ts) | Built to `dist/`; **not** registered in `attacks/index.ts`. |
-| [`entropy.ts`](../../packages/secure-code-scanner/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
+| [`prototypePollution.ts`](../../src/attacks/injection/prototypePollution.ts) | Present in tree; **not** exported from `attacks/index.ts` — not part of default scan. |
+| [`jwt-weak-test.ts`](../../src/attacks/crypto/jwt-weak-test.ts) | Built to `dist/`; **not** registered in `attacks/index.ts`. |
+| [`entropy.ts`](../../src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
 
 ## README documentation summary
 
-- **Package README** ([`packages/secure-code-scanner/README.md`](../../packages/secure-code-scanner/README.md)): minimal — points to root README and build/scan commands.
+- **Package README** ([`README.md`](../../README.md)): minimal — points to root README and build/scan commands.
 - **Per-rule markdown:** none in-repo.
 - **Catalog:** root [README.md](../../README.md) includes rule IDs, CWEs, CLI, tests — sufficient for paper supplement references.
 

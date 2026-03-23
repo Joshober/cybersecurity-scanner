@@ -19,6 +19,21 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 
 ---
 
+## Repository roles
+
+- **Evaluated artifact (paper):** VibeScan (`secure-code-scanner`) — the root scanner in `src/` run via `vibescan`/`secure`, with evidence in `benchmarks/results/`.
+- **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
+- **Related tooling:** the `vibescan/` package — standalone helpers (e.g. extraction/route graph tooling). Treat as related engineering unless you add it to the evaluation scope.
+
+## Maturity legend (how to avoid “scope mixing”)
+
+- **Implemented:** shipped in the default CLI/scanner path.
+- **Documented:** described in README/handoff materials.
+- **Evaluated:** covered by manifest + adjudication + frozen benchmark outputs.
+- **Future:** explicitly planned, not part of current evidence.
+
+---
+
 ## What it does
 
 Static analysis for **JavaScript/TypeScript** focused on:
@@ -74,9 +89,14 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 | **SLOP-001** — npm HEAD, max 5 concurrent, workspaces by package name, `.npmrc` non-npmjs skip | [`slopsquat.ts`](../src/system/ai/slopsquat.ts) |
 | **SSRF-003** — `ip.isPublic`/`isPrivate` when gating `fetch`/HTTP client on same URL id | [`ipGuard.ts`](../src/system/ai/ipGuard.ts) |
 | **RULE-SSRF-002** — axios baseURL + user URL | [`axiosBypass.ts`](../src/system/ai/axiosBypass.ts) |
-| Prototype pollution payloads | [`prototypePollution.ts`](../src/attacks/injection/prototypePollution.ts) |
 | `envFallback` shim (re-export) | [`envFallback.ts`](../src/system/ai/envFallback.ts) |
 | Rule registry | [`attacks/index.ts`](../src/attacks/index.ts) — `cryptoRules` (9), `injectionRules` (11) |
+
+## Experimental / not in default scan
+
+- `prototypePollution.ts`: present in tree but not exported from `src/attacks/index.ts` (not part of the default scan rule list)
+- `jwt-weak-test.ts`: built to `dist/` but not registered in the active rule list
+- `entropy.ts`: helper for secret detection; not a standalone rule
 
 **Finding extras:** `packageName`, `cveRef`, `findingKind`, `remediation` on [`Finding`](../src/system/types.ts) where relevant.
 

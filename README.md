@@ -24,6 +24,8 @@ VibeScan’s **scanner** lives at the repository root (`src/`, `dist/`). **secur
 | [`packages/secure-arch-cli`](packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
 | [`packages/secure-arch-adapters`](packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
 
+Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md).
+
 ---
 
 ## Quick start

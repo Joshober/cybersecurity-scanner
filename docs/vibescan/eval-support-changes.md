@@ -37,7 +37,7 @@ Constraints: **no change to core detection logic** unless unavoidable; focus on 
 
 ## 4. Exclude vendor / minified files (flag)
 
-**Issue:** CLI globs `**/*.{js,ts,mjs,cjs}` under a directory ([`cli/index.ts`](../../packages/secure-code-scanner/src/system/cli/index.ts)), which can pull in minified bundles and skew counts.
+**Issue:** CLI globs `**/*.{js,ts,mjs,cjs}` under a directory ([`cli/index.ts`](../../src/system/cli/index.ts)), which can pull in minified bundles and skew counts.
 
 **Smallest fix:**
 
