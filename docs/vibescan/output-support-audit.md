@@ -6,22 +6,22 @@
 
 ### JSON shape today
 
-- **Per-file + findings:** `formatJson` in [`packages/secure-code-scanner/src/system/format.ts`](../../packages/secure-code-scanner/src/system/format.ts) maps each `Finding` via `findingToJson` (`ruleId`, `severity`, `severityLabel`, `category`, `line`, `filePath`, etc.).
+- **Per-file + findings:** `formatJson` in [`src/system/format.ts`](../../src/system/format.ts) maps each `Finding` via `findingToJson` (`ruleId`, `severity`, `severityLabel`, `category`, `line`, `filePath`, etc.).
 - **Project scan:** `formatProjectJson` adds `routes`, `packageJsonPath`, flat `findings`, and `fileResults[]` with nested `findings` — already suitable for **per-file** extraction.
 
 ### CLI wiring
 
-- [`packages/secure-code-scanner/src/system/cli/index.ts`](../../packages/secure-code-scanner/src/system/cli/index.ts): `--format json` calls `formatProjectJson(project)` for static multi-file scans (the common benchmark path).
+- [`src/system/cli/index.ts`](../../src/system/cli/index.ts): `--format json` calls `formatProjectJson(project)` for static multi-file scans (the common benchmark path).
 
 ### Types
 
-- [`packages/secure-code-scanner/src/system/types.ts`](../../packages/secure-code-scanner/src/system/types.ts): `Finding`, `ProjectScanResult` — stable fields for aggregation.
+- [`src/system/types.ts`](../../src/system/types.ts): `Finding`, `ProjectScanResult` — stable fields for aggregation.
 
 ## Easiest extension points (recommended order)
 
 ### 1. **Post-process in `formatProjectJson`** (lowest risk)
 
-**Location:** [`format.ts`](../../packages/secure-code-scanner/src/system/format.ts), end of `formatProjectJson` (or a new helper `summarizeProject(project): BenchmarkSummary` used only when a flag is set).
+**Location:** [`format.ts`](../../src/system/format.ts), end of `formatProjectJson` (or a new helper `summarizeProject(project): BenchmarkSummary` used only when a flag is set).
 
 **Add computed fields** alongside existing keys, e.g.:
 
@@ -34,7 +34,7 @@
 
 ### 2. **Optional CLI flag** (keeps default output backward compatible)
 
-**Location:** [`cli/index.ts`](../../packages/secure-code-scanner/src/system/cli/index.ts).
+**Location:** [`cli/index.ts`](../../src/system/cli/index.ts).
 
 **Example:** `--benchmark-summary` or `--format jsonl` (if line-delimited is preferred for pipelines).
 

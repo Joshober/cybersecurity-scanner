@@ -21,7 +21,7 @@ benchmarks/seeded/
 └── mixed/
 ```
 
-Start by **promoting** high-value cases from [`packages/secure-code-scanner/tests/fixtures/`](../../packages/secure-code-scanner/tests/fixtures/) and inline strings in `tests/unit/*.test.mjs`, then deduplicate.
+Start by **promoting** high-value cases from [`tests/fixtures/`](../../tests/fixtures/) and inline strings in `tests/unit/*.test.mjs`, then deduplicate.
 
 ## Ground-truth table (required)
 

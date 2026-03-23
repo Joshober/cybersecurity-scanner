@@ -64,7 +64,7 @@ benchmarks/
 - File naming: `pos-<rule-id-short>.js`, `neg-<rule-id-short>.js` (positives / negatives).
 - Include a **`seeded/README.md`** table: path → expected rule IDs (ground truth for automation).
 
-**Seed sources:** Start from [`packages/secure-code-scanner/tests/fixtures/`](../../packages/secure-code-scanner/tests/fixtures/) and inline cases from `tests/unit/*.test.mjs`; deduplicate and document expected findings.
+**Seed sources:** Start from [`tests/fixtures/`](../../tests/fixtures/) and inline cases from `tests/unit/*.test.mjs`; deduplicate and document expected findings.
 
 ## `benchmarks/results/`
 

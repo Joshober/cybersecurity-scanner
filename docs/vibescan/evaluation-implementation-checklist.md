@@ -30,17 +30,16 @@ All three strands from the unfinished-features plan are in scope, in this order:
 
 ## Phase C — Ground truth and scoring
 
-- [ ] For each benchmark run, fill a copy of `benchmark-manifest-template.json`
-- [ ] Sample findings into `adjudication-template.md` (stratify by rule ID and file)
-- [ ] Define primary metrics (precision/recall per rule, or clustered CWE families) and document in `dvna-evaluation.md` successor
+- [x] For each benchmark run, fill a copy of `benchmark-manifest-template.json` (seeded golden run: [`benchmarks/results/2026-03-23_seeded_vibescan_v1.0.0+04e93ca/manifest.json`](../../benchmarks/results/2026-03-23_seeded_vibescan_v1.0.0+04e93ca/manifest.json))
+- [x] Sample findings into `adjudication-template.md` (seeded golden run: [`benchmarks/results/2026-03-23_seeded_vibescan_v1.0.0+04e93ca/adjudication.md`](../../benchmarks/results/2026-03-23_seeded_vibescan_v1.0.0+04e93ca/adjudication.md))
+- [x] Define primary metrics (precision/recall per rule, or clustered CWE families) and document in `dvna-evaluation.md` successor (`./metrics-definitions.md`)
 
 ## Phase D — Scanner output (small code changes)
 
 - [x] Implement agreed items from [`eval-support-changes.md`](./eval-support-changes.md): `--ignore-glob`, `--benchmark-metadata` (+ `VIBESCAN_BENCHMARK=1`), stable JSON finding order, optional `ruleFamily` on findings, [`vibescan-benchmark-output.schema.json`](./vibescan-benchmark-output.schema.json)
-- [ ] Regenerate benchmark JSON with new fields after each tool-version bump; keep a frozen “before” copy per run folder under `benchmarks/results/`
+- [x] Regenerate benchmark JSON with new fields after each tool-version bump; keep a frozen “before” copy per run folder under `benchmarks/results/` (seeded golden run: `vibescan-project.frozen.json` present in the run folder)
 
 ## Related repo docs
 
 - Root [README.md](../../README.md) — rule catalog and CLI usage
 - [`docs/REPO-HANDOFF.md`](../REPO-HANDOFF.md) — architecture and pipeline
-- [`packages/secure-code-scanner/README.md`](../../packages/secure-code-scanner/README.md) — package entry point

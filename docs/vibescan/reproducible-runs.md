@@ -42,7 +42,7 @@ cd /path/to/CyberSecurity
 npm install
 npm run build:scanner
 # Verify binary resolves:
-npx vibescan scan packages/secure-code-scanner/src --format compact | head -n 5
+npx vibescan scan src --format compact | head -n 5
 ```
 
 **PowerShell:**
@@ -51,7 +51,7 @@ npx vibescan scan packages/secure-code-scanner/src --format compact | head -n 5
 Set-Location C:\path\to\CyberSecurity
 npm install
 npm run build:scanner
-npx vibescan scan packages/secure-code-scanner/src --format compact | Select-Object -First 5
+npx vibescan scan src --format compact | Select-Object -First 5
 ```
 
 ---
@@ -83,7 +83,7 @@ npx vibescan scan "$TARGET" \
   > OUT/vibescan-with-registry.json
 ```
 
-**Windows note:** If `vibescan` expands globs differently, pass an explicit directory; the CLI uses `fast-glob` for directories ([`packages/secure-code-scanner/src/system/cli/index.ts`](../../packages/secure-code-scanner/src/system/cli/index.ts)).
+**Windows note:** If `vibescan` expands globs differently, pass an explicit directory; the CLI uses `fast-glob` for directories ([`src/system/cli/index.ts`](../../src/system/cli/index.ts)).
 
 ---
 
