@@ -1,5 +1,7 @@
 # Carving `Jober/NewLayout` into mergeable pieces
 
+**Status on current `main`:** The **scanner → `vibescan/`** workspace move and **private root** workspace are **done**. Treat **Slices 3–4** below as **historical guidance** for any future large refactors—not a pending migration. Authoritative layout: [`../MONOREPO-LAYOUT.md`](../MONOREPO-LAYOUT.md).
+
 **Intent:** Keep **research merges** independent of **layout/refactor** work. Academic work should land on `master` from `docs/research-strengthening` (or similar) without waiting for a megamerge.
 
 **Hybrid layout (this repo’s `main`):** The scanner lives in **`vibescan/`** (published package). **secure-arch** is under `packages/secure-arch-*`, default settings under `architecture/secure-rules/`, and `docs/secure-arch/`.

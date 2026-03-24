@@ -28,7 +28,7 @@ This folder is the **paper/poster spine**: research question, methodology, evalu
 
 ### 1. Research track (this folder + `docs/vibescan/`)
 
-Ship on **`master`** via branch `docs/research-strengthening` (or equivalent): strengthen RQ, methodology, evaluation, seeded plan, metrics, abstract. **No dependency** on a monorepo rename landing first.
+Ship on **`master`** via branch `docs/research-strengthening` (or equivalent): strengthen RQ, methodology, evaluation, seeded plan, metrics, abstract. The **scanner package layout is settled** (`vibescan/` is the publishable workspace); see [`../MONOREPO-LAYOUT.md`](../MONOREPO-LAYOUT.md).
 
 ### 2. Product track (secure-arch)
 

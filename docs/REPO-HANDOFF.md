@@ -2,7 +2,13 @@
 
 This document summarizes **what the repo is**, **how the scanner works**, **what is implemented**, and **where files live**. Paste or attach it when onboarding a new assistant.
 
-**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [benchmarks/results/legacy/](../benchmarks/results/legacy/) (DVNA evaluation markdown + raw logs).
+**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [**Monorepo / package layout**](MONOREPO-LAYOUT.md) (what is published vs workspace-only) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [benchmarks/results/legacy/](../benchmarks/results/legacy/) (DVNA evaluation markdown + raw logs).
+
+---
+
+## Monorepo layout (settled)
+
+The scanner **does not** live at the repository root. **Root** `package.json` is **`private: true`** and only orchestrates workspaces. The **publishable** scanner is the **`vibescan/`** workspace (`npm publish -w vibescan`); source and build output are **`vibescan/src/`** and **`vibescan/dist/`**. Full detail: [`docs/MONOREPO-LAYOUT.md`](MONOREPO-LAYOUT.md).
 
 ---
 
@@ -21,9 +27,9 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 
 ## Repository roles
 
-- **Evaluated artifact (paper):** VibeScan (`vibescan`) — the scanner in `vibescan/src/` runs via `vibescan`/`secure`, with evidence in `benchmarks/results/`.
+- **Evaluated artifact (paper):** VibeScan — the **`vibescan`** npm package (`vibescan/src/`, CLI `vibescan` / `secure`), with evidence in `benchmarks/results/`.
 - **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
-- **Related tooling:** the `vibescan/` package — standalone helpers (e.g. extraction/route graph tooling). Treat as related engineering unless you add it to the evaluation scope.
+- **Research / conference layer:** `docs/vibescan/`, `benchmarks/`, `demo/` — same git repo as the product; not shipped in the `vibescan` npm tarball (`files`: `dist`, `README.md` only).
 
 ## Maturity legend (how to avoid “scope mixing”)
 
@@ -92,7 +98,11 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 | `envFallback` shim (re-export) | [`envFallback.ts`](../vibescan/src/system/ai/envFallback.ts) |
 | Rule registry | [`attacks/index.ts`](../vibescan/src/attacks/index.ts) — `cryptoRules` (10), `injectionRules` (12) |
 
-## Additional notes`r`n`r`n- `prototypePollution.ts` is now registered as `RULE-PROTO-001` in the default injection rule list.`r`n- `jwt-weak-test.ts` now exposes `crypto.jwt.weak-secret-verify` in the default crypto rule list.`r`n- `entropy.ts`: helper for secret detection; not a standalone rule
+## Additional notes
+
+- **`prototypePollution.ts`** — registered as **`RULE-PROTO-001`** in the default injection rule list.
+- **`jwt-weak-test.ts`** — exposes **`crypto.jwt.weak-secret-verify`** in the default crypto rule list (alongside the existing JWT sign rule).
+- **`entropy.ts`** — helper for secret detection; not a standalone rule.
 
 **Finding extras:** `packageName`, `cveRef`, `findingKind`, `remediation` on [`Finding`](../vibescan/src/system/types.ts) where relevant.
 
@@ -103,6 +113,7 @@ Exit **non-zero** if any finding has severity **critical** or **error** (see [`c
 ```
 CyberSecurity/                    ← private workspace root (not published)
 ├── docs/
+│   ├── MONOREPO-LAYOUT.md       ← published vs workspace-only (authoritative)
 │   ├── REPO-HANDOFF.md          ← this file
 │   ├── samples/                 ← example policy JSON for policy-eval bridge
 │   ├── secure-arch/             ← secure-arch usage + AI prompts
@@ -144,9 +155,8 @@ CyberSecurity/                    ← private workspace root (not published)
 npm install
 npm run build -w vibescan # tsc (scanner under vibescan/)
 npm run build:arch         # build secure-arch workspaces
-npm run test -w vibescan  # build + node --test tests/unit/  (~51 tests)
+npm run test -w vibescan   # build + node --test vibescan/tests/unit/ (~51 tests)
 npm run test:arch          # secure-arch-core tests
-npm run test -w vibescan  # tests only (dist must exist)
 
 # Scan application code only (avoid node_modules):
 npx vibescan scan vibescan/src
@@ -178,6 +188,6 @@ npx secure-arch check --root . --code-evidence js-ts
 
 ---
 
-*Last updated to match repo layout and README as of the VibeScan Person A implementation pass.*
+*Last updated to match monorepo layout: private root workspace, publishable scanner under `vibescan/`.*
 
 

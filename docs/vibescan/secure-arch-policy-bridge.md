@@ -13,7 +13,8 @@ This workflow uses a small **policy file** that states architectural security ex
   "publicDatabaseDisallowed": true,
   "strongSecretsRequired": true,
   "loggingRequiredOnSensitiveActions": false,
-  "corsWildcardDisallowed": true
+  "corsWildcardDisallowed": true,
+  "llmUnsafeIntegrationDisallowed": false
 }
 ```
 
@@ -30,13 +31,16 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
 | `strongSecretsRequired` | `SEC-004`, `crypto.secrets.hardcoded`, `crypto.jwt.weak-secret-literal`, `crypto.jwt.weak-secret-verify`, … | Several crypto rules |
 | `loggingRequiredOnSensitiveActions` | *(gap)* | Needs taint/route bridge |
 | `corsWildcardDisallowed` | `MW-004` | `cors({ origin: '*' })` |
+| `llmUnsafeIntegrationDisallowed` | `injection.llm.dynamic-system-prompt`, `injection.llm.rag-template-mixing`, `injection.llm.unsafe-html-output` | Heuristic LLM integration patterns; see [`llm-threat-coverage.md`](./llm-threat-coverage.md) |
+
+`--from-settings` leaves `llmUnsafeIntegrationDisallowed` **false** unless you add it explicitly to your policy JSON when not using derived settings alone.
 
 ## Production usage
 
 1. Run `vibescan scan` with JSON output:
 
    ```bash
-   node vibescan/dist/system/cli/index.js scan ./src --format json > scan.json
+   node vibescan/dist/system/cli/index.js scan ./path/to/your/app --format json > scan.json
    ```
 
 2. Evaluate with explicit policy:

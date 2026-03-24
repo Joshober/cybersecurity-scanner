@@ -24,6 +24,11 @@ const POLICY_RULES = {
   corsWildcardDisallowed: ["MW-004"],
   publicDatabaseDisallowed: ["ARCH-DB-001"],
   loggingRequiredOnSensitiveActions: ["LOG-001"],
+  llmUnsafeIntegrationDisallowed: [
+    "injection.llm.dynamic-system-prompt",
+    "injection.llm.rag-template-mixing",
+    "injection.llm.unsafe-html-output",
+  ],
 };
 
 function usage() {
@@ -67,6 +72,7 @@ function policyFromSecureArchSettings(settingsDoc) {
     corsWildcardDisallowed: true,
     publicDatabaseDisallowed: !asBool(env?.database?.publiclyReachable, false),
     loggingRequiredOnSensitiveActions: false,
+    llmUnsafeIntegrationDisallowed: false,
     sourceEnvironment: envName,
   };
 }

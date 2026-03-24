@@ -23,6 +23,11 @@ import { insecureCookieRule } from "./injection/insecure-cookie.js";
 import { prototypePollutionRule } from "./injection/prototypePollution.js";
 import { ipGuardSsrRule } from "../system/ai/ipGuard.js";
 import { axiosBypassRule } from "../system/ai/axiosBypass.js";
+import {
+  llmDynamicSystemPromptRule,
+  llmRagTemplateMixingRule,
+  llmUnsafeHtmlOutputRule,
+} from "./injection/llm-integration.js";
 
 export const cryptoRules: Rule[] = [
   weakHashingRule,
@@ -50,4 +55,7 @@ export const injectionRules: Rule[] = [
   prototypePollutionRule,
   ipGuardSsrRule,
   axiosBypassRule,
+  llmDynamicSystemPromptRule,
+  llmRagTemplateMixingRule,
+  llmUnsafeHtmlOutputRule,
 ];

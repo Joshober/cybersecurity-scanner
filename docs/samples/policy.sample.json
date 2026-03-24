@@ -6,5 +6,6 @@
   "strongSecretsRequired": true,
   "corsWildcardDisallowed": true,
   "publicDatabaseDisallowed": false,
-  "loggingRequiredOnSensitiveActions": false
+  "loggingRequiredOnSensitiveActions": false,
+  "llmUnsafeIntegrationDisallowed": false
 }

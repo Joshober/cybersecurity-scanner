@@ -14,6 +14,8 @@ This proposal standardizes **inputs** (vulnerable apps + synthetic seeds), **scr
 benchmarks/
 ├── dvna/                    # DVNA (or fork) — git submodule OR documented clone path
 │   └── README.md            # Pin: upstream URL, commit, why this revision
+├── vuln-lab/                # Small committable Express “lab” app + GROUND_TRUTH.md (DVNA-style smoke)
+│   └── GROUND_TRUTH.md      # Expected themes; baselines: benchmarks/scripts/run-vuln-lab-baselines.{sh,ps1}
 ├── seeded/                  # Synthetic / minimal corpora (small files, safe to commit)
 │   ├── README.md            # Map folders → rule IDs / CWE families
 │   ├── crypto/
@@ -51,6 +53,15 @@ benchmarks/
 
 **Legacy DVNA bundle:** [`benchmarks/results/legacy/dvna-evaluation.md`](../../benchmarks/results/legacy/dvna-evaluation.md) plus sibling raw logs. New paper-grade runs should use `benchmarks/results/<run-id>/` with a completed `manifest.json`.
 
+## `benchmarks/vuln-lab/`
+
+**Purpose:** A **small, committable** Node/Express app with labeled expectations in **`GROUND_TRUTH.md`**—useful when you want a reproducible corpus **without** cloning full DVNA. Baseline runners write timestamped outputs under `benchmarks/results/`:
+
+- [`benchmarks/scripts/run-vuln-lab-baselines.sh`](../../benchmarks/scripts/run-vuln-lab-baselines.sh)
+- [`benchmarks/scripts/run-vuln-lab-baselines.ps1`](../../benchmarks/scripts/run-vuln-lab-baselines.ps1)
+
+This does **not** replace DVNA for external comparability; it complements it for fast regression and demos.
+
 ## `benchmarks/seeded/`
 
 **Purpose:** Small, reviewable files that trigger **specific rule IDs** (or deliberate negatives). Use for:
@@ -64,7 +75,7 @@ benchmarks/
 - File naming: `pos-<rule-id-short>.js`, `neg-<rule-id-short>.js` (positives / negatives).
 - Include a **`seeded/README.md`** table: path → expected rule IDs (ground truth for automation).
 
-**Seed sources:** Start from [`tests/fixtures/`](../../tests/fixtures/) and inline cases from `tests/unit/*.test.mjs`; deduplicate and document expected findings.
+**Seed sources:** Start from [`vibescan/tests/fixtures/`](../../vibescan/tests/fixtures/) and inline cases from `vibescan/tests/unit/*.test.mjs`; deduplicate and document expected findings.
 
 ## `benchmarks/results/`
 

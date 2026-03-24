@@ -26,6 +26,8 @@ VibeScan’s **scanner** lives under [`vibescan/`](vibescan/) (`vibescan/src/`, 
 
 Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md).
 
+**What is published vs workspace-only:** [`docs/MONOREPO-LAYOUT.md`](docs/MONOREPO-LAYOUT.md)
+
 ---
 
 ## Quick start
@@ -83,6 +85,9 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 | `injection.noql` | 943 | NoSQL injection patterns |
 | `injection.xpath` | 643 | XPath injection |
 | `injection.log` | 117 | Log injection via unsanitized input |
+| `injection.llm.dynamic-system-prompt` | 74 | Non-literal `system` field may mix instructions with untrusted text |
+| `injection.llm.rag-template-mixing` | 74 | Prompt template mentions context/retrieval and embeds expressions |
+| `injection.llm.unsafe-html-output` | 79 | `innerHTML` / similar fed from typical LLM output variable names |
 | `mw.cookie.missing-flags` | 614 | Session cookies missing `HttpOnly` / `Secure` |
 | `SSRF-003` | 918 | `ip.isPublic` / `ip.isPrivate` gating outbound HTTP |
 | `RULE-SSRF-002` | 918 | axios `baseURL` + user-controlled URL risk |
@@ -170,7 +175,8 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 | `--project-root <dir>` | Resolve `package.json`, OpenAPI discovery root, registry check, ignore globs |
 | `--openapi-spec <file>` | OpenAPI/Swagger file for drift vs Express routes (repeatable) |
 | `--no-openapi-discovery` | Skip auto-discovery of `openapi.*` / `swagger.*` under project root |
-| `--build-id <id>` | Label JSON output and `--manifest` scope for deployment correlation |`r`n| `--ai-api-url` / `--ai-api-key` / `--ai-model` | Explicit AI provider endpoint/auth/model (overrides environment) |
+| `--build-id <id>` | Label JSON output and `--manifest` scope for deployment correlation |
+| `--ai-api-url` / `--ai-api-key` / `--ai-model` | Explicit AI provider endpoint/auth/model (overrides environment) |
 
 ---
 
@@ -185,7 +191,7 @@ npm run test:arch   # @secure-arch/core (requires build:arch)
 
 ## DVNA evaluation (research)
 
-Benchmark outputs live under [`benchmarks/`](benchmarks/) only: dated runs under [`benchmarks/results/`](benchmarks/results/), and legacy DVNA prose + raw logs under [`benchmarks/results/legacy/`](benchmarks/results/legacy/) (see [`dvna-evaluation.md`](benchmarks/results/legacy/dvna-evaluation.md) and [`person-b-handoff.md`](benchmarks/results/legacy/person-b-handoff.md)). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
+Benchmark outputs live under [`benchmarks/`](benchmarks/) only: dated runs under [`benchmarks/results/`](benchmarks/results/), and legacy DVNA prose + raw logs under [`benchmarks/results/legacy/`](benchmarks/results/legacy/) (see [`dvna-evaluation.md`](benchmarks/results/legacy/dvna-evaluation.md) and [`person-b-handoff.md`](benchmarks/results/legacy/person-b-handoff.md)). For a **small committable** Express lab (ground truth in-repo), see [`benchmarks/vuln-lab/`](benchmarks/vuln-lab/) and baseline scripts [`benchmarks/scripts/run-vuln-lab-baselines.sh`](benchmarks/scripts/run-vuln-lab-baselines.sh) / [`.ps1`](benchmarks/scripts/run-vuln-lab-baselines.ps1). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
 
 ---
 
@@ -249,6 +255,14 @@ docs/
 ## Scope and limitations
 
 Static analysis cannot prove security; it surfaces high-likelihood patterns. Optional AI mode depends on the configured model. Use as one layer alongside review, tests, and dependency scanning.
+
+**LLM and model-plane threats (not fully covered by VibeScan):**
+
+- **Not covered or incomplete:** Runtime **prompt injection** and **jailbreak** testing (the scanner does not call your model). **Training-time data poisoning**, **model inversion** / memorization testing, and behavioral **output manipulation** of the model itself are out of scope for this SAST tool.
+- **Supply chain:** `SLOP-001` plus workspace **`npm audit`** catch some dependency risks but not everything (e.g. compromised maintainers, all CVE classes). Prefer pinned versions, a software bill of materials, and registry policies alongside the scanner.
+- **Partially related (code only):** Unsafe handling of model-generated text (e.g. XSS-style sinks, including [`injection.llm.unsafe-html-output`](vibescan/src/attacks/injection/llm-integration.ts)) and risky **tool** surfaces reflected in code (command execution, SSRF-style patterns, weak route auth) are flagged where patterns match—they are **not** a substitute for least-privilege connectors, human approval for sensitive tool calls, or runtime monitoring.
+
+Full mapping of these themes to rule IDs, CI, and external controls: [`docs/vibescan/llm-threat-coverage.md`](docs/vibescan/llm-threat-coverage.md).
 
 ---
 

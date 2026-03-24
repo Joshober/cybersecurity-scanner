@@ -1,0 +1,10 @@
+{
+  "name": "vibescan-seeded-slop-case",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SB-11 / supply-chain: dependency name should 404 on registry for SLOP-001 CI smoke",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "totally-fake-pkg-vibescan-seeded-xyz": "1.0.0"
+  }
+}

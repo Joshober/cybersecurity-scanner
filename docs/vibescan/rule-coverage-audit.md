@@ -8,7 +8,7 @@
 | Column | Meaning |
 |--------|---------|
 | **Unit tests** | `tests/unit/*.test.mjs` exercises the rule (substring match on `ruleId` and/or dedicated file). |
-| **Fixture in repo** | File exists under `tests/fixtures/**` that appears intended for the rule. |
+| **Fixture in repo** | File exists under `vibescan/tests/fixtures/**` that appears intended for the rule. |
 | **Fixture in CI** | A test calls `scanFixture(...)` on that path (today only SQL + generic safe). |
 | **README** | Documented in root [README.md](../../README.md) rule table (catalog-level, not per-rule prose). |
 | **Benchmark relevance** | Expected signal on **DVNA**-class Node/Express apps, **seeded** synthetic snippets, or **dependency/registry** benchmarks. |
@@ -31,6 +31,9 @@
 | `injection.command` | Yes (`command-injection.test.mjs`) | — | No | Yes | **Medium** on DVNA |
 | `injection.path-traversal` | Yes (`path-traversal.test.mjs`) | `path-traversal/vulnerable.js`, `vulnerable-path.mjs`, `safe.js` | No | Yes | **Medium** on file-handling routes |
 | `injection.xss` | Yes (`xss.test.mjs`) | — | No | Yes | **Medium** (client/server templates) |
+| `injection.llm.dynamic-system-prompt` | Yes (`llm-integration.test.mjs`) | — | No | Yes | Seeded SB-14; LLM integration heuristic |
+| `injection.llm.rag-template-mixing` | Yes (`llm-integration.test.mjs`) | — | No | Yes | Seeded SB-15; RAG-style template heuristic |
+| `injection.llm.unsafe-html-output` | Yes (`llm-integration.test.mjs`) | — | No | Yes | Seeded SB-16; model output → HTML heuristic |
 | `injection.noql` | Yes (`nosql-injection.test.mjs`) | — | No | Yes | **Medium** if Mongo-style APIs present |
 | `injection.xpath` | Yes (`xpath-injection.test.mjs`) | — | No | Yes | Low unless XPath APIs used |
 | `injection.log` | Yes (`log-injection.test.mjs`) | — | No | Yes | Low–medium |
@@ -60,16 +63,22 @@
 
 **Structured output:** project JSON includes `routeInventory` (per-route `sensitivePath`, `adminPath`, `objectScoped`, `hasAuthMiddleware`). SARIF run `properties` may include `vibescanRouteInventory`, `vibescanOpenApiSpecsUsed`, `vibescanBuildId` when present.
 
-## Additional source notes`r`n`r`n| Artifact | Status |`r`n|----------|--------|`r`n| [`prototypePollution.ts`](../../vibescan/src/attacks/injection/prototypePollution.ts) | Registered as `RULE-PROTO-001` in default scan. |`r`n| [`jwt-weak-test.ts`](../../vibescan/src/attacks/crypto/jwt-weak-test.ts) | Registered as `crypto.jwt.weak-secret-verify` in default scan. |`r`n| [`entropy.ts`](../../vibescan/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |`r`n
+## Additional source notes
+
+| Artifact | Status |
+|----------|--------|
+| [`prototypePollution.ts`](../../vibescan/src/attacks/injection/prototypePollution.ts) | Registered as `RULE-PROTO-001` in default scan. |
+| [`jwt-weak-test.ts`](../../vibescan/src/attacks/crypto/jwt-weak-test.ts) | Registered as `crypto.jwt.weak-secret-verify` in default scan. |
+| [`entropy.ts`](../../vibescan/src/attacks/crypto/entropy.ts) | Helper for secret detection; **not** a standalone rule. |
 ## README documentation summary
 
-- **Package README** ([`README.md`](../../README.md)): minimal — points to root README and build/scan commands.
+- **Package README** ([`vibescan/README.md`](../../vibescan/README.md)): npm-oriented quick start; full rule table and monorepo commands are in the [root `README.md`](../../README.md).
 - **Per-rule markdown:** none in-repo.
 - **Catalog:** root [README.md](../../README.md) includes rule IDs, CWEs, CLI, tests — sufficient for paper supplement references.
 
 ## Fixture folder utilization
 
-Committed fixtures under `tests/fixtures/` include `crypto-safe/`, `disabled-tls/`, `env-fallback/`, `openapi-drift/`, `path-traversal/`, `sql-injection/`, `unsafe/`, `weak-hashing/`, `safe/`. **Most are not referenced** by `scanFixture` in CI today; rules are primarily validated with **inline `scanSource`** strings. Consider wiring high-value fixtures into tests or into `benchmarks/seeded/` for evaluation stability.
+Committed fixtures under `vibescan/tests/fixtures/` include `crypto-safe/`, `disabled-tls/`, `env-fallback/`, `openapi-drift/`, `path-traversal/`, `sql-injection/`, `unsafe/`, `weak-hashing/`, `safe/`. **Most are not referenced** by `scanFixture` in CI today; rules are primarily validated with **inline `scanSource`** strings. Consider wiring high-value fixtures into tests or into `benchmarks/seeded/` for evaluation stability.
 
 ## Benchmark relevance summary
 
@@ -85,7 +94,7 @@ Committed fixtures under `tests/fixtures/` include `crypto-safe/`, `disabled-tls
 ## Implementation checklist (gaps to close for evaluation rigor)
 
 1. Add **unit tests** for: `crypto.jwt.weak-secret-literal`, `mw.cookie.missing-flags`, `RULE-SSRF-002`, and **middleware** `MW-002` / app-level `MW-003`–`MW-004` if those IDs are in the paper’s scope.
-2. Reference or copy **fixtures** from `tests/fixtures/` into `benchmarks/seeded/` with manifests (see [`benchmark-layout.md`](./benchmark-layout.md)).
+2. Reference or copy **fixtures** from `vibescan/tests/fixtures/` into `benchmarks/seeded/` with manifests (see [`benchmark-layout.md`](./benchmark-layout.md)).
 3. Standardize **outputs** using [`reproducible-runs.md`](./reproducible-runs.md) and [`benchmark-manifest-template.json`](./benchmark-manifest-template.json).
 4. Track **ground truth** with [`adjudication-template.md`](./adjudication-template.md).
 5. Optionally implement **JSON summary** hooks described in [`output-support-audit.md`](./output-support-audit.md) and [`eval-support-changes.md`](./eval-support-changes.md).

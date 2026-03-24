@@ -21,7 +21,7 @@ benchmarks/seeded/
 └── mixed/
 ```
 
-Start by **promoting** high-value cases from [`tests/fixtures/`](../../tests/fixtures/) and inline strings in `tests/unit/*.test.mjs`, then deduplicate.
+Start by **promoting** high-value cases from [`vibescan/tests/fixtures/`](../../vibescan/tests/fixtures/) and inline strings in `vibescan/tests/unit/*.test.mjs`, then deduplicate.
 
 ## Ground-truth table (required)
 
