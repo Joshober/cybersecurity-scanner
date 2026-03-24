@@ -139,3 +139,10 @@ scanBtn.addEventListener("click", () => {
   startScan();
 });
 
+document.querySelectorAll(".exampleBtn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const url = btn.getAttribute("data-repo-url");
+    if (url) repoUrlEl.value = url;
+  });
+});
+

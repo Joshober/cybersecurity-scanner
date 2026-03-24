@@ -16,6 +16,13 @@ This interactive website clones a selected GitHub repository, optionally applies
 3. Open:
    - `http://localhost:3000/`
 
+## Example projects (bundled source)
+
+- **`demo/examples/fashion-ai/`** — trimmed Fashion AI monorepo (no `node_modules`, `venv`, large model weights, or `.env`). Scan via GitHub: **Fashion AI** quick-pick or `https://github.com/Alvaromp3/fashion_ai`.
+- **`demo/examples/NutrionMobileApp/`** — trimmed **Nutrion** mobile stack (Flutter + Java/Spring backend). `.git` and large ONNX weights under `models/` are omitted in the copy; use **Nutrion mobile app** or `https://github.com/Joshober/NutrionMobileApp` to scan the live repo.
+
+The demo UI still **clones from GitHub** when you run a scan; the folders under `demo/examples/` are for local reference only.
+
 ## Safety notes
 
 - The server only accepts `https://github.com/<owner>/<repo>` URLs.

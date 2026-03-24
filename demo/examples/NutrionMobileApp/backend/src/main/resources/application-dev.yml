@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: nutrition-app-backend
+  
+  datasource:
+    url: jdbc:h2:mem:nutrition_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  
+  # H2 for development/testing
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  # Cache Configuration
+  cache:
+    type: simple
+  
+  security:
+    user:
+      name: admin
+      password: admin
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# JWT Configuration
+jwt:
+  secret: mySecretKey123456789012345678901234567890
+  expiration: 86400000 # 24 hours in milliseconds
+
+# CORS Configuration - Allow ngrok for development
+cors:
+  allowed-origins: "http://localhost:3000,http://localhost:8080,https://*.ngrok.io,https://*.ngrok-free.app"
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowed-headers: "*"
+  allow-credentials: true
+
+# ML/AI Configuration
+ml:
+  onnx:
+    models-path: classpath:models/
+    food-segmentation-model: food_segmentation.onnx
+    food-classification-model: food_classification.onnx
+    depth-estimation-model: depth_estimation.onnx
+  opencv:
+    native-library-path: /usr/local/lib/
+  inference:
+    batch-size: 1
+    timeout: 30000 # 30 seconds
+
+# Menu Processing Configuration - Use mock data to avoid rate limits
+menu:
+  sodexo:
+    api-url: https://api.sodexo.com/menu
+    api-key: ${SODEXO_API_KEY:demo-key}
+    cache-ttl: 3600 # 1 hour
+    use-mock-data: true # Use mock data instead of real API calls
+    rate-limit:
+      requests-per-minute: 1 # Very low for development
+      burst-capacity: 1
+  lucene:
+    index-path: ./lucene-index
+    analyzer: standard
+
+# Portion Analysis Configuration
+portion:
+  plate-detection:
+    min-radius: 50
+    max-radius: 200
+    hough-threshold: 50
+  density-database:
+    default-density: 1.0 # g/cm³
+    food-densities:
+      rice: 0.8
+      pasta: 0.6
+      bread: 0.3
+      meat: 1.1
+      vegetables: 0.9
+
+# Logging
+logging:
+  level:
+    com.nutrition: DEBUG
+    org.springframework.security: DEBUG
+    org.apache.lucene: WARN
+    com.microsoft.onnxruntime: INFO
+    org.springframework.web: DEBUG

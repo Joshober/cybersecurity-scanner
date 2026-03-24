@@ -17,7 +17,8 @@
     "secure-arch": "node packages/secure-arch-cli/dist/cli.js",
     "policy-eval": "node vibescan/scripts/policy-eval.mjs",
     "policy-check": "node vibescan/scripts/policy-check.mjs",
-    "test:gold-path": "npm run build -w vibescan && cd benchmarks/gold-path-demo && npm install && npm test"
+    "test:gold-path": "npm run build -w vibescan && cd benchmarks/gold-path-demo && npm install && npm test",
+    "comparison:run": "npm run build -w vibescan && node demo/comparison/scripts/run-comparison.mjs"
   },
   "keywords": [
     "security",

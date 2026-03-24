@@ -1,0 +1,5 @@
+{
+  "matchMode": "anyOf",
+  "expectedRuleIds": ["WEBHOOK-001"],
+  "fixedMustNotTriggerRuleIds": ["WEBHOOK-001"]
+}

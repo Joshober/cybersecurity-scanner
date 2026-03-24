@@ -1,0 +1,5 @@
+{
+  "matchMode": "anyOf",
+  "expectedRuleIds": ["MW-002"],
+  "fixedMustNotTriggerRuleIds": ["MW-002"]
+}

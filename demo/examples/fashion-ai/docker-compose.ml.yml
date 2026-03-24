@@ -1,0 +1,16 @@
+# ML en Docker: publica modelos con ./scripts/publish-models-release.sh models-v1.0
+# Luego: export GITHUB_REPO=tu-usuario/repo && docker compose -f docker-compose.ml.yml build
+
+services:
+  ml:
+    image: fashion-ml
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+      args:
+        GITHUB_REPO: ${GITHUB_REPO}
+        MODELS_RELEASE_TAG: ${MODELS_RELEASE_TAG:-models-v1.0}
+        GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    ports:
+      - "6001:6001"
+    container_name: fashion-ml

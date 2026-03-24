@@ -1,0 +1,5 @@
+{
+  "matchMode": "anyOf",
+  "expectedRuleIds": ["injection.path-traversal", "injection.path-traversal.tainted-flow"],
+  "fixedMustNotTriggerRuleIds": ["injection.path-traversal", "injection.path-traversal.tainted-flow"]
+}

@@ -1,0 +1,270 @@
+# Cursor Rules for NutrionMobileApp
+
+## Project Overview
+This is a comprehensive nutrition tracking mobile application with:
+- Flutter frontend (mobile app)
+- Spring Boot backend (REST API)
+- Python FastAPI model service (ML/AI)
+- PostgreSQL database with Redis caching
+- Docker containerization
+
+## Root Directory: `C:\Users\Josh\Documents\NutrionMobileApp`
+
+### Core Services
+```
+NutrionMobileApp/
+├── frontend/                 # Flutter mobile application
+├── backend/                  # Java Spring Boot REST API
+├── model-service/           # Python FastAPI ML service
+├── docker-compose.yml       # Multi-service orchestration
+└── docker-compose.prod.yml  # Production configuration
+```
+
+## Frontend (Flutter) - `frontend/`
+**Technology**: Flutter 3.0+ with Dart
+**Purpose**: Mobile application for nutrition tracking
+
+### Key Files:
+- `pubspec.yaml` - Dependencies and configuration
+- `lib/main.dart` - Application entry point
+- `lib/models/` - Data models (user, nutrition, menu items)
+- `lib/providers/` - State management (auth, menu, nutrition)
+- `lib/screens/` - UI screens (auth, home, dashboard)
+- `lib/services/` - API and ML services
+- `lib/widgets/` - Reusable UI components
+- `assets/models/` - ML models (food_classifier.tflite)
+
+### Key Dependencies:
+- `provider: ^6.1.1` - State management
+- `http: ^1.1.0` - API communication
+- `camera: ^0.10.5+5` - Camera functionality
+- `image_picker: ^1.0.4` - Image selection
+- `tflite_flutter: ^0.9.0` - TensorFlow Lite (commented out)
+
+## Backend (Spring Boot) - `backend/`
+**Technology**: Java 17, Spring Boot 3.2.0
+**Purpose**: REST API and business logic
+
+### Key Files:
+- `pom.xml` - Maven dependencies
+- `src/main/java/com/nutrition/` - Java source code
+- `src/main/resources/application.yml` - Configuration
+- `Dockerfile` - Container configuration
+
+### Key Dependencies:
+- Spring Boot Web, Data JPA, Security
+- JWT (jjwt 0.11.5)
+- PostgreSQL, H2 (development)
+- Redis for caching
+- ONNX Runtime for ML
+- Lucene for search
+
+### Package Structure:
+- `config/` - Configuration classes
+- `controller/` - REST controllers
+- `dto/` - Data transfer objects
+- `model/` - Entity models
+- `repository/` - Data access layer
+- `security/` - Security configuration
+- `service/` - Business logic
+
+## Model Service (Python) - `model-service/`
+**Technology**: Python, FastAPI, TensorFlow
+**Purpose**: ML/AI operations for food recognition
+
+### Key Files:
+- `app.py` - FastAPI application
+- `food_recognition_service.py` - ML service logic
+- `requirements.txt` - Python dependencies
+- `models/food_classifier.tflite` - ML model
+- `models/food_labels.txt` - Model labels
+
+### Key Dependencies:
+- `fastapi==0.104.1`
+- `tensorflow==2.15.0`
+- `opencv-python==4.8.1.78`
+- `Pillow==10.1.0`
+
+## Database Configuration
+- **Primary**: PostgreSQL 15 (production)
+- **Development**: H2 (in-memory)
+- **Cache**: Redis 7
+- **Connection**: `jdbc:postgresql://postgres:5432/nutrition_db`
+
+## Docker Services
+- `postgres` - Database (port 5432)
+- `redis` - Cache (port 6379)
+- `model-service` - ML API (port 8000)
+- `backend` - REST API (port 8080)
+- `frontend` - Web interface (port 3000)
+
+## Environment Variables
+- `SPRING_DATASOURCE_URL` - Database connection
+- `SPRING_DATASOURCE_USERNAME` - DB username
+- `SPRING_DATASOURCE_PASSWORD` - DB password
+- `SPRING_DATA_REDIS_HOST` - Redis host
+- `MODEL_SERVICE_URL` - ML service endpoint
+
+## Technology Stack
+
+### Frontend Stack
+**Framework**: Flutter 3.0+
+**Language**: Dart
+**State Management**: Provider 6.1.1
+**HTTP Client**: http 1.1.0
+**Local Storage**: shared_preferences 2.2.2
+**UI Components**: Material Design Icons, Font Awesome
+**Charts**: fl_chart 0.66.0
+**Camera**: camera 0.10.5+5, image_picker 1.0.4
+**ML**: TensorFlow Lite (tflite_flutter 0.9.0)
+
+### Backend Stack
+**Framework**: Spring Boot 3.2.0
+**Language**: Java 17
+**Database**: PostgreSQL 15 (prod), H2 (dev)
+**Cache**: Redis 7
+**Security**: Spring Security + JWT (jjwt 0.11.5)
+**ML**: ONNX Runtime 1.16.3
+**Search**: Apache Lucene 9.8.0
+**HTTP Client**: WebFlux
+**JSON**: Jackson
+
+### Model Service Stack
+**Framework**: FastAPI 0.104.1
+**Language**: Python 3.11+
+**ML**: TensorFlow 2.15.0
+**Image Processing**: OpenCV 4.8.1.78, Pillow 10.1.0
+**Server**: Uvicorn 0.24.0
+**Validation**: Pydantic 2.5.0
+
+### Infrastructure Stack
+**Containerization**: Docker + Docker Compose
+**Database**: PostgreSQL 15
+**Cache**: Redis 7
+**Web Server**: Nginx (frontend)
+**Process Management**: Docker Compose
+
+## SpecKit Integration
+This project uses SpecKit for spec-driven development. Always use these commands:
+
+### Feature Development Workflow
+1. **Specify**: `/cursor/commands/specify.md "Feature description"`
+2. **Plan**: `/cursor/commands/plan.md "Implementation details"`
+3. **Tasks**: `/cursor/commands/tasks.md "Context for tasks"`
+4. **Implement**: `/cursor/commands/implement.md`
+
+### Available Commands
+- `/cursor/commands/constitution.md` - Update project principles
+- `/cursor/commands/specify.md` - Create feature specifications
+- `/cursor/commands/plan.md` - Generate implementation plans
+- `/cursor/commands/tasks.md` - Break down into tasks
+- `/cursor/commands/implement.md` - Execute implementation
+
+### Development Phases
+
+#### Phase 1: Specification
+1. Use `/cursor/commands/specify.md` to define feature
+2. Review generated specification
+3. Validate against project constitution
+
+#### Phase 2: Planning
+1. Use `/cursor/commands/plan.md` to create implementation plan
+2. Review architecture decisions
+3. Validate technical constraints
+
+#### Phase 3: Task Generation
+1. Use `/cursor/commands/tasks.md` to break down work
+2. Review task dependencies
+3. Identify parallel execution opportunities
+
+#### Phase 4: Implementation
+1. Use `/cursor/commands/implement.md` to execute tasks
+2. Follow TDD approach (tests first)
+3. Validate each phase completion
+
+## Development Principles
+1. **Multi-Service Architecture**: Clear separation of concerns
+2. **Security First**: JWT auth, input validation, secure communication
+3. **Test-Driven Development**: 80% coverage requirement
+4. **Documentation Standards**: API docs, code comments, ADRs
+5. **Performance**: Optimized queries, caching, monitoring
+6. **Data Privacy**: GDPR compliance, encryption, audit trails
+
+## File Locations
+
+### SpecKit Files
+- Commands: `.cursor/commands/`
+- Templates: `templates/`
+- Memory: `memory/`
+- Specifications: `specs/[feature-name]/`
+
+### Project Files
+- Frontend: `frontend/`
+- Backend: `backend/`
+- Model Service: `model-service/`
+- Docker: `docker-compose.yml`
+
+### Frontend Files
+- Main app: `frontend/lib/main.dart`
+- Models: `frontend/lib/models/`
+- Screens: `frontend/lib/screens/`
+- Services: `frontend/lib/services/`
+- Widgets: `frontend/lib/widgets/`
+- Dependencies: `frontend/pubspec.yaml`
+
+### Backend Files
+- Main app: `backend/src/main/java/com/nutrition/NutritionAppBackendApplication.java`
+- Controllers: `backend/src/main/java/com/nutrition/controller/`
+- Models: `backend/src/main/java/com/nutrition/model/`
+- Services: `backend/src/main/java/com/nutrition/service/`
+- Config: `backend/src/main/resources/application.yml`
+- Dependencies: `backend/pom.xml`
+
+### Model Service Files
+- Main app: `model-service/app.py`
+- ML service: `model-service/food_recognition_service.py`
+- Models: `model-service/models/`
+- Dependencies: `model-service/requirements.txt`
+
+### Infrastructure Files
+- Docker compose: `docker-compose.yml`
+- Production: `docker-compose.prod.yml`
+- Makefile: `Makefile`
+
+## Common Patterns
+
+### Frontend Development
+- Use Provider for state management
+- Follow Material Design guidelines
+- Implement responsive design
+- Add comprehensive widget tests
+- Use proper error handling
+
+### Backend Development
+- Create REST controllers with validation
+- Implement JWT authentication
+- Add comprehensive unit tests
+- Follow Spring Boot best practices
+- Use proper exception handling
+
+### ML Service Development
+- Use TensorFlow Lite for mobile inference
+- Implement proper error handling
+- Add model versioning
+- Optimize for mobile performance
+- Use FastAPI best practices
+
+## Quick Commands
+- Start new feature: `/cursor/commands/specify.md "Feature description"`
+- Plan implementation: `/cursor/commands/plan.md "Technical details"`
+- Generate tasks: `/cursor/commands/tasks.md "Context"`
+- Execute implementation: `/cursor/commands/implement.md`
+
+## Important Notes
+- Always use SpecKit commands for feature development
+- Follow the constitution principles
+- Maintain test coverage above 80%
+- Document all API endpoints
+- Use proper error handling and logging
+- Follow security best practices
+- Optimize for performance and scalability

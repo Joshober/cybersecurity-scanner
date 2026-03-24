@@ -30,6 +30,48 @@ npx vibescan scan . --format sarif > vibescan.sarif
 
 Exit code is **non-zero** if any finding has severity `critical` or `error`.
 
+## GitHub Actions
+
+There is **no** separate marketplace GitHub Action for VibeScan yet. Use Node and install the **`vibescan`** npm package (global install or **`npx`**) in your workflow.
+
+**Example workflow** (scan the repo, write SARIF, optional upload to GitHub code scanning):
+
+```yaml
+name: VibeScan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  vibescan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g vibescan
+      - run: vibescan scan . --exclude-vendor --format sarif > vibescan.sarif
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: vibescan.sarif
+```
+
+Pin the CLI version with **`npx`** instead of a global install:
+
+```yaml
+      - run: npx --yes vibescan@1.0.0 scan . --exclude-vendor --format sarif > vibescan.sarif
+```
+
+**SARIF upload:** `security-events: write` is required for **`github/codeql-action/upload-sarif`**. On private repositories, your org must allow GitHub code scanning (policy and billing may apply). If you only need the artifact in CI, drop the upload step and add **`actions/upload-artifact`** on **`vibescan.sarif`** instead.
+
 ## Options (high level)
 
 - `--rules crypto,injection`

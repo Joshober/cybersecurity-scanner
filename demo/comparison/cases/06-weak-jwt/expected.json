@@ -1,0 +1,5 @@
+{
+  "matchMode": "anyOf",
+  "expectedRuleIds": ["crypto.jwt.weak-secret-literal"],
+  "fixedMustNotTriggerRuleIds": ["crypto.jwt.weak-secret-literal"]
+}

@@ -1,0 +1,46 @@
+{
+  "findings": [
+    {
+      "ruleId": "injection.path-traversal",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "message": "File path may be derived from user input, enabling path traversal.",
+      "filePath": "demo/comparison/cases/02-path-traversal/vulnerable/app.js",
+      "line": 8
+    },
+    {
+      "ruleId": "injection.path-traversal.tainted-flow",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "message": "Path traversal risk",
+      "filePath": "demo/comparison/cases/02-path-traversal/vulnerable/app.js",
+      "line": 8
+    },
+    {
+      "ruleId": "MW-003",
+      "severity": "info",
+      "severityLabel": "LOW",
+      "message": "No helmet() call detected in this file — verify security headers are set.",
+      "filePath": "demo/comparison/cases/02-path-traversal/vulnerable/app.js",
+      "line": 1
+    }
+  ],
+  "findingCount": 3,
+  "record": {
+    "tool": "vibescan",
+    "detectedExpectedIssue": true,
+    "matchedRulesOrFindings": [
+      "injection.path-traversal",
+      "injection.path-traversal.tainted-flow"
+    ],
+    "falsePositiveCount": 1,
+    "falsePositiveNote": "Findings with rule IDs outside expectedRuleIds (golden set is minimal; may still be true positives)",
+    "deterministicRerun": true,
+    "producesReusableOutput": true,
+    "ciEnforceable": true,
+    "regressionTestSupport": true,
+    "fixSuggested": false,
+    "fixCorrect": null,
+    "stableAcrossReruns": true
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "sharedArtifact": "../npm-audit-shared.json",
+  "globalAudit": {
+    "skipped": false,
+    "exitCode": 0,
+    "advisoryCount": 0,
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 3,
+        "dev": 86,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 88
+      }
+    },
+    "vulnerabilityKeys": 0
+  },
+  "record": {
+    "tool": "npm-audit",
+    "detectedExpectedIssue": false,
+    "matchedRulesOrFindings": [],
+    "falsePositiveCount": null,
+    "falsePositiveNote": "Single shared audit for demo/comparison/package.json — same value for every case; does not target inline bug class.",
+    "deterministicRerun": true,
+    "producesReusableOutput": true,
+    "ciEnforceable": true,
+    "regressionTestSupport": false,
+    "fixSuggested": null,
+    "fixCorrect": null,
+    "stableAcrossReruns": true
+  }
+}

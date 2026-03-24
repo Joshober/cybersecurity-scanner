@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+.env.local
+.pages-env-bulk.json
+
+# Build outputs
+dist/
+build/
+*.log
+logs/
+
+# Vite cache
+frontend/vite.config.js.timestamp-*.mjs
+node_modules/.vite/
+
+# Uploads
+backend/uploads/
+backend/temp/
+ml-service/temp/
+
+# Model files (pueden ser grandes)
+*.h5
+*.hdf5
+*.pkl
+*.keras
+vit_model_v1.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Duplicate lockfiles
+**/package-lock 2.json
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+.env.vault

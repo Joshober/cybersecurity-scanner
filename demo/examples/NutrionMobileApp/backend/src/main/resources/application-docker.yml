@@ -1,0 +1,123 @@
+spring:
+  application:
+    name: nutrition-app-backend
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/nutrition_db}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:nutrition_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: 
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 # 10 minutes
+  
+  # Flyway Configuration
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME:admin}
+      password: ${SPRING_SECURITY_USER_PASSWORD:}
+
+server:
+  port: 8080
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:NutritionAppSuperSecretJWTKey2024Minimum32CharsLongForHS256Algorithm}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+
+# CORS Configuration
+cors:
+  allowed-origins: "http://localhost:3000,http://frontend:3000,https://*.ngrok.io,https://*.ngrok-free.app"
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowed-headers: "*"
+  allow-credentials: true
+
+# ML/AI Configuration
+ml:
+  mode: ${ML_MODE:openrouter-only}
+  onnx:
+    models-path: ${ML_MODELS_PATH:/app/models/}
+    food-classification-model: ${ONNX_MODEL_NAME:food_classifier.onnx}
+    auto-download: ${ML_AUTO_DOWNLOAD:true}
+    model-download-url: ${ML_MODEL_DOWNLOAD_URL:}
+  inference:
+    batch-size: 1
+    timeout: 30000 # 30 seconds
+
+# OpenRouter Configuration (optional - for food recognition via API)
+openrouter:
+  enabled: ${OPENROUTER_ENABLED:false}
+  api-key: ${OPENROUTER_API_KEY:}
+  model: ${OPENROUTER_MODEL:openai/gpt-4o}
+  use-only: ${USE_OPENROUTER_ONLY:false}
+
+# Menu Processing Configuration
+menu:
+  sodexo:
+    api-url: https://api.sodexo.com/menu
+    api-key: ${SODEXO_API_KEY:demo-key}
+    cache-ttl: 3600 # 1 hour
+  lucene:
+    index-path: ./lucene-index
+    analyzer: standard
+
+# Portion Analysis Configuration
+portion:
+  plate-detection:
+    min-radius: 50
+    max-radius: 200
+    hough-threshold: 50
+  density-database:
+    default-density: 1.0 # g/cm³
+    food-densities:
+      rice: 0.8
+      pasta: 0.6
+      bread: 0.3
+      meat: 1.1
+      vegetables: 0.9
+
+# Logging
+logging:
+  level:
+    com.nutrition: INFO
+    org.springframework.security: WARN
+    org.apache.lucene: WARN
+    com.microsoft.onnxruntime: INFO
+    org.springframework.web: INFO

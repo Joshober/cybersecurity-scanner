@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .card { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; margin: 20px 0; backdrop-filter: blur(10px); }
+        .btn { background: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px; }
+        .btn:hover { background: #45a049; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍎 Nutrition App</h1>
+        <div class="card">
+            <h2>Welcome to the Nutrition App!</h2>
+            <p>This is a full-stack nutrition tracking application with:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>🍎 Food recognition using AI/ML</li>
+                <li>📊 Nutrition calculation and tracking</li>
+                <li>🍽️ Dining hall menu integration</li>
+                <li>👤 User profiles and meal planning</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h3>Backend API Status</h3>
+            <div id="backend-status" class="status">Checking...</div>
+            <button class="btn" onclick="checkBackend()">Check Backend</button>
+        </div>
+        
+        <div class="card">
+            <h3>Quick Actions</h3>
+            <button class="btn" onclick="window.open('http://localhost:8080/api/auth/login', '_blank')">API Login</button>
+            <button class="btn" onclick="window.open('http://localhost:8080/h2-console', '_blank')">Database Console</button>
+        </div>
+    </div>
+
+    <script>
+        async function checkBackend() {
+            const statusDiv = document.getElementById("backend-status");
+            statusDiv.textContent = "Checking...";
+            statusDiv.className = "status";
+            
+            try {
+                const response = await fetch("http://localhost:8080/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: "test", password: "test" })
+                });
+                
+                if (response.ok || response.status === 400) {
+                    statusDiv.textContent = "✅ Backend is running!";
+                    statusDiv.className = "status success";
+                } else {
+                    statusDiv.textContent = "⚠️ Backend responded with status: " + response.status;
+                    statusDiv.className = "status error";
+                }
+            } catch (error) {
+                statusDiv.textContent = "❌ Backend is not accessible: " + error.message;
+                statusDiv.className = "status error";
+            }
+        }
+        
+        // Check backend status on page load
+        window.onload = checkBackend;
+    </script>
+</body>
+</html>

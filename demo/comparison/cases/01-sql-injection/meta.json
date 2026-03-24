@@ -1,0 +1,11 @@
+{
+  "id": "01-sql-injection",
+  "title": "SQL Injection",
+  "expectedRuleIds": ["injection.sql.string-concat", "injection.sql.tainted-flow"],
+  "vulnerableRuleIds": ["injection.sql.string-concat", "injection.sql.tainted-flow"],
+  "expectVulnerableAnyOf": true,
+  "expectAbsentWhenFixed": ["injection.sql.string-concat", "injection.sql.tainted-flow"],
+  "verificationMode": "scan+integration",
+  "policyRelevant": true,
+  "sourceBenchmark": "benchmarks/gold-path-demo/cases/01-sql-injection"
+}

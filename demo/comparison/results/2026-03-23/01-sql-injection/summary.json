@@ -1,0 +1,99 @@
+{
+  "caseId": "01-sql-injection",
+  "title": "SQL Injection",
+  "policyRelevant": true,
+  "verificationMode": "scan+integration",
+  "expectedRuleIds": [
+    "injection.sql.string-concat",
+    "injection.sql.tainted-flow"
+  ],
+  "tools": {
+    "vibescan": {
+      "tool": "vibescan",
+      "detectedExpectedIssue": true,
+      "matchedRulesOrFindings": [
+        "injection.sql.string-concat",
+        "injection.sql.tainted-flow"
+      ],
+      "falsePositiveCount": 1,
+      "falsePositiveNote": "Findings with rule IDs outside expectedRuleIds (golden set is minimal; may still be true positives)",
+      "deterministicRerun": true,
+      "producesReusableOutput": true,
+      "ciEnforceable": true,
+      "regressionTestSupport": true,
+      "fixSuggested": false,
+      "fixCorrect": null,
+      "stableAcrossReruns": true
+    },
+    "eslint": {
+      "tool": "eslint-plugin-security",
+      "detectedExpectedIssue": false,
+      "matchedRulesOrFindings": [],
+      "falsePositiveCount": 0,
+      "falsePositiveNote": "Config uses plugin:security only; signal = any ESLint message with a ruleId in vulnerable/. Not aligned to VibeScan rule IDs.",
+      "deterministicRerun": true,
+      "producesReusableOutput": true,
+      "ciEnforceable": true,
+      "regressionTestSupport": true,
+      "fixSuggested": null,
+      "fixCorrect": null,
+      "stableAcrossReruns": true
+    },
+    "npmAudit": {
+      "tool": "npm-audit",
+      "detectedExpectedIssue": false,
+      "matchedRulesOrFindings": [],
+      "falsePositiveCount": null,
+      "falsePositiveNote": "Single shared audit for demo/comparison/package.json — same value for every case; does not target inline bug class.",
+      "deterministicRerun": true,
+      "producesReusableOutput": true,
+      "ciEnforceable": true,
+      "regressionTestSupport": false,
+      "fixSuggested": null,
+      "fixCorrect": null,
+      "stableAcrossReruns": true
+    },
+    "bearer": {
+      "tool": "bearer",
+      "detectedExpectedIssue": null,
+      "matchedRulesOrFindings": [],
+      "falsePositiveCount": null,
+      "falsePositiveNote": "bearer not on PATH",
+      "deterministicRerun": false,
+      "producesReusableOutput": false,
+      "ciEnforceable": false,
+      "regressionTestSupport": false,
+      "fixSuggested": null,
+      "fixCorrect": null,
+      "stableAcrossReruns": false
+    },
+    "snyk": {
+      "tool": "snyk",
+      "detectedExpectedIssue": null,
+      "matchedRulesOrFindings": [],
+      "falsePositiveCount": null,
+      "falsePositiveNote": "snyk not on PATH",
+      "deterministicRerun": false,
+      "producesReusableOutput": false,
+      "ciEnforceable": false,
+      "regressionTestSupport": false,
+      "fixSuggested": null,
+      "fixCorrect": null,
+      "stableAcrossReruns": false
+    },
+    "ai": {
+      "tool": "ai",
+      "detectedExpectedIssue": null,
+      "matchedRulesOrFindings": [],
+      "falsePositiveCount": null,
+      "falsePositiveNote": "No manual ai.json capture yet (only placeholder).",
+      "deterministicRerun": false,
+      "producesReusableOutput": false,
+      "ciEnforceable": false,
+      "regressionTestSupport": false,
+      "fixSuggested": null,
+      "fixCorrect": null,
+      "stableAcrossReruns": null
+    }
+  }
+}

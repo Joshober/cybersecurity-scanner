@@ -82,6 +82,38 @@ body {
   color: var(--text);
 }
 
+.examples {
+  margin-top: 12px;
+}
+
+.examplesLabel {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.exampleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.exampleBtn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0f0f16;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exampleBtn:hover {
+  border-color: var(--accent);
+}
+
 .radioRow {
   display: flex;
   gap: 16px;

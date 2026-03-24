@@ -1,0 +1,18 @@
+{
+  "name": "vibescan-comparison-harness",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency surface for npm audit in the demo comparison harness (aligned with gold-path-demo)",
+  "scripts": {
+    "run": "node scripts/run-comparison.mjs"
+  },
+  "devDependencies": {
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "stripe": "^17.4.0"
+  },
+  "dependencies": {
+    "cybersecurity-scanner-monorepo": "file:../.."
+  }
+}

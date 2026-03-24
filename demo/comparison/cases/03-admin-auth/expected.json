@@ -1,0 +1,5 @@
+{
+  "matchMode": "anyOf",
+  "expectedRuleIds": ["AUTH-004"],
+  "fixedMustNotTriggerRuleIds": ["AUTH-004"]
+}

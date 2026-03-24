@@ -1,0 +1,19 @@
+{
+  "_placeholder": true,
+  "message": "Replace with manual capture using demo/comparison/tools/ai/result.template.json",
+  "promptRef": "cases/03-admin-auth/prompt.md",
+  "record": {
+    "tool": "ai",
+    "detectedExpectedIssue": null,
+    "matchedRulesOrFindings": [],
+    "falsePositiveCount": null,
+    "falsePositiveNote": "No manual ai.json capture yet (only placeholder).",
+    "deterministicRerun": false,
+    "producesReusableOutput": false,
+    "ciEnforceable": false,
+    "regressionTestSupport": false,
+    "fixSuggested": null,
+    "fixCorrect": null,
+    "stableAcrossReruns": null
+  }
+}

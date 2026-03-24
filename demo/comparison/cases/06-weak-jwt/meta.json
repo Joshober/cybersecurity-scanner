@@ -1,0 +1,11 @@
+{
+  "id": "06-weak-jwt",
+  "title": "Weak JWT secret",
+  "expectedRuleIds": ["crypto.jwt.weak-secret-literal"],
+  "vulnerableRuleIds": ["crypto.jwt.weak-secret-literal"],
+  "expectVulnerableAnyOf": true,
+  "expectAbsentWhenFixed": ["crypto.jwt.weak-secret-literal"],
+  "verificationMode": "scan+integration",
+  "policyRelevant": true,
+  "sourceBenchmark": "benchmarks/gold-path-demo/cases/06-weak-jwt"
+}
