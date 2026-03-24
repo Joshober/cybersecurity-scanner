@@ -121,6 +121,104 @@ function severityWeight(sev) {
   return 0;
 }
 
+const MAX_PROMPT_FINDINGS = 35;
+const MAX_SNIPPET_CHARS = 520;
+
+function findingToDetail(f, repoDir) {
+  const abs = f.filePath || "";
+  const rel = abs && abs.startsWith(repoDir) ? path.relative(repoDir, abs) : abs || "(unknown)";
+  const rawSource = f.source ? String(f.source).replace(/\r\n/g, "\n") : "";
+  const snippet =
+    rawSource.length > MAX_SNIPPET_CHARS
+      ? `${rawSource.slice(0, MAX_SNIPPET_CHARS)}\n…`
+      : rawSource || undefined;
+  const remediation = f.remediation || f.fix || "";
+  return {
+    ruleId: f.ruleId,
+    severity: f.severity,
+    severityLabel: f.severityLabel,
+    message: f.message,
+    why: f.why || "",
+    remediation,
+    file: `${rel}:${f.line}`,
+    cwe: f.cwe,
+    owasp: f.owasp,
+    snippet,
+  };
+}
+
+function buildAiRemediationPrompt({
+  repoGitUrl,
+  scenario,
+  totalFindings,
+  criticalOrErrorCount,
+  details,
+}) {
+  const scenarioNote =
+    scenario === "simulated_hacked"
+      ? "A demo-only file (`vibescan-demo-hack.js`) was added to simulate a bad commit; remove or fix it like any other finding."
+      : "No demo-only files were injected.";
+
+  const gate =
+    criticalOrErrorCount > 0
+      ? `This demo’s merge gate would **BLOCK** while critical/error findings remain (${criticalOrErrorCount}).`
+      : `This demo’s merge gate would **not block** on severity alone (no critical/error in this run).`;
+
+  const header = `You are helping secure a JavaScript/TypeScript codebase that was analyzed with **VibeScan** (static security checks for Node/Express-style apps).
+
+**Repository (scanned clone):** ${repoGitUrl}
+**Scenario:** ${scenario}. ${scenarioNote}
+
+**Scan summary:** ${totalFindings} finding(s) total. ${criticalOrErrorCount} critical/error-level finding(s). ${gate}
+
+Your job: **propose concrete code changes** that fix the issues below while keeping behavior correct. Prefer standard library patterns (parameterized SQL, validated redirects, strong secrets from env, auth middleware, verified webhooks, etc.).
+
+---
+
+`;
+
+  if (!details.length) {
+    return (
+      header +
+      `The scan reported **no findings** in the analyzed file set. No VibeScan-driven fixes are required.\n\n` +
+      `If the user still wants a security pass, suggest a short manual checklist (dependencies, authz, logging) appropriate for their stack.\n`
+    );
+  }
+
+  const blocks = details.map((d, i) => {
+    const n = i + 1;
+    const fixText =
+      d.remediation ||
+      "No built-in remediation text: interpret the message, remove the unsafe construct, and align with OWASP ASVS / framework security guidance for this rule class.";
+    const whyBlock = d.why ? `\n**Why:** ${d.why}\n` : "";
+    const meta = [d.cwe ? `CWE-${d.cwe}` : null, d.owasp || null].filter(Boolean).join(" · ");
+    const metaLine = meta ? `\n**Reference:** ${meta}\n` : "";
+    const snippetBlock = d.snippet
+      ? `\n**Code context (excerpt from file):**\n\`\`\`javascript\n${d.snippet}\n\`\`\`\n`
+      : "";
+    return (
+      `### ${n}. \`${d.ruleId}\` (${d.severityLabel || d.severity}) — \`${d.file}\`\n` +
+      `**Description:** ${d.message}\n` +
+      whyBlock +
+      metaLine +
+      `**Recommended direction:** ${fixText}\n` +
+      snippetBlock
+    );
+  });
+
+  const footer = `---
+
+**Instructions for the assistant**
+1. Fix items in **severity order** (CRITICAL / HIGH first), then MEDIUM / LOW.
+2. Keep changes **minimal and reviewable**; do not refactor unrelated code.
+3. If a finding is a false positive for this app, explain why and what evidence would justify suppressing it.
+4. End with a **short file-by-file summary** of edits.
+
+**Disclaimer:** VibeScan uses heuristics; verify fixes with tests and, when appropriate, your own security review.`;
+
+  return header + blocks.join("\n") + "\n" + footer;
+}
+
 async function runScanJob(scanId, repoGitUrl, scenario) {
   const job = jobs.get(scanId);
   if (!job) return;
@@ -182,19 +280,30 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       return acc;
     }, {});
 
-    const topFindings = [...findings]
-      .sort((a, b) => severityWeight(b.severity) - severityWeight(a.severity))
-      .slice(0, 10)
-      .map((f) => {
-        const abs = f.filePath || "";
-        const rel = abs && abs.startsWith(repoDir) ? path.relative(repoDir, abs) : abs || "(unknown)";
-        return {
-          ruleId: f.ruleId,
-          severityLabel: f.severityLabel,
-          message: f.message,
-          file: `${rel}:${f.line}`,
-        };
-      });
+    const sortedForUi = [...findings].sort(
+      (a, b) => severityWeight(b.severity) - severityWeight(a.severity)
+    );
+
+    const topFindings = sortedForUi.slice(0, 10).map((f) => {
+      const abs = f.filePath || "";
+      const rel = abs && abs.startsWith(repoDir) ? path.relative(repoDir, abs) : abs || "(unknown)";
+      return {
+        ruleId: f.ruleId,
+        severityLabel: f.severityLabel,
+        message: f.message,
+        file: `${rel}:${f.line}`,
+        remediation: f.remediation || f.fix || "",
+      };
+    });
+
+    const promptDetails = sortedForUi.slice(0, MAX_PROMPT_FINDINGS).map((f) => findingToDetail(f, repoDir));
+    const aiRemediationPrompt = buildAiRemediationPrompt({
+      repoGitUrl,
+      scenario,
+      totalFindings: findings.length,
+      criticalOrErrorCount: criticalOrError.length,
+      details: promptDetails,
+    });
 
     job.result = {
       repoGitUrl,
@@ -204,6 +313,9 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       criticalOrErrorCount: criticalOrError.length,
       countsBySeverity,
       topFindings,
+      aiRemediationPrompt,
+      promptFindingsIncluded: promptDetails.length,
+      promptFindingsTotal: findings.length,
     };
     job.state = "done";
   } catch (err) {

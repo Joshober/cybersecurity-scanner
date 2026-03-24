@@ -62,6 +62,19 @@
         <h2 class="h2">Top findings</h2>
         <div id="findings" class="findings"></div>
 
+        <h2 class="h2">Prompt for your AI assistant</h2>
+        <p class="promptIntro">
+          Copy the text below into ChatGPT, Claude, Copilot, or any editor AI. It summarizes what VibeScan found and how to fix it, with optional code excerpts.
+        </p>
+        <div class="promptMeta" id="promptMeta" aria-live="polite"></div>
+        <div class="promptRow">
+          <textarea id="aiPrompt" class="promptText" readonly rows="16" spellcheck="false" aria-label="Remediation prompt for external AI"></textarea>
+          <div class="promptActions">
+            <button type="button" id="copyPromptBtn" class="btn btnSecondary">Copy prompt</button>
+            <button type="button" id="downloadPromptBtn" class="btn btnGhost">Download .txt</button>
+          </div>
+        </div>
+
         <div class="hint">
           What this means: VibeScan blocks changes when it sees high-confidence security patterns in generated code paths.
         </div>
