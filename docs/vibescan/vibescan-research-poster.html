@@ -3,324 +3,397 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VibeScan — Research Poster</title>
+  <title>VibeScan — CCSC Research Poster</title>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --bg-card: #12121a;
-      --border: #2a2a38;
-      --text: #e8e8ef;
-      --muted: #9898a8;
+      --bg: #07070c;
+      --panel: #101018;
+      --border: #2a2a3a;
+      --text: #ececf4;
+      --muted: #9a9aac;
       --accent: #7c3aed;
-      --accent-2: #22d3ee;
-      --bar: linear-gradient(90deg, var(--accent), var(--accent-2));
+      --accent2: #22d3ee;
+      --warn: #f59e0b;
+      --gradient: linear-gradient(105deg, var(--accent), var(--accent2));
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.45;
-      padding: 1.5rem;
-      max-width: 56rem;
-      margin: 0 auto;
+      line-height: 1.4;
+      font-size: 11.5pt;
+      padding: 0.85rem 1.1rem 1.25rem;
     }
     @media print {
-      @page { size: landscape; margin: 12mm; }
-      body { padding: 0; max-width: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      @page { size: landscape; margin: 10mm; }
+      body {
+        padding: 0;
+        font-size: 10.5pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
     }
-    .poster-header {
+    .poster {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .banner {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.65rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--border);
     }
-    .poster-header h1 {
-      font-size: clamp(2rem, 5vw, 3.25rem);
+    .banner h1 {
+      font-size: clamp(1.35rem, 2.8vw, 1.95rem);
       font-weight: 800;
-      letter-spacing: -0.03em;
-      background: var(--bar);
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      background: var(--gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .poster-header .subtitle {
+    .hook-lead {
+      font-size: clamp(1.05rem, 2.2vw, 1.45rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0.55rem auto 0.4rem;
+      max-width: 58rem;
+    }
+    .hook-sub {
       color: var(--muted);
-      font-size: clamp(0.95rem, 2vw, 1.15rem);
-      margin-top: 0.35rem;
+      font-size: clamp(0.82rem, 1.35vw, 0.98rem);
+      max-width: 56rem;
+      margin: 0 auto;
     }
-    /* B1: Hook — large, 6-ft readable */
-    .hook {
-      font-size: clamp(1.25rem, 3.2vw, 1.85rem);
-      font-weight: 600;
-      line-height: 1.35;
-      text-align: center;
-      color: var(--text);
-      max-width: 52rem;
-      margin: 0.75rem auto 1.25rem;
-      padding: 0 0.5rem;
-    }
-    .stats-bar {
+    .columns {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-      gap: 0.65rem;
-      margin-bottom: 1.25rem;
+      grid-template-columns: 1fr 1.12fr 1fr;
+      gap: 0.75rem 1rem;
+      align-items: start;
     }
-    .stat {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      text-align: center;
-      border-top: 4px solid var(--accent);
+    @media (max-width: 900px) {
+      .columns { grid-template-columns: 1fr; }
     }
-    .stat strong {
-      display: block;
-      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
-      color: var(--accent-2);
-    }
-    .stat span { font-size: 0.8rem; color: var(--muted); }
-    h2.section-title {
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--accent-2);
-      margin: 1.25rem 0 0.65rem;
-      letter-spacing: 0.04em;
+    h2 {
+      font-size: 0.72rem;
       text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent2);
+      margin: 0.65rem 0 0.35rem;
+      font-weight: 700;
     }
-    .grid-2 {
+    h2:first-child { margin-top: 0; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.65rem;
+      border-top: 3px solid var(--accent);
+      margin-bottom: 0.45rem;
+    }
+    .card p, .card li { font-size: 0.88rem; color: var(--muted); }
+    .card p + p { margin-top: 0.35rem; }
+    .card strong { color: var(--text); font-weight: 600; }
+    ul.tight {
+      margin: 0.25rem 0 0 1rem;
+      padding: 0;
+    }
+    ul.tight li { margin-bottom: 0.28rem; }
+    .rq-box {
+      background: linear-gradient(145deg, #15152a, var(--panel));
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.55rem 0.65rem;
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 0.45rem;
+    }
+    .feature-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 0.4rem;
     }
-    @media (max-width: 52rem) { .grid-2 { grid-template-columns: 1fr; } }
-    .card {
-      background: var(--bg-card);
+    @media (max-width: 500px) { .feature-grid { grid-template-columns: 1fr; } }
+    .mini {
+      background: #0c0c14;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.1rem;
-      border-top: 4px solid var(--accent);
-      position: relative;
+      border-radius: 6px;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.78rem;
     }
-    .contrib-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.85rem;
-    }
-    @media (max-width: 40rem) { .contrib-grid { grid-template-columns: 1fr; } }
-    /* B1: Larger contribution numbers */
-    .contrib-num {
-      font-size: clamp(2.5rem, 6vw, 3.75rem);
-      font-weight: 800;
-      line-height: 1;
-      color: var(--accent);
-      opacity: 0.95;
-      margin-bottom: 0.35rem;
-      letter-spacing: -0.02em;
-    }
-    .contrib-title {
+    .mini h3 {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent2);
+      margin-bottom: 0.2rem;
       font-weight: 700;
-      font-size: clamp(1rem, 2.2vw, 1.15rem);
-      margin-bottom: 0.4rem;
     }
-    .contrib-body { color: var(--muted); font-size: 0.92rem; }
-    .breach-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
+    .mini p { color: var(--muted); font-size: 0.76rem; line-height: 1.35; }
+    .big-result {
+      text-align: center;
+      padding: 0.65rem 0.5rem;
+      margin-bottom: 0.45rem;
+      background: linear-gradient(180deg, #1a1030, var(--panel));
+      border: 1px solid var(--accent);
+      border-radius: 10px;
     }
-    @media (max-width: 48rem) { .breach-grid { grid-template-columns: 1fr; } }
-    .breach-flag {
-      margin-top: 0.6rem;
-      font-size: 0.82rem;
-      color: var(--accent-2);
-      border-left: 3px solid var(--accent);
-      padding-left: 0.5rem;
+    .big-result .nums {
+      font-size: clamp(1.75rem, 4vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
     }
-    .breach-flag strong { color: var(--text); }
-    table.eval {
+    .big-result .cap {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+      max-width: 16rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    table.data {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
-      margin-top: 0.5rem;
+      font-size: 0.78rem;
+      margin-top: 0.25rem;
     }
-    table.eval th, table.eval td {
+    table.data th, table.data td {
       border: 1px solid var(--border);
-      padding: 0.5rem 0.65rem;
+      padding: 0.28rem 0.4rem;
       text-align: left;
     }
-    table.eval th {
-      background: #1a1a26;
-      color: var(--accent-2);
+    table.data th {
+      background: #18182a;
+      color: var(--accent2);
       font-weight: 600;
     }
-    table.eval td.tbd { color: var(--muted); font-style: italic; }
-    .lessons { font-size: 0.88rem; }
-    .lessons li {
-      margin-bottom: 0.55rem;
-      list-style: none;
-      padding-left: 0;
+    table.data td.num { text-align: center; font-weight: 700; color: var(--text); }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem 0.15rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.45rem 0.35rem;
+      background: #0c0c14;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      margin: 0.35rem 0;
     }
-    .lessons strong { color: var(--text); }
-    .footer-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1.25rem;
-      align-items: end;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
+    .flow span {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.45rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .flow .arr { color: var(--accent2); border: none; background: none; padding: 0 0.1rem; }
+    .footnote {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+    .contact-corner {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+      padding-top: 0.45rem;
       border-top: 1px solid var(--border);
     }
-    @media (max-width: 40rem) { .footer-row { grid-template-columns: 1fr; } }
-    .qr-block {
-      text-align: center;
-      padding: 0.5rem;
-    }
-    .qr-block img {
-      display: block;
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 0.35rem;
+    .contact-corner img {
+      width: 88px;
+      height: 88px;
       border-radius: 6px;
       border: 1px solid var(--border);
     }
-    .qr-label {
+    .contact-corner .links {
+      font-size: 0.72rem;
+      color: var(--accent2);
+      word-break: break-all;
+      max-width: 11rem;
+    }
+    .contact-corner .people {
       font-size: 0.72rem;
       color: var(--muted);
-      max-width: 12rem;
-      margin: 0 auto;
     }
-    .repo-url {
-      font-size: 0.75rem;
-      color: var(--accent-2);
-      word-break: break-all;
-      margin-top: 0.25rem;
-    }
-    .takeaway {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .takeaway em { color: var(--accent-2); font-style: normal; }
+    .compare th:first-child { width: 38%; }
   </style>
 </head>
 <body>
-  <header class="poster-header">
-    <h1>VibeScan</h1>
-    <p class="subtitle">Security scanning npm package for LLM-generated Node.js applications</p>
-  </header>
+  <div class="poster">
+    <header class="banner">
+      <h1>VibeScan: Security Verification and Pipeline Protection for AI-Assisted JavaScript Applications</h1>
+      <p class="hook-lead">AI-generated backend code can look functional while still shipping weak secrets, unsafe dependencies, missing auth checks, and other security flaws.</p>
+      <p class="hook-sub">VibeScan is a JavaScript/TypeScript security tool that combines static analysis, benchmark-ready evidence, and pipeline protection to catch risky patterns before deployment.</p>
+    </header>
 
-  <p class="hook">
-    One in five packages AI tools recommend don't exist. Half of AI-generated backends are exploitable.
-    VibeScan is the safety layer vibe coding never had.
-  </p>
+    <div class="columns">
+      <!-- LEFT -->
+      <div class="col-left">
+        <h2>Why this matters</h2>
+        <div class="card">
+          <ul class="tight">
+            <li>LLM-generated backend code has <strong>inconsistent security quality</strong> even when it appears correct.</li>
+            <li><strong>Hallucinated npm package names</strong> and weak defaults create real supply-chain and deployment risk.</li>
+            <li>Teams need <strong>repeatable safeguards</strong>, not just one-time prompt fixes.</li>
+          </ul>
+        </div>
 
-  <div class="stats-bar">
-    <div class="stat"><strong>19.7%</strong><span>LLM npm suggestions hallucinated (Spracklen et al., USENIX Sec 2025)</span></div>
-    <div class="stat"><strong>~50%</strong><span>Passing AI backends still exploitable (BaxBench, arXiv:2502.11844)</span></div>
-    <div class="stat"><strong>10.5%</strong><span>SecPass rate under security prompting (SusVibes, arXiv:2512.03262)</span></div>
-    <div class="stat"><strong>1,182</strong><span>Apps with literal &lsquo;supersecretkey&rsquo; (Invicti, 2025)</span></div>
-  </div>
+        <h2>Research question</h2>
+        <div class="rq-box">
+          Can a deterministic security verification tool provide clearer coverage, more repeatable outputs, and better pipeline protection for AI-assisted Node/Express code than prompt-only or ad hoc security workflows?
+        </div>
 
-  <div class="grid-2">
-    <section>
-      <h2 class="section-title">Motivation</h2>
-      <div class="card">
-        <p><strong>Vibe coding</strong> lets developers ship full-stack apps from natural language, but
-        <strong>systemic security failure</strong> follows: wrong dependencies, default secrets, and missing auth checks slip into production.
-        Prompt engineering alone cannot close that gap.</p>
+        <h2>Core contributions</h2>
+        <div class="card">
+          <ul class="tight">
+            <li>Static JS/TS security scanner for Node/Express-style apps.</li>
+            <li>Route and middleware analysis beyond basic payload checks.</li>
+            <li>Optional registry check for hallucinated npm dependencies (<code>--check-registry</code> / slopsquat-style signals).</li>
+            <li>Benchmark and adjudication export for reproducible evaluation.</li>
+            <li>Policy-driven CI enforcement concept (JSON/SARIF → merge gate).</li>
+          </ul>
+        </div>
       </div>
-    </section>
-    <section>
-      <h2 class="section-title">Approach</h2>
-      <div class="card">
-        <p>VibeScan runs <strong>downstream static analysis</strong> on generated Express/Node code: AST route graph,
-        taint-style checks, registry-backed <strong>slopsquatting</strong> detection, and generated <code>.test.js</code> security probes—without requiring a formal spec from the author.</p>
+
+      <!-- MIDDLE -->
+      <div class="col-mid">
+        <h2>What VibeScan is</h2>
+        <div class="feature-grid">
+          <div class="mini">
+            <h3>Static analysis</h3>
+            <p>Crypto patterns · injection (SQL/command/eval) · auth/middleware heuristics · OpenAPI drift / route inventory</p>
+          </div>
+          <div class="mini">
+            <h3>Dependency trust</h3>
+            <p>Slopsquat-style signals · optional npm registry verification</p>
+          </div>
+          <div class="mini">
+            <h3>Verification support</h3>
+            <p>Generated test stubs · benchmark + adjudication export</p>
+          </div>
+          <div class="mini">
+            <h3>Pipeline protection</h3>
+            <p>JSON / SARIF output · policy checks · CI fail conditions</p>
+          </div>
+        </div>
+
+        <h2>Verification / pipeline story</h2>
+        <div class="card">
+          <div class="flow" aria-label="Pipeline flow">
+            <span>Scan</span><span class="arr">→</span>
+            <span>Findings</span><span class="arr">→</span>
+            <span>JSON / SARIF</span><span class="arr">→</span>
+            <span>Policy check</span><span class="arr">→</span>
+            <span>Security tests</span><span class="arr">→</span>
+            <span>Merge gate</span>
+          </div>
+          <p>VibeScan is evolving from a static scanner into a <strong>security verification and pipeline protection</strong> tool with explicit, repeatable coverage.</p>
+        </div>
+
+        <h2>Why this is better than AI-only workflows</h2>
+        <div class="card">
+          <p class="footnote" style="margin-top:0;margin-bottom:0.4rem">VibeScan makes coverage <strong>explicit and enforceable</strong>; AI assistance may be helpful but is <strong>less deterministic</strong>.</p>
+          <table class="data compare" aria-label="VibeScan vs AI-only">
+            <thead>
+              <tr><th>Property</th><th>VibeScan</th><th>AI-only workflow</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Explicit rule coverage</td><td>Yes</td><td>Limited</td></tr>
+              <tr><td>Repeatable output</td><td>Yes</td><td>Variable</td></tr>
+              <tr><td>CI enforcement</td><td>Yes</td><td>Limited</td></tr>
+              <tr><td>Regression protection</td><td>Yes</td><td>Limited</td></tr>
+              <tr><td>Auditable findings</td><td>Yes</td><td>Harder</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </section>
-  </div>
 
-  <h2 class="section-title">Novel contributions</h2>
-  <div class="contrib-grid">
-    <div class="card">
-      <div class="contrib-num">01</div>
-      <div class="contrib-title">Spec-Free AST Route Graph</div>
-      <p class="contrib-body">Extracts mounted routes and handlers from idiomatic Express without an OpenAPI spec.</p>
-    </div>
-    <div class="card">
-      <div class="contrib-num">02</div>
-      <div class="contrib-title">Persistent Security Test Files</div>
-      <p class="contrib-body">Emits <code>.test.js</code> files that encode exploit hypotheses for CI, not one-off chat fixes.</p>
-    </div>
-    <div class="card">
-      <div class="contrib-num">03</div>
-      <div class="contrib-title">LLM Default Secret Dictionary</div>
-      <p class="contrib-body">Flags literals and env fallbacks that match known model-default placeholder secrets.</p>
-    </div>
-    <div class="card">
-      <div class="contrib-num">04</div>
-      <div class="contrib-title">NPM Registry Slopsquat Detector</div>
-      <p class="contrib-body"><strong>RULE-SLOP-001</strong> verifies dependencies against the public npm registry before ship.</p>
-    </div>
-  </div>
+      <!-- RIGHT -->
+      <div class="col-right">
+        <h2>Method / evaluation setup</h2>
+        <div class="card">
+          <ul class="tight">
+            <li><strong>Benchmark target:</strong> DVNA (<a href="https://github.com/appsecco/dvna" style="color:var(--accent2)">appsecco/dvna</a>), first-party code only.</li>
+            <li><strong>Ground truth:</strong> manual adjudication of counted true positives.</li>
+            <li><strong>Baseline run:</strong> eslint-plugin-security (pinned config in repo).</li>
+            <li><strong>Additional baselines</strong> (Bearer, Snyk Code) are <strong>documented but not run in the same environment yet</strong>.</li>
+            <li>Results are <strong>preliminary and scope-limited</strong> — see <code>benchmarks/results/legacy/dvna-evaluation.md</code>.</li>
+          </ul>
+        </div>
 
-  <h2 class="section-title">Real-world impact</h2>
-  <div class="breach-grid">
-    <div class="card">
-      <strong>Enrichlead</strong>
-      <p class="contrib-body" style="margin-top:0.4rem">Cursor-built app, zero hand-written code, shut down permanently after users bypassed subscriptions (March&nbsp;2025).</p>
-      <p class="breach-flag">VibeScan would have flagged <strong>route graph + auth middleware gaps</strong> and <strong>RULE-SLOP-001</strong> on AI-suggested dependencies before deployment.</p>
-    </div>
-    <div class="card">
-      <strong>Tea App</strong>
-      <p class="contrib-body" style="margin-top:0.4rem">72,000 government ID photos exposed via default Firebase configuration.</p>
-      <p class="breach-flag">VibeScan would have flagged <strong>crypto.secrets.hardcoded</strong> and weak client/config exposure patterns before deployment.</p>
-    </div>
-    <div class="card">
-      <strong>CVE-2025-48757</strong>
-      <p class="contrib-body" style="margin-top:0.4rem">170 Lovable-built production sites with full database exposure via missing Supabase Row Level Security.</p>
-      <p class="breach-flag">VibeScan would have flagged <strong>unauthenticated data paths</strong> and <strong>injection / access-control</strong> signals on generated Supabase client usage before deployment.</p>
-    </div>
-  </div>
+        <h2>Results (preliminary)</h2>
+        <div class="big-result">
+          <div class="nums">8 vs 1</div>
+          <p class="cap">Counted first-party true positives on DVNA (current setup): VibeScan vs eslint-plugin-security</p>
+        </div>
+        <div class="card">
+          <table class="data" aria-label="DVNA theme counts">
+            <thead>
+              <tr><th>Theme</th><th>VibeScan</th><th>eslint-plugin-security</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Injection</td><td class="num">3</td><td class="num">1</td></tr>
+              <tr><td>Broken Authentication</td><td class="num">2</td><td class="num">0</td></tr>
+              <tr><td>Sensitive Data / Crypto</td><td class="num">2</td><td class="num">0</td></tr>
+              <tr><td>Logging / Monitoring</td><td class="num">1</td><td class="num">0</td></tr>
+            </tbody>
+          </table>
+          <p class="footnote">Figures from <code>benchmarks/results/legacy/dvna-evaluation.md</code> (manual TP table). Not full precision/recall.</p>
+        </div>
 
-  <h2 class="section-title">Preliminary evaluation — DVNA benchmark</h2>
-  <div class="card">
-    <p class="contrib-body" style="margin-bottom:0.65rem">Manual <strong>true-positive</strong> counts on <strong>first-party</strong> DVNA app code only (vendor minified JS excluded). See <code>benchmarks/results/legacy/dvna-evaluation.md</code> for methodology.</p>
-    <table class="eval" aria-label="DVNA benchmark comparison">
-      <thead>
-        <tr>
-          <th>DVNA theme (OWASP &rsquo;17)</th>
-          <th>VibeScan TPs</th>
-          <th>eslint-plugin-security TPs</th>
-          <th>Bearer</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Injection (e.g. SQLi, tainted flows)</td><td><strong>3</strong></td><td>1</td><td class="tbd">Pending*</td></tr>
-        <tr><td>Broken authentication</td><td><strong>2</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
-        <tr><td>Sensitive data / crypto exposure</td><td><strong>2</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
-        <tr><td>Insufficient logging / monitoring</td><td><strong>1</strong></td><td>0</td><td class="tbd">Pending*</td></tr>
-        <tr><td>Other themes (XXE, BOLA, app XSS, etc.)</td><td>0</td><td>0</td><td class="tbd">Pending*</td></tr>
-      </tbody>
-    </table>
-    <p class="contrib-body" style="margin-top:0.55rem;font-size:0.82rem;color:var(--muted)"><strong>Total first-party TPs:</strong> VibeScan <strong>8</strong> vs eslint <strong>1</strong>. *Bearer not executed in the benchmark environment (Docker/Windows); reproduce via <code>benchmarks/results/legacy/bearer-dvna.txt</code>.</p>
-  </div>
+        <h2>Real-world implications</h2>
+        <div class="card">
+          <ul class="tight">
+            <li>Helps <strong>small teams</strong> shipping AI-assisted apps without dedicated security review.</li>
+            <li>Reduces risk around <strong>identifiers, payments, and account data</strong>.</li>
+            <li>Improves <strong>trust in software pipelines</strong> through repeatable checks.</li>
+          </ul>
+        </div>
 
-  <h2 class="section-title">Lessons learned</h2>
-  <div class="card lessons">
-    <ul>
-      <li><strong>Security prompts trade quality for little gain.</strong> SusVibes shows security-focused prompting degrades functional correctness without reliably improving security (arXiv:2512.03262).</li>
-      <li><strong>Passing the benchmark is not enough.</strong> BaxBench reports ~50% of backends that pass automated checks remain exploitable (arXiv:2502.11844).</li>
-      <li><strong>Models leak predictable default secrets.</strong> Invicti found 1,182 apps using the same placeholder key—each LLM has a fingerprintable default-secret vocabulary (2025).</li>
-      <li><strong>Nearly one in five package suggestions are fake.</strong> Spracklen et al. measure 19.7% hallucinated npm names in LLM outputs—supply-chain risk is structural (USENIX Security 2025).</li>
-    </ul>
-  </div>
+        <h2>Limitations</h2>
+        <div class="card">
+          <ul class="tight">
+            <li>Benchmark is <strong>preliminary and incomplete</strong>.</li>
+            <li><strong>Bearer</strong> and <strong>Snyk</strong> were not run in the same environment yet.</li>
+            <li>Static analysis is <strong>heuristic</strong>, not proof of security.</li>
+            <li>Full TP/FP/FN precision/recall remains <strong>future work</strong>.</li>
+          </ul>
+        </div>
 
-  <div class="footer-row">
-    <div>
-      <p class="takeaway"><em>Architectural lesson:</em> Ship <strong>downstream scanning</strong> in the build pipeline—not more prompt engineering—as the primary safety layer for vibe-coded systems.</p>
-      <p class="takeaway" style="margin-top:0.5rem">Tenzai (Jan 2026): 100% SSRF detection vs 0% CSRF in evaluated AI-generated stacks—coverage is uneven; static tools must fill the holes.</p>
-    </div>
-    <div class="qr-block">
-      <img src="qr-github.svg" alt="QR code linking to GitHub repository" width="120" height="120" />
-      <div class="qr-label">Scan for GitHub repo</div>
-      <div class="repo-url">github.com/Joshober/cybersecurity-scanner</div>
+        <h2>Future work</h2>
+        <div class="card">
+          <ul class="tight">
+            <li>Complete multi-baseline benchmark (Bearer, Snyk, frozen versions).</li>
+            <li>Expand generated security tests.</li>
+            <li>Strengthen policy-check / merge-gate workflow.</li>
+            <li>Add more seeded benchmark cases.</li>
+            <li>Compare against AI-assisted security workflows more formally.</li>
+          </ul>
+        </div>
+
+        <div class="contact-corner">
+          <img src="qr-github.svg" alt="QR code to GitHub repository" width="88" height="88" />
+          <div>
+            <div class="links"><strong>GitHub:</strong><br />github.com/Joshober/cybersecurity-scanner</div>
+            <div class="people" style="margin-top:0.35rem"><strong>Contact:</strong> <em>(your name)</em><br /><span style="opacity:0.85">Co-authors / mentor: <em>(add names)</em></span></div>
+            <div class="links" style="margin-top:0.25rem">Short link: <em>(optional go link)</em></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </body>
