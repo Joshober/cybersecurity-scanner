@@ -1,0 +1,7 @@
+{
+  "id": "05-webhook",
+  "title": "Webhook without signature verification",
+  "expectVulnerableAnyOf": true,
+  "vulnerableRuleIds": ["WEBHOOK-001"],
+  "expectAbsentWhenFixed": ["WEBHOOK-001"]
+}

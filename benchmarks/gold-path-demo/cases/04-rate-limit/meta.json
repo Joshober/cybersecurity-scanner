@@ -1,0 +1,7 @@
+{
+  "id": "04-rate-limit",
+  "title": "POST /login without rate limiting",
+  "expectVulnerableAnyOf": true,
+  "vulnerableRuleIds": ["MW-002"],
+  "expectAbsentWhenFixed": ["MW-002"]
+}

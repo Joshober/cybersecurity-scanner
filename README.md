@@ -6,6 +6,8 @@
 
 **VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
 
+**Verification matrix, pipeline roadmap, AI comparison plan:** [`docs/vibescan/rule-verification-matrix.md`](docs/vibescan/rule-verification-matrix.md) · [`docs/vibescan/pipeline-protection-roadmap.md`](docs/vibescan/pipeline-protection-roadmap.md) · [`docs/vibescan/ai-comparison-study-plan.md`](docs/vibescan/ai-comparison-study-plan.md) · gold-path demo [`benchmarks/gold-path-demo/`](benchmarks/gold-path-demo/).
+
 **Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
 
 **Universal secure-architecture CLI (AI settings + static checks):** [`docs/secure-arch/README.md`](docs/secure-arch/README.md)
@@ -105,7 +107,7 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 
 **Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.
 
-**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs docs/samples/policy.sample.json vibescan-out.json`
+**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `npm run policy-check -- docs/samples/policy.sample.json vibescan-out.json` (CI gate) · `npm run policy-eval -- docs/samples/policy.sample.json vibescan-out.json` (JSON summary)
 
 ---
 

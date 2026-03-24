@@ -15,7 +15,9 @@
     "build:arch": "npm run build -w @secure-arch/core -w @secure-arch/adapters -w @secure-arch/cli",
     "test:arch": "npm run build:arch && npm run test -w @secure-arch/core",
     "secure-arch": "node packages/secure-arch-cli/dist/cli.js",
-    "policy-eval": "node vibescan/scripts/policy-eval.mjs"
+    "policy-eval": "node vibescan/scripts/policy-eval.mjs",
+    "policy-check": "node vibescan/scripts/policy-check.mjs",
+    "test:gold-path": "npm run build -w vibescan && cd benchmarks/gold-path-demo && npm install && npm test"
   },
   "keywords": [
     "security",

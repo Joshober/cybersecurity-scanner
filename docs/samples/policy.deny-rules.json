@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2",
+  "authRequiredOnAdminRoutes": false,
+  "rateLimitRequiredOnSensitiveRoutes": false,
+  "webhookSignatureVerificationRequired": false,
+  "strongSecretsRequired": false,
+  "corsWildcardDisallowed": false,
+  "publicDatabaseDisallowed": false,
+  "loggingRequiredOnSensitiveActions": false,
+  "llmUnsafeIntegrationDisallowed": false,
+  "denyRuleIds": [
+    "injection.sql.string-concat",
+    "injection.sql.tainted-flow",
+    "injection.path-traversal",
+    "injection.path-traversal.tainted-flow"
+  ]
+}

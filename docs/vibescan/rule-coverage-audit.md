@@ -3,6 +3,8 @@
 **Scope:** Rules and project-level checks that **actually run** in static mode, as wired in [`vibescan/src/attacks/index.ts`](../../vibescan/src/attacks/index.ts), [`vibescan/src/system/scanner.ts`](../../vibescan/src/system/scanner.ts), and engine audits under [`vibescan/src/system/engine/`](../../vibescan/src/system/engine/).
 **Date:** 2025-03-20 (repo snapshot).
 
+For per-rule verification columns (fixtures, generated tests, policy, benchmarks), see **[`rule-verification-matrix.md`](./rule-verification-matrix.md)** and **[`verification-tier-plan.md`](./verification-tier-plan.md)**.
+
 ## Legend
 
 | Column | Meaning |

@@ -17,7 +17,8 @@
     "test": "npm run build && node --test tests/unit/",
     "release:check": "npm run build && npm pack --dry-run",
     "prepublishOnly": "npm run build",
-    "policy-eval": "node scripts/policy-eval.mjs"
+    "policy-eval": "node scripts/policy-eval.mjs",
+    "policy-check": "node scripts/policy-check.mjs"
   },
   "keywords": [
     "security",

@@ -1,0 +1,7 @@
+{
+  "id": "01-sql-injection",
+  "title": "SQL string concatenation",
+  "expectVulnerableAnyOf": true,
+  "vulnerableRuleIds": ["injection.sql.string-concat", "injection.sql.tainted-flow"],
+  "expectAbsentWhenFixed": ["injection.sql.string-concat", "injection.sql.tainted-flow"]
+}

@@ -35,6 +35,12 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
 
 `--from-settings` leaves `llmUnsafeIntegrationDisallowed` **false** unless you add it explicitly to your policy JSON when not using derived settings alone.
 
+## Explicit deny list (`denyRuleIds`)
+
+Policy files may include **`denyRuleIds`**: an array of `ruleId` strings. If **any** VibeScan finding matches, [`policy-check.mjs`](../../vibescan/scripts/policy-check.mjs) fails (merge gate). Use this when architectural booleans are not enough—for example “never ship SQL concat findings.”
+
+Example: [`docs/samples/policy.deny-rules.json`](../samples/policy.deny-rules.json).
+
 ## Production usage
 
 1. Run `vibescan scan` with JSON output:
@@ -43,19 +49,27 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
    node vibescan/dist/system/cli/index.js scan ./path/to/your/app --format json > scan.json
    ```
 
-2. Evaluate with explicit policy:
+2. **CI gate (human-readable stderr + JSON):**
+
+   ```bash
+   node vibescan/scripts/policy-check.mjs docs/samples/policy.sample.json scan.json
+   ```
+
+3. Evaluate with explicit policy (JSON summary on stdout only):
 
    ```bash
    node vibescan/scripts/policy-eval.mjs docs/samples/policy.sample.json scan.json
    ```
 
-3. Or derive policy flags from secure-arch settings:
+4. Or derive policy flags from secure-arch settings:
 
    ```bash
-   node vibescan/scripts/policy-eval.mjs --from-settings architecture/secure-rules/settings.global.yaml scan.json
+   node vibescan/scripts/policy-check.mjs --from-settings architecture/secure-rules/settings.global.yaml scan.json
    ```
 
-4. The script exits non-zero when violations are present and prints totals + per-policy counts.
+5. The scripts exit non-zero when violations are present. Use **`policy-check`** in pipelines; use **`policy-eval`** when you only need machine-readable output without the stderr narrative.
+
+**npm (workspace root):** `npm run policy-check -- docs/samples/policy.sample.json scan.json`
 
 ## Relation to secure-arch YAML
 
