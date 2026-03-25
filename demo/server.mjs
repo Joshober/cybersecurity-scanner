@@ -4,11 +4,17 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import fg from "fast-glob";
 
-const PUBLIC_DIR = path.resolve(process.cwd(), "demo/public");
-const TMP_DIR = path.resolve(process.cwd(), "demo/.tmp");
+// Resolve paths relative to this file, so the demo works even if launched from
+// a different working directory.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, "..");
+
+const PUBLIC_DIR = path.join(REPO_ROOT, "demo/public");
+const TMP_DIR = path.join(REPO_ROOT, "demo/.tmp");
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
@@ -34,6 +40,21 @@ function sendJson(res, status, obj) {
     "Cache-Control": "no-store",
   });
   res.end(body);
+}
+
+function safeHttpProbeBaseUrl(input) {
+  if (!input || typeof input !== "string") return null;
+  const s = input.trim();
+  if (!s) return null;
+  try {
+    const u = new URL(s);
+    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+    // No credentials in demo probes
+    if (u.username || u.password) return null;
+    return u.origin;
+  } catch {
+    return null;
+  }
 }
 
 function safeGithubRepoUrl(input) {
@@ -219,7 +240,7 @@ Your job: **propose concrete code changes** that fix the issues below while keep
   return header + blocks.join("\n") + "\n" + footer;
 }
 
-async function runScanJob(scanId, repoGitUrl, scenario) {
+async function runScanJob(scanId, repoGitUrl, scenario, extraScanOpts = {}) {
   const job = jobs.get(scanId);
   if (!job) return;
 
@@ -244,7 +265,7 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       await maybePatchSimulatedHack(repoDir);
     }
 
-    const distIndex = path.resolve(process.cwd(), "vibescan/dist/system/index.js");
+    const distIndex = path.join(REPO_ROOT, "vibescan/dist/system/index.js");
     if (!existsSync(distIndex)) {
       throw new Error(
         `Scanner build not found at ${distIndex}. Run 'npm run build -w vibescan' from the repo root first.`
@@ -265,8 +286,20 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       entries.push({ path: filePath, source });
     }
 
-    const options = { crypto: true, injection: true, severityThreshold: "info" };
     const projectRoot = repoDir;
+    const options = {
+      crypto: true,
+      injection: true,
+      severityThreshold: "info",
+      projectRoot,
+      ...(extraScanOpts.npmAudit ? { npmAudit: true } : {}),
+      ...(extraScanOpts.httpProbeUrl
+        ? {
+            httpProbeUrl: extraScanOpts.httpProbeUrl,
+            httpProbeMaxRoutes: extraScanOpts.httpProbeMaxRoutes ?? 10,
+          }
+        : {}),
+    };
     const project = await scanProjectAsync(entries, options, projectRoot);
     const findings = project.findings || [];
 
@@ -308,6 +341,10 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
     job.result = {
       repoGitUrl,
       scenario,
+      scanFlags: {
+        npmAudit: !!extraScanOpts.npmAudit,
+        httpProbeUrl: extraScanOpts.httpProbeUrl || null,
+      },
       blocked,
       totalFindings: findings.length,
       criticalOrErrorCount: criticalOrError.length,
@@ -372,6 +409,15 @@ const server = http.createServer((req, res) => {
         const body = await readJsonBody(req);
         const repoInput = String(body.repoUrl || "");
         const scenarioInput = String(body.scenario || "original");
+        const npmAudit = body.npmAudit === true || body.npmAudit === "true";
+        const probeRaw = body.httpProbeUrl != null ? String(body.httpProbeUrl) : "";
+        const httpProbeUrl = safeHttpProbeBaseUrl(probeRaw);
+        if (probeRaw.trim() && !httpProbeUrl) {
+          sendJson(res, 400, {
+            error: "httpProbeUrl must be a plain http(s) origin URL (no path required), e.g. http://127.0.0.1:3000",
+          });
+          return;
+        }
 
         const repoGitUrl = safeGithubRepoUrl(repoInput);
         if (!repoGitUrl) {
@@ -385,7 +431,10 @@ const server = http.createServer((req, res) => {
         jobs.set(scanId, { state: "queued", result: null, error: null });
 
         // Fire-and-forget background job.
-        runScanJob(scanId, repoGitUrl, scenario).catch(() => {});
+        runScanJob(scanId, repoGitUrl, scenario, {
+          npmAudit,
+          httpProbeUrl: httpProbeUrl || undefined,
+        }).catch(() => {});
 
         sendJson(res, 202, { scanId });
         return;

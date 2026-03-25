@@ -15,6 +15,15 @@ describe("vibescan config merge", () => {
     assert.strictEqual(m.scanner.crypto, false);
   });
 
+  it("file dependencies.npmAudit enables scanner.npmAudit", () => {
+    const m = mergeVibeScanConfig(
+      { dependencies: { npmAudit: true } },
+      {},
+      { crypto: true, injection: true }
+    );
+    assert.strictEqual(m.scanner.npmAudit, true);
+  });
+
   it("suppression drops matching ruleId", () => {
     const findings = [
       {

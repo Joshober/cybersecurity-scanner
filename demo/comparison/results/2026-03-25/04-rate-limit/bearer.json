@@ -1,0 +1,20 @@
+{
+  "raw": {
+    "skipped": true,
+    "reason": "bearer not on PATH"
+  },
+  "record": {
+    "tool": "bearer",
+    "detectedExpectedIssue": null,
+    "matchedRulesOrFindings": [],
+    "falsePositiveCount": null,
+    "falsePositiveNote": "bearer not on PATH",
+    "deterministicRerun": false,
+    "producesReusableOutput": false,
+    "ciEnforceable": false,
+    "regressionTestSupport": false,
+    "fixSuggested": null,
+    "fixCorrect": null,
+    "stableAcrossReruns": false
+  }
+}

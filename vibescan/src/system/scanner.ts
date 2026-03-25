@@ -18,6 +18,8 @@ import { buildRouteInventory, runRoutePostureFinding } from "./engine/routeInven
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import { scanWithAi } from "./ai/ai-analyzer.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";
+import { runNpmAuditFindings } from "./npmAudit.js";
+import { probeHttpRoutes } from "./httpProbe.js";
 
 function getRules(options: ScannerOptions): Rule[] {
   const rules: Rule[] = [];
@@ -152,6 +154,18 @@ export async function scanProjectAsync(
 
   if (opts.generateTests && opts.generateTestsOutputDir) {
     generateTests(base.findings, opts.generateTestsOutputDir);
+  }
+
+  if (opts.npmAudit && packageJsonPath) {
+    const audit = runNpmAuditFindings(packageJsonPath);
+    base.findings.push(...filterByThreshold(audit.findings, opts.severityThreshold));
+  }
+
+  if (opts.httpProbeUrl && base.routes.length > 0) {
+    const probed = await probeHttpRoutes(opts.httpProbeUrl, base.routes, {
+      maxRoutes: opts.httpProbeMaxRoutes,
+    });
+    base.findings.push(...filterByThreshold(probed, opts.severityThreshold));
   }
 
   return { ...base, packageJsonPath };

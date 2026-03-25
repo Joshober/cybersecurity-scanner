@@ -39,6 +39,24 @@
           </label>
         </div>
 
+        <h2 class="h2">3) Extra checks (new)</h2>
+        <p class="hint" style="margin-bottom: 0.65rem">
+          Optional layers from the CLI: merge <strong>npm audit</strong> advisories, and/or shallow <strong>HTTP GET</strong> probes
+          when your app is already running somewhere (not full DAST).
+        </p>
+        <label class="checkRow">
+          <input type="checkbox" id="optNpmAudit" checked />
+          <span>Include <code>npm audit</code> findings (CVEs / vulnerable dependencies)</span>
+        </label>
+        <label class="label" for="httpProbeUrl" style="margin-top: 0.75rem">HTTP probe base URL (optional)</label>
+        <input
+          id="httpProbeUrl"
+          class="input"
+          type="url"
+          placeholder="e.g. http://127.0.0.1:3000 — leave empty to skip"
+          spellcheck="false"
+        />
+
         <button id="scanBtn" class="btn">Scan &amp; decide</button>
 
         <div id="status" class="status" aria-live="polite">Idle</div>

@@ -1,0 +1,29 @@
+{
+  "findings": [
+    {
+      "ruleId": "crypto.jwt.weak-secret-literal",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "message": "JWT signed with a known weak secret literal.",
+      "filePath": "demo/comparison/cases/06-weak-jwt/vulnerable/app.js",
+      "line": 4
+    }
+  ],
+  "findingCount": 1,
+  "record": {
+    "tool": "vibescan",
+    "detectedExpectedIssue": true,
+    "matchedRulesOrFindings": [
+      "crypto.jwt.weak-secret-literal"
+    ],
+    "falsePositiveCount": 0,
+    "falsePositiveNote": "",
+    "deterministicRerun": true,
+    "producesReusableOutput": true,
+    "ciEnforceable": true,
+    "regressionTestSupport": true,
+    "fixSuggested": false,
+    "fixCorrect": null,
+    "stableAcrossReruns": true
+  }
+}

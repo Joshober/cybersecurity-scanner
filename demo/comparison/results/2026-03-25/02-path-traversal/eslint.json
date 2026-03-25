@@ -1,0 +1,55 @@
+{
+  "raw": {
+    "ok": true,
+    "files": [
+      {
+        "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\demo\\comparison\\cases\\02-path-traversal\\vulnerable\\app.js",
+        "messages": [
+          {
+            "ruleId": "security/detect-non-literal-fs-filename",
+            "severity": 1,
+            "message": "Found readFileSync from package \"fs\" with non literal argument at index 0",
+            "line": 8,
+            "column": 12,
+            "nodeType": "CallExpression",
+            "endLine": 8,
+            "endColumn": 38
+          }
+        ],
+        "suppressedMessages": [],
+        "errorCount": 0,
+        "fatalErrorCount": 0,
+        "warningCount": 1,
+        "fixableErrorCount": 0,
+        "fixableWarningCount": 0,
+        "source": "const express = require(\"express\");\r\nconst fs = require(\"fs\");\r\nconst app = express();\r\n\r\napp.get(\"/file\", (req, res) => {\r\n  const name = req.query.name;\r\n  const p = \"./data/\" + name;\r\n  res.send(fs.readFileSync(p, \"utf8\"));\r\n});\r\n\r\nmodule.exports = { app };\r\n",
+        "usedDeprecatedRules": []
+      }
+    ],
+    "securityMessages": [
+      {
+        "ruleId": "security/detect-non-literal-fs-filename",
+        "message": "Found readFileSync from package \"fs\" with non literal argument at index 0",
+        "line": 8,
+        "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\demo\\comparison\\cases\\02-path-traversal\\vulnerable\\app.js"
+      }
+    ],
+    "exitCode": 0
+  },
+  "record": {
+    "tool": "eslint-plugin-security",
+    "detectedExpectedIssue": true,
+    "matchedRulesOrFindings": [
+      "security/detect-non-literal-fs-filename"
+    ],
+    "falsePositiveCount": 0,
+    "falsePositiveNote": "Config uses plugin:security only; signal = any ESLint message with a ruleId in vulnerable/. Not aligned to VibeScan rule IDs.",
+    "deterministicRerun": true,
+    "producesReusableOutput": true,
+    "ciEnforceable": true,
+    "regressionTestSupport": true,
+    "fixSuggested": null,
+    "fixCorrect": null,
+    "stableAcrossReruns": true
+  }
+}

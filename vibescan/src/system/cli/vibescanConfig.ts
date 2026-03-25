@@ -18,6 +18,10 @@ export interface VibeScanFileConfig {
   excludeVendor?: boolean;
   format?: OutputFormat;
   registry?: { checkRegistry?: boolean; skipRegistry?: boolean };
+  /** Run npm audit and merge advisory findings (same as --npm-audit). */
+  dependencies?: { npmAudit?: boolean };
+  /** Shallow HTTP GET probes against a running server (same as --http-probe-url). */
+  probes?: { httpBaseUrl?: string; httpMaxRoutes?: number };
   suppressions?: SuppressionRule[];
   /** Absolute or project-relative OpenAPI/Swagger paths (disables discovery). */
   openApiSpecPaths?: string[];
@@ -82,6 +86,12 @@ export function mergeVibeScanConfig(
     openApiDiscoverySet?: boolean;
     buildId?: string;
     buildIdSet?: boolean;
+    npmAudit?: boolean;
+    npmAuditSet?: boolean;
+    httpProbeUrl?: string;
+    httpProbeUrlSet?: boolean;
+    httpProbeMaxRoutes?: number;
+    httpProbeMaxRoutesSet?: boolean;
   },
   baseScanner: ScannerOptions
 ): MergedCliConfig {
@@ -99,6 +109,11 @@ export function mergeVibeScanConfig(
   if (file?.registry) {
     if ("checkRegistry" in file.registry) scanner.checkRegistry = !!file.registry.checkRegistry;
     if ("skipRegistry" in file.registry) scanner.skipRegistry = !!file.registry.skipRegistry;
+  }
+  if (file?.dependencies?.npmAudit === true) scanner.npmAudit = true;
+  if (file?.probes?.httpBaseUrl) {
+    scanner.httpProbeUrl = file.probes.httpBaseUrl;
+    if (typeof file.probes.httpMaxRoutes === "number") scanner.httpProbeMaxRoutes = file.probes.httpMaxRoutes;
   }
   if (file?.openApiSpecPaths?.length) {
     scanner.openApiSpecPaths = [...file.openApiSpecPaths];
@@ -135,6 +150,15 @@ export function mergeVibeScanConfig(
   }
   if (cli.buildIdSet && cli.buildId !== undefined) {
     scanner.buildId = cli.buildId;
+  }
+  if (cli.npmAuditSet && cli.npmAudit !== undefined) {
+    scanner.npmAudit = cli.npmAudit;
+  }
+  if (cli.httpProbeUrlSet && cli.httpProbeUrl !== undefined) {
+    scanner.httpProbeUrl = cli.httpProbeUrl;
+  }
+  if (cli.httpProbeMaxRoutesSet && cli.httpProbeMaxRoutes !== undefined) {
+    scanner.httpProbeMaxRoutes = cli.httpProbeMaxRoutes;
   }
   if (cli.formatSet && cli.format !== undefined) format = cli.format;
 

@@ -5,7 +5,7 @@ export type Severity = "critical" | "error" | "warning" | "info";
 export type SeverityLabel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 // Category of security issue.
-export type Category = "crypto" | "injection" | "api_inventory";
+export type Category = "crypto" | "injection" | "api_inventory" | "supply_chain";
 
 /** OWASP Top 10 style id, e.g. A03:2021 */
 export type OwaspId = string;
@@ -111,6 +111,12 @@ export interface ScannerOptions {
   openApiDiscovery?: boolean;
   /** Optional build/deploy id for run metadata (JSON output / manifests). */
   buildId?: string;
+  /** Run `npm audit --json` and attach dependency advisory findings (CLI: --npm-audit). */
+  npmAudit?: boolean;
+  /** Base URL for shallow GET probes of discovered routes (CLI: --http-probe-url). */
+  httpProbeUrl?: string;
+  /** Max routes to probe (default 12). */
+  httpProbeMaxRoutes?: number;
 }
 
 // Result of scanning a file.

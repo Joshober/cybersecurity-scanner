@@ -1,0 +1,200 @@
+{
+  "generatedAtUtc": "2026-03-25T13:07:14.061Z",
+  "dateFolder": "2026-03-25",
+  "caseIds": [
+    "01-sql-injection",
+    "02-path-traversal",
+    "03-admin-auth",
+    "04-rate-limit",
+    "05-webhook",
+    "06-weak-jwt"
+  ],
+  "rows": [
+    {
+      "case": "01-sql-injection",
+      "title": "SQL Injection",
+      "vibescan": "yes",
+      "eslint": "no",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    },
+    {
+      "case": "02-path-traversal",
+      "title": "Path traversal",
+      "vibescan": "yes",
+      "eslint": "yes",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    },
+    {
+      "case": "03-admin-auth",
+      "title": "Missing admin auth",
+      "vibescan": "yes",
+      "eslint": "no",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    },
+    {
+      "case": "04-rate-limit",
+      "title": "Missing rate limiting",
+      "vibescan": "yes",
+      "eslint": "no",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    },
+    {
+      "case": "05-webhook",
+      "title": "Webhook verification",
+      "vibescan": "yes",
+      "eslint": "no",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    },
+    {
+      "case": "06-weak-jwt",
+      "title": "Weak JWT secret",
+      "vibescan": "yes",
+      "eslint": "no",
+      "npmAudit": "no",
+      "bearer": "",
+      "snyk": "",
+      "ai": "",
+      "vibescanDeterministic": "yes",
+      "vibescanCi": "yes",
+      "vibescanRegression": "yes",
+      "aiDeterministic": "no",
+      "aiCi": "no",
+      "aiRegression": "manual"
+    }
+  ],
+  "toolComparisonAxes": {
+    "vibescan": {
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    "eslint": {
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    "npmAudit": {
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": false
+    },
+    "bearer": {
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    "snyk": {
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    "ai": {
+      "explicitCoverage": false,
+      "stableReruns": false,
+      "policyGate": false,
+      "regressionProtection": false
+    }
+  },
+  "toolAxesRows": [
+    {
+      "tool": "vibescan",
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    {
+      "tool": "eslint-plugin-security",
+      "explicitCoverage": true,
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    {
+      "tool": "npm-audit",
+      "explicitCoverage": "dependencies only",
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": false
+    },
+    {
+      "tool": "bearer",
+      "explicitCoverage": "when CLI installed",
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    {
+      "tool": "snyk",
+      "explicitCoverage": "when CLI installed",
+      "stableReruns": true,
+      "policyGate": true,
+      "regressionProtection": true
+    },
+    {
+      "tool": "ai-workflow",
+      "explicitCoverage": false,
+      "stableReruns": false,
+      "policyGate": false,
+      "regressionProtection": "manual"
+    }
+  ],
+  "notes": [
+    "Cases are copied from benchmarks/gold-path-demo (synthetic vulnerable/fixed pairs).",
+    "VibeScan 'detects expected' uses expected.json / meta.expectedRuleIds.",
+    "ESLint column = any security-plugin finding under vulnerable/ (not rule-mapped to VibeScan).",
+    "npm audit is one shared run for demo/comparison/package.json.",
+    "Bearer/Snyk omitted from PATH → null/empty in 'detects' columns.",
+    "Use --check-determinism to verify two VibeScan passes yield identical rule-id sets."
+  ]
+}

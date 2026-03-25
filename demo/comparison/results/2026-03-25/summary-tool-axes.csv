@@ -1,0 +1,7 @@
+Tool,Explicit coverage,Stable reruns,Policy gate,Regression protection
+vibescan,true,true,true,true
+eslint-plugin-security,true,true,true,true
+npm-audit,dependencies only,true,true,false
+bearer,when CLI installed,true,true,true
+snyk,when CLI installed,true,true,true
+ai-workflow,false,false,false,manual

@@ -206,8 +206,9 @@
       <h1>VibeScan — Static security for JavaScript &amp; TypeScript</h1>
       <p class="tagline">Research-driven tooling for AI-assisted backends: explicit rules, reproducible scans, and pipeline-ready signals.</p>
       <p class="sub">
-        Open-source scanner (npm: <strong style="color:var(--text)">vibescan</strong>) focused on OWASP-style crypto &amp; injection classes,
-        Express-oriented heuristics, and evaluation harnesses in this monorepo — not a full application security platform.
+        Open-source scanner (npm: <strong style="color:var(--text)">vibescan</strong>) — static rules for crypto &amp; injection,
+        Express heuristics, <strong>LLM/chatbot integration</strong> code patterns, optional <strong>npm audit</strong> merge,
+        optional <strong>shallow HTTP GET</strong> probes, and <strong>LLM-ready prompt export</strong> — complementary to model red-teaming and org policy layers (<code>secure-arch</code>).
       </p>
     </header>
 
@@ -238,6 +239,10 @@
             <p>AST rules for weak crypto, injection sinks, JWT/secret misuse, plus taint-style source→sink flows where implemented.</p>
           </div>
           <div class="feat">
+            <h3>LLM / chatbot integration</h3>
+            <p>Static checks for common mistakes in LLM apps: dynamic system prompts, RAG/template boundary mixing, unsafe DOM sinks for model output — <strong>not</strong> runtime jailbreak or prompt-injection scoring.</p>
+          </div>
+          <div class="feat">
             <h3>Express route intelligence</h3>
             <p>Heuristics for missing auth on sensitive routes, rate limits, webhook verification gaps, and related middleware patterns.</p>
           </div>
@@ -246,16 +251,24 @@
             <p><strong>JSON</strong> and <strong>SARIF</strong>; non-zero exit on critical/error. Optional <code>policy-check</code> / policy eval scripts in-repo.</p>
           </div>
           <div class="feat">
-            <h3>Dependency signals</h3>
-            <p>Optional <code>--check-registry</code> for slopsquat-style package-name signals (<code>SLOP-001</code>). Complements <code>npm audit</code>, does not replace it.</p>
+            <h3>Registry + npm audit</h3>
+            <p><code>--check-registry</code> → <code>SLOP-001</code> (slopsquat-style). <code>--npm-audit</code> merges advisory findings as <code>supply_chain.npm_audit</code> (same run / SARIF). Data still comes from npm.</p>
+          </div>
+          <div class="feat">
+            <h3>Optional HTTP probes</h3>
+            <p><code>--http-probe-url</code> issues shallow <strong>GET</strong>s for discovered Express routes (status/latency). <strong>Not</strong> DAST, auth flows, or session testing.</p>
+          </div>
+          <div class="feat">
+            <h3>LLM workflow bridge</h3>
+            <p><code>--fix-prompt-file</code> writes a deterministic Markdown prompt from findings for ChatGPT/Copilot/etc. No model call in-tool; pairs with static remediation text.</p>
           </div>
           <div class="feat">
             <h3>Generated test stubs</h3>
             <p>Optional <code>--generate-tests</code> to scaffold security-oriented tests (starting points for human review).</p>
           </div>
           <div class="feat">
-            <h3>Benchmarks &amp; demo</h3>
-            <p>Gold-path vulnerable/fixed pairs, scan regression tests, comparison harness vs ESLint/npm audit/optional CLI baselines, interactive demo UI.</p>
+            <h3>Benchmarks &amp; demo UI</h3>
+            <p>Gold-path regression tests; comparison harness; interactive demo with optional npm audit + HTTP probe toggles (clone → scan).</p>
           </div>
         </div>
 
@@ -272,8 +285,10 @@
           <div class="flow-wrap" aria-label="User workflow">
             <span>Clone / CI</span><span class="arr">→</span>
             <span><code>vibescan scan</code></span><span class="arr">→</span>
+            <span>+ optional audit / HTTP probe</span><span class="arr">→</span>
             <span>Findings + SARIF/JSON</span><span class="arr">→</span>
-            <span>Policy gate (optional)</span><span class="arr">→</span>
+            <span>Policy gate</span><span class="arr">→</span>
+            <span>Fix prompt file (optional)</span><span class="arr">→</span>
             <span>Fix &amp; re-scan</span>
           </div>
           <p class="footnote" style="margin-top:0.25rem">
@@ -308,7 +323,7 @@
             <tbody>
               <tr>
                 <td class="tool">Known CVEs in lockfile</td>
-                <td class="no">○</td>
+                <td class="partial">◐</td>
                 <td class="yes">●</td>
                 <td class="no">○</td>
                 <td class="partial">◐</td>
@@ -362,7 +377,7 @@
               </tr>
               <tr>
                 <td class="tool">Observed HTTP / session behavior</td>
-                <td class="no">○</td>
+                <td class="partial">◐</td>
                 <td class="no">○</td>
                 <td class="no">○</td>
                 <td class="no">○</td>
@@ -381,18 +396,50 @@
             </tbody>
           </table>
           <p class="footnote">
-            Row labels are <strong>typical</strong> roles; vendor features change. VibeScan is intentionally
-            <strong>JS/TS-first</strong> and <strong>static</strong>. Deeper positioning notes: <code>docs/vibescan/related-tools-positioning.md</code>.
-            Formal AI-vs-scanner study protocol: <code>docs/vibescan/ai-comparison-study-plan.md</code>.
+            <strong>VibeScan ◐ cells:</strong> CVE row = optional <code>--npm-audit</code> merge (advisory DB still npm’s). HTTP row = optional shallow GET probes only — not sessions, authz, or crawl depth of DAST.
+            Row labels are <strong>typical</strong> roles; vendor features change. VibeScan remains <strong>JS/TS-first</strong>.
+            See <code>docs/vibescan/related-tools-positioning.md</code> · <code>docs/vibescan/ai-comparison-study-plan.md</code>.
           </p>
+        </div>
+
+        <h2>LLM, chatbots &amp; AI-assisted development</h2>
+        <div class="card" style="border-top-color: #a78bfa">
+          <p class="lit" style="margin-bottom:0.35rem">
+            VibeScan does <strong>not</strong> run prompts against a model or score jailbreak success — it analyzes
+            <strong>JavaScript/TypeScript</strong> for patterns that often appear in LLM-backed apps and coding-agent output.
+          </p>
+          <ul class="tight">
+            <li>
+              <strong>Chatbot / RAG code plane (static heuristics):</strong>
+              <code>injection.llm.dynamic-system-prompt</code> (non-literal system content),
+              <code>injection.llm.rag-template-mixing</code> (retrieval + template boundaries),
+              <code>injection.llm.unsafe-html-output</code> (model output into <code>innerHTML</code>-style sinks / XSS class).
+            </li>
+            <li>
+              <strong>Tool &amp; connector abuse:</strong> overlaps with classic rules — command injection, <code>eval</code>, SSRF-style flows,
+              weak auth on sensitive routes — relevant when agents call HTTP, shells, or admin APIs.
+            </li>
+            <li>
+              <strong>What stays outside the scanner:</strong> dataset poisoning, memorization/PII probing, full prompt-injection &amp; jailbreak <em>pass/fail</em> —
+              use red-team suites, output filters, human approval on tools, monitoring. This repo includes
+              <code>benchmarks/llm-redteam/</code> for evaluation-style work; full mapping:
+              <code>docs/vibescan/llm-threat-coverage.md</code>.
+            </li>
+            <li>
+              <strong>secure-arch (monorepo):</strong> portable <strong>architecture YAML</strong> + <code>secure-arch check</code> with optional
+              VibeScan code evidence; adapters generate instruction files for <strong>Cursor</strong>, <strong>Amazon Q</strong>, etc. — org-level guardrails
+              alongside static scans (<code>docs/secure-arch/README.md</code>).
+            </li>
+          </ul>
         </div>
 
         <h2>Evidence &amp; honesty</h2>
         <div class="card">
           <ul class="tight">
-            <li><strong>Preliminary DVNA-style counts</strong> and theme tables live under <code>benchmarks/results/</code> — not full precision/recall.</li>
-            <li><strong>Gold-path demo</strong> cases support regression testing and conference comparison harnesses (VibeScan vs ESLint security signal, shared npm audit, optional Bearer/Snyk CLI).</li>
-            <li><strong>secure-arch</strong> packages in the monorepo add architecture-policy YAML and CLI checks — related but separate from the core scanner tarball.</li>
+            <li><strong>Preliminary DVNA-style counts</strong> under <code>benchmarks/results/</code> — not full precision/recall.</li>
+            <li><strong>Gold-path + unit tests</strong> cover scan regression; npm-audit JSON parsing, HTTP probe, and fix-prompt builders have dedicated tests in <code>vibescan/tests/unit/</code>.</li>
+            <li><strong>Comparison harness</strong> still compares VibeScan vs ESLint security signal, shared npm audit surface, optional Bearer/Snyk CLI — now aligned with in-CLI <code>--npm-audit</code>.</li>
+            <li><strong>secure-arch</strong> is workspace-published; the npm <code>vibescan</code> tarball is the scanner only — policy bridge doc: <code>docs/vibescan/secure-arch-policy-bridge.md</code>.</li>
           </ul>
         </div>
 
@@ -400,7 +447,7 @@
           <div>
             <strong style="color:var(--text)">Repository</strong><br />
             <a href="https://github.com/Joshober/cybersecurity-scanner">github.com/Joshober/cybersecurity-scanner</a><br />
-            <span style="display:block;margin-top:0.25rem"><strong style="color:var(--text)">Poster variant</strong> — overview &amp; comparison (print landscape).</span>
+            <span style="display:block;margin-top:0.25rem"><strong style="color:var(--text)">Poster</strong> — overview &amp; comparison · LLM/chatbot code coverage + secure-arch · print landscape.</span>
           </div>
           <div style="text-align:right">
             <img src="qr-github.svg" alt="QR to GitHub" width="76" height="76" />

@@ -12,6 +12,8 @@ const aiPromptEl = $("#aiPrompt");
 const promptMetaEl = $("#promptMeta");
 const copyPromptBtn = $("#copyPromptBtn");
 const downloadPromptBtn = $("#downloadPromptBtn");
+const optNpmAuditEl = $("#optNpmAudit");
+const httpProbeUrlEl = $("#httpProbeUrl");
 
 function setStatus(msg) {
   statusEl.textContent = msg;
@@ -63,10 +65,13 @@ async function startScan() {
   findingsEl.innerHTML = "";
   setStatus("Queued scan…");
 
+  const npmAudit = !!(optNpmAuditEl && optNpmAuditEl.checked);
+  const httpProbeUrl = httpProbeUrlEl ? httpProbeUrlEl.value.trim() : "";
+
   const res = await fetch("/api/scan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ repoUrl, scenario }),
+    body: JSON.stringify({ repoUrl, scenario, npmAudit, httpProbeUrl }),
   });
 
   if (!res.ok) {
@@ -148,14 +153,17 @@ function showResults(result) {
   if (promptMetaEl) {
     const inc = result.promptFindingsIncluded;
     const tot = result.promptFindingsTotal;
+    const flags = result.scanFlags;
+    let base = "";
     if (typeof inc === "number" && typeof tot === "number" && tot > inc) {
-      promptMetaEl.textContent = `Prompt includes the top ${inc} of ${tot} findings (by severity).`;
+      base = `Prompt includes the top ${inc} of ${tot} findings (by severity).`;
     } else if (typeof tot === "number") {
-      promptMetaEl.textContent =
-        tot === 0 ? "No findings in this scan." : `All ${tot} finding(s) included in the prompt.`;
-    } else {
-      promptMetaEl.textContent = "";
+      base = tot === 0 ? "No findings in this scan." : `All ${tot} finding(s) included in the prompt.`;
     }
+    const extras = [];
+    if (flags?.npmAudit) extras.push("npm audit merged");
+    if (flags?.httpProbeUrl) extras.push(`HTTP probe: ${flags.httpProbeUrl}`);
+    promptMetaEl.textContent = [base, extras.length ? `(${extras.join(" · ")})` : ""].filter(Boolean).join(" ");
   }
 }
 

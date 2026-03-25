@@ -25,6 +25,7 @@ import {
 import { applySuppressions } from "../suppress.js";
 import { buildRunManifest, writeRunManifest } from "./manifest.js";
 import { writeAdjudicationExports } from "./adjudication.js";
+import { buildFixAssistantPrompt } from "../fixPrompt.js";
 
 const args = process.argv.slice(2);
 let subcommand = "";
@@ -57,9 +58,16 @@ const cliMerge = {
   openApiDiscoverySet: false,
   buildId: undefined as string | undefined,
   buildIdSet: false,
+  npmAudit: false,
+  npmAuditSet: false,
+  httpProbeUrl: undefined as string | undefined,
+  httpProbeUrlSet: false,
+  httpProbeMaxRoutes: undefined as number | undefined,
+  httpProbeMaxRoutesSet: false,
 };
 
 let fixSuggestions = false;
+let fixPromptFile: string | undefined;
 let useColor = process.stdout.isTTY;
 let benchmarkMetadata = process.env.VIBESCAN_BENCHMARK === "1";
 
@@ -87,6 +95,9 @@ function scanOptionsEcho(
     excludeVendor: !!scanOpts.excludeVendor,
     checkRegistry: !!scanOpts.checkRegistry,
     skipRegistry: !!scanOpts.skipRegistry,
+    npmAudit: !!scanOpts.npmAudit,
+    httpProbeUrl: scanOpts.httpProbeUrl,
+    httpProbeMaxRoutes: scanOpts.httpProbeMaxRoutes,
     crypto: scanOpts.crypto,
     injection: scanOpts.injection,
     severityThreshold: scanOpts.severityThreshold,
@@ -147,7 +158,21 @@ for (let i = 0; i < args.length; i++) {
     else cliMerge.format = "compact";
     cliMerge.formatSet = true;
   } else if (a === "--fix-suggestions") fixSuggestions = true;
-  else if (a === "--check-registry") {
+  else if (a === "--npm-audit") {
+    cliMerge.npmAudit = true;
+    cliMerge.npmAuditSet = true;
+  } else if (a === "--http-probe-url" && args[i + 1]) {
+    cliMerge.httpProbeUrl = args[++i];
+    cliMerge.httpProbeUrlSet = true;
+  } else if (a === "--http-probe-max-routes" && args[i + 1]) {
+    const n = parseInt(args[++i], 10);
+    if (!Number.isNaN(n) && n > 0) {
+      cliMerge.httpProbeMaxRoutes = n;
+      cliMerge.httpProbeMaxRoutesSet = true;
+    }
+  } else if (a === "--fix-prompt-file" && args[i + 1]) {
+    fixPromptFile = resolve(args[++i]);
+  } else if (a === "--check-registry") {
     cliMerge.checkRegistry = true;
     cliMerge.checkRegistrySet = true;
   } else if (a === "--skip-registry") {
@@ -222,6 +247,10 @@ Options:
   --benchmark-metadata JSON: add run{} + findingsPerFile + ruleFamily; or set VIBESCAN_BENCHMARK=1
   --fix-suggestions
   --check-registry     HEAD npm registry for missing packages (slopsquat signal)
+  --npm-audit          Merge npm audit --json findings (CVE / dependency advisories)
+  --http-probe-url <u> Shallow GET probes for discovered Express routes (app must be running)
+  --http-probe-max-routes <n>  Cap probes (default 12)
+  --fix-prompt-file <path>  Write LLM-oriented remediation prompt from findings
   --skip-registry      Skip registry checks
   --generate-tests [dir]  Emit stub tests under dir (default: ./vibescan-generated-tests)
   --project-root <dir>    package.json resolution for registry check
@@ -267,6 +296,12 @@ const merged = mergeVibeScanConfig(
     openApiDiscoverySet: cliMerge.openApiDiscoverySet,
     buildId: cliMerge.buildId,
     buildIdSet: cliMerge.buildIdSet,
+    npmAudit: cliMerge.npmAudit,
+    npmAuditSet: cliMerge.npmAuditSet,
+    httpProbeUrl: cliMerge.httpProbeUrl,
+    httpProbeUrlSet: cliMerge.httpProbeUrlSet,
+    httpProbeMaxRoutes: cliMerge.httpProbeMaxRoutes,
+    httpProbeMaxRoutesSet: cliMerge.httpProbeMaxRoutesSet,
   },
   { crypto: true, injection: true }
 );
@@ -387,6 +422,15 @@ async function main(): Promise<void> {
     } else {
       if (totalFindings === 0) {
         console.log("No vulnerabilities found.");
+        if (fixPromptFile) {
+          const text = buildFixAssistantPrompt({
+            projectLabel: projectRoot,
+            findings: flat,
+          });
+          writeFileSync(fixPromptFile, text, "utf-8");
+          if (structuredStdout) console.error(`Wrote fix prompt: ${fixPromptFile}`);
+          else console.log(`Wrote fix prompt: ${fixPromptFile}`);
+        }
         process.exit(0);
       }
       console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
@@ -410,6 +454,15 @@ async function main(): Promise<void> {
           if (remed) console.error(`[${f.ruleId}] ${remed}`);
         }
       }
+    }
+    if (fixPromptFile) {
+      const text = buildFixAssistantPrompt({
+        projectLabel: projectRoot,
+        findings: flat,
+      });
+      writeFileSync(fixPromptFile, text, "utf-8");
+      if (structuredStdout) console.error(`Wrote fix prompt: ${fixPromptFile}`);
+      else console.log(`Wrote fix prompt: ${fixPromptFile}`);
     }
     process.exit(exitCode);
     return;
@@ -467,6 +520,15 @@ async function main(): Promise<void> {
   } else {
     if (totalFindings === 0) {
       console.log("No vulnerabilities found.");
+      if (fixPromptFile) {
+        const text = buildFixAssistantPrompt({
+          projectLabel: projectRoot,
+          findings: project.findings,
+        });
+        writeFileSync(fixPromptFile, text, "utf-8");
+        if (structuredStdout) console.error(`Wrote fix prompt: ${fixPromptFile}`);
+        else console.log(`Wrote fix prompt: ${fixPromptFile}`);
+      }
       process.exit(0);
     }
     console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
@@ -488,6 +550,16 @@ async function main(): Promise<void> {
       const remed = f.remediation ?? f.fix;
       if (remed) console.error(`[${f.ruleId}] ${remed}`);
     }
+  }
+
+  if (fixPromptFile) {
+    const text = buildFixAssistantPrompt({
+      projectLabel: projectRoot,
+      findings: project.findings,
+    });
+    writeFileSync(fixPromptFile, text, "utf-8");
+    if (structuredStdout) console.error(`Wrote fix prompt: ${fixPromptFile}`);
+    else console.log(`Wrote fix prompt: ${fixPromptFile}`);
   }
 
   process.exit(exitCode);

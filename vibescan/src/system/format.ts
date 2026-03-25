@@ -37,6 +37,9 @@ const LEGACY_RULE_FAMILY: Record<string, string> = {
   "API-INV-002": "api.inventory",
   "API-POSTURE-001": "api.inventory",
   "WEBHOOK-001": "webhook.verification",
+  "supply_chain.npm_audit": "supply_chain.npm_audit",
+  "probe.http.response": "probe.http",
+  "probe.http.error": "probe.http",
 };
 
 /** Stable family label for mixed legacy and dotted rule IDs. */
@@ -94,7 +97,12 @@ export function summarizeFindings(findings: Finding[]): FindingsSummary {
     info: 0,
   };
   const byRuleId: Record<string, number> = {};
-  const byCategory: Record<Category, number> = { crypto: 0, injection: 0, api_inventory: 0 };
+  const byCategory: Record<Category, number> = {
+    crypto: 0,
+    injection: 0,
+    api_inventory: 0,
+    supply_chain: 0,
+  };
 
   for (const f of findings) {
     bySeverity[f.severity] = (bySeverity[f.severity] ?? 0) + 1;
