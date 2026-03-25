@@ -1,5 +1,0 @@
-{
-  "matchMode": "anyOf",
-  "expectedRuleIds": ["injection.sql.string-concat", "injection.sql.tainted-flow"],
-  "fixedMustNotTriggerRuleIds": ["injection.sql.string-concat", "injection.sql.tainted-flow"]
-}

@@ -1,6 +1,0 @@
-.tmp/
-examples/**/node_modules/
-examples/**/venv/
-examples/**/.env
-examples/**/.env.*
-!examples/**/.env.example

@@ -1,7 +1,0 @@
-Case,Title,VibeScan detects expected,ESLint security signal,npm audit (deps),Bearer,Snyk,AI (manual),VibeScan deterministic,VibeScan CI,VibeScan regression,AI deterministic,AI CI,AI regression
-01-sql-injection,SQL Injection,yes,no,no,,,,yes,yes,yes,no,no,manual
-02-path-traversal,Path traversal,yes,yes,no,,,,yes,yes,yes,no,no,manual
-03-admin-auth,Missing admin auth,yes,no,no,,,,yes,yes,yes,no,no,manual
-04-rate-limit,Missing rate limiting,yes,no,no,,,,yes,yes,yes,no,no,manual
-05-webhook,Webhook verification,yes,no,no,,,,yes,yes,yes,no,no,manual
-06-weak-jwt,Weak JWT secret,yes,no,no,,,,yes,yes,yes,no,no,manual

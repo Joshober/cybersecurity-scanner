@@ -1,7 +1,0 @@
-{
-  "id": "02-path-traversal",
-  "title": "Path traversal via file read",
-  "expectVulnerableAnyOf": true,
-  "vulnerableRuleIds": ["injection.path-traversal", "injection.path-traversal.tainted-flow"],
-  "expectAbsentWhenFixed": ["injection.path-traversal", "injection.path-traversal.tainted-flow"]
-}

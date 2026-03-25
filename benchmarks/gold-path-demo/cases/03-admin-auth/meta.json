@@ -1,7 +1,0 @@
-{
-  "id": "03-admin-auth",
-  "title": "POST /admin without auth middleware",
-  "expectVulnerableAnyOf": true,
-  "vulnerableRuleIds": ["AUTH-004"],
-  "expectAbsentWhenFixed": ["AUTH-004"]
-}

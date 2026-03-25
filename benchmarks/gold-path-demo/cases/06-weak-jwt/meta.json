@@ -1,7 +1,0 @@
-{
-  "id": "06-weak-jwt",
-  "title": "JWT signed with weak literal secret",
-  "expectVulnerableAnyOf": true,
-  "vulnerableRuleIds": ["crypto.jwt.weak-secret-literal"],
-  "expectAbsentWhenFixed": ["crypto.jwt.weak-secret-literal"]
-}
