@@ -15,7 +15,7 @@ This repo ships one **public** scanner package from the `vibescan/` directory. O
 Quick install from **npm** (e.g. another project on your machine):
 
 ```bash
-npm i @jobersteadt/vibescan@1.0.0
+npm i @jobersteadt/vibescan@1.0.1
 npx @jobersteadt/vibescan scan .
 ```
 

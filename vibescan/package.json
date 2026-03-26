@@ -1,7 +1,7 @@
 {
   "name": "@joshober/vibescan",
-  "version": "1.0.0",
-  "description": "VibeScan — static analysis for crypto failures and injection risks in JavaScript/TypeScript",
+  "version": "1.0.1",
+  "description": "VibeScan — static security scanner for JavaScript/TypeScript: crypto and injection issues (OWASP A02/A03), optional npm registry checks (SLOP-001), JSON & SARIF output, CI-friendly exit codes. CLIs: vibescan, secure.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Joshober/cybersecurity-scanner.git"
@@ -32,10 +32,14 @@
   "keywords": [
     "security",
     "static-analysis",
+    "sast",
+    "sarif",
     "cryptography",
     "injection",
     "eslint-plugin",
-    "lint"
+    "lint",
+    "github-actions",
+    "supply-chain"
   ],
   "author": "",
   "license": "MIT",

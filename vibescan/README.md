@@ -20,7 +20,7 @@ CLI binaries (after install): **`vibescan`** and **`secure`** (same for either p
 ```bash
 npm i @jobersteadt/vibescan
 # pin version:
-npm i @jobersteadt/vibescan@1.0.0
+npm i @jobersteadt/vibescan@1.0.1
 ```
 
 **From GitHub Packages** — point the scope at GitHub’s npm registry, then install:
@@ -40,7 +40,7 @@ Then set a token with **`read:packages`** (fine-grained PAT or classic PAT) and 
 
 ```bash
 export NODE_AUTH_TOKEN=ghp_xxx   # PowerShell: $env:NODE_AUTH_TOKEN = "ghp_xxx"
-npm i @joshober/vibescan@1.0.0
+npm i @joshober/vibescan@1.0.1
 ```
 
 Public packages on GitHub still require authentication for **`npm install`** against `npm.pkg.github.com` in most setups; use a PAT or **`GITHUB_TOKEN`** in Actions (see GitHub Actions example below).
@@ -120,7 +120,7 @@ jobs:
 Pin with **`npx`** from **npm** (use **`@jobersteadt`** until **`@joshober`** is published to npmjs):
 
 ```yaml
-      - run: npx --yes @jobersteadt/vibescan@1.0.0 scan . --exclude-vendor --format sarif > vibescan.sarif
+      - run: npx --yes @jobersteadt/vibescan@1.0.1 scan . --exclude-vendor --format sarif > vibescan.sarif
 ```
 
 **SARIF upload:** `security-events: write` is required for **`github/codeql-action/upload-sarif`**. On private repositories, your org must allow GitHub code scanning (policy and billing may apply). If you only need the artifact in CI, drop the upload step and add **`actions/upload-artifact`** on **`vibescan.sarif`** instead.
