@@ -106,6 +106,84 @@
       color: var(--text);
       margin-bottom: 0.4rem;
     }
+    .highlights {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.35rem;
+    }
+    @media (max-width: 520px) { .highlights { grid-template-columns: 1fr; } }
+
+    .highlight {
+      background: #08080f;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.38rem 0.48rem;
+      min-height: 3.2rem;
+    }
+    .highlight .kicker {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--accent2);
+      font-weight: 800;
+      margin-bottom: 0.18rem;
+    }
+    .highlight .text {
+      font-size: 0.74rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .metric-card {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.55rem;
+      align-items: center;
+      padding: 0.35rem 0.2rem 0.25rem;
+    }
+    @media (max-width: 960px) { .metric-card { grid-template-columns: 1fr; } }
+
+    .metric-number {
+      font-size: 2rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      text-align: left;
+    }
+    .metric-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .arch-steps {
+      background: #08080f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.55rem;
+    }
+
+    .demo-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem;
+      margin-top: 0.25rem;
+    }
+    @media (max-width: 520px) { .demo-row { grid-template-columns: 1fr; } }
+    .demo-shot {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.55rem;
+      background: #06060b;
+      color: var(--muted);
+      font-size: 0.7rem;
+      line-height: 1.35;
+      min-height: 4.8rem;
+    }
+    .demo-shot strong { color: var(--text); font-weight: 800; }
+
     .features {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -203,8 +281,8 @@
 <body>
   <div class="poster">
     <header class="banner">
-      <h1>VibeScan — Static security for JavaScript &amp; TypeScript</h1>
-      <p class="tagline">Research-driven tooling for AI-assisted backends: explicit rules, reproducible scans, and pipeline-ready signals.</p>
+      <h1>VibeScan: Static Security for AI-Assisted Node.js &amp; TypeScript</h1>
+      <p class="tagline">Research-driven static analysis with explicit rules, reproducible scans, and pipeline-ready signals.</p>
       <p class="sub">
         Open-source scanner (npm: <strong style="color:var(--text)">vibescan</strong>) — static rules for crypto &amp; injection,
         Express heuristics, <strong>LLM/chatbot integration</strong> code patterns, optional <strong>npm audit</strong> merge,
@@ -214,12 +292,16 @@
 
     <div class="grid-main">
       <div class="col-a">
-        <h2>Research motivation</h2>
+        <h2>1. Research Motivation &amp; Core Claim</h2>
         <div class="card">
           <p class="lit" style="margin-bottom:0.35rem">
-            Recent work reports <strong>uneven security quality</strong> in LLM-generated backends and risks such as
-            <strong>weak defaults</strong> and <strong>risky dependency choices</strong>. That motivates
-            <strong>deterministic, versioned checks</strong> in the loop — not prompt tweaks alone.
+            Recent work reports <strong>uneven security quality</strong> in AI-assisted backends and risks such as
+            <strong>weak defaults</strong> and <strong>risky dependency choices</strong>. Prompting alone is not enough.
+          </p>
+          <p class="lit" style="margin-bottom:0.35rem">
+            <strong>Core claim:</strong> downstream static analysis can act as a practical safety layer for
+            <strong>AI-assisted development</strong> by improving <strong>repeatability</strong>, <strong>auditability</strong>,
+            and <strong>CI enforcement</strong>.
           </p>
           <p class="footnote" style="margin-top:0">
             See <code>docs/vibescan/abstract.md</code> for citation anchors (e.g., SusVibes, BaxBench, USENIX Security 2025 slopsquat discussion).
@@ -232,15 +314,45 @@
           JavaScript — especially alongside AI-generated code — compared to ad hoc review or single-tool baselines?
         </div>
 
-        <h2>What we ship (features)</h2>
+        <h2>Highlights</h2>
+        <div class="card">
+          <div class="highlights">
+            <div class="highlight">
+              <div class="kicker">Published package</div>
+              <div class="text"><strong>vibescan</strong> — static security for JS/TS.</div>
+            </div>
+            <div class="highlight">
+              <div class="kicker">Deterministic coverage</div>
+              <div class="text">AST rules + taint-style flows + Express heuristics (rule-explicit, reproducible).</div>
+            </div>
+            <div class="highlight">
+              <div class="kicker">LLM workflow outputs</div>
+              <div class="text">Deterministic fix-prompt exports and optional generated test stubs.</div>
+            </div>
+            <div class="highlight">
+              <div class="kicker">CI-ready signals</div>
+              <div class="text"><strong>JSON</strong> + <strong>SARIF</strong>, non-zero exit on critical/error, merge-gate friendly.</div>
+            </div>
+            <div class="highlight">
+              <div class="kicker">Supply-chain add-on</div>
+              <div class="text"><code>--check-registry</code> + optional <code>npm audit</code> merge (slopsquat-style).</div>
+            </div>
+            <div class="highlight">
+              <div class="kicker">Preliminary DVNA</div>
+              <div class="text">VibeScan: <strong>8</strong> true positives vs <strong>1</strong> for eslint-plugin-security.</div>
+            </div>
+          </div>
+        </div>
+
+        <h2>2. Features, Coverage &amp; Architecture</h2>
         <div class="features">
           <div class="feat">
             <h3>Rule-based &amp; taint checks</h3>
             <p>AST rules for weak crypto, injection sinks, JWT/secret misuse, plus taint-style source→sink flows where implemented.</p>
           </div>
           <div class="feat">
-            <h3>LLM / chatbot integration</h3>
-            <p>Static checks for common mistakes in LLM apps: dynamic system prompts, RAG/template boundary mixing, unsafe DOM sinks for model output — <strong>not</strong> runtime jailbreak or prompt-injection scoring.</p>
+            <h3>LLM/chatbot heuristics</h3>
+            <p>Static checks for common LLM-app failures: dynamic system prompts, RAG/template boundary mixing, unsafe DOM sinks for model output — <strong>not</strong> jailbreak scoring.</p>
           </div>
           <div class="feat">
             <h3>Express route intelligence</h3>
@@ -259,47 +371,63 @@
             <p><code>--http-probe-url</code> issues shallow <strong>GET</strong>s for discovered Express routes (status/latency). <strong>Not</strong> DAST, auth flows, or session testing.</p>
           </div>
           <div class="feat">
-            <h3>LLM workflow bridge</h3>
-            <p><code>--fix-prompt-file</code> writes a deterministic Markdown prompt from findings for ChatGPT/Copilot/etc. No model call in-tool; pairs with static remediation text.</p>
+            <h3>Fix prompt export</h3>
+            <p><code>--fix-prompt-file</code> exports a deterministic Markdown remediation prompt from findings for ChatGPT/Copilot/etc. No model call in-tool; pairs with static remediation text.</p>
           </div>
           <div class="feat">
             <h3>Generated test stubs</h3>
             <p>Optional <code>--generate-tests</code> to scaffold security-oriented tests (starting points for human review).</p>
           </div>
-          <div class="feat">
-            <h3>Benchmarks &amp; demo UI</h3>
-            <p>Gold-path regression tests; comparison harness; interactive demo with optional npm audit + HTTP probe toggles (clone → scan).</p>
-          </div>
         </div>
 
-        <h2>How we work (project workflow)</h2>
-        <div class="card">
-          <div class="flow-wrap" aria-label="Engineering workflow">
-            <span>Rule design &amp; CWE mapping</span><span class="arr">→</span>
-            <span>TypeScript implementation</span><span class="arr">→</span>
-            <span>Unit tests (scanner)</span><span class="arr">→</span>
-            <span>Gold-path / DVNA-style fixtures</span><span class="arr">→</span>
-            <span>Adjudication docs</span><span class="arr">→</span>
-            <span>npm publish <code>vibescan</code></span>
-          </div>
-          <div class="flow-wrap" aria-label="User workflow">
-            <span>Clone / CI</span><span class="arr">→</span>
-            <span><code>vibescan scan</code></span><span class="arr">→</span>
-            <span>+ optional audit / HTTP probe</span><span class="arr">→</span>
-            <span>Findings + SARIF/JSON</span><span class="arr">→</span>
-            <span>Policy gate</span><span class="arr">→</span>
-            <span>Fix prompt file (optional)</span><span class="arr">→</span>
-            <span>Fix &amp; re-scan</span>
+        <div class="card" style="margin-bottom:0.35rem">
+          <p class="lit" style="margin-bottom:0.25rem"><strong>Architecture:</strong> deterministic coverage pipeline</p>
+          <div class="arch-steps">
+            <div class="flow-wrap" style="margin:0; padding:0.35rem 0.3rem; border-style:solid" aria-label="Architecture flow">
+              <span>Clone / project inputs</span><span class="arr">→</span>
+              <span>Parse + taint</span><span class="arr">→</span>
+              <span>Rules + Express heuristics + LLM checks</span><span class="arr">→</span>
+              <span>Evidence outputs (JSON/SARIF) + fix prompt</span>
+            </div>
           </div>
           <p class="footnote" style="margin-top:0.25rem">
-            Monorepo: scanner under <code>vibescan/</code>; research &amp; benchmarks under <code>docs/vibescan/</code>, <code>benchmarks/</code>, <code>demo/</code>.
-            Claims stay conservative until multi-baseline metrics are frozen (see <code>abstract.md</code>).
+            Designed for versioned reruns and CI gate checks, not best-effort LLM judgments.
+          </p>
+        </div>
+
+        <h2>Workflow</h2>
+        <div class="card">
+          <div class="flow-wrap" aria-label="npm package workflow">
+            <span>Install vibescan (npx / npm i)</span><span class="arr">→</span>
+            <span><code>vibescan scan</code> (or <code>secure scan</code>)</span><span class="arr">→</span>
+            <span>Rules &amp; config (severity threshold)</span><span class="arr">→</span>
+            <span>Optional checks (<code>--check-registry</code>, <code>--npm-audit</code>, <code>--http-probe-url</code>)</span><span class="arr">→</span>
+            <span>Artifacts: JSON + <strong>SARIF</strong></span><span class="arr">→</span>
+            <span>CI gate: non-zero on critical/error</span><span class="arr">→</span>
+            <span>Optional remediation: fix-prompt / test stubs</span>
+          </div>
+          <p class="footnote" style="margin-top:0.25rem">
+            The npm package is the scanner; this poster’s monorepo includes benchmarks + demo UI. Artifacts are designed for CI merge-gate workflows.
           </p>
         </div>
       </div>
 
       <div class="col-b">
-        <h2>How VibeScan compares (at a glance)</h2>
+        <h2>Main empirical result</h2>
+        <div class="card" style="border-top-color: var(--accent2)">
+          <div class="metric-card">
+            <div class="metric-number">8 vs 1</div>
+            <div class="metric-text">
+              DVNA preliminary: <strong>VibeScan 8</strong> true positives vs <strong>eslint-plugin-security 1</strong>.
+              Bearer baseline still pending for same-environment comparison.
+            </div>
+          </div>
+          <p class="footnote" style="margin-top:0">
+            Preliminary DVNA evidence; not a final precision/recall study.
+          </p>
+        </div>
+
+        <h2>3. Comparison &amp; complementary controls</h2>
         <div class="card" style="border-top-color: var(--accent2)">
           <p class="footnote" style="margin-top:0;margin-bottom:0.35rem">
             <strong style="color:var(--text)">Legend:</strong>
@@ -402,45 +530,56 @@
           </p>
         </div>
 
-        <h2>LLM, chatbots &amp; AI-assisted development</h2>
+        <h2>AI Positioning &amp; Honest Limits</h2>
         <div class="card" style="border-top-color: #a78bfa">
           <p class="lit" style="margin-bottom:0.35rem">
-            VibeScan does <strong>not</strong> run prompts against a model or score jailbreak success — it analyzes
+            VibeScan does <strong>not</strong> run prompts or measure jailbreak success — it analyzes
             <strong>JavaScript/TypeScript</strong> for patterns that often appear in LLM-backed apps and coding-agent output.
           </p>
           <ul class="tight">
             <li>
-              <strong>Chatbot / RAG code plane (static heuristics):</strong>
+              <strong>Static coverage for LLM-app code planes:</strong>
               <code>injection.llm.dynamic-system-prompt</code> (non-literal system content),
               <code>injection.llm.rag-template-mixing</code> (retrieval + template boundaries),
               <code>injection.llm.unsafe-html-output</code> (model output into <code>innerHTML</code>-style sinks / XSS class).
             </li>
             <li>
-              <strong>Tool &amp; connector abuse:</strong> overlaps with classic rules — command injection, <code>eval</code>, SSRF-style flows,
-              weak auth on sensitive routes — relevant when agents call HTTP, shells, or admin APIs.
+              <strong>Connector abuse overlaps classic rules:</strong> command injection, <code>eval</code>, SSRF-style flows,
+              and weak auth on sensitive routes — relevant when agents call tools or admin APIs.
             </li>
             <li>
-              <strong>What stays outside the scanner:</strong> dataset poisoning, memorization/PII probing, full prompt-injection &amp; jailbreak <em>pass/fail</em> —
-              use red-team suites, output filters, human approval on tools, monitoring. This repo includes
+              <strong>What stays outside the scanner:</strong> dataset poisoning, memorization/PII probing, and full prompt-injection &amp; jailbreak <em>pass/fail</em>.
+              Use red-team suites, output filters, human approval on tools, and monitoring. This repo includes
               <code>benchmarks/llm-redteam/</code> for evaluation-style work; full mapping:
               <code>docs/vibescan/llm-threat-coverage.md</code>.
             </li>
             <li>
-              <strong>secure-arch (monorepo):</strong> portable <strong>architecture YAML</strong> + <code>secure-arch check</code> with optional
-              VibeScan code evidence; adapters generate instruction files for <strong>Cursor</strong>, <strong>Amazon Q</strong>, etc. — org-level guardrails
-              alongside static scans (<code>docs/secure-arch/README.md</code>).
+              <strong>secure-arch (monorepo):</strong> a policy/architecture layer that complements VibeScan with YAML guardrails and IDE adapters
+              (<code>docs/secure-arch/README.md</code>).
             </li>
           </ul>
         </div>
 
-        <h2>Evidence &amp; honesty</h2>
+        <h2>Evidence &amp; limitations</h2>
         <div class="card">
           <ul class="tight">
-            <li><strong>Preliminary DVNA-style counts</strong> under <code>benchmarks/results/</code> — not full precision/recall.</li>
+            <li><strong>Preliminary DVNA-style evidence</strong> under <code>benchmarks/results/</code> — not full precision/recall.</li>
             <li><strong>Gold-path + unit tests</strong> cover scan regression; npm-audit JSON parsing, HTTP probe, and fix-prompt builders have dedicated tests in <code>vibescan/tests/unit/</code>.</li>
-            <li><strong>Comparison harness</strong> still compares VibeScan vs ESLint security signal, shared npm audit surface, optional Bearer/Snyk CLI — now aligned with in-CLI <code>--npm-audit</code>.</li>
-            <li><strong>secure-arch</strong> is workspace-published; the npm <code>vibescan</code> tarball is the scanner only — policy bridge doc: <code>docs/vibescan/secure-arch-policy-bridge.md</code>.</li>
+            <li><strong>Comparison harness</strong> aligns VibeScan vs ESLint-style signals on shared evidence surfaces; deeper SAST baselines (e.g., Bearer/Snyk) are not yet frozen in the same environment.</li>
+            <li><strong>secure-arch</strong> is related (policy layer), but the core evaluated contribution here is the deterministic scanner.</li>
           </ul>
+        </div>
+
+        <h2>Visual placement suggestions</h2>
+        <div class="card">
+          <p class="lit" style="margin-bottom:0.2rem"><strong>Add 1–2 screenshots</strong> of the demo scanning a real app</p>
+          <div class="demo-row" aria-label="Demo screenshot placeholders">
+            <div class="demo-shot"><strong>Screenshot A:</strong> Demo UI scanning a real website/app (clone → scan).</div>
+            <div class="demo-shot"><strong>Screenshot B:</strong> “Blocked” run with critical/high findings.</div>
+          </div>
+          <p class="footnote" style="margin-top:0.35rem">
+            QR code is placed in the lower-right in the contact panel.
+          </p>
         </div>
 
         <div class="contact">
