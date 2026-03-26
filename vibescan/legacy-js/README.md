@@ -2,6 +2,8 @@
 
 Static security scanner for Express-style Node.js apps: **route graph extraction** (Babel), **rule pack** (injection, auth, middleware, secrets, prototype pollution), optional **npm registry** checks (“slopsquat”), and **Jest test stubs** generation.
 
+> Status: this folder is a **legacy JavaScript prototype** kept for reference. The actively maintained scanner is the TypeScript codebase under `vibescan/` at the repo root.
+
 ## Install
 
 From this directory:

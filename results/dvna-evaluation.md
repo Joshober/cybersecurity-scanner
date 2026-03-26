@@ -4,19 +4,25 @@ This file reports a **preliminary and incomplete** benchmark pass. It must not b
 
 ## Benchmark setup (current state)
 
-- **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`).
-- **VibeScan run:** `npm run build -w vibescan` then `node vibescan/dist/system/cli/index.js scan ./dvna --format json --exclude-vendor --benchmark-metadata` (or `.\benchmarks\scripts\run-vibescan-dvna.ps1` / `./benchmarks/scripts/run-vibescan-dvna.sh` when DVNA is present) -> [`vibescan-dvna.txt`](./vibescan-dvna.txt).
+- **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`), frozen at commit `9ba473add536f66ac9007966acb2a775dd31277a`.
+- **VibeScan run (frozen artifact):** `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/`
+  - manifest (versions + scope): `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json`
+  - output JSON: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json`
+  - command: `node vibescan/dist/system/cli/index.js scan benchmarks/dvna/dvna --format json --project-root benchmarks/dvna/dvna --exclude-vendor --benchmark-metadata --manifest <run>/manifest.json`
 - **eslint-plugin-security run:** `npx eslint -c results/eslint-dvna.eslintrc.cjs "dvna/**/*.js"` -> [`eslint-dvna.txt`](./eslint-dvna.txt).
 - **Bearer:** **not run in this environment**; see [`bearer-dvna.txt`](./bearer-dvna.txt) and [`../benchmarks/scripts/README.md`](../benchmarks/scripts/README.md) for Docker/scripts when the daemon is available.
+- **Bearer run (frozen artifact):** `benchmarks/results/2026-03-25_223217_dvna_bearer/`
+  - manifest (versions + DVNA SHA): `benchmarks/results/2026-03-25_223217_dvna_bearer/manifest.json`
+  - output JSON: `benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json`
 - **npm audit:** `npm install --package-lock-only --ignore-scripts` in `dvna/`, then `npm audit` -> [`npm-audit-dvna.txt`](./npm-audit-dvna.txt).
 - **Snyk Code:** **not run in this environment**; recommended baseline command (after `snyk auth`): `snyk code test ./dvna --json-file-output=results/snyk-code-dvna.json` — scope-aligned SAST for comparison with VibeScan’s first-party JS findings. OpenAPI drift / route inventory rules (`API-INV-*`, `routeInventory`) have **no direct Snyk equivalent** in-repo; document separately when claiming that contribution.
 
 ## Reproducibility TODOs (required before final paper numbers)
 
-- [ ] Record DVNA commit SHA used for this run.
-- [ ] Record Node, npm, eslint, eslint-plugin-security, and Bearer versions in this file.
+- [x] Record DVNA commit SHA used for this run.
+- [x] Record Node and npm versions for the frozen VibeScan run (see run manifest).
 - [ ] Re-run all tools under the same scope policy (first-party-only primary table).
-- [ ] Execute Bearer and add raw JSON under `benchmarks/results/<run>/` (and link from this doc).
+- [x] Execute Bearer and add raw JSON under `benchmarks/results/<run>/` (and link from this doc).
 - [ ] Add adjudication sheet reference (TP/FP/FN rationale per finding/case).
 
 DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for reporting convenience.

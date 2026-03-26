@@ -2,6 +2,25 @@
 
 Use this table to keep the **paper/poster** aligned with what is **actually evaluated** and shipped in the repo.
 
+## Contribution evidence matrix (detailed)
+
+Evidence basis:
+
+- `README.md`
+- `docs/REPO-HANDOFF.md`
+- `docs/vibescan/abstract.md`
+- `results/dvna-evaluation.md`
+
+| Claimed contribution | Where implemented in repo | Where demonstrated | Where evaluated | Status |
+|---|---|---|---|---|
+| Spec-free AST endpoint extraction and route graphing for Express-style backends | `vibescan/src/system/parser/routeGraph.ts`, `vibescan/src/system/scanner.ts`, documented in `docs/REPO-HANDOFF.md` | CLI pipeline docs in `README.md` and `docs/REPO-HANDOFF.md`; available in code path during `scanProjectAsync` | No dedicated quantitative ablation isolating route-graph contribution in `results/dvna-evaluation.md` | **Partially supported** |
+| Persistent generated security test files (`--generate-tests`) | `vibescan/src/system/engine/testWriter.ts`, CLI flags in `vibescan/src/system/cli/index.ts` | Feature documented in `README.md`; callable via CLI | No benchmark section measuring generated-test quality or impact | **Partially supported** |
+| LLM default secret dictionary and weak fallback detection | `vibescan/src/attacks/crypto/secretDict.ts`, `vibescan/src/attacks/crypto/default-secret-fallback.ts`, `vibescan/src/attacks/crypto/jwt-weak-sign.ts`; counts in `results/person-b-handoff.md` | Rule list in `README.md`; implementation details in `docs/REPO-HANDOFF.md` | DVNA notes include some crypto/secret-related TPs, but no isolated dictionary benchmark yet | **Partially supported** |
+| Slopsquatting detector via npm registry checks (`SLOP-001`) | `vibescan/src/system/ai/slopsquat.ts`, wired in `vibescan/src/system/scanner.ts` and CLI `--check-registry` | Documented usage in `README.md` and architecture in `docs/REPO-HANDOFF.md` | Not separately quantified in DVNA comparison tables; Bearer comparison pending | **Partially supported** |
+| Taint-style source-to-sink detection for injection classes | `vibescan/src/system/engine/taintEngine.ts` and sinks/sources modules under `vibescan/src/system/sinks` and `vibescan/src/system/sources` | Described in `docs/REPO-HANDOFF.md`; surfaced in findings (e.g., SQL tainted flow) | Preliminary DVNA table reports injection-related TPs | **Partially supported** |
+| Comparative advantage over eslint-plugin-security on DVNA first-party code | Implemented via tool runs and manual adjudication artifacts in `results/` | Summarized in `results/dvna-evaluation.md` | Reported as preliminary: VibeScan vs eslint on first-party adjudicated TPs | **Partially supported** |
+| Complete multi-baseline comparison including Bearer | Planned baseline in `results/dvna-evaluation.md` and `results/bearer-dvna.txt` | Bearer command guidance exists | Bearer run is explicitly pending in current environment | **Future work** |
+
 ## Tier A — Safe to claim as primary contributions (if evaluation supports)
 
 | Claim | Evidence in repo | Risk if overstated |
@@ -35,6 +54,20 @@ Use this table to keep the **paper/poster** aligned with what is **actually eval
 | `jwt-weak-test.ts` | Built; **not** in active rule list |
 
 Do not claim these as evaluated rules unless you wire + test + benchmark them.
+
+## Abstract claim-strength check (guardrails)
+
+The current abstract is directionally aligned but has several claims that should remain carefully bounded:
+
+1. **Claim:** DVNA comparison is presented with a strong numeric contrast vs eslint.\n   **Evidence status:** Supported as **preliminary/manual adjudication** in `results/dvna-evaluation.md`.\n   **Risk:** Can be read as a complete baseline study if caveats are not explicit.\n   **Recommendation:** Keep wording as “preliminary” and preserve Bearer-pending caveat in the same paragraph.
+2. **Claim:** Several contributions are framed as established project advances.\n   **Evidence status:** Implemented in code and docs; quantitative validation is incomplete for some.\n   **Risk:** Readers may infer all contributions are empirically validated.\n   **Recommendation:** Separate “implemented contributions” from “measured findings” in abstract structure.
+3. **Claim:** Architectural lesson (downstream scanning > prompt engineering) is presented strongly.\n   **Evidence status:** Motivated by literature and project experience, but not fully causal-tested within this repo.\n   **Risk:** Overinterpretation as a causal conclusion from current experiments alone.\n   **Recommendation:** Attribute as a design position informed by literature plus preliminary benchmark evidence.
+
+## Overclaim guardrails for poster/paper
+
+- Do not describe Bearer comparison as complete until results are produced.
+- Do not present seeded-benchmark outcomes until cases are implemented and adjudicated.
+- Distinguish **implemented** features from **evaluated** features in all tables.
 
 ## secure-arch vs VibeScan (one sentence for abstract)
 

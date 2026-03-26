@@ -4,7 +4,7 @@
 
 Each run folder should contain:
 
-- `manifest.json` — from [`../benchmark-manifest-template.json`](../benchmark-manifest-template.json)
+- `manifest.json` — from [`docs/vibescan/benchmark-manifest-template.json`](../../docs/vibescan/benchmark-manifest-template.json)
 - Tool artifacts (`vibescan.json`, `eslint.json`, `bearer.json`, `npm-audit.json`, …)
 - Optional `notes.md` (environment, partial runs, Docker failures)
 

@@ -74,7 +74,7 @@ CLI (cli/index.ts)
 
 Exit **non-zero** if any finding has severity **critical** or **error** (see [`cli/index.ts`](../vibescan/src/system/cli/index.ts)).
 
-**Parent pointers:** [`buildParentMap`](../src/system/walker.ts) is built once per file AST and passed into `RuleContext.getParent` for rules that need ancestors (e.g. **SSRF-003**). The ESLint wrapper builds the same map from `context.getSourceCode().ast` ([`eslint-plugin.ts`](../src/system/eslint-plugin.ts)).
+**Parent pointers:** [`buildParentMap`](../vibescan/src/system/walker.ts) is built once per file AST and passed into `RuleContext.getParent` for rules that need ancestors (e.g. **SSRF-003**). The ESLint wrapper builds the same map from `context.getSourceCode().ast` ([`eslint-plugin.ts`](../vibescan/src/system/eslint-plugin.ts)).
 
 ---
 

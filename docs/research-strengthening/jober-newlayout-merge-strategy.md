@@ -34,7 +34,7 @@ Document results in the PR that proposes merging layout changes. If any command 
 
 ### Slice 3 — Scanner package path / workspace layout
 
-- Moving `vibescan` or changing workspace names **only after** benchmarks and `reproducible-runs.md` are updated so **historical commands** still work or are clearly versioned in the manifest.
+- Moving `vibescan` or changing workspace names **only after** benchmarks and [`benchmarking-runbook.md`](./benchmarking-runbook.md) are updated so **historical commands** still work or are clearly versioned in the manifest.
 
 ### Slice 4 — Root identity / monorepo branding
 
@@ -67,4 +67,4 @@ Jober/NewLayout ──(PR3 layout)───────────▶ master   
 ## Remote branches (this repo snapshot)
 
 - `origin/master` — integration target for research.
-- `origin/docs/research-strengthening` — may contain overlapping files (e.g. `docs/vibescan/research-question.md`); reconcile with this folder when merging.
+- `origin/docs/research-strengthening` — may contain overlapping files (e.g. older duplicate topic docs under `docs/vibescan/`); reconcile by keeping the consolidated canonical set in `docs/research-strengthening/`.

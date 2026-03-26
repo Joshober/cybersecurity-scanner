@@ -92,9 +92,9 @@ Committed fixtures under `tests/fixtures/` include `crypto-safe/`, `disabled-tls
 ## Implementation checklist (gaps to close for evaluation rigor)
 
 1. Add **unit tests** for: `crypto.jwt.weak-secret-literal`, `mw.cookie.missing-flags`, `RULE-SSRF-002`, and **middleware** `MW-002` / app-level `MW-003`–`MW-004` if those IDs are in the paper’s scope.
-2. Reference or copy **fixtures** from `tests/fixtures/` into `benchmarks/seeded/` with manifests (see [`benchmark-layout.md`](./benchmark-layout.md)).
-3. Standardize **outputs** using [`reproducible-runs.md`](./reproducible-runs.md) and [`benchmark-manifest-template.json`](./benchmark-manifest-template.json).
+2. Reference or copy **fixtures** from `tests/fixtures/` into `benchmarks/seeded/` with manifests (see [`../research-strengthening/benchmarking-runbook.md`](../research-strengthening/benchmarking-runbook.md)).
+3. Standardize **outputs** using [`../research-strengthening/benchmarking-runbook.md`](../research-strengthening/benchmarking-runbook.md) and [`benchmark-manifest-template.json`](./benchmark-manifest-template.json).
 4. Track **ground truth** with [`adjudication-template.md`](./adjudication-template.md).
-5. Optionally implement **JSON summary** hooks described in [`output-support-audit.md`](./output-support-audit.md) and [`eval-support-changes.md`](./eval-support-changes.md).
+5. Optionally implement **JSON summary** hooks described in [`../research-strengthening/eval-output-and-cli-support.md`](../research-strengthening/eval-output-and-cli-support.md).
 6. Add **Snyk Code** (`snyk code test`) as a documented SAST baseline alongside eslint; see [`results/dvna-evaluation.md`](../../results/dvna-evaluation.md).
 7. Add dedicated **unit tests** for `AUTH-005` if it becomes in-scope for the paper’s access-control claims.

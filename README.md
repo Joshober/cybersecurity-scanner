@@ -6,6 +6,8 @@
 
 **VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
 
+**All plans / runbooks / proposals (index):** [`docs/PLANS.md`](docs/PLANS.md)
+
 **Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
 
 **Universal secure-architecture CLI (AI settings + static checks):** [`docs/secure-arch/README.md`](docs/secure-arch/README.md)
@@ -93,9 +95,9 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 | `API-INV-002` | 284 | OpenAPI operation not matched to static Express route (ghost doc or graph gap) |
 | `API-POSTURE-001` | 285 | Aggregate: object-scoped routes lack auth middleware (informational) |
 | `MW-001` | 352 | Missing CSRF protection on state-changing route |
-| `MW-002` | 307 | Sensitive path without rate-limit middleware |
+| `MW-002` | 307 | Sensitive path without rate-limit middleware (heuristic; middleware-name based) |
 | `MW-003` | 693 | Express app with routes but no `helmet()` in file |
-| `MW-004` | 942 | CORS `origin: '*'` |
+| `MW-004` | 942 | CORS `origin: '*'` (heuristic; configuration-shape based) |
 | `WEBHOOK-001` | 345 | Webhook-like path uses body without obvious signature verification |
 
 **Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.

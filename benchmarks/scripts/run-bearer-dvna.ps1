@@ -9,7 +9,11 @@ if (-not (Test-Path $DvnaRoot)) {
   Write-Error "DVNA not found at $DvnaRoot."
 }
 
-docker info 2>&1 | Out-Null
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+$null = docker info 2>&1
+$ErrorActionPreference = $prevEap
+# Docker Desktop may print warnings to stderr even when healthy; only fail on non-zero exit.
 if ($LASTEXITCODE -ne 0) {
   Write-Error "Docker daemon not running or not installed. Start Docker Desktop or use WSL/Linux with Bearer; see results/bearer-dvna.txt"
 }
