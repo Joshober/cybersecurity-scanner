@@ -6,9 +6,9 @@ This folder is the **paper/poster spine**: research question, methodology, evalu
 
 | Audience | Location |
 |----------|----------|
-| Judges, poster tone | [`../vibescan/research-framing.md`](../vibescan/research-framing.md), [`../vibescan/judge-prep-score-and-sources.md`](../vibescan/judge-prep-score-and-sources.md) |
+| Judges, poster tone | [`../vibescan/judging-pack.md`](../vibescan/judging-pack.md) |
 | Conference abstract (working draft) | [`../vibescan/abstract.md`](../vibescan/abstract.md) |
-| Reproducibility + benchmarks | [`../vibescan/reproducible-runs.md`](../vibescan/reproducible-runs.md), [`../vibescan/benchmark-layout.md`](../vibescan/benchmark-layout.md), [`../vibescan/evaluation-implementation-checklist.md`](../vibescan/evaluation-implementation-checklist.md) |
+| Reproducibility + benchmarks | [`benchmarking-runbook.md`](./benchmarking-runbook.md), [`eval-output-and-cli-support.md`](./eval-output-and-cli-support.md) |
 | Rule inventory vs tests | [`../vibescan/rule-coverage-audit.md`](../vibescan/rule-coverage-audit.md) |
 
 ## Documents in this folder

@@ -1,4 +1,4 @@
-/** Severity for architecture findings (aligns with secure-code-scanner). */
+/** Severity for architecture findings (aligns with VibeScan). */
 export type ArchSeverity = "critical" | "error" | "warning" | "info";
 
 export interface ArchitectureFinding {

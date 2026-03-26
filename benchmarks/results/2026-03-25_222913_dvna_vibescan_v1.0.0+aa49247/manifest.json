@@ -1,0 +1,75 @@
+{
+  "benchmarkName": "Damn Vulnerable Node Application (DVNA)",
+  "benchmarkSlug": "dvna",
+  "sourceRepo": {
+    "url": "https://github.com/appsecco/dvna",
+    "originLabel": "benchmarks/dvna/dvna",
+    "commitHash": "9ba473add536f66ac9007966acb2a775dd31277a",
+    "branchOrTag": "main (shallow)"
+  },
+  "scannerRepo": {
+    "url": "https://github.com/Joshober/cybersecurity-scanner",
+    "commitHash": "aa492475dbbfdc94d620f8976cd8f9c3e98013ce"
+  },
+  "toolVersions": {
+    "node": "v22.14.0",
+    "npm": "10.9.2",
+    "secureCodeScanner": "1.0.0",
+    "vibescanCli": "1.0.0"
+  },
+  "scope": {
+    "includedFiles": [
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/server.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/config/db.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/config/server.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/config/vulns.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/core/appHandler.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/core/authHandler.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/core/passport.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/models/index.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/models/product.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/models/user.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/routes/app.js",
+      "C:/Users/IT Lab VR/cybersecurity-scanner/benchmarks/dvna/dvna/routes/main.js"
+    ],
+    "excludedFiles": [],
+    "excludedGlobs": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.git/**"
+    ],
+    "projectRoot": "C:\\Users\\IT Lab VR\\cybersecurity-scanner\\benchmarks\\dvna\\dvna",
+    "buildId": "",
+    "openApiSpecsUsed": []
+  },
+  "runDate": {
+    "utcIso8601": "2026-03-26T03:29:13.805Z",
+    "timezone": "America/Chicago"
+  },
+  "outputs": {
+    "directory": "benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/",
+    "artifacts": [
+      {
+        "path": "vibescan-project.json",
+        "description": "VibeScan --format json (project scan)"
+      }
+    ]
+  },
+  "cliArgv": [
+    "scan",
+    "benchmarks/dvna/dvna",
+    "--format",
+    "json",
+    "--project-root",
+    "benchmarks/dvna/dvna",
+    "--exclude-vendor",
+    "--benchmark-metadata",
+    "--manifest",
+    "benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json"
+  ],
+  "environment": {
+    "os": "win32",
+    "shell": "C:\\WINDOWS\\system32\\cmd.exe"
+  },
+  "notes": ""
+}

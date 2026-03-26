@@ -23,7 +23,7 @@ npx secure-arch check --root . --code-evidence js-ts --format human
 ```
 
 - Exit code **1** if any finding is **critical** or **error** (including code-evidence rules such as `ARCH-E001`).
-- `--code-evidence off | js-ts | all` — `js-ts` reuses **VibeScan** (`secure-code-scanner`); `all` adds Python/Java heuristics.
+- `--code-evidence off | js-ts | all` — `js-ts` reuses **VibeScan** (`vibescan`); `all` adds Python/Java heuristics.
 
 ## CI
 
@@ -35,7 +35,7 @@ npx secure-arch check --root . --code-evidence js-ts --format human
 
 ## Publishing note
 
-In this monorepo, `@secure-arch/core` depends on `secure-code-scanner` via `file:../secure-code-scanner`. For npm publish, switch that dependency to a **semver range** on the published `secure-code-scanner` package.
+In this monorepo, `@secure-arch/core` depends on `vibescan` via the local workspace. For npm publish, switch that dependency to a **semver range** on the published `vibescan` package.
 
 ## Further reading
 

@@ -1,0 +1,33 @@
+[
+  {
+    "ruleId": "crypto.hash.weak",
+    "message": "Avoid weak hash algorithm 'md5'. For password storage use a password hashing function; for general hashing use SHA-256+.",
+    "why": "MD5 and SHA-1 are cryptographically broken. If this hashes passwords, they are vulnerable to brute-force. For integrity/signatures use SHA-256 or SHA-3.",
+    "fix": "For passwords: use bcrypt, scrypt, PBKDF2, or argon2 with salting (e.g. bcrypt.hashSync(password, 10)). For general hashing: crypto.createHash('sha256') or crypto.createHash('sha512').",
+    "severity": "error",
+    "severityLabel": "HIGH",
+    "category": "crypto",
+    "line": 3,
+    "column": 10,
+    "endLine": 3,
+    "endColumn": 34,
+    "file": "c:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeded\\crypto\\pos-weak-hash.js",
+    "filePath": "c:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeded\\crypto\\pos-weak-hash.js"
+  },
+  {
+    "ruleId": "MW-003",
+    "message": "No helmet() call detected in this file — verify security headers are set.",
+    "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+    "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+    "severity": "info",
+    "severityLabel": "LOW",
+    "category": "injection",
+    "cwe": 693,
+    "owasp": "A05:2021",
+    "findingKind": "APP_CONFIG",
+    "line": 1,
+    "column": 0,
+    "file": "c:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeded\\injection\\pos-sql-concat.js",
+    "filePath": "c:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeded\\injection\\pos-sql-concat.js"
+  }
+]

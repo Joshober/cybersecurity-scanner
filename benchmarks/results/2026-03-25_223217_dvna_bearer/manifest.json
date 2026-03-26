@@ -1,0 +1,44 @@
+{
+  "benchmarkName": "Damn Vulnerable Node Application (DVNA)",
+  "benchmarkSlug": "dvna",
+  "sourceRepo": {
+    "url": "https://github.com/appsecco/dvna",
+    "originLabel": "benchmarks/dvna/dvna",
+    "commitHash": "9ba473add536f66ac9007966acb2a775dd31277a",
+    "branchOrTag": "main (shallow)"
+  },
+  "scannerRepo": {
+    "url": "https://github.com/Joshober/cybersecurity-scanner",
+    "commitHash": "aa492475dbbfdc94d620f8976cd8f9c3e98013ce"
+  },
+  "toolVersions": {
+    "node": "v22.14.0",
+    "npm": "10.9.2",
+    "bearerDockerImage": "bearer/bearer:latest-amd64",
+    "bearerImageDigest": "bearer/bearer@sha256:f6701b1b6385c9e564efe680a8391cacc5e94798d7b719a21450064c26a7b2d9"
+  },
+  "scope": {
+    "projectRoot": "benchmarks/dvna/dvna",
+    "excludedFiles": [],
+    "excludedGlobs": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.git/**"
+    ]
+  },
+  "runDate": {
+    "utcIso8601": "2026-03-26T03:32:17Z",
+    "timezone": "UTC"
+  },
+  "outputs": {
+    "directory": "benchmarks/results/2026-03-25_223217_dvna_bearer/",
+    "artifacts": [
+      {
+        "path": "bearer.json",
+        "description": "Bearer scan JSON (Docker image)"
+      }
+    ]
+  },
+  "notes": "Generated via benchmarks/scripts/run-bearer-dvna.ps1. If Docker prints seccomp warnings, the script intentionally ignores them when exit code is 0."
+}
+

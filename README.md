@@ -1,10 +1,12 @@
 # VibeScan
 
-**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The npm package is published as `secure-code-scanner`; the CLI binaries are **`vibescan`** and **`secure`**.
+**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The npm package is published as `vibescan`; the CLI binaries are **`vibescan`** and **`secure`**.
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
 **VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
+
+**All plans / runbooks / proposals (index):** [`docs/PLANS.md`](docs/PLANS.md)
 
 **Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
 
@@ -12,17 +14,19 @@
 
 ---
 
-## Monorepo (scanner at repo root)
+## Monorepo (scanner under `vibescan/`)
 
-VibeScan’s **scanner** lives at the repository root (`src/`, `dist/`). **secure-arch** packages are nested workspaces for portable YAML settings, architecture checks, and IDE adapters—optional and separate from publishing `secure-code-scanner`.
+VibeScan’s **scanner** lives under [`vibescan/`](vibescan/) (`vibescan/src/`, `vibescan/dist/`). **secure-arch** packages are nested workspaces for portable YAML settings, architecture checks, and IDE adapters.
 
 | Package | Description |
 |---------|-------------|
-| **Root** (`secure-code-scanner`) | VibeScan — JS/TS static scanner (`vibescan` / `secure`) |
-| [`vibescan/`](vibescan/) | Standalone **`vibescan`** package (Babel extractor, route graph, rules CLI) — see [`vibescan/README.md`](vibescan/README.md) |
+| **Root** (private workspace) | Monorepo workspace root |
+| [`vibescan/`](vibescan/) | Published npm package **`vibescan`** — JS/TS static scanner (`vibescan` / `secure`) — see [`vibescan/README.md`](vibescan/README.md) |
 | [`packages/secure-arch-core`](packages/secure-arch-core/) | Portable settings schema, architecture checks, evidence layer |
 | [`packages/secure-arch-cli`](packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
 | [`packages/secure-arch-adapters`](packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
+
+Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md).
 
 ---
 
@@ -33,8 +37,8 @@ git clone https://github.com/Joshober/cybersecurity-scanner.git
 cd cybersecurity-scanner
 npm install
 npm run build
-npx vibescan scan ./src
-# or: npx secure scan ./src
+npx vibescan scan ./vibescan/src
+# or: npx secure scan ./vibescan/src
 ```
 
 ### secure-arch (architecture settings + validation)
@@ -91,14 +95,14 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 | `API-INV-002` | 284 | OpenAPI operation not matched to static Express route (ghost doc or graph gap) |
 | `API-POSTURE-001` | 285 | Aggregate: object-scoped routes lack auth middleware (informational) |
 | `MW-001` | 352 | Missing CSRF protection on state-changing route |
-| `MW-002` | 307 | Sensitive path without rate-limit middleware |
+| `MW-002` | 307 | Sensitive path without rate-limit middleware (heuristic; middleware-name based) |
 | `MW-003` | 693 | Express app with routes but no `helmet()` in file |
-| `MW-004` | 942 | CORS `origin: '*'` |
+| `MW-004` | 942 | CORS `origin: '*'` (heuristic; configuration-shape based) |
 | `WEBHOOK-001` | 345 | Webhook-like path uses body without obvious signature verification |
 
 **Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.
 
-**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node scripts/policy-eval.mjs scripts/policy.sample.json vibescan-out.json`
+**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs scripts/policy.sample.json vibescan-out.json`
 
 ---
 
@@ -106,7 +110,7 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 
 ```bash
 npx vibescan scan .
-npx vibescan scan src --rules injection,crypto
+npx vibescan scan ./vibescan/src --rules injection,crypto
 npx vibescan scan . --format human --fix-suggestions
 npx vibescan scan . --format json          # stdout: JSON + summary (even when 0 findings); progress on stderr
 npx vibescan scan . --format sarif         # SARIF 2.1.0 for CI / GitHub Advanced Security upload
@@ -117,7 +121,7 @@ npx vibescan scan . --generate-tests ./generated-security-tests
 npx vibescan scan . --openapi-spec ./openapi.yaml   # repeat flag for multiple specs; disables auto-discovery
 npx vibescan scan . --no-openapi-discovery
 npx vibescan scan . --build-id "$(git rev-parse --short HEAD)"
-npx vibescan scan ./src --export-routes ./out/routes.json   # merged Express routes + tagged inventory (static scan)
+npx vibescan scan ./vibescan/src --export-routes ./out/routes.json   # merged Express routes + tagged inventory (static scan)
 ```
 
 ### `vibescan.config.json` (optional)
@@ -143,7 +147,7 @@ Place next to the project or any parent directory (or pass `--config <path>`). C
 ### Benchmark / adjudication exports
 
 ```bash
-npx vibescan scan ./src --format json --manifest ./out/run-manifest.json --export-adjudication ./out/findings
+npx vibescan scan ./vibescan/src --format json --manifest ./out/run-manifest.json --export-adjudication ./out/findings
 # writes run-manifest.json, findings.json, findings.csv (stem from --export-adjudication)
 ```
 
@@ -175,8 +179,7 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 ## Test
 
 ```bash
-npm run test
-npm run test:only   # if `dist/` is already built
+npm test -w vibescan
 npm run test:arch   # @secure-arch/core (requires build:arch)
 ```
 
@@ -193,15 +196,15 @@ Benchmark outputs and comparison table live under [`results/`](results/) (legacy
 Same rules can run inside ESLint (rule IDs match `SEC-004`, `SSRF-003`, `crypto.*`, `injection.*`, etc.):
 
 ```javascript
-import eslintPluginSecureCodeScanner from "secure-code-scanner";
+import eslintPluginVibeScan from "vibescan";
 
 export default [
   {
-    plugins: { "secure-code-scanner": eslintPluginSecureCodeScanner },
+    plugins: { vibescan: eslintPluginVibeScan },
     rules: {
       ...Object.fromEntries(
-        Object.keys(eslintPluginSecureCodeScanner.rules).map((id) => [
-          `secure-code-scanner/${id}`,
+        Object.keys(eslintPluginVibeScan.rules).map((id) => [
+          `vibescan/${id}`,
           "error",
         ])
       ),
@@ -217,17 +220,17 @@ export default [
 See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary:
 
 ```
-src/
-├── attacks/           # Rule definitions (crypto, injection, browser, file)
-└── system/            # Engine, CLI, parser, taint, format, optional AI
+vibescan/
+├── src/               # Rule definitions (crypto, injection, browser, file)
+│   └── system/        # Engine, CLI, parser, taint, format, optional AI
+├── tests/             # Scanner unit tests + fixtures
+│   ├── fixtures/
+│   └── unit/
 packages/
 ├── secure-arch-core/  # Settings schema + ARCH-* checks + evidence
 ├── secure-arch-cli/   # secure-arch CLI
 └── secure-arch-adapters/
 architecture/secure-rules/   # YAML settings (templates via secure-arch install)
-tests/
-├── fixtures/
-└── unit/
 docs/
 ├── REPO-HANDOFF.md    # Architecture + file map for handoffs
 ├── secure-arch/       # secure-arch usage + AI prompts

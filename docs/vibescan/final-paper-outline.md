@@ -30,7 +30,7 @@
 
 ## 4. Methodology
 
-- Research questions and hypotheses (from `research-question.md`).
+- Research questions and hypotheses (from `../research-strengthening/research-question.md`).
 - Benchmark selection and scope policy:
   - DVNA first-party focus
   - seeded benchmark suite design

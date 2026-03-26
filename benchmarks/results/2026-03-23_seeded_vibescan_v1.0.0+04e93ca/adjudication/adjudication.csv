@@ -1,0 +1,4 @@
+kind,tool,file,line,ruleId,adjudicatedLabel,rationale,reviewer
+finding,vibescan,crypto/pos-weak-hash.js,3,crypto.hash.weak,tp,"Seeded corpus explicitly expects crypto.hash.weak; file uses crypto.createHash(""md5"").",
+finding,vibescan,injection/pos-sql-concat.js,1,MW-003,out_of_scope,"This golden run scoring definition excludes MW-003 (helmet presence); treat as out-of-scope for P/R.", 
+fn,vibescan,injection/pos-sql-concat.js,,injection.sql.string-concat,fn,"Seeded corpus expects an injection string-concat/taint signal in this file; no matching injection finding emitted in this run.", 

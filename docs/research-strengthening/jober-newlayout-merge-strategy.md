@@ -2,7 +2,7 @@
 
 **Intent:** Keep **research merges** independent of **layout/refactor** work. Academic work should land on `master` from `docs/research-strengthening` (or similar) without waiting for a megamerge.
 
-**Hybrid layout (this repo’s `main`):** The scanner remains at **repo root** (`src/`). **secure-arch** is under `packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into `packages/secure-code-scanner/`.
+**Hybrid layout (this repo’s `main`):** The scanner remains at **repo root** (`src/`). **secure-arch** is under `packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into a nested scanner package.
 
 ## What to verify on `Jober/NewLayout` first
 
@@ -10,9 +10,9 @@ Run from repo root on that branch:
 
 ```bash
 npm install
-npm run build
-npm test
-npx vibescan scan ./src --format compact
+npm run build -w vibescan
+npm test -w vibescan
+npx vibescan scan ./vibescan/src --format compact
 npx secure-arch check --root . --code-evidence js-ts
 ```
 
@@ -34,7 +34,7 @@ Document results in the PR that proposes merging layout changes. If any command 
 
 ### Slice 3 — Scanner package path / workspace layout
 
-- Moving `secure-code-scanner` or changing workspace names **only after** benchmarks and `reproducible-runs.md` are updated so **historical commands** still work or are clearly versioned in the manifest.
+- Moving `vibescan` or changing workspace names **only after** benchmarks and [`benchmarking-runbook.md`](./benchmarking-runbook.md) are updated so **historical commands** still work or are clearly versioned in the manifest.
 
 ### Slice 4 — Root identity / monorepo branding
 
@@ -67,4 +67,4 @@ Jober/NewLayout ──(PR3 layout)───────────▶ master   
 ## Remote branches (this repo snapshot)
 
 - `origin/master` — integration target for research.
-- `origin/docs/research-strengthening` — may contain overlapping files (e.g. `docs/vibescan/research-question.md`); reconcile with this folder when merging.
+- `origin/docs/research-strengthening` — may contain overlapping files (e.g. older duplicate topic docs under `docs/vibescan/`); reconcile by keeping the consolidated canonical set in `docs/research-strengthening/`.

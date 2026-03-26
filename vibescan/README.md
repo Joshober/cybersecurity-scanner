@@ -1,63 +1,39 @@
 # VibeScan
 
-Static security scanner for Express-style Node.js apps: **route graph extraction** (Babel), **rule pack** (injection, auth, middleware, secrets, prototype pollution), optional **npm registry** checks (“slopsquat”), and **Jest test stubs** generation.
+VibeScan is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP A02:2021) and **injection** issues (A03:2021), with optional npm **registry checks** (SLOP-001) and optional **generated tests**.
+
+Published npm package: `vibescan`  
+CLI binaries: `vibescan` and `secure`
 
 ## Install
 
-From this directory:
-
 ```bash
-npm install
+npm i vibescan
 ```
 
-Global / local CLI via `bin`:
+## Quick start
 
 ```bash
-node src/cli.js scan ./src
-npx vibescan scan ./src
+npx vibescan scan .
+# or:
+npx secure scan .
 ```
 
-## Usage
+## CI-friendly output
+
+Write machine-readable output to a file:
 
 ```bash
-vibescan scan <dir>              # human-readable report
-vibescan scan <dir> --json       # CI-friendly JSON
-vibescan scan <dir> --generate-tests --tests-dir ./generated
-vibescan scan <dir> --check-registry --package-json ./package.json
-vibescan scan <dir> --check-registry --skip-registry   # offline: skip HEAD requests
-vibescan rules                   # list rules (id, severity, CWE, OWASP)
+npx vibescan scan . --format json  > vibescan.json
+npx vibescan scan . --format sarif > vibescan.sarif
 ```
 
-Exit code **1** if any **critical** severity finding is present (for CI gating).
+Exit code is **non-zero** if any finding has severity `critical` or `error`.
 
-## Generated tests
+## Options (high level)
 
-`--generate-tests` writes Jest files with a **TODO import** for your real Express app. Wire `import app from '…'` and helpers (`supertest`, tokens) before relying on them in CI. See comments in [src/generator/testWriter.js](src/generator/testWriter.js).
+- `--rules crypto,injection`
+- `--severity critical|error|warning|info`
+- `--exclude-vendor`
+- `--check-registry` (optional SLOP-001 signal)
 
-## Layout
-
-- [src/extractor/](src/extractor/) — `extractRoutes(dir)`, route objects (`fullPath`, middleware chain, `req.*` fields)
-- [src/rules/](src/rules/) — rule registry [src/rules/index.js](src/rules/index.js)
-- [src/payloads/](src/payloads/) — payload lists for docs / future DAST
-- [src/secrets/](src/secrets/) — weak-secret dictionaries + entropy helper
-- [src/slopsquat/](src/slopsquat/) — `checkDependencies(packageJsonPath)`
-- [src/reporter/](src/reporter/) — chalk table + JSON
-- [tests/fixtures/](tests/fixtures/) — sample apps
-
-Full rule descriptions: [RULES.md](RULES.md). Contributing new rules: [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Tests
-
-```bash
-npm test
-```
-
-Benchmark-style fixture sweep:
-
-```bash
-node tests/benchmark.js
-```
-
-## Limitations
-
-Heuristic static analysis: false positives and false negatives are expected. Dynamic routes, unusual framework wrappers, and indirection through helpers are only partially supported.

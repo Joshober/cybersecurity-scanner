@@ -12,30 +12,20 @@ Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a b
 | [`pitch-60s.md`](./pitch-60s.md) | 60s script + six judge cue cards. |
 | [`handout.html`](./handout.html) | A5 handout; print in grayscale to verify contrast. |
 | [`SUBMISSION-CHECKLIST.md`](./SUBMISSION-CHECKLIST.md) | Logistics (form, chair, deadlines). |
-| [`rubric-status-updated.md`](./rubric-status-updated.md) | CCSC-style rubric vs **current** repo (DVNA numbers, gaps, fixes). |
-| [`judge-prep-score-and-sources.md`](./judge-prep-score-and-sources.md) | **Score band**, **source tiers** (peer-reviewed vs industry), QR/repo credibility, rehearsal notes. |
-| [`research-framing.md`](./research-framing.md) | **Research question, novelty, baselines, safe claims**, six deliverables checklist—turn “scanner + stats” into “evaluated method.” |
-| [`evaluation-implementation-checklist.md`](./evaluation-implementation-checklist.md) | **Master tracker** for benchmark + adjudication work; links all evaluation docs below. |
+| [`project-tracking.md`](./project-tracking.md) | Consolidated checklists + roadmap + repo health tracker (includes rubric status). |
+| [`judging-pack.md`](./judging-pack.md) | Judge prep: research framing + source tiers + rigor talking points. |
+| [`demo-plan.md`](./demo-plan.md) | Consolidated conference demo plan (examples, seeded app designs, folder layout). |
 | [`rule-coverage-audit.md`](./rule-coverage-audit.md) | Rules × unit tests, fixtures, README, benchmark relevance. |
-| [`benchmark-layout.md`](./benchmark-layout.md) | Proposed `benchmarks/{dvna,seeded,results,scripts}/` layout. |
-| [`reproducible-runs.md`](./reproducible-runs.md) | Scripts / pseudocode: build scanner, VibeScan, ESLint, npm audit, Bearer. |
+| [`../research-strengthening/benchmarking-runbook.md`](../research-strengthening/benchmarking-runbook.md) | Benchmark folder layout + reproducible runbook (canonical). |
 | [`benchmark-manifest-template.json`](./benchmark-manifest-template.json) | Run metadata template (copy per experiment). |
 | [`adjudication-template.md`](./adjudication-template.md) | Per-finding ground-truth labeling table. |
-| [`output-support-audit.md`](./output-support-audit.md) | Where to add JSON summaries (format layer). |
-| [`eval-support-changes.md`](./eval-support-changes.md) | Smallest non-detection code changes for eval ergonomics. |
+| [`../research-strengthening/eval-output-and-cli-support.md`](../research-strengthening/eval-output-and-cli-support.md) | Formatter/CLI support notes for evaluation (canonical). |
 | [`vibescan-benchmark-output.schema.json`](./vibescan-benchmark-output.schema.json) | JSON Schema for project scan output (incl. `--benchmark-metadata`). |
-| [`project-direction-update.md`](./project-direction-update.md) | Scope: trust boundaries, surface analysis, positioning vs Snyk/DAST. |
+| [`baselines-and-positioning.md`](./baselines-and-positioning.md) | Consolidated positioning + baseline comparison plans (Snyk/DAST/etc.). |
 | [`research-scope-v2.md`](./research-scope-v2.md) | Updated RQ, hypotheses (conservative). |
-| [`related-tools-positioning.md`](./related-tools-positioning.md) | Comparison table: SAST, SCA, DAST, exploit tools, platforms. |
-| [`trust-boundary-model.md`](./trust-boundary-model.md) | Express-oriented trust boundaries and static limits. |
-| [`endpoint-discovery-plan.md`](./endpoint-discovery-plan.md) | Route inventory and future spec drift. |
-| [`authz-and-surface-gap-analysis.md`](./authz-and-surface-gap-analysis.md) | What VibeScan detects vs misses (IDOR, authz, etc.). |
+| [`surface-and-boundaries.md`](./surface-and-boundaries.md) | Trust boundaries, endpoint discovery, and authz/surface gap analysis (consolidated). |
 | [`platform-and-api-benchmark-plan.md`](./platform-and-api-benchmark-plan.md) | Seeded benchmark case IDs (qualitative baselines). |
-| [`rule-roadmap-v2.md`](./rule-roadmap-v2.md) | Planned rules by difficulty. |
 | [`context-aware-prioritization-plan.md`](./context-aware-prioritization-plan.md) | Future prioritization design. |
-| [`snyk-baseline-plan.md`](./snyk-baseline-plan.md) | Honest Snyk comparison protocol. |
-| [`dast-comparison-plan.md`](./dast-comparison-plan.md) | Burp, ZAP, nuclei, sqlmap vs static scope. |
-| [`runtime-context-future-work.md`](./runtime-context-future-work.md) | Deployment/build correlation (future). |
 | [`webhook-verification-rule-proposal.md`](./webhook-verification-rule-proposal.md) | Webhook signature rule (v2 ideas; aligns with `WEBHOOK-001`). |
 
 ## Regenerate the QR (if the public URL changes)
@@ -68,5 +58,5 @@ Adjust colors in the SVG to match the poster if needed.
 
 ## Person A inputs to merge
 
-- **Bearer** row on the poster (optional): run and update from `results/bearer-dvna.txt`.
+- **Bearer** row on the poster: Bearer DVNA raw JSON is now captured under `benchmarks/results/` (see `results/dvna-evaluation.md` for links); update the poster table if it still shows “TODO (not run)”.
 - Rule count on the poster if the frozen inventory changes (optional).

@@ -35,5 +35,5 @@ If prioritization features are added (e.g., weighting by route sensitivity or pr
 ## Claim boundaries
 
 - Hypotheses concern **detection and ranking behavior on defined benchmarks**, not legal or compliance outcomes.
-- Comparisons to Burp, ZAP, nuclei, sqlmap, or Snyk require **explicit scope alignment**; many categories are **not directly comparable** without hybrid protocols (see `related-tools-positioning.md`, `snyk-baseline-plan.md`, `dast-comparison-plan.md`).
+- Comparisons to Burp, ZAP, nuclei, sqlmap, or Snyk require **explicit scope alignment**; many categories are **not directly comparable** without hybrid protocols (see `baselines-and-positioning.md`).
 - Registry-dependent hypotheses require network and configuration conditions documented in the run manifest.
