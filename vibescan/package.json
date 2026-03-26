@@ -5,8 +5,8 @@
   "main": "dist/system/index.js",
   "types": "dist/system/index.d.ts",
   "bin": {
-    "secure": "dist/system/cli/index.js",
-    "vibescan": "dist/system/cli/index.js"
+    "secure": "dist/system/cli/vibescan.js",
+    "vibescan": "dist/system/cli/vibescan.js"
   },
   "files": [
     "dist",
@@ -16,7 +16,7 @@
     "build": "tsc",
     "test": "npm run build && node --test tests/unit/",
     "release:check": "npm run build && npm pack --dry-run",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
     "policy-eval": "node scripts/policy-eval.mjs"
   },
   "keywords": [

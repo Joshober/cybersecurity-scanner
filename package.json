@@ -5,14 +5,15 @@
   "description": "Private monorepo workspace for VibeScan and secure-arch packages",
   "workspaces": [
     "vibescan",
-    "packages/secure-arch-core",
-    "packages/secure-arch-adapters",
-    "packages/secure-arch-cli"
+    "vibescan/packages/secure-arch-core",
+    "vibescan/packages/secure-arch-adapters",
+    "vibescan/packages/secure-arch-cli"
   ],
   "scripts": {
+    "build": "npm run build -w vibescan",
     "build:arch": "npm run build -w @secure-arch/core -w @secure-arch/adapters -w @secure-arch/cli",
     "test:arch": "npm run build:arch && npm run test -w @secure-arch/core",
-    "secure-arch": "node packages/secure-arch-cli/dist/cli.js",
+    "secure-arch": "node vibescan/packages/secure-arch-cli/dist/cli.js",
     "policy-eval": "node vibescan/scripts/policy-eval.mjs"
   },
   "keywords": [
@@ -37,7 +38,7 @@
     "yaml": "^2.7.0"
   },
   "devDependencies": {
-    "@secure-arch/cli": "file:packages/secure-arch-cli",
+    "@secure-arch/cli": "file:vibescan/packages/secure-arch-cli",
     "@types/eslint": "^8.56.0",
     "@types/estree": "^1.0.0",
     "@types/node": "^20.0.0",

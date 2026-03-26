@@ -40,7 +40,7 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
 
 ## Relation to secure-arch YAML
 
-[`packages/secure-arch-core`](../../packages/secure-arch-core/) loads `architecture/secure-rules/*.yaml` into **ArchitectureFacts**. A future step is to **generate** the JSON policy above from those facts (or merge both in one CI job). This repo keeps the PoC as **standalone JSON** so it runs without building secure-arch.
+[`vibescan/packages/secure-arch-core`](../../vibescan/packages/secure-arch-core/) loads `architecture/secure-rules/*.yaml` into **ArchitectureFacts**. A future step is to **generate** the JSON policy above from those facts (or merge both in one CI job). This repo keeps the PoC as **standalone JSON** so it runs without building secure-arch.
 
 ## Limitations
 

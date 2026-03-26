@@ -43,8 +43,8 @@ Evidence basis:
 
 | Topic | Location | Paper treatment |
 |-------|----------|-----------------|
-| secure-arch CLI, YAML settings, evidence checks | `packages/secure-arch-*`, `docs/secure-arch/` | **Future work** or one sentence “orthogonal tooling” |
-| Cursor / Amazon Q adapters | `packages/secure-arch-adapters` | Same |
+| secure-arch CLI, YAML settings, evidence checks | `vibescan/packages/secure-arch-*`, `docs/secure-arch/` | **Future work** or one sentence “orthogonal tooling” |
+| Cursor / Amazon Q adapters | `vibescan/packages/secure-arch-adapters` | Same |
 
 ## Tier D — Not currently part of the default scanner
 

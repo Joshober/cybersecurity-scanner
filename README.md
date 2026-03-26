@@ -22,9 +22,9 @@ VibeScan’s **scanner** lives under [`vibescan/`](vibescan/) (`vibescan/src/`, 
 |---------|-------------|
 | **Root** (private workspace) | Monorepo workspace root |
 | [`vibescan/`](vibescan/) | Published npm package **`vibescan`** — JS/TS static scanner (`vibescan` / `secure`) — see [`vibescan/README.md`](vibescan/README.md) |
-| [`packages/secure-arch-core`](packages/secure-arch-core/) | Portable settings schema, architecture checks, evidence layer |
-| [`packages/secure-arch-cli`](packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
-| [`packages/secure-arch-adapters`](packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
+| [`vibescan/packages/secure-arch-core`](vibescan/packages/secure-arch-core/) | Portable settings schema, architecture checks, evidence layer |
+| [`vibescan/packages/secure-arch-cli`](vibescan/packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
+| [`vibescan/packages/secure-arch-adapters`](vibescan/packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
 
 Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md).
 
@@ -226,10 +226,10 @@ vibescan/
 ├── tests/             # Scanner unit tests + fixtures
 │   ├── fixtures/
 │   └── unit/
-packages/
-├── secure-arch-core/  # Settings schema + ARCH-* checks + evidence
-├── secure-arch-cli/   # secure-arch CLI
-└── secure-arch-adapters/
+├── packages/
+│   ├── secure-arch-core/  # Settings schema + ARCH-* checks + evidence
+│   ├── secure-arch-cli/   # secure-arch CLI
+│   └── secure-arch-adapters/
 architecture/secure-rules/   # YAML settings (templates via secure-arch install)
 docs/
 ├── REPO-HANDOFF.md    # Architecture + file map for handoffs

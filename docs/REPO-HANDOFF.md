@@ -15,14 +15,14 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 | **CLI binaries** | `vibescan`, `secure` (same `vibescan/dist/system/cli/index.js`) |
 | **Language / runtime** | TypeScript → JavaScript, **Node 18+** |
 | **Repo** | [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner) |
-| **Workspaces** | Root scanner + [`packages/secure-arch-*`](../packages/) (`npm` workspaces; see root `package.json`) |
+| **Workspaces** | Root scanner + [`vibescan/packages/secure-arch-*`](../vibescan/packages/) (`npm` workspaces; see root `package.json`) |
 
 ---
 
 ## Repository roles
 
 - **Evaluated artifact (paper):** VibeScan (`vibescan`) — the scanner in `vibescan/src/` runs via `vibescan`/`secure`, with evidence in `benchmarks/results/`.
-- **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
+- **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `vibescan/packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
 - **Related tooling:** the `vibescan/` package — standalone helpers (e.g. extraction/route graph tooling). Treat as related engineering unless you add it to the evaluation scope.
 
 ## Maturity legend (how to avoid “scope mixing”)
@@ -53,8 +53,8 @@ Mechanisms:
 ### Universal secure-architecture layer
 
 - **Settings in YAML** under [`architecture/secure-rules/`](../architecture/secure-rules/) (AI tools fill templates; they do not “validate” security by themselves).
-- **Static checker** — [`@secure-arch/core`](../packages/secure-arch-core/) loads YAML, runs **ARCH-*** rules, and optionally correlates **JS/TS** evidence via **`vibescan`** (`ARCH-E*`) plus **Python/Java** heuristics (`ARCH-H*`).
-- **CLI** — [`secure-arch`](../packages/secure-arch-cli/src/cli.ts): `install`, `init --tool cursor|amazonq`, `check`.
+- **Static checker** — [`@secure-arch/core`](../vibescan/packages/secure-arch-core/) loads YAML, runs **ARCH-*** rules, and optionally correlates **JS/TS** evidence via **`vibescan`** (`ARCH-E*`) plus **Python/Java** heuristics (`ARCH-H*`).
+- **CLI** — [`secure-arch`](../vibescan/packages/secure-arch-cli/src/cli.ts): `install`, `init --tool cursor|amazonq`, `check`.
 - **Docs** — [docs/secure-arch/README.md](secure-arch/README.md).
 
 ---

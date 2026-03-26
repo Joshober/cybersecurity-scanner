@@ -2,7 +2,7 @@
 
 **Intent:** Keep **research merges** independent of **layout/refactor** work. Academic work should land on `master` from `docs/research-strengthening` (or similar) without waiting for a megamerge.
 
-**Hybrid layout (this repo’s `main`):** The scanner remains at **repo root** (`src/`). **secure-arch** is under `packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into a nested scanner package.
+**Hybrid layout (this repo’s `main`):** The scanner lives under **`vibescan/`**. **secure-arch** is under `vibescan/packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into a nested scanner package.
 
 ## What to verify on `Jober/NewLayout` first
 
@@ -29,7 +29,7 @@ Document results in the PR that proposes merging layout changes. If any command 
 
 ### Slice 2 — secure-arch as self-contained packages
 
-- Anything under `packages/secure-arch-*`, `docs/secure-arch/`, templates—**if** paths in READMEs and CLI still resolve from root after merge.
+- Anything under `vibescan/packages/secure-arch-*`, `docs/secure-arch/`, templates—**if** paths in READMEs and CLI still resolve from root after merge.
 - Avoid renaming the root package or scanner package in the same PR.
 
 ### Slice 3 — Scanner package path / workspace layout

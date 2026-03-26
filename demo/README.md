@@ -9,8 +9,8 @@ This interactive website clones a selected GitHub repository, optionally applies
 
 ## Setup
 
-1. Build the scanner (required so the demo can import from `dist/`):
-   - `npm run build`
+1. Build the scanner (required so the demo can import from `vibescan/dist/`):
+   - From repo root: `npm run build` (or `npm run build -w vibescan`)
 2. Start the demo server:
    - `node demo/server.mjs`
 3. Open:
