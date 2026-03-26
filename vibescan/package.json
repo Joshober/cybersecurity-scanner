@@ -1,7 +1,15 @@
 {
-  "name": "vibescan",
+  "name": "@joshober/vibescan",
   "version": "1.0.0",
   "description": "VibeScan — static analysis for crypto failures and injection risks in JavaScript/TypeScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joshober/cybersecurity-scanner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Joshober/cybersecurity-scanner/issues"
+  },
+  "homepage": "https://github.com/Joshober/cybersecurity-scanner#readme",
   "main": "dist/system/index.js",
   "types": "dist/system/index.d.ts",
   "bin": {
@@ -16,6 +24,7 @@
     "build": "tsc",
     "test": "npm run build && node --test tests/unit/",
     "release:check": "npm run build && npm pack --dry-run",
+    "publish:github-packages": "node scripts/publish-github-packages.mjs",
     "prepublishOnly": "npm run build",
     "policy-eval": "node scripts/policy-eval.mjs",
     "policy-check": "node scripts/policy-check.mjs"
@@ -56,6 +65,9 @@
     "eslint": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
 

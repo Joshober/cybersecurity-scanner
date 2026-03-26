@@ -1,0 +1,4 @@
+; Use only for: npm publish --userconfig .npmrc.github-packages
+; Requires NODE_AUTH_TOKEN (e.g. from: gh auth token)
+@joshober:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
