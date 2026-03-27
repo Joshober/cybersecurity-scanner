@@ -11,7 +11,14 @@
     "checkRegistry": false,
     "skipRegistry": false
   },
-  "suppressions": [],
+  "baseline": ".vibescan/baseline.json",
+  "suppressions": [
+    {
+      "ruleId": "example-rule-id",
+      "file": "src/legacy/generated.js",
+      "reason": "Third-party generated file; tracked for removal in Q2 (ticket PROJ-123)."
+    }
+  ],
   "aiExport": {
     "tool": "cursor",
     "settings": "architecture/secure-rules"

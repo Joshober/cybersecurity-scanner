@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
+import { runVibeScanProjectBootstrap } from "./projectInit.js";
 const scanCliPath = join(__dirname, "index.js");
 const secureArchCliPath = join(__dirname, "../../node_modules/@secure-arch/cli/dist/cli.js");
 
@@ -42,11 +43,13 @@ function main(): void {
   }
 
   if (first === "init") {
+    const boot = runVibeScanProjectBootstrap(__dirname, process.cwd());
+    for (const c of boot.created) console.log(`vibescan init: created ${c}`);
+    for (const s of boot.skipped) console.log(`vibescan init: ${s}`);
     if (!existsSync(secureArchCliPath)) {
       console.error(`Missing vendored secure-arch CLI: ${secureArchCliPath}`);
       process.exit(1);
     }
-    // Alias: `vibescan init` => `secure-arch init`
     process.exit(spawnCli(secureArchCliPath, argv));
   }
 

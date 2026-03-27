@@ -10,8 +10,10 @@ import {
   formatHuman,
   formatCompact,
   formatProjectJson,
+  findingToJson,
   projectFindingsToScanResults,
   readScannerPackageVersion,
+  sortFindingsStable,
 } from "../format.js";
 import type { ScannerOptions, Severity, ScanMode, Finding, ProjectScanResult } from "../types.js";
 import { collectScanFiles } from "./collectFiles.js";
@@ -22,6 +24,13 @@ import {
   type OutputFormat,
 } from "./vibescanConfig.js";
 import { applySuppressions } from "../suppress.js";
+import {
+  findingsToBaselineEntries,
+  parseBaselineFile,
+  partitionByBaseline,
+  BASELINE_FILE_VERSION,
+  type BaselineFile,
+} from "../baseline.js";
 import { buildRunManifest, writeRunManifest } from "./manifest.js";
 import { writeAdjudicationExports } from "./adjudication.js";
 import { writeIdeAssistPrompt } from "./ideAssistPrompt.js";
@@ -63,6 +72,11 @@ const cliMerge = {
 let fixSuggestions = false;
 let useColor = process.stdout.isTTY;
 let benchmarkMetadata = process.env.VIBESCAN_BENCHMARK === "1";
+let baselineCliPath: string | undefined;
+let writeBaselinePath: string | undefined;
+let baselineIncludeKnown = false;
+let baselineCliSet = false;
+let writeBaselineSet = false;
 
 function tryGitCommit(cwd: string): string | null {
   try {
@@ -180,6 +194,14 @@ for (let i = 0; i < args.length; i++) {
   } else if (a === "--build-id" && args[i + 1]) {
     cliMerge.buildId = args[++i];
     cliMerge.buildIdSet = true;
+  } else if (a === "--baseline" && args[i + 1]) {
+    baselineCliPath = resolve(args[++i]);
+    baselineCliSet = true;
+  } else if (a === "--write-baseline" && args[i + 1]) {
+    writeBaselinePath = resolve(args[++i]);
+    writeBaselineSet = true;
+  } else if (a === "--baseline-include-known") {
+    baselineIncludeKnown = true;
   } else if (a === "--color" && args[i + 1]) {
     const v = args[++i].toLowerCase();
     useColor = v === "always" ? true : v === "never" ? false : process.stdout.isTTY;
@@ -226,6 +248,9 @@ Options:
   --openapi-spec <file>   OpenAPI/Swagger file (repeatable; disables discovery)
   --no-openapi-discovery  Do not auto-find openapi.* / swagger.* under project root
   --build-id <id>         Deployment/build label (JSON output + manifest)
+  --baseline <file>       Ignore baseline entries for CI exit (see --write-baseline)
+  --write-baseline <file> Write current findings to baseline JSON and exit 0
+  --baseline-include-known With --baseline, print deferred findings too (verbose)
   --color always|never|auto
 `);
 };
@@ -264,9 +289,14 @@ const merged = mergeVibeScanConfig(
     openApiDiscoverySet: cliMerge.openApiDiscoverySet,
     buildId: cliMerge.buildId,
     buildIdSet: cliMerge.buildIdSet,
+    baseline: baselineCliPath,
+    baselineSet: baselineCliSet,
   },
   { crypto: true, injection: true }
 );
+
+const baselineFromConfig = merged.baseline ? resolve(searchRoot, merged.baseline) : undefined;
+const effectiveBaselinePath = baselineCliSet ? baselineCliPath : baselineFromConfig;
 
 let options: ScannerOptions = merged.scanner;
 const format = merged.format;
@@ -353,9 +383,47 @@ async function main(): Promise<void> {
   const rawProject = await scanProjectAsync(entries, options, projectRoot);
   const project = withFilteredFindings(rawProject);
 
-  if (findingsFail(project.findings)) exitCode = 1;
+  if (writeBaselineSet && writeBaselinePath) {
+    const entriesOut = findingsToBaselineEntries(projectRoot, project.findings);
+    const bf: BaselineFile = {
+      version: BASELINE_FILE_VERSION,
+      generatedAt: new Date().toISOString(),
+      tool: "vibescan",
+      note: "Findings after suppressions; CI with --baseline defers these until remediated.",
+      entries: entriesOut,
+    };
+    writeFileSync(writeBaselinePath, JSON.stringify(bf, null, 2), "utf-8");
+    console.error(`Wrote baseline (${entriesOut.length} entries): ${writeBaselinePath}`);
+    process.exit(0);
+  }
 
-  const totalFindings = project.findings.length;
+  let baselineData: BaselineFile | null = null;
+  if (effectiveBaselinePath) {
+    try {
+      baselineData = parseBaselineFile(readFileSync(effectiveBaselinePath, "utf-8"));
+    } catch (e) {
+      console.error(`Failed to read baseline file: ${effectiveBaselinePath}`);
+      console.error(e instanceof Error ? e.message : e);
+      process.exit(1);
+    }
+  }
+
+  const { baseline: baselineFindings, fresh: freshFindings } = baselineData
+    ? partitionByBaseline(project.findings, baselineData.entries)
+    : { baseline: [], fresh: project.findings };
+
+  const findingsForGate = baselineData ? freshFindings : project.findings;
+  const displayFindings = baselineData
+    ? baselineIncludeKnown
+      ? project.findings
+      : freshFindings
+    : project.findings;
+
+  if (findingsFail(findingsForGate)) exitCode = 1;
+
+  const totalFindings = displayFindings.length;
+  const totalRaw = project.findings.length;
+
   maybeWriteSidecars(project.findings, projectRoot, {
     buildId: project.buildId ?? options.buildId,
     openApiSpecsUsed: project.openApiSpecsUsed,
@@ -368,7 +436,7 @@ async function main(): Promise<void> {
     );
     writeIdeAssistPrompt(assistPath, {
       projectRoot,
-      findings: project.findings,
+      findings: displayFindings,
       scannedRelativePaths,
     });
     const msg = `Wrote IDE assist prompt (Cursor / Claude Code): ${assistPath}`;
@@ -392,40 +460,78 @@ async function main(): Promise<void> {
     if (structuredStdout) console.error(`Wrote route export: ${exportRoutesPath}`);
   }
 
+  const projectOut = { ...project, findings: displayFindings };
+
   if (format === "json") {
-    console.log(
+    const payload = JSON.parse(
       formatProjectJson(project, {
         benchmarkMetadata,
         includeRuleFamily: benchmarkMetadata,
         toolVersion: readScannerPackageVersion(),
         gitCommit: tryGitCommit(projectRoot),
-        scanOptions: scanOptionsEcho(options, format, benchmarkMetadata),
+        scanOptions: {
+          ...scanOptionsEcho(options, format, benchmarkMetadata),
+          ...(baselineData && effectiveBaselinePath
+            ? {
+                baseline: effectiveBaselinePath,
+                baselineDeferred: baselineFindings.length,
+                baselineFresh: freshFindings.length,
+              }
+            : {}),
+        },
       })
-    );
+    ) as Record<string, unknown>;
+    if (baselineData && effectiveBaselinePath) {
+      payload.baseline = {
+        file: effectiveBaselinePath,
+        deferredCount: baselineFindings.length,
+        freshCount: freshFindings.length,
+      };
+      payload.regressions = sortFindingsStable(freshFindings).map((f) => findingToJson(f, undefined, true, true));
+    }
+    console.log(JSON.stringify(payload, null, 2));
   } else if (format === "sarif") {
     const { formatProjectSarif } = await import("../sarif.js");
     console.log(formatProjectSarif(project));
   } else {
-    if (totalFindings === 0) {
+    if (totalRaw === 0) {
       console.log("No vulnerabilities found.");
       process.exit(0);
     }
-    console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
-    const display = projectFindingsToScanResults(project);
+    if (baselineData && freshFindings.length === 0 && baselineFindings.length > 0 && !baselineIncludeKnown) {
+      console.log(
+        `No new issues beyond baseline (${baselineFindings.length} known finding(s) deferred — use --baseline-include-known to list them).`
+      );
+      process.exit(exitCode);
+    }
+    if (totalFindings === 0 && (!baselineData || baselineIncludeKnown)) {
+      console.log("No vulnerabilities found.");
+      process.exit(exitCode);
+    }
+    const bl = baselineData
+      ? ` (${freshFindings.length} affecting CI exit, ${baselineFindings.length} in baseline)`
+      : "";
+    console.log(`\n${totalFindings} finding${totalFindings === 1 ? "" : "s"} shown${bl}\n`);
+    if (baselineData && !baselineIncludeKnown) {
+      const msg = `(Baseline active: ${baselineFindings.length} deferred; exit reflects new issues only.)`;
+      if (structuredStdout) console.error(msg);
+      else console.log(msg);
+    }
+    const display = projectFindingsToScanResults(projectOut);
     if (format === "human") console.log(formatHuman(display, useColor));
     else console.log(formatCompact(display, useColor));
   }
 
   if (fixSuggestions && format !== "human" && format !== "json" && format !== "sarif" && totalFindings > 0) {
     console.log("\n--- Fix suggestions ---");
-    for (const f of project.findings) {
+    for (const f of displayFindings) {
       const remed = f.remediation ?? f.fix;
       if (remed) console.log(`[${f.ruleId}] ${remed}`);
     }
   }
   if ((format === "json" || format === "sarif") && fixSuggestions && totalFindings > 0) {
     console.error("\n--- Fix suggestions ---");
-    for (const f of project.findings) {
+    for (const f of displayFindings) {
       const remed = f.remediation ?? f.fix;
       if (remed) console.error(`[${f.ruleId}] ${remed}`);
     }

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Finding, ScanResult, ProjectScanResult, Severity, Category } from "./types.js";
+import { getConfidenceScore, getRuleDocumentation, type RuleDocumentation } from "./ruleCatalog.js";
 
 /** Aggregated counts for benchmarks / CI. */
 export interface FindingsSummary {
@@ -159,28 +160,62 @@ export function projectFindingsToScanResults(project: ProjectScanResult): ScanRe
   return [...m.entries()].map(([filePath, findings]) => ({ filePath, findings }));
 }
 
-export function formatHuman(results: ScanResult[], useColor = false): string {
+/** One finding block: severity, impact, location, confidence, fix, example, references. */
+export function formatFindingDetailed(f: Finding, fileFallback: string, index: number, total: number, useColor: boolean): string {
+  const c = colorForSeverity(f.severityLabel ?? "HIGH", useColor);
+  const dim = useColor ? (s: string) => `${ansi.dim}${s}${ansi.reset}` : (s: string) => s;
+  const loc = f.filePath ?? fileFallback;
+  const doc = getRuleDocumentation(f.ruleId);
+  const conf = getConfidenceScore(f);
+  const why = f.why?.trim() || doc.risk;
+  const fix = (f.remediation ?? f.fix)?.trim() || doc.remediation;
   const lines: string[] = [];
+  lines.push(dim(`── Finding ${index}/${total} ──`));
+  lines.push(c(`${f.severityLabel}  ${f.ruleId}: ${f.message}`));
+  const meta = metaLine(f, useColor);
+  if (meta) lines.push(meta);
+  lines.push(dim("Location"));
+  lines.push(`  File: ${loc}`);
+  lines.push(`  Line: ${f.line}` + (f.column != null ? `, column: ${f.column}` : ""));
+  if (f.route) {
+    lines.push(`  Route: ${f.route.method} ${f.route.fullPath}`);
+  }
+  if (f.sourceLabel) lines.push(dim("  Data flow · Source: ") + f.sourceLabel);
+  if (f.sinkLabel) lines.push(dim("  Data flow · Sink: ") + f.sinkLabel);
+  lines.push(dim("Why it matters"));
+  lines.push(`  ${why}`);
+  lines.push(dim(`Confidence: ${conf} (heuristic static analysis; confirm in code review)`));
+  lines.push(dim("Suggested fix"));
+  lines.push(`  ${fix}`);
+  lines.push(dim("Safe pattern (example)"));
+  const exampleLines = doc.secureExample.trim().split("\n");
+  for (const el of exampleLines) lines.push(`  ${el}`);
+  lines.push(dim("References"));
+  for (const url of doc.referenceUrls) lines.push(`  ${url}`);
+  if (f.packageName) lines.push(dim("Package: ") + f.packageName);
+  if (f.cveRef?.length) lines.push(dim("CVE: ") + f.cveRef.join(", "));
+  lines.push("");
+  return lines.join("\n");
+}
+
+export function formatHuman(results: ScanResult[], useColor = false): string {
+  const flat: { f: Finding; fileFallback: string }[] = [];
   for (const r of results) {
-    for (const f of r.findings) {
-      const c = colorForSeverity(f.severityLabel ?? "HIGH", useColor);
-      const loc = f.filePath ?? r.filePath;
-      lines.push(c(`[${f.severityLabel}] ${f.message}`));
-      const meta = metaLine(f, useColor);
-      if (meta) lines.push(meta);
-      lines.push(`File: ${loc}:${f.line}`);
-      if (f.sourceLabel) lines.push(`Source: ${f.sourceLabel}`);
-      if (f.sinkLabel) lines.push(`Sink: ${f.sinkLabel}`);
-      lines.push(`Rule: ${f.ruleId}`);
-      if (f.why) lines.push(`Why: ${f.why}`);
-      const remed = f.remediation ?? f.fix;
-      if (remed) lines.push(`Fix: ${remed}`);
-      if (f.packageName) lines.push(`Package: ${f.packageName}`);
-      if (f.cveRef?.length) lines.push(`CVE: ${f.cveRef.join(", ")}`);
-      lines.push("");
-    }
+    for (const f of r.findings) flat.push({ f, fileFallback: r.filePath });
+  }
+  const lines: string[] = [];
+  const total = flat.length;
+  let i = 0;
+  for (const { f, fileFallback } of flat) {
+    i += 1;
+    lines.push(formatFindingDetailed(f, fileFallback, i, total, useColor));
   }
   return lines.join("\n").trimEnd();
+}
+
+/** Narrative for governance exports and AI rule packs. */
+export function ruleDocumentationForExport(ruleId: string): RuleDocumentation {
+  return getRuleDocumentation(ruleId);
 }
 
 export function formatCompact(results: ScanResult[], useColor = false): string {
@@ -201,9 +236,11 @@ export function formatCompact(results: ScanResult[], useColor = false): string {
 export function findingToJson(
   f: Finding,
   fallbackFile?: string,
-  includeRuleFamily = false
+  includeRuleFamily = false,
+  includeRuleDocs = false
 ): Record<string, unknown> {
   const file = findingDisplayFile(f, fallbackFile);
+  const doc = getRuleDocumentation(f.ruleId);
   const row: Record<string, unknown> = {
     ruleId: f.ruleId,
     message: f.message,
@@ -227,11 +264,23 @@ export function findingToJson(
     sinkLabel: f.sinkLabel,
     file,
     filePath: f.filePath,
+    confidence: getConfidenceScore(f),
     ...(f.route ? { route: f.route } : {}),
   };
   if (includeRuleFamily) {
     const rf = ruleFamilyForRuleId(f.ruleId);
     if (rf) row.ruleFamily = rf;
+  }
+  if (includeRuleDocs) {
+    row.ruleDocumentation = {
+      title: doc.title,
+      pattern: doc.pattern,
+      risk: doc.risk,
+      falsePositives: doc.falsePositives,
+      remediation: doc.remediation,
+      secureExample: doc.secureExample,
+      referenceUrls: doc.referenceUrls,
+    };
   }
   return row;
 }
@@ -272,11 +321,11 @@ export function formatProjectJson(
     openApiSpecsUsed: project.openApiSpecsUsed,
     buildId: project.buildId,
     packageJsonPath: project.packageJsonPath,
-    findings: sortedFlat.map((f) => findingToJson(f, undefined, includeRf)),
+    findings: sortedFlat.map((f) => findingToJson(f, undefined, includeRf, true)),
     fileResults: project.fileResults.map((r) => ({
       filePath: r.filePath,
       file: r.filePath,
-      findings: sortFindingsStable(r.findings).map((f) => findingToJson(f, r.filePath, includeRf)),
+      findings: sortFindingsStable(r.findings).map((f) => findingToJson(f, r.filePath, includeRf, true)),
       routeCount: r.routes?.length ?? 0,
     })),
   };

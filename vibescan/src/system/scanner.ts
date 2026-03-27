@@ -150,7 +150,7 @@ export async function scanProjectAsync(
   }
 
   if (opts.generateTests && opts.generateTestsOutputDir) {
-    generateTests(base.findings, opts.generateTestsOutputDir);
+    generateTests(base.findings, opts.generateTestsOutputDir, { projectRoot: root });
   }
 
   return { ...base, packageJsonPath };

@@ -7,3 +7,4 @@ export { runWebhookAudit } from "./webhookAudit.js";
 export { runAppLevelAudit } from "./appLevelAudit.js";
 export type { AppLevelAuditOptions } from "./appLevelAudit.js";
 export { generateTests } from "./testWriter.js";
+export type { GenerateTestsOptions } from "./testWriter.js";

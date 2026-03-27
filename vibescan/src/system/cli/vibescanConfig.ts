@@ -8,6 +8,8 @@ export interface SuppressionRule {
   ruleId?: string;
   file?: string;
   line?: number;
+  /** Audit trail: why this suppression is acceptable (recommended in regulated teams). */
+  reason?: string;
 }
 
 export interface VibeScanFileConfig {
@@ -31,12 +33,16 @@ export interface VibeScanFileConfig {
     /** secure-arch settings dir relative to project root */
     settings?: string;
   };
+  /** When set (or overridden by CLI --baseline), findings matching this file do not fail the run. */
+  baseline?: string;
 }
 
 export interface MergedCliConfig {
   scanner: ScannerOptions;
   format: OutputFormat;
   suppressions: SuppressionRule[];
+  /** Project-relative or absolute path to baseline JSON (optional). */
+  baseline?: string;
 }
 
 function parseConfigJson(text: string): VibeScanFileConfig {
@@ -88,12 +94,15 @@ export function mergeVibeScanConfig(
     openApiDiscoverySet?: boolean;
     buildId?: string;
     buildIdSet?: boolean;
+    baseline?: string;
+    baselineSet?: boolean;
   },
   baseScanner: ScannerOptions
 ): MergedCliConfig {
   const scanner: ScannerOptions = { ...baseScanner };
   let format: OutputFormat = "compact";
   const suppressions: SuppressionRule[] = [...(file?.suppressions ?? [])];
+  let baseline: string | undefined = file?.baseline;
 
   if (file?.rules) {
     if (file.rules.crypto !== undefined) scanner.crypto = file.rules.crypto;
@@ -143,6 +152,7 @@ export function mergeVibeScanConfig(
     scanner.buildId = cli.buildId;
   }
   if (cli.formatSet && cli.format !== undefined) format = cli.format;
+  if (cli.baselineSet && cli.baseline !== undefined) baseline = cli.baseline;
 
-  return { scanner, format, suppressions };
+  return { scanner, format, suppressions, baseline };
 }

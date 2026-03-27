@@ -100,8 +100,12 @@ describe("CLI dispatcher - secure-arch", () => {
       assert.ok(existsSync(ruleFile), "Expected Cursor rule file to be generated.");
 
       const content = readFileSync(ruleFile, "utf-8");
+      assert.ok(content.includes("Generated from your project's security policy"), "Expected governance banner.");
       assert.ok(content.includes("Secure architecture — fill YAML settings only"), "Expected rule content marker.");
       assert.ok(content.includes("architecture/secure-rules/**/*"), "Expected rule globs marker.");
+      assert.ok(existsSync(join(tmpProjectRoot, "vibescan-ai-governance.md")), "Expected generic governance markdown.");
+      const pol = JSON.parse(readFileSync(join(tmpProjectRoot, "vibescan.policy.json"), "utf-8"));
+      assert.strictEqual(pol.kind, "vibescan.securityPolicyExport");
 
       assert.ok(!existsSync(join(tmpProjectRoot, ".cursor", "rules", "vibescan-static-scan.mdc")), "No vibescan.config — no static-scan mdc.");
 
@@ -124,6 +128,7 @@ describe("CLI dispatcher - secure-arch", () => {
       const scanMdc = join(tmpProjectRoot, ".cursor", "rules", "vibescan-static-scan.mdc");
       assert.ok(existsSync(scanMdc));
       assert.ok(readFileSync(scanMdc, "utf-8").includes("VibeScan"));
+      assert.ok(readFileSync(scanMdc, "utf-8").includes("Generated from your project's security policy"));
     } finally {
       rmSync(tmpProjectRoot, { recursive: true, force: true });
     }

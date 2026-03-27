@@ -4,7 +4,9 @@
 
 **Official CLI:** `vibescan`. The `secure` binary is the **same entrypoint**, kept only for backward compatibility—docs and scripts should call `vibescan`.
 
-VibeScan is a **static** security scanner for **JavaScript/TypeScript**: crypto failures (OWASP A02:2021), injection (A03:2021), optional **registry checks** (SLOP-001), and optional **test scaffolding** (not full automated pentesting). It bundles **secure-arch** (YAML architecture settings + `secure-arch check`).
+**VibeScan** is a developer-first security CLI: **static JS/TS scanning**, **AI-assistant rule export** (Cursor, Amazon Q, generic markdown, and a JSON policy artifact), **generated security test scaffolds** for risky routes and JWT checks, optional **slopsquat-style registry signal** (SLOP-001), and **secure-arch** architecture checks in the **same** `npm` install—without shipping separate security products.
+
+Human-readable findings use **severity, impact, location, confidence**, **remediation**, **safe examples**, and **reference links** (see [Rule reference](#rule-reference)).
 
 **Free (MIT).** No VibeScan API keys. Optional [IDE assist](#ide-assist) is a markdown file you paste into Cursor / Claude Code / similar.
 
@@ -131,17 +133,18 @@ These subcommands are served by **`vibescan`** (and `secure`):
 | `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
 | `vibescan secure-arch init --tool cursor` (or `amazonq`) | Low-level: adapter files only. |
 | `vibescan secure-arch check …` | Validate architecture YAML + optional code evidence. |
-| **`vibescan export-ai-rules …`** | **Recommended:** reads **`vibescan.config.json`** (optional) + secure-arch paths; writes Cursor rules and/or Amazon Q prompt; with config + **cursor**, also writes **`.cursor/rules/vibescan-static-scan.mdc`**. |
-| `vibescan init …` | Alias of **`secure-arch init`** (passes through to vendored CLI). |
+| **`vibescan export-ai-rules …`** | **Governance export:** reads **`vibescan.config.json`** + secure-arch settings path; by default writes **Cursor** rules, **Amazon Q** prompt, **`vibescan-ai-governance.md`**, and **`vibescan.policy.json`**, each bannered as *generated from your project’s security policy*. |
+| `vibescan init …` | Creates **`vibescan.config.json`** (from sample) and **`.github/workflows/vibescan.yml`** when missing, then runs **`secure-arch init`** with the same arguments. |
 
 ### `export-ai-rules` (project-aware)
 
 ```bash
-vibescan export-ai-rules --tool cursor --root .
-# Defaults for tool/settings can come from vibescan.config.json → aiExport
+vibescan export-ai-rules --root .
+# Optional: --emit all|cursor,amazonq,markdown,policy   (default: all)
+# --settings <rel> overrides secure-arch folder (else aiExport.settings or architecture/secure-rules)
 ```
 
-Uses vendored **`@secure-arch/adapters`** plus your **`vibescan.config.json`** when present (rules/severity/OpenAPI hints for the extra Cursor file).
+Uses vendored **`@secure-arch/adapters`**, optional **`vibescan.config.json`**, and emits a **JSON policy** digest for downstream tooling. When config exists and Cursor output is included, also writes **`.cursor/rules/vibescan-static-scan.mdc`**.
 
 ### secure-arch
 
@@ -163,11 +166,22 @@ npx vibescan scan . --format json  > vibescan.json
 npx vibescan scan . --format sarif > vibescan.sarif
 ```
 
-Exit code is **non-zero** if any finding has severity `critical` or `error`.
+Exit code is **non-zero** if any finding has severity `critical` or `error` (after [baseline](#baseline-for-ci-rollout), only **new** issues count).
+
+## Baseline for CI rollout
+
+Adopt VibeScan without blocking on every historical finding:
+
+1. **Capture** a baseline (after suppressions):  
+   `vibescan scan . --exclude-vendor --write-baseline .vibescan/baseline.json`
+2. **Commit** the baseline and add to **`vibescan.config.json`**: `"baseline": ".vibescan/baseline.json"` or pass **`--baseline .vibescan/baseline.json`** in CI.
+3. CI **fails only on regressions** (findings not in the baseline). Use **`--baseline-include-known`** to print deferred findings too.
+
+**Suppressions** in config support an optional **`reason`** string for audit trails.
 
 ## Generated test scaffolding (`--generate-tests`)
 
-Emit **starter** Node test files (`node:test`) per finding—**helpers to fill in**, not hands-off pentesting or full E2E automation:
+Emit **starter** Node test files (`node:test`) per finding: **attack class**, **route/context** when available, **`CONFIG`** blocks with **headers / query / body** placeholders, and **`<REQUIRED>`** hints—not hands-off pentesting or full E2E automation:
 
 ```bash
 npx vibescan scan . --generate-tests ./vibescan-generated-tests
@@ -197,6 +211,16 @@ For long-lived editor rules, prefer **`vibescan export-ai-rules`** (reads projec
 - `--generate-tests [dir]` (templates under `./vibescan-generated-tests` by default)
 - `--mode ai` — static scan + `vibescan-ai-assist.md` for Cursor / Claude Code (see [IDE assist](#ide-assist) above)
 - `--ai-assist-out <path>` — markdown output path when using `--mode ai`
+- `--baseline <file>` — defer known findings for exit code / human output (see [Baseline](#baseline-for-ci-rollout))
+- `--write-baseline <file>` — write current findings JSON and exit (bootstrap baseline)
+- `--baseline-include-known` — with `--baseline`, list deferred findings in addition to new ones
+- `--format human` — detailed finding report (confidence, impact, examples, references)
+
+## Rule reference
+
+VibeScan maps each rule id to documentation: **what pattern matched**, **why it is risky**, **common false positives**, **how to fix**, **safe example**, and **links** (OWASP/CWE/README). The CLI **`--format human`** and **JSON** output surface **`confidence`** and **`ruleDocumentation`** for consumers.
+
+This section is the anchor for links emitted in-tool; the catalog ships in the package (`ruleCatalog`).
 
 ## Publish verification
 From the `vibescan/` directory, run:

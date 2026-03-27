@@ -2,7 +2,7 @@
 
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -37,7 +37,9 @@ describe("generateTests", () => {
     ];
     const out = generateTests(findings, dir);
     assert.strictEqual(out.length, 1);
+    assert.ok(existsSync(join(dir, "vibescan-test-config.mjs")));
     const src = readFileSync(out[0], "utf8");
+    assert.match(src, /vibescan-test-config\.mjs/);
     assert.match(src, /forgeHs256/);
     assert.match(src, /createHmac/);
     assert.match(src, /CONFIG\.jwtOracleBase/);
@@ -61,6 +63,7 @@ describe("generateTests", () => {
     ];
     const out = generateTests(findings, dir);
     const src = readFileSync(out[0], "utf8");
+    assert.match(src, /vibescanTestDefaults/);
     assert.match(src, /CONFIG\.apiBase/);
     assert.match(src, /CONFIG\.tokenUserA/);
     assert.ok(!src.toLowerCase().includes("todo:"));
@@ -77,6 +80,31 @@ describe("generateTests", () => {
     const src = readFileSync(out[0], "utf8");
     assert.match(src, /CONFIG\.oracleBase/);
     assert.ok(!src.toLowerCase().includes("todo:"));
+  });
+
+  it("vibescan.tests.json beside helper merges into generated CONFIG via defaults helper", () => {
+    const findings = [
+      minimalFinding({
+        ruleId: "injection.sql.string-concat",
+        message: "sql",
+      }),
+    ];
+    writeFileSync(
+      join(dir, "vibescan.tests.json"),
+      JSON.stringify({ oracleBase: "https://example.invalid" }),
+      "utf8"
+    );
+    generateTests(findings, dir, { projectRoot: dir });
+    const testFile = findings[0].generatedTest;
+    const helperSrc = readFileSync(join(dir, "vibescan-test-config.mjs"), "utf8");
+    assert.match(helperSrc, /vibescan\.tests\.json/);
+    const r = spawnSync(process.execPath, ["-e", `import('./vibescan-test-config.mjs').then(m => { const b = m.vibescanTestDefaults(); if (b.oracleBase !== 'https://example.invalid') process.exit(2); });`], {
+      encoding: "utf8",
+      cwd: dir,
+    });
+    assert.strictEqual(r.status, 0, r.stdout + r.stderr);
+    const src = readFileSync(testFile, "utf8");
+    assert.match(src, /vibescanTestDefaults/);
   });
 });
 
