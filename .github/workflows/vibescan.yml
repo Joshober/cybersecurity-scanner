@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - run: npm ci
-      - run: npm test -w vibescan
+      - run: npm test -w @jobersteadt/vibescan
 
       - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format json > ./vibescan-fixture.out.json
       - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format sarif > ./vibescan-fixture.out.sarif
