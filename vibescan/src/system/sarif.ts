@@ -66,6 +66,11 @@ export function formatProjectSarif(project: ProjectScanResult): string {
         category: f.category,
         cwe: f.cwe,
         remediation: f.remediation ?? f.fix,
+        ...(f.proofGeneration
+          ? {
+              vibescanProofGeneration: f.proofGeneration,
+            }
+          : {}),
       },
       locations: [
         {

@@ -23,6 +23,28 @@ function main(): void {
   const argv = process.argv.slice(2);
   const first = String(argv[0] ?? "");
 
+  if (first === "prove") {
+    const rest = argv.slice(1);
+    let genDir: string | undefined;
+    const filtered: string[] = [];
+    for (let i = 0; i < rest.length; i++) {
+      if (rest[i] === "--output" && rest[i + 1]) {
+        genDir = rest[++i];
+        continue;
+      }
+      filtered.push(rest[i]);
+    }
+    const paths = filtered.filter((a) => !a.startsWith("-"));
+    const flags = filtered.filter((a) => a.startsWith("-"));
+    const scanArgs = [...(paths.length > 0 ? paths : ["."]), ...flags, "--generate-tests"];
+    if (genDir) scanArgs.push(genDir);
+    if (!existsSync(scanCliPath)) {
+      console.error(`Missing scan CLI: ${scanCliPath}`);
+      process.exit(1);
+    }
+    process.exit(spawnCli(scanCliPath, scanArgs));
+  }
+
   if (first === "export-ai-rules") {
     void import("./exportAiRules.js")
       .then((m) => m.runExportAiRulesCliAsync(argv.slice(1), __dirname))

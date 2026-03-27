@@ -1,4 +1,4 @@
-import type { Severity } from "../types.js";
+import type { ProofHints, Severity } from "../types.js";
 import type { Node } from "estree";
 
 export interface ReportOptions {
@@ -11,6 +11,7 @@ export interface ReportOptions {
   cveRef?: string[];
   findingKind?: string;
   generatedTest?: string;
+  proofHints?: ProofHints;
   [key: string]: unknown;
 }
 

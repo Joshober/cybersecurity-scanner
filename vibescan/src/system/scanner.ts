@@ -150,7 +150,12 @@ export async function scanProjectAsync(
   }
 
   if (opts.generateTests && opts.generateTestsOutputDir) {
-    generateTests(base.findings, opts.generateTestsOutputDir, { projectRoot: root });
+    const written = generateTests(base.findings, opts.generateTestsOutputDir, { projectRoot: root });
+    if (written.length > 0) {
+      console.error(
+        `VibeScan: wrote ${written.length} local proof-oriented test file(s) under ${opts.generateTestsOutputDir}`
+      );
+    }
   }
 
   return { ...base, packageJsonPath };

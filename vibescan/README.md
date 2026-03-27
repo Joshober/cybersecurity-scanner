@@ -4,7 +4,7 @@
 
 **Official CLI:** `vibescan`. The `secure` binary is the **same entrypoint**, kept only for backward compatibility—docs and scripts should call `vibescan`.
 
-**VibeScan** is a developer-first security CLI: **static JS/TS scanning**, **AI-assistant rule export** (Cursor, Amazon Q, generic markdown, and a JSON policy artifact), **generated security test scaffolds** for risky routes and JWT checks, optional **slopsquat-style registry signal** (SLOP-001), and **secure-arch** architecture checks in the **same** `npm` install—without shipping separate security products.
+**VibeScan** is a developer-first security CLI: **static JS/TS scanning**, **AI-assistant rule export** (Cursor, Amazon Q, generic markdown, and a JSON policy artifact), **local proof-oriented test generation** for supported finding classes (deterministic `node:test` files—no live API, no base URL, no AI), optional **slopsquat-style registry signal** (SLOP-001), and **secure-arch** architecture checks in the **same** `npm` install—without shipping separate security products.
 
 Human-readable findings use **severity, impact, location, confidence**, **remediation**, **safe examples**, and **reference links** (see [Rule reference](#rule-reference)).
 
@@ -179,22 +179,37 @@ Adopt VibeScan without blocking on every historical finding:
 
 **Suppressions** in config support an optional **`reason`** string for audit trails.
 
-## Generated test scaffolding (`--generate-tests`)
+## Local proof-oriented test generation (`vibescan prove` / `--generate-tests`)
 
-Emit **starter** Node test files (`node:test`) per finding: **attack class**, **route/context** when available, **`CONFIG`** blocks with **headers / query / body** placeholders, and **`<REQUIRED>`** hints—not hands-off pentesting or full E2E automation:
+For **supported** rule families, VibeScan emits **deterministic Node test files** (`node:test`) that illustrate the risky behavior using **static scan metadata** (routes, taint labels, weak JWT literals). **No running API, no base URL, no remote AI.** This is **not** universal exploit confirmation—unsupported rules get `proofGeneration.status: unsupported` in JSON without a file.
+
+**Preferred command:**
+
+```bash
+npx vibescan prove . --output ./vibescan-generated-tests
+```
+
+**Backward-compatible** (same behavior; stderr notes that `prove` is preferred in docs):
 
 ```bash
 npx vibescan scan . --generate-tests ./vibescan-generated-tests
-# omit the directory to use ./vibescan-generated-tests
 ```
 
-Run them in CI or locally:
+Run generated tests:
 
 ```bash
 node --test ./vibescan-generated-tests/
 ```
 
-The JWT template always runs a small **HS256 forge check** (no network). Optional **integration** tests use a **`CONFIG` object** at the top of each generated file (empty strings skip those tests): set URLs, tokens, or paths there—**no environment variables required**.
+**Proof statuses** (per finding, in JSON / SARIF `vibescanProofGeneration`): `provable_locally`, `needs_manual_completion`, `unsupported`. Examples: JWT proofs use **HS256 forge + verify** with the weak literal from the scanner; **SSRF** proofs use a **mock sink** to show taint → request API (not live SSRF); **missing-auth** route findings encode **structural** route/middleware facts from the graph, not a live HTTP stack.
+
+### Known boundaries in the current implementation
+
+- **JWT:** Verification proof is limited to same-file `jwt.verify` discovery and does not yet perform cross-file sign/verify linkage.
+- **BOLA / IDOR:** Coverage generates route-aware tests with mocked identities, but does not yet validate real authorization behavior end to end.
+- **SSRF:** Coverage proves tainted input reaches a request sink, but does not yet demonstrate actual outbound network egress.
+- **Regression of generators:** Validation currently relies on behavioral and unit tests rather than checked-in golden generated test fixtures.
+- **Test scripts:** The default `npm test` path covers unit tests only; smoke tests exist separately (under `tests/smoke/`).
 
 ## IDE assist
 
@@ -208,7 +223,8 @@ For long-lived editor rules, prefer **`vibescan export-ai-rules`** (reads projec
 - `--severity critical|error|warning|info`
 - `--exclude-vendor`
 - `--check-registry` (optional SLOP-001 signal)
-- `--generate-tests [dir]` (templates under `./vibescan-generated-tests` by default)
+- `vibescan prove [paths...] [--output dir]` — local proof-oriented tests (same as `--generate-tests`)
+- `--generate-tests [dir]` — alias for proof generation; default `./vibescan-generated-tests`
 - `--mode ai` — static scan + `vibescan-ai-assist.md` for Cursor / Claude Code (see [IDE assist](#ide-assist) above)
 - `--ai-assist-out <path>` — markdown output path when using `--mode ai`
 - `--baseline <file>` — defer known findings for exit code / human output (see [Baseline](#baseline-for-ci-rollout))

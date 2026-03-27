@@ -73,6 +73,27 @@ export interface Finding {
   packageName?: string;
   /** When the finding is tied to an extracted Express route. */
   route?: FindingRouteRef;
+  /** Static hints for local proof-oriented test generation (deterministic; no remote calls). */
+  proofHints?: ProofHints;
+  /** Result of proof-oriented test generation when the pipeline ran (see `emitProofTests`). */
+  proofGeneration?: ProofGeneration;
+}
+
+/** Scanner-populated hints for generated proof tests (optional per rule). */
+export interface ProofHints {
+  /** Weak JWT signing secret literal from pattern rule `crypto.jwt.weak-secret-literal`. */
+  weakJwtSecretLiteral?: string;
+}
+
+/** Outcome of local proof-oriented test generation for one finding. */
+export interface ProofGeneration {
+  status: "provable_locally" | "needs_manual_completion" | "unsupported";
+  wasGenerated: boolean;
+  generatedPath?: string;
+  autoFilled: string[];
+  manualNeeded: string[];
+  notes?: string;
+  generatorId: string;
 }
 
 /** `static` = rule-based scan only. `ai` = same scan + writes an IDE paste-in prompt (Cursor / Claude Code); no remote API. */
