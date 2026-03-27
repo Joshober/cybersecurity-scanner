@@ -32,5 +32,9 @@ export type {
   ProjectScanResult,
   RouteNode,
   RouteInventoryEntry,
+  ProofGeneration,
+  ProofHints,
 } from "./types.js";
+export { emitProofTests } from "./proof/pipeline.js";
+export type { EmitProofTestsOptions } from "./proof/pipeline.js";
 export type { Rule, RuleContext } from "./utils/rule-types.js";

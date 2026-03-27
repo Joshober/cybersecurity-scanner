@@ -23,6 +23,10 @@ export const jwtWeakSecretRule: Rule = {
     if (!secretArg || secretArg.type !== "Literal" || typeof secretArg.value !== "string") return;
     if (isLikelyRealSecret(secretArg.value)) return;
     if (!ALL_SECRETS.has(secretArg.value)) return;
-    context.report(node, { cwe: 347, owasp: "A07:2021" });
+    context.report(node, {
+      cwe: 347,
+      owasp: "A07:2021",
+      proofHints: { weakJwtSecretLiteral: secretArg.value },
+    });
   },
 };

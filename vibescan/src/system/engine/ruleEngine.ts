@@ -1,7 +1,7 @@
 // Pattern/rule-based detection: runs AST rules on the parsed tree and collects findings.
 
 import type { Program } from "estree";
-import type { Finding, ScannerOptions, Severity, SeverityLabel } from "../types.js";
+import type { Finding, ProofHints, ScannerOptions, Severity, SeverityLabel } from "../types.js";
 import type { Rule } from "../utils/rule-types.js";
 import { buildParentMap, walk } from "../walker.js";
 
@@ -56,6 +56,10 @@ function buildRuleContext(
       typeof data.findingKind === "string" ? data.findingKind : undefined;
     const generatedTest =
       typeof data.generatedTest === "string" ? data.generatedTest : undefined;
+    const proofHints =
+      data.proofHints && typeof data.proofHints === "object" && !Array.isArray(data.proofHints)
+        ? (data.proofHints as ProofHints)
+        : undefined;
 
     const finding: Finding = {
       ruleId: rule.id,
@@ -71,6 +75,7 @@ function buildRuleContext(
       cveRef,
       findingKind,
       generatedTest,
+      proofHints,
       line: loc.start.line,
       column: loc.start.column,
       endLine: loc.end?.line,

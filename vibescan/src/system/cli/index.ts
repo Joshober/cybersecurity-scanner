@@ -243,7 +243,7 @@ Options:
   --fix-suggestions
   --check-registry     HEAD npm registry for missing packages (slopsquat signal)
   --skip-registry      Skip registry checks
-  --generate-tests [dir]  Emit runnable test templates under dir (default: ./vibescan-generated-tests)
+  --generate-tests [dir]  Local proof-oriented tests (same as vibescan prove); default dir ./vibescan-generated-tests
   --project-root <dir>    package.json resolution for registry check
   --openapi-spec <file>   OpenAPI/Swagger file (repeatable; disables discovery)
   --no-openapi-discovery  Do not auto-find openapi.* / swagger.* under project root
@@ -314,6 +314,9 @@ if (cm.generateTests) {
     generateTests: true,
     generateTestsOutputDir: cm.generateTestsDir ?? join(process.cwd(), "vibescan-generated-tests"),
   };
+  console.error(
+    "Note: `--generate-tests` runs the same local proof-oriented test generation as `vibescan prove` (preferred in documentation)."
+  );
 }
 
 const files = collectScanFiles(inputPaths, options);

@@ -194,6 +194,17 @@ export function formatFindingDetailed(f: Finding, fileFallback: string, index: n
   for (const url of doc.referenceUrls) lines.push(`  ${url}`);
   if (f.packageName) lines.push(dim("Package: ") + f.packageName);
   if (f.cveRef?.length) lines.push(dim("CVE: ") + f.cveRef.join(", "));
+  if (f.proofGeneration) {
+    const p = f.proofGeneration;
+    lines.push(dim("Proof-oriented test generation"));
+    lines.push(
+      `  status: ${p.status} · generator: ${p.generatorId} · generated: ${p.wasGenerated ? "yes" : "no"}`
+    );
+    if (p.generatedPath) lines.push(`  path: ${p.generatedPath}`);
+    if (p.autoFilled?.length) lines.push(`  auto-filled: ${p.autoFilled.join("; ")}`);
+    if (p.manualNeeded?.length) lines.push(`  manual: ${p.manualNeeded.join("; ")}`);
+    if (p.notes) lines.push(`  notes: ${p.notes}`);
+  }
   lines.push("");
   return lines.join("\n");
 }
@@ -266,6 +277,8 @@ export function findingToJson(
     filePath: f.filePath,
     confidence: getConfidenceScore(f),
     ...(f.route ? { route: f.route } : {}),
+    ...(f.proofHints ? { proofHints: f.proofHints } : {}),
+    ...(f.proofGeneration ? { proofGeneration: f.proofGeneration } : {}),
   };
   if (includeRuleFamily) {
     const rf = ruleFamilyForRuleId(f.ruleId);
