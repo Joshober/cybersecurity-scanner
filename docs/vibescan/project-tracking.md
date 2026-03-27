@@ -158,7 +158,7 @@ Verify the `npm pack --dry-run` file list contains only:
 
 And does **not** include:
 
-- `docs/`, `benchmarks/`, `results/`, `tests/`, `demo*`, or `legacy-*`
+- `docs/`, `benchmarks/`, `results/`, `tests/`, or `demo*`
 
 ### Publish
 
