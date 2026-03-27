@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { dirname } from "node:path";
@@ -73,7 +73,7 @@ describe("CLI dispatcher - secure-arch", () => {
     assert.strictEqual(r.status, 0, r.stderr || r.stdout);
   });
 
-  it("aliases export-ai-rules to secure-arch init (cursor)", () => {
+  it("export-ai-rules writes Cursor rules from vendored adapters (secure-arch + optional vibescan config)", () => {
     ensureVendoredSecureArch();
 
     const tmpProjectRoot = mkdtempSync(join(tmpdir(), "vibescan-secure-arch-init-"));
@@ -102,6 +102,28 @@ describe("CLI dispatcher - secure-arch", () => {
       const content = readFileSync(ruleFile, "utf-8");
       assert.ok(content.includes("Secure architecture — fill YAML settings only"), "Expected rule content marker.");
       assert.ok(content.includes("architecture/secure-rules/**/*"), "Expected rule globs marker.");
+
+      assert.ok(!existsSync(join(tmpProjectRoot, ".cursor", "rules", "vibescan-static-scan.mdc")), "No vibescan.config — no static-scan mdc.");
+
+      writeFileSync(
+        join(tmpProjectRoot, "vibescan.config.json"),
+        JSON.stringify({
+          rules: { crypto: true, injection: true },
+          severityThreshold: "error",
+          aiExport: { tool: "cursor", settings: "architecture/secure-rules" },
+        }),
+        "utf-8"
+      );
+
+      const r2 = spawnSync(
+        process.execPath,
+        [dispatcherCli, "export-ai-rules", "--tool", "cursor", "--root", tmpProjectRoot],
+        { cwd: monorepoRoot, encoding: "utf-8" }
+      );
+      assert.strictEqual(r2.status, 0, r2.stderr || r2.stdout);
+      const scanMdc = join(tmpProjectRoot, ".cursor", "rules", "vibescan-static-scan.mdc");
+      assert.ok(existsSync(scanMdc));
+      assert.ok(readFileSync(scanMdc, "utf-8").includes("VibeScan"));
     } finally {
       rmSync(tmpProjectRoot, { recursive: true, force: true });
     }

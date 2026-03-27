@@ -1,6 +1,6 @@
 {
   "name": "@jobersteadt/vibescan",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publishConfig": {
     "access": "public"
   },
@@ -13,12 +13,12 @@
     "url": "https://github.com/Joshober/cybersecurity-scanner/issues"
   },
   "homepage": "https://github.com/Joshober/cybersecurity-scanner/tree/main/vibescan#readme",
-  "description": "VibeScan — static analysis for crypto failures and injection risks in JavaScript/TypeScript",
+  "description": "VibeScan (@jobersteadt/vibescan) — static JS/TS security scan, secure-arch, and IDE rule export. Official CLI: vibescan.",
   "main": "dist/system/index.js",
   "types": "dist/system/index.d.ts",
   "bin": {
-    "secure": "dist/system/cli/vibescan.js",
-    "vibescan": "dist/system/cli/vibescan.js"
+    "vibescan": "dist/system/cli/vibescan.js",
+    "secure": "dist/system/cli/vibescan.js"
   },
   "files": [
     "dist",

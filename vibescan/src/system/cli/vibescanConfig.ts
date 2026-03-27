@@ -25,6 +25,12 @@ export interface VibeScanFileConfig {
   openApiDiscovery?: boolean;
   /** Echoed in JSON output and run manifests for deployment correlation. */
   buildId?: string;
+  /** Defaults for `vibescan export-ai-rules` when CLI flags are omitted. */
+  aiExport?: {
+    tool?: "cursor" | "amazonq";
+    /** secure-arch settings dir relative to project root */
+    settings?: string;
+  };
 }
 
 export interface MergedCliConfig {

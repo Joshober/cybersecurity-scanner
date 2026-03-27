@@ -3,7 +3,6 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
-
 const scanCliPath = join(__dirname, "index.js");
 const secureArchCliPath = join(__dirname, "../../node_modules/@secure-arch/cli/dist/cli.js");
 
@@ -23,21 +22,23 @@ function main(): void {
   const argv = process.argv.slice(2);
   const first = String(argv[0] ?? "");
 
+  if (first === "export-ai-rules") {
+    void import("./exportAiRules.js")
+      .then((m) => m.runExportAiRulesCliAsync(argv.slice(1), __dirname))
+      .then((code) => process.exit(code))
+      .catch((e) => {
+        console.error(e);
+        process.exit(1);
+      });
+    return;
+  }
+
   if (first === "secure-arch") {
     if (!existsSync(secureArchCliPath)) {
       console.error(`Missing vendored secure-arch CLI: ${secureArchCliPath}`);
       process.exit(1);
     }
     process.exit(spawnCli(secureArchCliPath, argv.slice(1)));
-  }
-
-  if (first === "export-ai-rules") {
-    if (!existsSync(secureArchCliPath)) {
-      console.error(`Missing vendored secure-arch CLI: ${secureArchCliPath}`);
-      process.exit(1);
-    }
-    // Alias: `export-ai-rules` => `secure-arch init`
-    process.exit(spawnCli(secureArchCliPath, ["init", ...argv.slice(1)]));
   }
 
   if (first === "init") {

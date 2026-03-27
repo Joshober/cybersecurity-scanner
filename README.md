@@ -1,6 +1,8 @@
 # VibeScan
 
-**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The package **`@jobersteadt/vibescan`** is published to **[npm](https://www.npmjs.com/package/@jobersteadt/vibescan)** and **[GitHub Packages](https://github.com/Joshober/cybersecurity-scanner/pkgs/npm/vibescan)**; the CLI binaries are **`vibescan`** and **`secure`**. **No API keys required** for scanning—see [`vibescan/README.md`](vibescan/README.md) for `npx`, CI template, and GitHub Packages `.npmrc` setup.
+**Public package:** **`@jobersteadt/vibescan`** on **[npm](https://www.npmjs.com/package/@jobersteadt/vibescan)** and **[GitHub Packages](https://github.com/Joshober/cybersecurity-scanner/pkgs/npm/vibescan)**. **Official CLI:** `vibescan` (the `secure` binary is the same code, for backward compatibility only).
+
+**VibeScan** is a static scanner for **JavaScript/TypeScript** (crypto / injection / optional registry checks / optional test **scaffolding**), with **secure-arch** and **export-ai-rules** bundled. **No VibeScan API keys.** User guide: [`vibescan/README.md`](vibescan/README.md).
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 

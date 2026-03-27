@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: "20"
 
-      # --yes: non-interactive npx (npm 9+). Pin version: @jobersteadt/vibescan@1.0.1
+      # --yes: non-interactive npx (npm 9+). Pin e.g. @jobersteadt/vibescan@1.1.0 for reproducible CI.
       - name: Static security scan
         run: npx --yes @jobersteadt/vibescan@latest scan . --exclude-vendor
 

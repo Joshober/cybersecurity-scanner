@@ -11,5 +11,9 @@
     "checkRegistry": false,
     "skipRegistry": false
   },
-  "suppressions": []
+  "suppressions": [],
+  "aiExport": {
+    "tool": "cursor",
+    "settings": "architecture/secure-rules"
+  }
 }

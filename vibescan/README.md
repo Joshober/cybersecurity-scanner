@@ -1,11 +1,12 @@
 # VibeScan
 
-VibeScan is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP A02:2021) and **injection** issues (A03:2021), with optional npm **registry checks** (SLOP-001) and optional **generated tests**.
+**Public product:** the npm package **`@jobersteadt/vibescan`** only. Install it from [npm](https://www.npmjs.com/package/@jobersteadt/vibescan) (recommended) or [GitHub Packages](https://github.com/Joshober/cybersecurity-scanner/pkgs/npm/vibescan).
 
-**Free to use (MIT).** The scanner does **not** require API keys or paid services. Optional IDE assist uses **your** editor (Cursor, Claude Code, etc.); see [IDE assist](#ide-assist).
+**Official CLI:** `vibescan`. The `secure` binary is the **same entrypoint**, kept only for backward compatibility—docs and scripts should call `vibescan`.
 
-Published as **`@jobersteadt/vibescan`** on [npm](https://www.npmjs.com/package/@jobersteadt/vibescan) and [GitHub Packages](https://github.com/Joshober/cybersecurity-scanner/pkgs/npm/vibescan) (same version; **simplest install: use npm**).  
-CLI binaries: `vibescan` and `secure` (alias; same dispatcher)
+VibeScan is a **static** security scanner for **JavaScript/TypeScript**: crypto failures (OWASP A02:2021), injection (A03:2021), optional **registry checks** (SLOP-001), and optional **test scaffolding** (not full automated pentesting). It bundles **secure-arch** (YAML architecture settings + `secure-arch check`).
+
+**Free (MIT).** No VibeScan API keys. Optional [IDE assist](#ide-assist) is a markdown file you paste into Cursor / Claude Code / similar.
 
 ## Easiest: run once without installing
 
@@ -15,7 +16,7 @@ Uses the public npm package; `npx --yes` avoids install prompts (npm 9+):
 npx --yes @jobersteadt/vibescan@latest scan . --exclude-vendor
 ```
 
-Pin a version for reproducible CI: `npx --yes @jobersteadt/vibescan@1.0.1 scan . --exclude-vendor`
+Pin a version for reproducible CI: `npx --yes @jobersteadt/vibescan@1.1.0 scan . --exclude-vendor`
 
 ## Recommended: add to your repo
 
@@ -46,7 +47,7 @@ If the app lives in a subdirectory, add `defaults.run.working-directory` or `cd 
 
 ## Optional: config file
 
-Copy **`vibescan.config.sample.json`** to **`vibescan.config.json`** at your project root (VibeScan discovers it upward from scan paths). After `npm i`, the sample also lives at **`node_modules/@jobersteadt/vibescan/vibescan.config.sample.json`**.
+Copy **`vibescan.config.sample.json`** to **`vibescan.config.json`** at your project root (VibeScan discovers it upward from scan paths). After `npm i`, the sample also lives at **`node_modules/@jobersteadt/vibescan/vibescan.config.sample.json`**. Optional **`aiExport`** defaults for **`vibescan export-ai-rules`** (see below).
 
 ## Install (npm) — global or transitive
 
@@ -111,46 +112,47 @@ gh workflow run publish-github-packages.yml --repo Joshober/cybersecurity-scanne
 ## Quick start (after local `npm i`)
 
 ```bash
-npx vibescan scan .
-npx secure scan .
+vibescan scan .
 ```
 
-Equivalent one-off (explicit package name):
+Same binary as legacy `secure` (not recommended for new docs):
 
 ```bash
-npx --yes @jobersteadt/vibescan@latest scan .
+secure scan .
 ```
 
-## secure-arch (portable architecture checks + AI instruction helpers)
-This repo also ships `secure-arch` as a portable rule-pack. It is vendored into the published `@jobersteadt/vibescan` package, so consumers get these commands from the same npm install.
+## Command surface (published CLI)
 
-Install the YAML rule pack into your project:
+These subcommands are served by **`vibescan`** (and `secure`):
+
+| Command | Purpose |
+|--------|---------|
+| `vibescan scan …` | Static analysis (default pipeline). |
+| `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
+| `vibescan secure-arch init --tool cursor` (or `amazonq`) | Low-level: adapter files only. |
+| `vibescan secure-arch check …` | Validate architecture YAML + optional code evidence. |
+| **`vibescan export-ai-rules …`** | **Recommended:** reads **`vibescan.config.json`** (optional) + secure-arch paths; writes Cursor rules and/or Amazon Q prompt; with config + **cursor**, also writes **`.cursor/rules/vibescan-static-scan.mdc`**. |
+| `vibescan init …` | Alias of **`secure-arch init`** (passes through to vendored CLI). |
+
+### `export-ai-rules` (project-aware)
+
 ```bash
-npx vibescan secure-arch install --root .
+vibescan export-ai-rules --tool cursor --root .
+# Defaults for tool/settings can come from vibescan.config.json → aiExport
 ```
 
-Generate AI tool instruction files (Cursor/Amazon Q):
+Uses vendored **`@secure-arch/adapters`** plus your **`vibescan.config.json`** when present (rules/severity/OpenAPI hints for the extra Cursor file).
+
+### secure-arch
+
 ```bash
-npx vibescan secure-arch init --tool cursor
-npx vibescan secure-arch init --tool amazonq
+vibescan secure-arch install --root .
+vibescan secure-arch check --root . --code-evidence off --format human
 ```
 
-Alias for the init flow:
-```bash
-npx vibescan export-ai-rules --tool cursor
-```
+### Legacy `secure` alias
 
-Optional alias (same as `secure-arch init`):
-```bash
-npx vibescan init --tool cursor
-```
-
-Run the static secure-architecture checks against your project’s YAML settings:
-```bash
-npx vibescan secure-arch check --root . --code-evidence off --format human
-```
-
-All of the above also works with the `secure` alias, e.g. `npx secure secure-arch check ...`.
+`npx secure …` and `secure …` invoke the same dispatcher as `vibescan` (backward compatibility).
 
 ## CI-friendly output
 
@@ -163,9 +165,9 @@ npx vibescan scan . --format sarif > vibescan.sarif
 
 Exit code is **non-zero** if any finding has severity `critical` or `error`.
 
-## Generated tests (`--generate-tests`)
+## Generated test scaffolding (`--generate-tests`)
 
-Emit **runnable** Node test files (`node:test`) for each finding:
+Emit **starter** Node test files (`node:test`) per finding—**helpers to fill in**, not hands-off pentesting or full E2E automation:
 
 ```bash
 npx vibescan scan . --generate-tests ./vibescan-generated-tests
@@ -184,12 +186,7 @@ The JWT template always runs a small **HS256 forge check** (no network). Optiona
 
 `--mode ai` runs the **same static rule engine** as the default. It also writes **`vibescan-ai-assist.md`** under your project root (override with **`--ai-assist-out <path>`**). That file is meant to be **pasted into Cursor, Claude Code, or another editor assistant** so *their* built-in model reviews the listed findings—VibeScan does **not** call a remote LLM or ask for API keys.
 
-For long-lived editor rules, use:
-
-```bash
-npx vibescan export-ai-rules --tool cursor
-npx vibescan secure-arch init --tool cursor
-```
+For long-lived editor rules, prefer **`vibescan export-ai-rules`** (reads project config). You can still run **`vibescan secure-arch init`** for adapter-only output.
 
 ## Options (high level)
 
