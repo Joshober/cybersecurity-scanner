@@ -4,6 +4,10 @@ This file centralizes **all plan/proposal/runbook/tracking** documents in the re
 
 If you’re looking for “what should we do next?” start here, then follow the links to the canonical plan docs.
 
+For non-planning docs (installation, CLI, package usage), use [`../README.md`](../README.md) and [`../vibescan/README.md`](../vibescan/README.md).
+
+For finalized benchmark outcomes and adjudication, use [`../results/dvna-evaluation.md`](../results/dvna-evaluation.md) and [`../results/dvna-adjudication.md`](../results/dvna-adjudication.md).
+
 ## Conference + demo plans
 
 - `docs/vibescan/demo-plan.md`: conference demo set, seeded demo app designs, and suggested demo folder layout.

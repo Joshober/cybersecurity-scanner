@@ -22,6 +22,8 @@ npx secure-arch init --tool amazonq
 npx secure-arch check --root . --code-evidence js-ts --format human
 ```
 
+Via the published scanner package, the same commands are available under `vibescan secure-arch ...` after installing `@jobersteadt/vibescan`.
+
 - Exit code **1** if any finding is **critical** or **error** (including code-evidence rules such as `ARCH-E001`).
 - `--code-evidence off | js-ts | all` — `js-ts` reuses **VibeScan** (`vibescan`); `all` adds Python/Java heuristics.
 
@@ -35,7 +37,7 @@ npx secure-arch check --root . --code-evidence js-ts --format human
 
 ## Publishing note
 
-In this monorepo, `@secure-arch/core` depends on `vibescan` via the local workspace. For npm publish, switch that dependency to a **semver range** on the published `vibescan` package.
+In this monorepo, `@secure-arch/core` depends on `@jobersteadt/vibescan` via a local file reference (`file:../..`). For external npm publish of secure-arch packages, switch that dependency to a **semver range** on the published `@jobersteadt/vibescan` package.
 
 ## Further reading
 

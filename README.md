@@ -132,10 +132,13 @@ npx vibescan scan . --exclude-vendor       # skip node_modules, dist, *.min.js, 
 npx vibescan scan . --check-registry
 npx vibescan scan . --check-registry --skip-registry   # offline: skip HEAD requests
 npx vibescan scan . --generate-tests ./generated-security-tests
+npx vibescan prove . --output ./generated-security-tests  # preferred alias for local proof-oriented tests
 npx vibescan scan . --openapi-spec ./openapi.yaml   # repeat flag for multiple specs; disables auto-discovery
 npx vibescan scan . --no-openapi-discovery
 npx vibescan scan . --build-id "$(git rev-parse --short HEAD)"
 npx vibescan scan ./vibescan/src --export-routes ./out/routes.json   # merged Express routes + tagged inventory (static scan)
+npx vibescan export-ai-rules --root .   # writes Cursor/Amazon Q/markdown/policy artifacts
+npx vibescan init --tool cursor --root .  # bootstraps config/workflow + secure-arch adapter files
 ```
 
 ### `vibescan.config.json` (optional)
@@ -201,7 +204,7 @@ npm run test:arch   # @secure-arch/core (requires build:arch)
 
 ## DVNA evaluation (research)
 
-Benchmark outputs and comparison table live under [`results/`](results/) (legacy captures) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/person-b-handoff.md`](results/person-b-handoff.md). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
+Benchmark outputs and comparison table live under [`results/`](results/) (narrative + adjudication) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/dvna-adjudication.md`](results/dvna-adjudication.md). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
 
 ---
 

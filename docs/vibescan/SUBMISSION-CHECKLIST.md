@@ -15,7 +15,7 @@ Complete these steps on your machine; they cannot be automated in-repo.
 - [ ] Decide **corresponding author** (prize contact).
 - [ ] Collect **full name + email** for every team member.
 - [ ] Collect **faculty mentor** name + email.
-- [ ] Paste abstract from [`abstract.md`](./abstract.md) (after Person A fills DVNA sentence).
+- [ ] Paste final abstract from [`abstract.md`](./abstract.md) (already aligned to current DVNA snapshot wording).
 - [ ] Submit form; **screenshot the confirmation page** and save the image.
 - [ ] Note **poster chair email** for PDF submission.
 - [ ] Add **calendar reminder**: “Send poster PDF to chair — Mar 26”.
@@ -33,9 +33,9 @@ Complete these steps on your machine; they cannot be automated in-repo.
 - [ ] **Print** Q&A cue cards (or flashcards app).
 - [ ] Practice pitch **≥10 times** out loud.
 
-## After Person A delivers
+## Final consistency pass before submit
 
 - [ ] Replace all **TBD** cells in the poster DVNA table.
-- [ ] Replace `[TBD — Person A…]` in [`abstract.md`](./abstract.md) and re-paste to form if already submitted (follow conference rules for edits).
-- [ ] Insert Person A’s **evaluation one-liner** into [`pitch-60s.md`](./pitch-60s.md) spoken script.
+- [ ] Confirm poster table uses the same metrics as `results/dvna-evaluation.md` and `results/dvna-adjudication.md`.
+- [ ] Confirm the spoken script in [`pitch-60s.md`](./pitch-60s.md) matches abstract metrics wording.
 - [ ] Update **GitHub URL** in poster, handout, and regenerate **QR** if URL changed.

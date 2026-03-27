@@ -4,13 +4,13 @@ This is the canonical index for evaluation evidence in the repo.
 
 ## 1) DVNA narrative + preliminary tables (legacy location)
 
-- `results/dvna-evaluation.md`: preliminary/incomplete DVNA comparison writeup and tables.
-- `results/person-b-handoff.md`: poster handoff notes and summary stats.
+- `results/dvna-evaluation.md`: current DVNA comparison writeup (frozen runs + adjudicated status snapshot).
+- `results/dvna-adjudication.md`: canonical per-finding TP/FP/FN adjudication sheet and FN policy.
 - Legacy raw logs (DVNA run captures):
   - `results/vibescan-dvna.txt`
   - `results/eslint-dvna.txt`
   - `results/npm-audit-dvna.txt`
-  - `results/bearer-dvna.txt` (or “not run” record)
+  - `results/bearer-dvna.txt`
 
 These legacy captures pre-date the standardized `benchmarks/results/` run-folder layout.
 

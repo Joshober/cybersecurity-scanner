@@ -7,10 +7,10 @@ Small snippets for regression and per-rule smoke checks. Expand over time; map f
 | [`crypto/pos-weak-hash.js`](./crypto/pos-weak-hash.js) | Expect `crypto.hash.weak` |
 | [`injection/pos-sql-concat.js`](./injection/pos-sql-concat.js) | Expect SQL injection / taint signal on DVNA-style concat |
 
-**Ground truth:** Run `npm run build -w vibescan` then:
+**Ground truth:** Run `npm run build` then:
 
 ```bash
-node vibescan/dist/system/cli/index.js scan benchmarks/seeded --format json --exclude-vendor
+npx vibescan scan benchmarks/seeded --format json --exclude-vendor
 ```
 
 and adjudicate findings in [`../results/`](../results/) or a dated run folder.

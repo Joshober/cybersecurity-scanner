@@ -1,26 +1,26 @@
-# VibeScan — Revised conservative abstract
+# VibeScan - revised abstract (current evidence)
 
-## Prior literature motivation
+## Motivation
 
-Recent literature suggests that security quality in LLM-generated backend code remains inconsistent even when systems appear functionally correct. SusVibes reports low security pass rates under prompt-based hardening (arXiv:2512.03262), BaxBench reports substantial residual exploitability in passing backends (arXiv:2502.11844), and other reports highlight recurring weak-secret and package-selection risks, including hallucinated npm package references (Spracklen et al., USENIX Security 2025; Invicti 2025). These findings motivate toolchain-level safeguards rather than prompt-only interventions.
+Recent work on AI-assisted software development shows that functionally correct code can still ship with exploitable security weaknesses. SusVibes and BaxBench report low security pass rates and residual exploitability in generated backend stacks, while other studies and industry datasets highlight weak default secrets and hallucinated package names. These trends motivate a practical, downstream scanner layer rather than relying on prompt hardening alone.
 
-## Our implemented contribution
+## System contribution
 
-VibeScan is a static JavaScript/TypeScript scanner focused on Node/Express-style applications. In the current repository, it implements: (1) AST rule-based detection for crypto and injection patterns, (2) taint-style source-to-sink checks, (3) route/middleware analysis support, (4) optional project-level npm registry checks for slopsquat-style dependency signals (`SLOP-001`), and (5) optional generated security test stubs. These are implementation claims, not all are fully benchmark-validated yet.
+VibeScan is a static JavaScript/TypeScript scanner for Node/Express-style projects. The current implementation combines AST pattern rules (crypto and injection families), taint-style source-to-sink checks, route and middleware heuristics, optional registry verification for slopsquat-style package signals (`SLOP-001`), and optional proof-oriented test scaffolding. Findings map to OWASP/CWE-aligned categories and can be exported in benchmark-friendly JSON/SARIF formats.
 
-## Our measured findings (current evidence)
+## Current measured evidence
 
-Our current evaluation package includes a preliminary DVNA benchmark (`results/dvna-evaluation.md`). Under a first-party-code manual adjudication protocol, VibeScan produced more counted true-positive signals than `eslint-plugin-security` in this setup (8 vs 1 across listed DVNA themes). However, this result is explicitly early-stage: Bearer baseline execution is still pending in the same environment, tool scopes differ (line-level static findings vs dependency advisories), and full TP/FP/FN precision/recall reporting remains future work.
+Our DVNA snapshot now includes captured and adjudicated outputs for VibeScan, eslint-plugin-security, Bearer, and Snyk Code, with frozen run artifacts under `benchmarks/results/` and narrative/adjudication under `results/`. Under the current first-party adjudication protocol (`results/dvna-adjudication.md`), provisional recall is: VibeScan `4/11` (`36.4%`), Bearer `8/11` (`72.7%`), Snyk Code `7/11` (`63.6%`), and eslint-plugin-security `1/11` (`9.1%`). Provisional precision currently reported is VibeScan `80.0%` and Bearer `90.0%` (out-of-scope excluded).
 
-## Future work
+## Interpretation and next steps
 
-To support publication-strength claims, we plan to finalize a reproducible multi-baseline benchmark package with frozen versions, complete Bearer runs, seeded Node/Express cases, and adjudicated TP/FP/FN metrics. The project’s central design claim remains cautious: downstream scanning appears promising as a practical safety layer for LLM-assisted development, but stronger comparative evidence is still being assembled.
+These results are still scope-limited and should not be treated as universal scanner rankings. Tool coverage differs (line-level app findings vs dependency or broader policy checks), and additional seeded and multi-target evaluations remain necessary. The practical claim is conservative: downstream static analysis provides measurable safety signal for AI-assisted workflows, but publication-grade comparative conclusions require continued scope normalization and replication.
 
 ---
 
-### Citation anchors used in this abstract
+### Citation anchors
 
-- Spracklen et al., USENIX Security 2025 (hallucinated npm suggestions)  
-- SusVibes, arXiv:2512.03262  
-- BaxBench, arXiv:2502.11844  
+- Spracklen et al., USENIX Security 2025 (hallucinated npm package suggestions)
+- SusVibes, arXiv:2512.03262
+- BaxBench, arXiv:2502.11844
 - Invicti, 2025 (`supersecretkey` prevalence)

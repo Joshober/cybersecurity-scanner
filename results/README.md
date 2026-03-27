@@ -1,9 +1,15 @@
-# VibeScan research results
+# VibeScan results (narrative + adjudication)
 
 - Canonical index: [`docs/research-strengthening/results-index.md`](../docs/research-strengthening/results-index.md)
 
-## Contents (legacy location)
+## Contents in this folder
 
-- **DVNA benchmark writeup:** [`dvna-evaluation.md`](./dvna-evaluation.md)
-- **Poster handoff:** [`person-b-handoff.md`](./person-b-handoff.md)
-- **Raw logs:** `vibescan-dvna.txt`, `eslint-dvna.txt`, `bearer-dvna.txt`, `npm-audit-dvna.txt`
+- **DVNA benchmark narrative:** [`dvna-evaluation.md`](./dvna-evaluation.md)
+- **Cross-tool adjudication sheet:** [`dvna-adjudication.md`](./dvna-adjudication.md)
+- **Legacy raw logs (reference):** `vibescan-dvna.txt`, `eslint-dvna.txt`, `bearer-dvna.txt`, `npm-audit-dvna.txt`
+
+## Canonical artifact location
+
+Standardized run artifacts (manifests, JSON outputs, adjudication exports, report tables) live under [`../benchmarks/results/`](../benchmarks/results/).
+
+Use this `results/` folder for narrative writeups and adjudication context. Treat `benchmarks/results/` as the source of truth for frozen run artifacts and manifests.

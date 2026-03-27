@@ -34,6 +34,7 @@ import {
 import { buildRunManifest, writeRunManifest } from "./manifest.js";
 import { writeAdjudicationExports } from "./adjudication.js";
 import { writeIdeAssistPrompt } from "./ideAssistPrompt.js";
+import { projectJsonToHtmlReport, projectScanToHtmlReport } from "../htmlReport.js";
 
 const args = process.argv.slice(2);
 let subcommand = "";
@@ -72,6 +73,8 @@ const cliMerge = {
 let fixSuggestions = false;
 let useColor = process.stdout.isTTY;
 let benchmarkMetadata = process.env.VIBESCAN_BENCHMARK === "1";
+let htmlReport = false;
+let htmlOutPath: string | undefined;
 let baselineCliPath: string | undefined;
 let writeBaselinePath: string | undefined;
 let baselineIncludeKnown = false;
@@ -115,6 +118,10 @@ for (let i = 0; i < args.length; i++) {
   const a = args[i];
   if (a === "scan") {
     subcommand = "scan";
+    continue;
+  }
+  if (a === "report") {
+    subcommand = "report";
     continue;
   }
   if (a === "--config" && args[i + 1]) {
@@ -205,8 +212,13 @@ for (let i = 0; i < args.length; i++) {
   } else if (a === "--color" && args[i + 1]) {
     const v = args[++i].toLowerCase();
     useColor = v === "always" ? true : v === "never" ? false : process.stdout.isTTY;
+  } else if (a === "--html") {
+    htmlReport = true;
+  } else if (a === "--html-out" && args[i + 1]) {
+    htmlOutPath = resolve(args[++i]);
   } else if (!a.startsWith("-")) {
     if (subcommand === "scan") inputPaths.push(a);
+    else if (subcommand === "report") inputPaths.push(a);
     else if (!subcommand) {
       subcommand = "scan";
       inputPaths.push(a);
@@ -237,6 +249,8 @@ Options:
   --no-crypto / --no-injection
   --severity critical|error|warning|info
   --format human|compact|json|sarif
+  --html                 Write a static HTML report (default: ./vibescan-report.html)
+  --html-out <path>      HTML report output path
   --exclude-vendor     Skip node_modules, dist, minified bundles, vendor trees
   --ignore-glob <pat>  Extra picomatch glob relative to project root (repeatable)
   --benchmark-metadata JSON: add run{} + findingsPerFile + ruleFamily; or set VIBESCAN_BENCHMARK=1
@@ -252,11 +266,32 @@ Options:
   --write-baseline <file> Write current findings to baseline JSON and exit 0
   --baseline-include-known With --baseline, print deferred findings too (verbose)
   --color always|never|auto
+
+  vibescan report <results.json> [--html-out <path>]
+    Build a static HTML report from a prior --format json output (no rescan).
 `);
 };
 
 if (inputPaths.length === 0) {
   showHelp();
+  process.exit(0);
+}
+
+if (subcommand === "report") {
+  try {
+    const jsonPath = resolve(inputPaths[0]);
+    const outPath = htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
+    const text = readFileSync(jsonPath, "utf-8");
+    const html = projectJsonToHtmlReport(text, {
+      generatedAt: new Date().toISOString(),
+      toolVersion: readScannerPackageVersion(),
+    });
+    writeFileSync(outPath, html, "utf-8");
+    console.error(`Wrote HTML report: ${outPath}`);
+  } catch (e) {
+    console.error(e instanceof Error ? e.message : e);
+    process.exit(1);
+  }
   process.exit(0);
 }
 
@@ -341,6 +376,20 @@ function logScan(msg: string): void {
 function withFilteredFindings(project: ProjectScanResult): ProjectScanResult {
   const findings = applySuppressions(project.findings, suppressions);
   return { ...project, findings };
+}
+
+function emitHtmlReport(projectOut: ProjectScanResult): void {
+  if (!htmlReport) return;
+  const htmlPath = htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
+  const html = projectScanToHtmlReport(projectOut, {
+    generatedAt: new Date().toISOString(),
+    toolVersion: readScannerPackageVersion(),
+    buildId: projectOut.buildId ?? options.buildId,
+  });
+  writeFileSync(htmlPath, html, "utf-8");
+  const msg = `Wrote HTML report: ${htmlPath}`;
+  if (structuredStdout) console.error(msg);
+  else console.log(msg);
 }
 
 function maybeWriteSidecars(
@@ -499,16 +548,19 @@ async function main(): Promise<void> {
   } else {
     if (totalRaw === 0) {
       console.log("No vulnerabilities found.");
+      emitHtmlReport(projectOut);
       process.exit(0);
     }
     if (baselineData && freshFindings.length === 0 && baselineFindings.length > 0 && !baselineIncludeKnown) {
       console.log(
         `No new issues beyond baseline (${baselineFindings.length} known finding(s) deferred — use --baseline-include-known to list them).`
       );
+      emitHtmlReport(projectOut);
       process.exit(exitCode);
     }
     if (totalFindings === 0 && (!baselineData || baselineIncludeKnown)) {
       console.log("No vulnerabilities found.");
+      emitHtmlReport(projectOut);
       process.exit(exitCode);
     }
     const bl = baselineData
@@ -540,6 +592,7 @@ async function main(): Promise<void> {
     }
   }
 
+  emitHtmlReport(projectOut);
   process.exit(exitCode);
 }
 

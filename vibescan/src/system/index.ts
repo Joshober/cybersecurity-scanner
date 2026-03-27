@@ -20,6 +20,14 @@ export {
   findingDisplayFile,
 } from "./format.js";
 export type { FindingsSummary } from "./format.js";
+export {
+  escapeHtml,
+  buildHtmlReport,
+  projectScanToHtmlReport,
+  projectJsonToHtmlReport,
+  extractFindingsFromProjectJson,
+} from "./htmlReport.js";
+export type { HtmlReportFindingRow, HtmlReportMeta } from "./htmlReport.js";
 export { formatProjectSarif, scanResultsToProjectForSarif } from "./sarif.js";
 export type {
   Finding,

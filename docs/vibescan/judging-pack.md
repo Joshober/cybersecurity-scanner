@@ -28,8 +28,8 @@ VibeScan targets failure modes that show up disproportionately in AI-assisted an
 
 1. Rule set / method: OWASP-aligned crypto + injection rules, taint-style flows, Express route graph, optional registry verification (SLOP-001), optional generated tests.
 2. Artifact: prototype (`vibescan` npm package / CLI) with reproducible build and scan commands.
-3. Evaluation: labeled comparison on DVNA vs baseline(s); methodology and logs in `results/` (extend with seeded suite).
-4. Finding: your headline numbers (e.g. DVNA adjudicated 8 vs 1), not literature figures.
+3. Evaluation: labeled DVNA comparison with frozen artifacts in `benchmarks/results/` and adjudication logs in `results/`.
+4. Finding: current first-party recall snapshot is VibeScan `4/11`, Bearer `8/11`, Snyk Code `7/11`, eslint-plugin-security `1/11` (scope-limited; not universal ranking).
 
 ## Safe claims vs risky claims
 
@@ -85,15 +85,15 @@ Judges who care about tiers respect explicit labeling more than a mismatch they 
 
 ## Score band + what to add (practical)
 
-Estimated ~79/100 on a typical CS poster rubric with main risks: incomplete Bearer row, mixed citation tiers, and any broken repo link/QR undermining credibility.
+Estimated ~84/100 on a typical CS poster rubric with main risks: citation tier mixing, scope-overclaiming, and any broken repo link/QR undermining credibility.
 
-With the public GitHub URL + QR aligned and one focused rehearsal (timing + Q&A), a realistic band is ~87/100.
+With a tight limitations statement, clean citation tier wording, and one focused rehearsal (timing + Q&A), a realistic band is ~90/100.
 
 What to add:
 
 1. One rehearsal with a skeptical listener—drill Tier A vs Tier B wording (five seconds each).
-2. Optional research closure: run Bearer on DVNA once (same environment) and fill the table.
-3. Repo visibility: QR must resolve to a public repo before print day.
+2. Optional research closure: add a second benchmark target beyond DVNA to test transferability.
+3. Repo visibility: QR must resolve to a public repo and point to current docs/results pages.
 
 ## If a judge pushes on rigor (talking points)
 

@@ -44,7 +44,7 @@
 
 - DVNA preliminary results:
   - current measured values
-  - caveats (Bearer pending, scope mismatch).
+  - caveats (scope mismatch, snapshot limitations).
 - Seeded benchmark results (when completed):
   - per-case table
   - per-rule/category coverage.
@@ -55,7 +55,7 @@
 
 ## 6. Limitations
 
-- Incomplete baseline execution (if Bearer still pending).
+- Single-benchmark concentration (DVNA-first snapshot).
 - Benchmark representativeness limitations (intentional vulnerabilities vs production).
 - Manual adjudication subjectivity and reviewer variance.
 - Scope mismatch across tools (line-level vs dependency advisory).

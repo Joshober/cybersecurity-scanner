@@ -24,7 +24,7 @@ Use this as the master completion tracker for poster/paper-quality academic pack
 - [x] Bearer baseline run under same DVNA revision/scope as other tools.
 - [x] Frozen version table (Node/npm/tool versions) included in evaluation docs.
 - [x] Adjudication sheet with explicit TP/FP/FN rationale linked to each counted item.
-- [x] Scope-normalized precision/recall calculations for all static baselines.
+- [x] Scope-normalized precision/recall calculations for current static baselines in the DVNA snapshot.
 - [x] Rule-level ablation or contribution breakdown showing which VibeScan modules drive observed gains.
 - [x] Vendor-inclusive sensitivity analysis (separate from first-party primary table; vendor runs may require authentication/licensing).
 
@@ -44,8 +44,8 @@ Evidence (DVNA Bearer parity):
 
 Evidence (vendor sensitivity scaffolding):
 
-- `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (captured auth-required response)
-- `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/reports/sensitivity.md` (separate sensitivity writeup + completion steps)
+- `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (captured run artifact)
+- `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/reports/sensitivity.md` (separate sensitivity analysis notes)
 
 ### Needs implementation
 
@@ -61,10 +61,11 @@ Evidence (vendor sensitivity scaffolding):
 - [ ] Add broader framework support and evaluate transferability.
 - [ ] Conduct inter-rater reliability measurement for adjudication process.
 - [ ] Publish benchmark and labels for external replication.
+- [ ] Re-run all baselines under one finalized primary scope policy for publication table lock.
 
 ### Claim discipline reminders
 
-- [x] Do not present baseline comparison as complete until Bearer parity is finished.
+- [x] Do not present baseline comparison as universal; current evidence is DVNA snapshot only.
 - [x] Do not present implemented features as empirically validated unless they are measured.
 - [x] Keep dependency-level findings (`npm audit`, slopsquat) separate from line-level static detection metrics.
 

@@ -2,6 +2,8 @@
 
 Portable YAML consumed by `@secure-arch/core` and `secure-arch check`.
 
+Canonical usage docs: [`docs/secure-arch/README.md`](../../../docs/secure-arch/README.md).
+
 ## Files
 
 - `settings.global.yaml` — `schemaVersion`, `project`, optional `environments.default` (or per-env keys).
@@ -27,3 +29,9 @@ Portable YAML consumed by `@secure-arch/core` and `secure-arch check`.
 ## Validation
 
 Runtime validation is implemented in `@secure-arch/core` (`validateSettingsDocument`). Unknown keys are ignored by the normalizer.
+
+When using this in-repo workflow, initialize/update settings with:
+
+```bash
+npx secure-arch install --root .
+```

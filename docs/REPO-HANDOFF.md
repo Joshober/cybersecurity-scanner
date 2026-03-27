@@ -2,7 +2,7 @@
 
 This document summarizes **what the repo is**, **how the scanner works**, **what is implemented**, and **where files live**. Paste or attach it when onboarding a new assistant.
 
-**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics, merge strategy) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [results/](../results/) (DVNA benchmark, Person B stats).
+**Related:** [README.md](../README.md) (install, CLI, rule×CWE table) · [docs/research-strengthening/](research-strengthening/) (RQ, methodology, evaluation plan, metrics) · [docs/secure-arch/](secure-arch/) (universal architecture rule pack + `secure-arch` CLI) · [docs/vibescan/](vibescan/) (poster, abstract, pitch, checklist) · [results/](../results/) (DVNA benchmark narrative + adjudication).
 
 ---
 
@@ -11,7 +11,7 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 | Item | Value |
 |------|--------|
 | **Product name** | VibeScan |
-| **npm package** | `vibescan` (published from [`vibescan/`](../vibescan/); scanner `src/` lives under `vibescan/`) |
+| **npm package** | `@jobersteadt/vibescan` (published from [`vibescan/`](../vibescan/); scanner sources live under `vibescan/src/`) |
 | **CLI binaries** | `vibescan`, `secure` (same `vibescan/dist/system/cli/index.js`) |
 | **Language / runtime** | TypeScript → JavaScript, **Node 18+** |
 | **Repo** | [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner) |
@@ -23,7 +23,7 @@ This document summarizes **what the repo is**, **how the scanner works**, **what
 
 - **Evaluated artifact (paper):** VibeScan (`vibescan`) — the scanner in `vibescan/src/` runs via `vibescan`/`secure`, with evidence in `benchmarks/results/`.
 - **Supporting product layer:** `secure-arch` (YAML policy + `secure-arch check`) under `vibescan/packages/secure-arch-*` and `docs/secure-arch/` — use for policy/evidence, but treat as out-of-scope for benchmark numbers unless explicitly evaluated.
-- **Related tooling:** the `vibescan/` package — standalone helpers (e.g. extraction/route graph tooling). Treat as related engineering unless you add it to the evaluation scope.
+- **Related tooling:** secure-arch workspaces under `vibescan/packages/secure-arch-*` — policy/schema/checking and adapter generation integrated with the scanner package.
 
 ## Maturity legend (how to avoid “scope mixing”)
 
@@ -112,41 +112,40 @@ CyberSecurity/
 │   ├── research-strengthening/  ← paper/poster methodology hub
 │   └── vibescan/                ← poster HTML, abstract, pitch, QR, checklist
 ├── architecture/secure-rules/   ← YAML settings (after secure-arch install)
-├── packages/
-│   ├── secure-arch-core/
-│   ├── secure-arch-cli/
-│   └── secure-arch-adapters/
 ├── benchmarks/                  ← DVNA README + seeded corpora + scripts + dated run outputs
 ├── results/                     ← DVNA benchmark outputs + evaluation markdown (legacy; see benchmarks/results/archive)
-├── src/
-│   ├── attacks/
-│   │   ├── index.ts             # cryptoRules[], injectionRules[]
-│   │   ├── crypto/              # SEC-004, JWT, secretDict, entropy, ciphers, …
-│   │   ├── injection/           # SQL, command, proto payloads, …
-│   │   ├── browser/             # XSS
-│   │   └── file/                # Path traversal
-│   └── system/
-│       ├── scanner.ts           # scan, scanProject, scanProjectAsync
-│       ├── cli/index.ts
-│       ├── types.ts
-│       ├── format.ts
-│       ├── walker.ts            # walk, buildParentMap
-│       ├── parser/              # parseFile.ts, routeGraph.ts
-│       ├── engine/              # ruleEngine, taintEngine, audits, testWriter
-│       ├── sources/             # taint sources
-│       ├── sinks/               # taint sinks
-│       ├── sanitizers/
-│       ├── utils/               # rule-types, helpers, …
-│       ├── ai/                  # slopsquat, ipGuard, axiosBypass, envFallback, ai-analyzer
-│       ├── eslint-plugin.ts
-│       └── index.ts
-├── tests/
-│   ├── helpers.mjs
-│   ├── fixtures/
-│   └── unit/*.test.mjs          # node:test (51 tests)
+├── vibescan/
+│   ├── src/
+│   │   ├── attacks/
+│   │   │   ├── index.ts             # cryptoRules[], injectionRules[]
+│   │   │   ├── crypto/              # SEC-004, JWT, secretDict, entropy, ciphers, …
+│   │   │   ├── injection/           # SQL, command, proto payloads, …
+│   │   │   ├── browser/             # XSS
+│   │   │   └── file/                # Path traversal
+│   │   └── system/
+│   │       ├── scanner.ts           # scan, scanProject, scanProjectAsync
+│   │       ├── cli/index.ts
+│   │       ├── types.ts
+│   │       ├── format.ts
+│   │       ├── walker.ts            # walk, buildParentMap
+│   │       ├── parser/              # parseFile.ts, routeGraph.ts
+│   │       ├── engine/              # ruleEngine, taintEngine, audits, testWriter
+│   │       ├── sources/             # taint sources
+│   │       ├── sinks/               # taint sinks
+│   │       ├── sanitizers/
+│   │       ├── utils/               # rule-types, helpers, …
+│   │       ├── ai/                  # slopsquat, ipGuard, axiosBypass, envFallback, ai-analyzer
+│   │       ├── proof/               # local proof-oriented test generators
+│   │       ├── eslint-plugin.ts
+│   │       └── index.ts
+│   ├── tests/
+│   │   ├── helpers.mjs
+│   │   ├── fixtures/
+│   │   └── unit/*.test.mjs          # node:test
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── README.md
 ├── package.json
-├── tsconfig.json
-├── README.md
 └── .gitignore                   # includes dvna/, dist/, node_modules/
 ```
 
@@ -160,16 +159,16 @@ CyberSecurity/
 
 ```bash
 npm install
-npm run build -w vibescan # tsc (scanner under vibescan/)
-npm run build:arch         # build secure-arch workspaces
-npm run test -w vibescan  # build + node --test tests/unit/  (~51 tests)
-npm run test:arch          # secure-arch-core tests
-npm run test -w vibescan  # tests only (dist must exist)
+npm run build                         # builds @jobersteadt/vibescan
+npm run build:arch                    # builds secure-arch workspaces
+npm run test -w @jobersteadt/vibescan # build + node --test vibescan/tests/unit/
+npm run test:arch                     # secure-arch-core tests
 
 # Scan application code only (avoid node_modules):
-npx vibescan scan vibescan/src
-# or
-node vibescan/dist/system/cli/index.js scan vibescan/src --format compact
+npx vibescan scan ./vibescan/src --format compact
+
+# Local proof-oriented tests from static findings:
+npx vibescan prove ./vibescan/src --output ./vibescan-generated-tests
 
 # Optional architecture rulepack + checks:
 npx secure-arch install --root .
@@ -182,10 +181,12 @@ npx secure-arch check --root . --code-evidence js-ts
 
 | Path | Purpose |
 |------|---------|
-| [`results/dvna-evaluation.md`](../results/dvna-evaluation.md) | Tool comparison vs DVNA themes + preliminary evaluation paragraph |
-| [`results/person-b-handoff.md`](../results/person-b-handoff.md) | Secret-dict stats, rule counts for poster |
-| [`results/eslint-dvna.eslintrc.cjs`](../results/eslint-dvna.eslintrc.cjs) | eslint-plugin-security config for DVNA runs |
-| Raw logs | `vibescan-dvna.txt`, `eslint-dvna.txt`, `npm-audit-dvna.txt`, `bearer-dvna.txt` |
+| [`results/dvna-evaluation.md`](../results/dvna-evaluation.md) | Current DVNA snapshot narrative, frozen versions, and provisional precision/recall |
+| [`results/dvna-adjudication.md`](../results/dvna-adjudication.md) | Canonical per-finding TP/FP/FN adjudication sheet and FN policy |
+| [`benchmarks/results/README.md`](../benchmarks/results/README.md) | Canonical location and naming policy for frozen run artifacts |
+| `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/` | Frozen VibeScan DVNA run (manifest + JSON output) |
+| `benchmarks/results/2026-03-25_223217_dvna_bearer/` | Frozen Bearer DVNA run (manifest + JSON output) |
+| `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/` | Frozen Snyk Code DVNA run + sensitivity notes |
 
 ---
 
@@ -196,4 +197,4 @@ npx secure-arch check --root . --code-evidence js-ts
 
 ---
 
-*Last updated to match repo layout and README as of the VibeScan Person A implementation pass.*
+*Last updated to match current monorepo layout and published CLI surface.*

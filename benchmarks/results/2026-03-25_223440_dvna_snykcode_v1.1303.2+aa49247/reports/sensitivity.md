@@ -6,23 +6,24 @@
 
 ## Result (this environment)
 
-Snyk Code requires authentication before it will execute a scan.
+Snyk Code executed successfully after setting the org context and restoring the DVNA source path.
 
 - Raw output (captured): `../snyk-code.json`
-- Error: `Use \`snyk auth\` to authenticate.`
+- Result summary: `36` findings (`4 error`, `27 warning`, `5 note`)
+- Top rule concentration: `javascript/NoRateLimitingForExpensiveWebOperation` (`18` results)
 
 ## How to complete the vendor sensitivity run
 
-1. Authenticate:
+1. Authenticate (if needed):
 
 ```bash
-npx --yes snyk auth
+snyk auth
 ```
 
 2. Re-run and capture JSON:
 
 ```bash
-npx --yes snyk code test benchmarks/dvna/dvna --json > benchmarks/results/<run-id>_dvna_snykcode/snyk-code.json
+snyk code test benchmarks/dvna/dvna --json > benchmarks/results/<run-id>_dvna_snykcode/snyk-code.json
 ```
 
 3. Record versions + DVNA SHA in a `manifest.json` in that run folder.
@@ -30,5 +31,5 @@ npx --yes snyk code test benchmarks/dvna/dvna --json > benchmarks/results/<run-i
 ## Notes / limitations
 
 - Vendor tool licensing/tiers and opaque rule mapping mean results should be reported as **sensitivity** only, separate from the primary (first-party) scope-normalized table.
-- Until authenticated output is captured, this run folder is evidence of **attempt + required precondition**, not a completed baseline.
+- Snyk JSON was generated via PowerShell redirection and is UTF-16 encoded in this run artifact; downstream parsers may need BOM/encoding handling.
 

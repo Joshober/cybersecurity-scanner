@@ -8,7 +8,7 @@
 
 ## Spoken script
 
-Almost one in five package names that coding assistants suggest for your `package.json` **do not exist** on npm—that is a measured hallucination rate from peer-reviewed security research, not a vibe. Teams are shipping whole Express backends from chat while studies show tiny SecPass rates, half of “passing” backends still exploitable, and uneven coverage like perfect SSRF finds but zero CSRF in generated stacks. **VibeScan** is the npm-side answer: it does **spec-free AST route extraction**, **persistent `.test.js` security files for CI**, an **LLM default-secret dictionary**, and a **registry slopsquat detector** that catches fake dependencies before you deploy. On DVNA, VibeScan detected **eight** first-party true positives across Injection, Broken Authentication, Sensitive Data, and Logging themes versus **one** for eslint-plugin-security; **Bearer** is still on our to-run list for a same-environment scan. The point is not cleverer prompts—it is **downstream static analysis** in your pipeline. **It’s the safety layer vibe coding never had.**
+Research keeps showing the same pattern: AI-generated backend code can look correct but still ship exploitable security flaws. **VibeScan** is a practical safety layer for that workflow. It is a static scanner for Node/Express-style JavaScript and TypeScript projects with **AST security rules**, **taint-style flow checks**, **route and middleware heuristics**, an optional **registry slopsquat check**, and optional **generated test scaffolds** for CI. On our current DVNA benchmark snapshot, we captured and adjudicated VibeScan, eslint-plugin-security, Bearer, and Snyk Code under frozen run artifacts. Under the current first-party rubric, provisional recall is **36.4%** for VibeScan, **72.7%** for Bearer, **63.6%** for Snyk Code, and **9.1%** for eslint-plugin-security. Our claim is conservative: this is not a universal ranking, but it shows why downstream scanning belongs in AI-assisted pipelines.
 
 ---
 
@@ -21,8 +21,8 @@ Almost one in five package names that coding assistants suggest for your `packag
 
 ### 2. How did you evaluate it? What are your numbers?
 
-- **DVNA** (Damn Vulnerable Node Application) benchmark vs **eslint-plugin-security** and **Bearer**.
-- **Eight vs one** on first-party DVNA (Injection, Broken Authentication, Sensitive Data, Logging); full adjudication in `results/dvna-evaluation.md`.
+- **DVNA** benchmark with frozen artifacts under `benchmarks/results/` for VibeScan, eslint-plugin-security, Bearer, and Snyk Code.
+- Current first-party adjudicated recall: VibeScan `4/11`, Bearer `8/11`, Snyk Code `7/11`, eslint-plugin-security `1/11` (see `results/dvna-evaluation.md` and `results/dvna-adjudication.md`).
 
 ### 3. Why not just use AI to fix the security issues?
 
@@ -31,7 +31,7 @@ Almost one in five package names that coding assistants suggest for your `packag
 
 ### 4. What is the false positive rate?
 
-- **Honest answer:** [Person A: if you have a number, state it]; else: “We’re measuring FP on DVNA and a small real-app set—early runs prioritize **high-signal rules**; tune thresholds per org.”
+- **Honest answer:** “Current DVNA snapshot precision is `80.0%` for VibeScan and `90.0%` for Bearer, with out-of-scope items excluded; broader rates still need more datasets.”
 - Static analysis always trades **noise vs coverage**; slopsquat uses **registry 404** to stay conservative.
 
 ### 5. What’s next for this project?

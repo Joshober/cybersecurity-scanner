@@ -22,7 +22,7 @@ This folder is the **paper/poster spine**: research question, methodology, evalu
 | [`contribution-audit.md`](./contribution-audit.md) | What the paper claims vs what the repo proves |
 | [`metrics-templates.md`](./metrics-templates.md) | Tables and definitions for TP/FP/FN and summaries |
 | [`abstract-revision-notes.md`](./abstract-revision-notes.md) | Cleanup checklist for `docs/vibescan/abstract.md` |
-| [`jober-newlayout-merge-strategy.md`](./jober-newlayout-merge-strategy.md) | How to split the layout branch without mixing tracks |
+| [`jober-newlayout-merge-strategy.md`](./jober-newlayout-merge-strategy.md) | Historical note on branch-splitting strategy (reference only) |
 
 ## Three tracks (keep mentally separate)
 
@@ -34,15 +34,15 @@ Ship on **`master`** via branch `docs/research-strengthening` (or equivalent): s
 
 **Worth keeping**, vendor-agnostic adapters and YAML settings are a **credible product extension**. For the **academic artifact**, treat secure-arch as **future work built on top of VibeScan**, not the evaluated core contribution—so the paper stays about the scanner + benchmark, not the architecture CLI.
 
-### 3. Architecture / refactor track (`Jober/NewLayout`)
+### 3. Architecture / refactor track (historical)
 
-Merge **only after** build, tests, `vibescan`, and docs commands are verified—and **prefer small PRs** (secure-arch-only, or package-path-only), not one megamerge during benchmark freeze. See [`jober-newlayout-merge-strategy.md`](./jober-newlayout-merge-strategy.md).
+Merge refactors only after build, tests, `vibescan`, and docs commands are verified—and prefer small PRs over large monolithic changes. Historical branch notes remain in [`jober-newlayout-merge-strategy.md`](./jober-newlayout-merge-strategy.md).
 
 ## Merge order (recommended)
 
 1. **Merge research docs into `master`** (evaluation + methodology + abstract cleanup). Keeps the academic story stable while benchmarks are finalized.
-2. **Keep `Jober/NewLayout` open** for product/refactor validation; **do not** block research merges on it.
-3. **Carve `Jober/NewLayout`** into mergeable pieces after `npm install && npm run build && npm test` and `npx secure-arch check` / `npx vibescan scan …` are confirmed on that branch.
+2. **Keep product/refactor work decoupled** from research-doc merges.
+3. **Carve refactors into mergeable pieces** after `npm install && npm run build && npm test` and `npx secure-arch check` / `npx vibescan scan …` are confirmed.
 
 ## Product vs research (secure-arch)
 

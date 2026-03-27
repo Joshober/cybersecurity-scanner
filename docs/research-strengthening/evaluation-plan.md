@@ -24,7 +24,7 @@ Commands and folder layout: [`benchmarking-runbook.md`](./benchmarking-runbook.m
    - Exclude vendor/minified assets in the primary table.
    - Optionally report vendor-inclusive sensitivity in appendix.
 3. Keep the current adjudication logic from `results/dvna-evaluation.md`, but formalize it into a reproducible adjudication sheet.
-4. Run pending baseline (Bearer) in a compatible environment and store raw logs in `results/`.
+4. Re-run baselines in a compatible environment when scope policy changes, and store raw logs/artifacts in `benchmarks/results/`.
 5. Regenerate summary table with no “implied completeness” wording.
 
 ## Phase 2 — Adjudication
@@ -47,14 +47,15 @@ Commands and folder layout: [`benchmarking-runbook.md`](./benchmarking-runbook.m
 
 - **VibeScan** (primary system under test).
 - **eslint-plugin-security** (syntax/rule baseline).
-- **Bearer** (SAST baseline, pending run completion).
+- **Bearer** (SAST baseline).
+- **Snyk Code** (SAST baseline; keep sensitivity analysis separate when scope differs).
 - **npm audit** (dependency advisory baseline; report in separate dependency-focused table).
 
 ## Baseline fairness checklist
 
 - ESLint: same Node project, documented config, same paths as VibeScan where possible.
 - npm audit: run from app root; clarify it does **not** target the same defect classes as static first-party rules.
-- Bearer: run with documented version or **omit** from comparative table.
+- Bearer/Snyk Code: run with documented versions; if scope differs, separate primary table vs sensitivity appendix.
 
 ## Exact metrics
 
@@ -115,6 +116,6 @@ For `npm audit`:
 
 ## Conservative interpretation policy
 
-- Treat current DVNA results as **preliminary** until Bearer and seeded suite are complete.
-- Avoid claims of “best overall” without complete baseline parity.
+- Treat current DVNA results as a **scope-limited snapshot** until multi-target replication is complete.
+- Avoid claims of “best overall” without cross-benchmark parity and fixed scope policy.
 - Keep a dedicated limitations paragraph tied to benchmark representativeness and adjudication subjectivity.

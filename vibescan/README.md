@@ -130,6 +130,7 @@ These subcommands are served by **`vibescan`** (and `secure`):
 | Command | Purpose |
 |--------|---------|
 | `vibescan scan …` | Static analysis (default pipeline). |
+| `vibescan report <results.json>` | Build a **static HTML** report from a prior `--format json` file (no rescan). |
 | `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
 | `vibescan secure-arch init --tool cursor` (or `amazonq`) | Low-level: adapter files only. |
 | `vibescan secure-arch check …` | Validate architecture YAML + optional code evidence. |
@@ -167,6 +168,22 @@ npx vibescan scan . --format sarif > vibescan.sarif
 ```
 
 Exit code is **non-zero** if any finding has severity `critical` or `error` (after [baseline](#baseline-for-ci-rollout), only **new** issues count).
+
+## HTML report (optional, static file)
+
+For demos and non-technical review, add a **single self-contained HTML file** (no server, no frontend stack). Default output path is **`./vibescan-report.html`**.
+
+```bash
+# After a normal scan (terminal output unchanged), also write the HTML report:
+vibescan scan . --exclude-vendor --html
+vibescan scan . --format json --html --html-out ./reports/scan.html
+
+# From a saved JSON artifact (same shape as --format json):
+vibescan report vibescan.json
+vibescan report vibescan.json --html-out ./reports/review.html
+```
+
+The page includes severity summary cards, a filterable findings list (severity, rule, file, free-text search), and expandable rows with location, CWE/OWASP, remediation, safe examples, references, and proof-generation status when present.
 
 ## Baseline for CI rollout
 

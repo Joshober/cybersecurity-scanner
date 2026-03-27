@@ -1,11 +1,13 @@
-# VibeScan — conference materials (Person B)
+# VibeScan conference materials
 
 Assets for poster, abstract, pitch, handout, and QR code. Open HTML files in a browser; print to PDF when ready.
+
+For product/CLI usage, use the canonical docs in [`../../README.md`](../../README.md) and [`../../vibescan/README.md`](../../vibescan/README.md).
 
 | File | Purpose |
 |------|---------|
 | [`../REPO-HANDOFF.md`](../REPO-HANDOFF.md) | **Codebase / architecture summary** for collaborators or LLMs (pipeline, paths, what’s implemented). |
-| [`../research-strengthening/README.md`](../research-strengthening/README.md) | **Academic spine:** RQ, methodology, evaluation, seeded plan, metrics, `Jober/NewLayout` merge strategy. |
+| [`../research-strengthening/README.md`](../research-strengthening/README.md) | **Academic spine:** RQ, methodology, evaluation, seeded plan, and metrics. |
 | [`vibescan-research-poster.html`](./vibescan-research-poster.html) | Main research poster (dark theme, cards, DVNA table per `results/dvna-evaluation.md`). |
 | [`qr-github.svg`](./qr-github.svg) | 120×120-style QR (white modules on `#0a0a0f`) for `https://github.com/Joshober/cybersecurity-scanner`. |
 | [`abstract.md`](./abstract.md) | Paste-up abstract + citation checklist. |
@@ -56,7 +58,7 @@ Adjust colors in the SVG to match the poster if needed.
 2. Print → **Save as PDF** → filename **`vibescan-poster-FINAL.pdf`**.
 3. Zoom to ~25–50% to sanity-check legibility before sending to the poster chair.
 
-## Person A inputs to merge
+## Notes to keep current
 
-- **Bearer** row on the poster: Bearer DVNA raw JSON is now captured under `benchmarks/results/` (see `results/dvna-evaluation.md` for links); update the poster table if it still shows “TODO (not run)”.
-- Rule count on the poster if the frozen inventory changes (optional).
+- Keep the DVNA comparison table aligned with `results/dvna-evaluation.md` and the latest run artifacts in `benchmarks/results/`.
+- Update poster rule-count callouts if the scanner rule inventory changes.
