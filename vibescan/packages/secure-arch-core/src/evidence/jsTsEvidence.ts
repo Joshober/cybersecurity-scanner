@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import fg from "fast-glob";
-import { scanProjectAsync } from "vibescan";
+import { scanProjectAsync } from "@jobersteadt/vibescan";
 import type { ArchitectureFinding } from "../types.js";
 
 const CORRELATION_RULES: Record<string, { archRule: string; message: string; severity: ArchitectureFinding["severity"] }> = {

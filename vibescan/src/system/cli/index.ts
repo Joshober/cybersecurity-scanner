@@ -3,13 +3,12 @@
 // CLI: VibeScan / secure — scan [paths...] — project scan, optional registry check, generated tests.
 
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve, join } from "node:path";
-import { scanAsync, scanProjectAsync } from "../scanner.js";
+import { readFileSync, writeFileSync } from "node:fs";
+import { resolve, join, relative } from "node:path";
+import { scanProjectAsync } from "../scanner.js";
 import {
   formatHuman,
   formatCompact,
-  formatJson,
   formatProjectJson,
   projectFindingsToScanResults,
   readScannerPackageVersion,
@@ -25,6 +24,7 @@ import {
 import { applySuppressions } from "../suppress.js";
 import { buildRunManifest, writeRunManifest } from "./manifest.js";
 import { writeAdjudicationExports } from "./adjudication.js";
+import { writeIdeAssistPrompt } from "./ideAssistPrompt.js";
 
 const args = process.argv.slice(2);
 let subcommand = "";
@@ -33,6 +33,7 @@ let configPathExplicit: string | undefined;
 let manifestPath: string | undefined;
 let adjudicationStem: string | undefined;
 let exportRoutesPath: string | undefined;
+let aiAssistOutPath: string | undefined;
 
 const cliMerge = {
   format: undefined as OutputFormat | undefined,
@@ -116,12 +117,8 @@ for (let i = 0; i < args.length; i++) {
       // applied after merge
       (cliMerge as unknown as { mode?: ScanMode }).mode = m as ScanMode;
     }
-  } else if (a === "--ai-api-url" && args[i + 1]) {
-    (cliMerge as unknown as { aiUrl?: string }).aiUrl = args[++i];
-  } else if (a === "--ai-api-key" && args[i + 1]) {
-    (cliMerge as unknown as { aiKey?: string }).aiKey = args[++i];
-  } else if (a === "--ai-model" && args[i + 1]) {
-    (cliMerge as unknown as { aiModel?: string }).aiModel = args[++i];
+  } else if (a === "--ai-assist-out" && args[i + 1]) {
+    aiAssistOutPath = resolve(args[++i]);
   } else if (a === "--no-crypto") {
     cliMerge.crypto = false;
     cliMerge.rulesSet = true;
@@ -212,7 +209,8 @@ Options:
   --manifest <path>      Write benchmark run manifest JSON
   --export-adjudication <stem>  Write <stem>.json and <stem>.csv (one row per finding)
   --export-routes <path>     Write route inventory JSON (static scan only; merged Express routes)
-  --mode static|ai
+  --mode static|ai           ai = same rules + write IDE paste-in prompt (no API keys)
+  --ai-assist-out <path>     With --mode ai, markdown path (default: <project>/vibescan-ai-assist.md)
   --rules crypto,injection
   --no-crypto / --no-injection
   --severity critical|error|warning|info
@@ -223,13 +221,12 @@ Options:
   --fix-suggestions
   --check-registry     HEAD npm registry for missing packages (slopsquat signal)
   --skip-registry      Skip registry checks
-  --generate-tests [dir]  Emit stub tests under dir (default: ./vibescan-generated-tests)
+  --generate-tests [dir]  Emit runnable test templates under dir (default: ./vibescan-generated-tests)
   --project-root <dir>    package.json resolution for registry check
   --openapi-spec <file>   OpenAPI/Swagger file (repeatable; disables discovery)
   --no-openapi-discovery  Do not auto-find openapi.* / swagger.* under project root
   --build-id <id>         Deployment/build label (JSON output + manifest)
   --color always|never|auto
-  --ai-api-url, --ai-api-key, --ai-model
 `);
 };
 
@@ -277,19 +274,10 @@ const suppressions = merged.suppressions;
 
 const cm = cliMerge as unknown as {
   mode?: ScanMode;
-  aiUrl?: string;
-  aiKey?: string;
-  aiModel?: string;
   generateTests?: boolean;
   generateTestsDir?: string;
 };
 if (cm.mode) options = { ...options, mode: cm.mode };
-if (cm.aiUrl || cm.aiKey || cm.aiModel) {
-  options = {
-    ...options,
-    ai: { apiUrl: cm.aiUrl, apiKey: cm.aiKey, model: cm.aiModel },
-  };
-}
 if (cm.generateTests) {
   options = {
     ...options,
@@ -309,7 +297,7 @@ function findingsFail(fs: Finding[]): boolean {
   return fs.some((f) => f.severity === "critical" || f.severity === "error");
 }
 
-const useAi = options.mode === "ai";
+const useIdeAssist = options.mode === "ai";
 const structuredStdout = format === "json" || format === "sarif";
 
 function logScan(msg: string): void {
@@ -353,68 +341,6 @@ function maybeWriteSidecars(
 async function main(): Promise<void> {
   let exitCode = 0;
 
-  if (useAi) {
-    logScan(`Scanning ${files.length} file${files.length === 1 ? "" : "s"} (AI mode)...`);
-    const results: import("../types.js").ScanResult[] = [];
-    for (const file of files) {
-      const path = resolve(file);
-      if (!existsSync(path)) continue;
-      const source = readFileSync(path, "utf-8");
-      const result = await scanAsync(source, path, options);
-      results.push(result);
-    }
-    let flat: Finding[] = [];
-    for (const r of results) {
-      for (const f of r.findings) flat.push({ ...f, filePath: f.filePath ?? r.filePath });
-    }
-    flat = applySuppressions(flat, suppressions);
-    if (findingsFail(flat)) exitCode = 1;
-    for (const r of results) {
-      const kept = flat.filter((f) => (f.filePath ?? r.filePath) === r.filePath);
-      r.findings = kept;
-    }
-
-    const projectRoot =
-      options.projectRoot ?? (inputPaths.length > 0 ? resolve(inputPaths[0]) : process.cwd());
-    maybeWriteSidecars(flat, projectRoot, { buildId: options.buildId });
-
-    const totalFindings = flat.length;
-    if (format === "json") {
-      console.log(formatJson(results));
-    } else if (format === "sarif") {
-      const { formatProjectSarif, scanResultsToProjectForSarif } = await import("../sarif.js");
-      console.log(formatProjectSarif(scanResultsToProjectForSarif(results)));
-    } else {
-      if (totalFindings === 0) {
-        console.log("No vulnerabilities found.");
-        process.exit(0);
-      }
-      console.log(`\n${totalFindings} vulnerabilit${totalFindings === 1 ? "y" : "ies"} found\n`);
-      if (format === "human") console.log(formatHuman(results, useColor));
-      else console.log(formatCompact(results, useColor));
-    }
-    if (fixSuggestions && format !== "human" && format !== "json" && format !== "sarif" && totalFindings > 0) {
-      console.log("\n--- Fix suggestions ---");
-      for (const r of results) {
-        for (const f of r.findings) {
-          const remed = f.remediation ?? f.fix;
-          if (remed) console.log(`[${f.ruleId}] ${remed}`);
-        }
-      }
-    }
-    if ((format === "json" || format === "sarif") && fixSuggestions && totalFindings > 0) {
-      console.error("\n--- Fix suggestions ---");
-      for (const r of results) {
-        for (const f of r.findings) {
-          const remed = f.remediation ?? f.fix;
-          if (remed) console.error(`[${f.ruleId}] ${remed}`);
-        }
-      }
-    }
-    process.exit(exitCode);
-    return;
-  }
-
   logScan(`Scanning ${files.length} file${files.length === 1 ? "" : "s"}...`);
   const entries = files.map((path) => ({
     path: resolve(path),
@@ -434,6 +360,21 @@ async function main(): Promise<void> {
     buildId: project.buildId ?? options.buildId,
     openApiSpecsUsed: project.openApiSpecsUsed,
   });
+
+  if (useIdeAssist) {
+    const assistPath = aiAssistOutPath ?? join(projectRoot, "vibescan-ai-assist.md");
+    const scannedRelativePaths = entries.map((e) =>
+      relative(projectRoot, e.path).split("\\").join("/")
+    );
+    writeIdeAssistPrompt(assistPath, {
+      projectRoot,
+      findings: project.findings,
+      scannedRelativePaths,
+    });
+    const msg = `Wrote IDE assist prompt (Cursor / Claude Code): ${assistPath}`;
+    if (structuredStdout) console.error(msg);
+    else console.log(msg);
+  }
 
   if (exportRoutesPath) {
     writeFileSync(

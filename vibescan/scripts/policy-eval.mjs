@@ -2,9 +2,12 @@
 /**
  * PoC: evaluate a minimal policy against VibeScan project JSON (stdin or file).
  *
- * Usage:
- *   node scripts/policy-eval.mjs policy.sample.json < scan-output.json
- *   node scripts/policy-eval.mjs policy.sample.json path/to/scan-output.json
+ * Usage (from vibescan package directory):
+ *   node scripts/policy-eval.mjs scripts/policy.sample.json < scan-output.json
+ *   node scripts/policy-eval.mjs scripts/policy.sample.json path/to/scan-output.json
+ *
+ * From repo root:
+ *   node vibescan/scripts/policy-eval.mjs vibescan/scripts/policy.sample.json path/to/scan-output.json
  */
 
 import { readFileSync } from "node:fs";

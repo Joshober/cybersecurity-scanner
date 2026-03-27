@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.0",
-    "vibescan": "file:../..",
+    "@jobersteadt/vibescan": "file:../..",
     "yaml": "^2.6.0"
   },
   "devDependencies": {

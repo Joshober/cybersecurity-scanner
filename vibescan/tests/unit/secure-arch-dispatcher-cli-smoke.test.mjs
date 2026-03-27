@@ -17,9 +17,20 @@ const vendoredSecureCli = join(
   "dist/node_modules/@secure-arch/cli/dist/cli.js"
 );
 const vendorScript = join(vibescanDir, "scripts/vendor-secure-arch-into-vibescan.mjs");
+const vendoredJsTsEvidence = join(
+  vibescanDir,
+  "dist/node_modules/@secure-arch/core/dist/evidence/jsTsEvidence.js"
+);
 
 function ensureVendoredSecureArch() {
-  if (existsSync(vendoredSecureCli)) return;
+  // Do not skip when an old vendor tree exists but @secure-arch/core is stale (e.g. after package rename).
+  if (
+    existsSync(vendoredSecureCli) &&
+    existsSync(vendoredJsTsEvidence) &&
+    readFileSync(vendoredJsTsEvidence, "utf8").includes("@jobersteadt/vibescan")
+  ) {
+    return;
+  }
 
   // Use `cmd.exe` so Windows PATH resolution for `npm` is reliable under the test runner.
   // Avoid nested quoting issues on Windows by passing the prefix path unquoted.

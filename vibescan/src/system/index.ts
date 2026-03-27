@@ -29,7 +29,6 @@ export type {
   SeverityLabel,
   Category,
   ScanMode,
-  AiAnalyzerOptions,
   ProjectScanResult,
   RouteNode,
   RouteInventoryEntry,

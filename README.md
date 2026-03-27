@@ -1,6 +1,6 @@
 # VibeScan
 
-**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The npm package is published as `vibescan`; the CLI binaries are **`vibescan`** and **`secure`**.
+**VibeScan** is a static security scanner for **JavaScript/TypeScript**: it flags common **cryptographic failures** (OWASP **A02:2021**) and **injection** issues (**A03:2021**), with optional npm **registry checks** for slopsquat-style signals and optional **generated tests**. The package **`@jobersteadt/vibescan`** is published to **[npm](https://www.npmjs.com/package/@jobersteadt/vibescan)** and **[GitHub Packages](https://github.com/Joshober/cybersecurity-scanner/pkgs/npm/vibescan)**; the CLI binaries are **`vibescan`** and **`secure`**. **No API keys required** for scanning—see [`vibescan/README.md`](vibescan/README.md) for `npx`, CI template, and GitHub Packages `.npmrc` setup.
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
@@ -21,7 +21,7 @@ VibeScan’s **scanner** lives under [`vibescan/`](vibescan/) (`vibescan/src/`, 
 | Package | Description |
 |---------|-------------|
 | **Root** (private workspace) | Monorepo workspace root |
-| [`vibescan/`](vibescan/) | Published npm package **`vibescan`** — JS/TS static scanner (`vibescan` / `secure`) — see [`vibescan/README.md`](vibescan/README.md) |
+| [`vibescan/`](vibescan/) | Published npm package **`@jobersteadt/vibescan`** — JS/TS static scanner (`vibescan` / `secure`) — see [`vibescan/README.md`](vibescan/README.md) |
 | [`vibescan/packages/secure-arch-core`](vibescan/packages/secure-arch-core/) | Portable settings schema, architecture checks, evidence layer |
 | [`vibescan/packages/secure-arch-cli`](vibescan/packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
 | [`vibescan/packages/secure-arch-adapters`](vibescan/packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
@@ -30,7 +30,17 @@ Repo roles and the “implemented/documented/evaluated/future” maturity legend
 
 ---
 
-## Quick start
+## Use VibeScan in your own project (npm, free)
+
+```bash
+npx --yes @jobersteadt/vibescan@latest scan . --exclude-vendor
+```
+
+Add to CI by copying [`vibescan/templates/github-actions.yml`](vibescan/templates/github-actions.yml) to `.github/workflows/vibescan.yml`. Full consumer docs: [`vibescan/README.md`](vibescan/README.md).
+
+---
+
+## Clone this repo (contributors / monorepo)
 
 ```bash
 git clone https://github.com/Joshober/cybersecurity-scanner.git
@@ -58,7 +68,7 @@ Requires **Node 18+**.
 - **OWASP-aligned** — Crypto and injection classes, plus Express **route/middleware** heuristics and optional **OpenAPI vs code** drift (API inventory).
 - **Shift-left** — CI, pre-commit, or ESLint integration.
 - **Actionable** — Findings include *why* and *how to fix*; several rules carry **CWE** metadata.
-- **Optional checks** — `--check-registry` for dependency names that 404 on the public npm registry; `--generate-tests` for stub security tests.
+- **Optional checks** — `--check-registry` for dependency names that 404 on the public npm registry; `--generate-tests` for security test templates.
 
 ---
 
@@ -102,11 +112,13 @@ Taint engine adds additional findings (e.g. `injection.sql.tainted-flow`) with C
 
 **Registry (project-level):** `SLOP-001` (CWE-829) — optional, `--check-registry`.
 
-**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs scripts/policy.sample.json vibescan-out.json`
+**Policy bridge (PoC):** [`docs/vibescan/secure-arch-policy-bridge.md`](docs/vibescan/secure-arch-policy-bridge.md) · `node vibescan/scripts/policy-eval.mjs vibescan/scripts/policy.sample.json vibescan-out.json`
 
 ---
 
 ## Usage (CLI)
+
+Install: `npm i @jobersteadt/vibescan` (then the `vibescan` / `secure` binaries are on your PATH via `node_modules/.bin`). For a one-off: `npx -p @jobersteadt/vibescan vibescan scan .`
 
 ```bash
 npx vibescan scan .
@@ -179,7 +191,7 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 ## Test
 
 ```bash
-npm test -w vibescan
+npm test -w @jobersteadt/vibescan
 npm run test:arch   # @secure-arch/core (requires build:arch)
 ```
 
@@ -196,7 +208,7 @@ Benchmark outputs and comparison table live under [`results/`](results/) (legacy
 Same rules can run inside ESLint (rule IDs match `SEC-004`, `SSRF-003`, `crypto.*`, `injection.*`, etc.):
 
 ```javascript
-import eslintPluginVibeScan from "vibescan";
+import eslintPluginVibeScan from "@jobersteadt/vibescan";
 
 export default [
   {

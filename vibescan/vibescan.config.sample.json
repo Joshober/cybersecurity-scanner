@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1",
+  "format": "compact",
+  "severityThreshold": "error",
+  "excludeVendor": true,
+  "rules": {
+    "crypto": true,
+    "injection": true
+  },
+  "registry": {
+    "checkRegistry": false,
+    "skipRegistry": false
+  },
+  "suppressions": []
+}

@@ -148,7 +148,7 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
 
     const distIndex = path.resolve(process.cwd(), "vibescan/dist/system/index.js");
     if (!existsSync(distIndex)) {
-      throw new Error(`Scanner build not found at ${distIndex}. Run 'npm run build -w vibescan' from the repo root first.`);
+      throw new Error(`Scanner build not found at ${distIndex}. Run 'npm run build' or 'npm run build -w @jobersteadt/vibescan' from the repo root first.`);
     }
 
     const scanner = await import(pathToFileURL(distIndex).href);

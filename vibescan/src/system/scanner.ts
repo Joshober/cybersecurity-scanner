@@ -16,7 +16,6 @@ import {
 import { runOpenApiDriftAudit, resolveOpenApiSpecPaths } from "./engine/openapiDrift.js";
 import { buildRouteInventory, runRoutePostureFinding } from "./engine/routeInventory.js";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
-import { scanWithAi } from "./ai/ai-analyzer.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";
 
 function getRules(options: ScannerOptions): Rule[] {
@@ -157,15 +156,12 @@ export async function scanProjectAsync(
   return { ...base, packageJsonPath };
 }
 
-// Async scan: when mode is "ai" runs AI analysis; otherwise same result as sync scan().
+// Async wrapper around sync scan (API compatibility for callers; mode does not change per-file results).
 export async function scanAsync(
   source: string,
   filePath: string,
   options: ScannerOptions = {}
 ): Promise<ScanResult> {
-  if (options.mode === "ai") {
-    return scanWithAi(source, filePath, options);
-  }
   return Promise.resolve(scan(source, filePath, options));
 }
 

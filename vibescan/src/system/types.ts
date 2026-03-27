@@ -75,15 +75,8 @@ export interface Finding {
   route?: FindingRouteRef;
 }
 
-// Scan engine: static (AST rules) or AI (LLM reads code and responds).
+/** `static` = rule-based scan only. `ai` = same scan + writes an IDE paste-in prompt (Cursor / Claude Code); no remote API. */
 export type ScanMode = "static" | "ai";
-
-// Options for AI-based analysis (used when mode is "ai").
-export interface AiAnalyzerOptions {
-  apiUrl?: string;
-  apiKey?: string;
-  model?: string;
-}
 
 // Options for the scanner.
 export interface ScannerOptions {
@@ -92,7 +85,6 @@ export interface ScannerOptions {
   crypto?: boolean;
   injection?: boolean;
   mode?: ScanMode;
-  ai?: AiAnalyzerOptions;
   /** npm registry slopsquat check (CLI: --check-registry). */
   checkRegistry?: boolean;
   skipRegistry?: boolean;

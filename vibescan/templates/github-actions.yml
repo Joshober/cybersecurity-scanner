@@ -1,0 +1,37 @@
+# Copy to: .github/workflows/vibescan.yml
+# VibeScan runs on every push/PR using the public npm package (no API keys).
+# Adjust paths or add working-directory if your app is not at the repo root.
+
+name: VibeScan
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vibescan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # --yes: non-interactive npx (npm 9+). Pin version: @jobersteadt/vibescan@1.0.1
+      - name: Static security scan
+        run: npx --yes @jobersteadt/vibescan@latest scan . --exclude-vendor
+
+      # Optional: keep SARIF for local review (fails the job if scanner would fail anyway)
+      # - name: VibeScan (SARIF artifact)
+      #   run: npx --yes @jobersteadt/vibescan@latest scan . --exclude-vendor --format sarif > vibescan.sarif
+      # - uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with:
+      #     name: vibescan-sarif
+      #     path: vibescan.sarif
