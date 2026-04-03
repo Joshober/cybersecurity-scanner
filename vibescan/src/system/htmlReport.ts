@@ -5,7 +5,12 @@
 
 import type { Category, ProjectScanResult, Severity } from "./types.js";
 import { getRuleDocumentation } from "./ruleCatalog.js";
-import { summarizeFindings, summarizeProofCoverage, type FindingsSummary } from "./format.js";
+import {
+  summarizeFindings,
+  summarizeProofCoverage,
+  summarizeProofCoverageByRuleFamily,
+  type FindingsSummary,
+} from "./format.js";
 
 function summarizeRows(rows: HtmlReportFindingRow[]): FindingsSummary {
   const bySeverity: Record<Severity, number> = {
@@ -198,7 +203,8 @@ function severityClass(sev: string | undefined): string {
 
 function proofCoverageSection(
   pc: Record<string, unknown> | undefined,
-  logPath: string | undefined
+  logPath: string | undefined,
+  byFamily: Record<string, unknown> | undefined
 ): string {
   if (!pc || typeof pc !== "object") return "";
   const prov = pc.provable;
@@ -211,6 +217,34 @@ function proofCoverageSection(
   ];
   if (logPath) {
     lines.push(`<p style="margin:0.35rem 0 0;color:var(--muted);">Proof run log: <code>${escapeHtml(logPath)}</code></p>`);
+  }
+  if (byFamily && typeof byFamily === "object" && Object.keys(byFamily).length > 0) {
+    const fams = Object.keys(byFamily).sort((a, b) => a.localeCompare(b));
+    lines.push(
+      `<details style="margin-top:0.6rem;"><summary style="cursor:pointer;color:var(--accent);">By rule family</summary>`,
+      `<table style="width:100%;border-collapse:collapse;margin-top:0.45rem;font-size:0.82rem;"><thead><tr>`,
+      `<th style="text-align:left;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Family</th>`,
+      `<th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">n</th>`,
+      `<th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Provable</th>`,
+      `<th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Cov %</th>`,
+      `</tr></thead><tbody>`
+    );
+    for (const fam of fams) {
+      const row = byFamily[fam] as Record<string, unknown> | undefined;
+      if (!row || typeof row !== "object") continue;
+      const n = row.total_findings;
+      const pr = row.provable;
+      const pct = row.proof_coverage_percent;
+      lines.push(
+        `<tr>`,
+        `<td style="padding:0.2rem 0.35rem;"><code>${escapeHtml(fam)}</code></td>`,
+        `<td style="text-align:right;padding:0.2rem 0.35rem;">${escapeHtml(String(n ?? "—"))}</td>`,
+        `<td style="text-align:right;padding:0.2rem 0.35rem;">${escapeHtml(String(pr ?? "—"))}</td>`,
+        `<td style="text-align:right;padding:0.2rem 0.35rem;">${escapeHtml(String(pct ?? "—"))}</td>`,
+        `</tr>`
+      );
+    }
+    lines.push(`</tbody></table></details>`);
   }
   lines.push(`</section>`);
   return lines.join("");
@@ -252,8 +286,10 @@ export function buildHtmlReport(input: {
   meta?: HtmlReportMeta;
   /** From summary.proofCoverage in project JSON or summarizeProofCoverage(). */
   proofCoverage?: Record<string, unknown>;
+  /** From summary.proofCoverageByRuleFamily when present. */
+  proofCoverageByRuleFamily?: Record<string, unknown>;
 }): string {
-  const { findings, summary, meta, proofCoverage } = input;
+  const { findings, summary, meta, proofCoverage, proofCoverageByRuleFamily } = input;
   const title = "VibeScan security report";
   const when = meta?.generatedAt ?? new Date().toISOString();
   const ver = meta?.toolVersion ?? "";
@@ -540,7 +576,7 @@ ${headExtra}
       <p class="sub">${summary.totalFindings} finding(s) · filter and expand rows below</p>
     </header>
     <div class="cards">${cardHtml}</div>
-    ${proofCoverageSection(proofCoverage, meta?.proofRunLogPath)}
+    ${proofCoverageSection(proofCoverage, meta?.proofRunLogPath, proofCoverageByRuleFamily)}
     <div class="toolbar">
       <div>
         <label for="filter-q">Search</label>
@@ -588,11 +624,16 @@ export function projectScanToHtmlReport(
   const findings = project.findings as unknown as HtmlReportFindingRow[];
   const summary = summarizeFindings(project.findings);
   const proofCoverage = summarizeProofCoverage(project.findings) as unknown as Record<string, unknown>;
+  const proofCoverageByRuleFamily = summarizeProofCoverageByRuleFamily(project.findings) as unknown as Record<
+    string,
+    unknown
+  >;
   return buildHtmlReport({
     findings,
     summary,
     meta: { ...meta, buildId: meta?.buildId ?? project.buildId },
     proofCoverage,
+    proofCoverageByRuleFamily,
   });
 }
 
@@ -607,11 +648,14 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
   const m = metaFromProjectJson(data);
   const summary = summarizeRows(rows);
   let proofCoverage: Record<string, unknown> | undefined;
+  let proofCoverageByRuleFamily: Record<string, unknown> | undefined;
   if (data && typeof data === "object") {
     const sum = (data as Record<string, unknown>).summary;
     if (sum && typeof sum === "object") {
       const pc = (sum as Record<string, unknown>).proofCoverage;
       if (pc && typeof pc === "object") proofCoverage = pc as Record<string, unknown>;
+      const pcf = (sum as Record<string, unknown>).proofCoverageByRuleFamily;
+      if (pcf && typeof pcf === "object") proofCoverageByRuleFamily = pcf as Record<string, unknown>;
     }
   }
   return buildHtmlReport({
@@ -619,5 +663,6 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
     summary,
     meta: { ...meta, buildId: meta?.buildId ?? m.buildId },
     proofCoverage,
+    proofCoverageByRuleFamily,
   });
 }

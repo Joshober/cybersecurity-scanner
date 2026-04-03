@@ -96,6 +96,8 @@ describe("evidence / proof coverage", () => {
       assert.strictEqual(typeof row.deterministic, "boolean");
       assert.strictEqual(typeof row.proofReason, "string");
       assert.strictEqual(typeof row.confidenceScore, "number");
+      assert.ok(row.confidenceDimensions);
+      assert.strictEqual(typeof row.confidenceDimensions.pathPresent, "boolean");
     }
   });
 

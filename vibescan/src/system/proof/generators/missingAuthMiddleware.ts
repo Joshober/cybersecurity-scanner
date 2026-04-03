@@ -5,6 +5,10 @@ import type { Finding } from "../../types.js";
 
 export const missingAuthMiddlewareGenerator: ProofGenerator = {
   id: "route.middleware_missing_auth",
+  harness: {
+    isolation: "mock",
+    notes: "Static route/middleware chain asserted without server listen (Express or Next.js App Router)",
+  },
 
   supports(f: Finding): boolean {
     return f.ruleId === "AUTH-003" || f.ruleId === "AUTH-004";
@@ -71,7 +75,7 @@ test('${ctx.safeBaseName}: route graph shows no recognizable auth middleware (st
         generatorId: "route.middleware_missing_auth",
         deterministic: status === "provable_locally",
         notes:
-          "Structural/static: encodes Express route graph facts from the scan. Does not prove runtime access to a live server — only that the extracted graph lacks recognizable auth middleware per VibeScan heuristics.",
+          "Structural/static: encodes route graph facts from the scan (Express and/or Next.js App Router). Does not prove runtime access to a live server — only that the extracted graph lacks recognizable auth middleware per VibeScan heuristics.",
       },
     };
   },

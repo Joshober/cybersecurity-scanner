@@ -5,7 +5,7 @@
 
 import { createHash } from "node:crypto";
 import type { Finding, ProofGeneration, ProofTierLabel } from "./types.js";
-import { getRuleDocumentation } from "./ruleCatalog.js";
+import { confidenceFromSignals, getRuleDocumentation } from "./ruleCatalog.js";
 
 /** Stable id for `vibescan reproduce` and dashboards (content-derived). */
 export function computeFindingId(f: Finding): string {
@@ -183,6 +183,48 @@ export function summarizeProofCoverage(findings: Finding[]): ProofCoverageSummar
     by_tier: byTier,
     proof_pipeline_not_run: findings.length > 0 && !anyProof,
   };
+}
+
+/** Structured inputs for confidence scoring (deterministic given finding fields). */
+export interface ConfidenceDimensions {
+  pathPresent: boolean;
+  routeExtracted: boolean;
+  middlewareChainKnown: boolean;
+  proofTierLabel: ProofTierLabel;
+  sanitization: "none" | "partial" | "parameterized" | "unknown";
+}
+
+export function confidenceDimensionsForFinding(f: Finding): ConfidenceDimensions {
+  const pm = proofMetricsForFinding(f);
+  const route = f.route;
+  const middlewareChainKnown =
+    (route?.middlewares?.length ?? 0) > 0 || (route?.middlewareEvidence?.length ?? 0) > 0;
+  return {
+    pathPresent: !!(f.sourceLabel && f.sinkLabel),
+    routeExtracted: !!route,
+    middlewareChainKnown,
+    proofTierLabel: pm.proofTierLabel,
+    sanitization: f.evidenceSignals?.sanitization ?? "unknown",
+  };
+}
+
+/**
+ * Confidence 0–1: `confidenceFromSignals` plus small evidence-based adjustments
+ * (path, route, middleware, proof tier, sanitization signal).
+ */
+export function getConfidenceScore(finding: Finding): number {
+  const base = confidenceFromSignals(finding);
+  const d = confidenceDimensionsForFinding(finding);
+  let adj = 0;
+  if (d.pathPresent) adj += 0.03;
+  if (d.routeExtracted) adj += 0.02;
+  if (d.middlewareChainKnown) adj += 0.02;
+  if (d.proofTierLabel === "provable") adj += 0.05;
+  else if (d.proofTierLabel === "partial") adj += 0.03;
+  else if (d.proofTierLabel === "structural") adj += 0.02;
+  if (d.sanitization === "none" && d.pathPresent) adj += 0.02;
+  const v = Math.min(0.98, Math.max(0.32, base + adj));
+  return Math.round(v * 100) / 100;
 }
 
 /** Human-readable basis for numeric confidence (evidence-first wording). */

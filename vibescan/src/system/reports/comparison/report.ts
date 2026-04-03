@@ -69,6 +69,9 @@ export function generateComparisonMarkdown(input: ComparisonReportInput): string
     lines.push(`| Proof pass | ${proofLog.summary.pass} |`);
     lines.push(`| Proof fail | ${proofLog.summary.fail} |`);
     lines.push(`| Proof inconclusive | ${proofLog.summary.inconclusive} |`);
+    if ("flaky" in proofLog.summary) {
+      lines.push(`| Proof flaky (retries) | ${proofLog.summary.flaky} |`);
+    }
     const avg =
       proofLog.summary.executed > 0
         ? Math.round(proofLog.summary.totalDurationMs / proofLog.summary.executed)

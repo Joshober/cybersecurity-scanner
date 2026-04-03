@@ -3,7 +3,9 @@
  */
 
 import { readFileSync } from "node:fs";
-import type { ProofFailureCode } from "../../types.js";
+import type { ProofFailureCode, Category } from "../../types.js";
+import type { SarifRuleMapEntry } from "./ruleMap.js";
+import { mapExternalRuleId } from "./ruleMap.js";
 
 export interface ImportedFindingRow {
   ruleId: string;
@@ -20,6 +22,8 @@ export interface ImportedFindingRow {
   sarifLevel?: string;
   /** Original SARIF result id if present. */
   sarifResultIndex?: number;
+  /** Canonical VibeScan rule id when rule map matched. */
+  mappedRuleId?: string;
   proofTierLabel?: "detection_only";
   proofReason?: string;
   proofGeneration?: {
@@ -46,6 +50,20 @@ function levelToSeverity(level: string | undefined): { severity: string; label: 
   return { severity: "warning", label: "MEDIUM" };
 }
 
+export interface ImportSarifTextOptions {
+  ruleMap?: SarifRuleMapEntry[];
+}
+
+function inferCategoryFromProps(props: Record<string, unknown> | undefined): Category {
+  const tags = props?.tags;
+  if (Array.isArray(tags)) {
+    const t = tags.map((x) => String(x).toLowerCase()).join(" ");
+    if (t.includes("crypto") || t.includes("secret")) return "crypto";
+    if (t.includes("api")) return "api_inventory";
+  }
+  return "injection";
+}
+
 function extractUri(
   loc: Record<string, unknown> | undefined
 ): { file?: string; line: number; column: number } {
@@ -61,7 +79,11 @@ function extractUri(
   };
 }
 
-export function importSarifText(text: string, sourceLabel = "sarif-import"): ImportSarifResult {
+export function importSarifText(
+  text: string,
+  sourceLabel = "sarif-import",
+  options?: ImportSarifTextOptions
+): ImportSarifResult {
   const doc = JSON.parse(text) as {
     runs?: Array<{
       tool?: { driver?: { name?: string; version?: string; informationUri?: string } };
@@ -74,23 +96,29 @@ export function importSarifText(text: string, sourceLabel = "sarif-import"): Imp
   const results = Array.isArray(run?.results) ? run!.results! : [];
   const findings: ImportedFindingRow[] = [];
 
+  const mapEntries = options?.ruleMap ?? [];
+
   results.forEach((raw, idx) => {
     if (!raw || typeof raw !== "object") return;
     const r = raw as Record<string, unknown>;
     const ruleId = String(r.ruleId ?? "imported-unknown");
+    const props = r.properties as Record<string, unknown> | undefined;
+    const mapped = mapEntries.length ? mapExternalRuleId(toolName, ruleId, mapEntries) : undefined;
     const msg = r.message as { text?: string } | undefined;
     const message = String(msg?.text ?? r.message ?? "");
     const { severity, label } = levelToSeverity(r.level as string | undefined);
     const loc0 = Array.isArray(r.locations) ? (r.locations[0] as Record<string, unknown>) : undefined;
     const phys = loc0?.physicalLocation as Record<string, unknown> | undefined;
     const { file, line, column } = extractUri(phys);
+    const category = inferCategoryFromProps(props);
+    const displayRuleId = mapped ?? `${sourceLabel}:${ruleId}`;
 
     findings.push({
-      ruleId: `${sourceLabel}:${ruleId}`,
+      ruleId: displayRuleId,
       message,
       severity,
       severityLabel: label,
-      category: "injection",
+      category,
       line,
       column,
       filePath: file,
@@ -99,15 +127,20 @@ export function importSarifText(text: string, sourceLabel = "sarif-import"): Imp
       toolRuleId: ruleId,
       sarifLevel: r.level as string | undefined,
       sarifResultIndex: idx,
+      ...(mapped ? { mappedRuleId: mapped } : {}),
       proofTierLabel: "detection_only",
-      proofReason: "Imported from external SARIF; VibeScan proof generators not applied.",
+      proofReason: mapped
+        ? "Imported SARIF; rule id mapped to VibeScan. Re-scan or emit-proofs for local proof when context allows."
+        : "Imported from external SARIF; VibeScan proof generators not applied.",
       proofGeneration: {
         status: "unsupported",
         wasGenerated: false,
-        autoFilled: [],
-        manualNeeded: ["Re-scan with VibeScan on source or map rule ids to built-in generators."],
+        autoFilled: mapped ? [`mapped to ${mapped}`] : [],
+        manualNeeded: mapped ? [] : ["Re-scan with VibeScan on source or map rule ids to built-in generators."],
         generatorId: "imported-sarif",
-        failureReason: "Finding originated from imported SARIF; no local proof emitted.",
+        failureReason: mapped
+          ? "Imported SARIF row; merge-scan or emit-proofs can attach proofs when matched to native findings."
+          : "Finding originated from imported SARIF; no local proof emitted.",
         failureCode: "unknown",
       },
     });
@@ -124,7 +157,7 @@ export function importSarifText(text: string, sourceLabel = "sarif-import"): Imp
   };
 }
 
-export function importSarifFromFile(absPath: string): ImportSarifResult {
+export function importSarifFromFile(absPath: string, options?: ImportSarifTextOptions): ImportSarifResult {
   const text = readFileSync(absPath, "utf-8");
-  return importSarifText(text, "sarif-import");
+  return importSarifText(text, "sarif-import", options);
 }

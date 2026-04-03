@@ -131,8 +131,10 @@ These subcommands are served by **`vibescan`** (and `secure`):
 |--------|---------|
 | `vibescan scan …` | Static analysis (default pipeline). |
 | `vibescan reproduce <findingId> --from <project.json>` | Run the **generated proof test** for one finding (from JSON: `findingId`, `proofGeneration.generatedPath`). Requires a prior `prove` / `--generate-tests` run. |
-| `vibescan prove --run --from <project.json> [--output proof-run-log.json]` | Run **`node --test`** on every generated proof in a saved project JSON; writes **`proof-run-log.json`** (pass/fail, duration). Non-zero exit if any proof **fails**. |
-| `vibescan import-sarif <file.sarif> [--output out.json]` | Normalize external SARIF results into VibeScan-shaped JSON (**detection-only** proofs). |
+| `vibescan prove --run --from <project.json> [--output proof-run-log.json] [--retries N]` | Run **`node --test`** on each generated proof; writes **`proof-run-log.json`** (pass/fail, duration, optional **stability** / **perRun** when `N>1`). Non-zero exit if any proof **fails**. |
+| `vibescan import-sarif <file.sarif> [--output out.json] [--rule-map map.json]` | Normalize external SARIF into VibeScan-shaped JSON; optional **rule map** maps tool rule id prefixes to canonical VibeScan ids. |
+| `vibescan import-sarif <file.sarif> --project <root> [--rule-map …] [--emit-proofs <dir>]` | **Merge scan:** native project scan + SARIF rows; drops imports that **collide on file:line** with native findings; optional proof emission. |
+| `vibescan fix-preview --project-root <dir> --patch <file.diff> [--output result.json] [--retries N]` | Copy project to temp trees, **apply patch** (`patch` or `git apply` after `git init`), run scan + proofs **before/after**, print JSON result. |
 | `vibescan comparison-report --vibescan <project.json> [--proof-log …] [--labels …]` | Markdown summary for benchmarks (proof stats + optional labels). |
 | `vibescan report <results.json>` | Build a **static HTML** report from a prior `--format json` file (no rescan). |
 | `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
@@ -173,7 +175,10 @@ VibeScan flags **insecure usage in source**: for example React **`dangerouslySet
 Project JSON (`vibescan scan … --format json`) includes:
 
 - **`summary.proofCoverage`** — counts by proof tier, `proof_coverage_percent`, **`deterministic_proof_percent`** (among generated proofs), and `proof_pipeline_not_run` when no proof pipeline attached findings.
-- Per finding (when using project JSON): **`findingId`**, **`confidenceScore`**, **`confidenceReasons`**, **`rootCause`** / **`causalGraph`** (versioned graph), **`proofTier`** (1–4), **`proofTierLabel`**, **`deterministic`**, **`requiresNetwork`**, **`requiresSecrets`**, **`proofReason`**, optional **`fixPreview`**, and **`proofGeneration.failureReason` / `failureCode`** when proof is partial or unsupported.
+- **`summary.proofCoverageByRuleFamily`** — same tier metrics **per rule family** (plus `unclassified`).
+- Per finding (when using project JSON): **`findingId`**, **`confidenceScore`**, **`confidenceDimensions`** (structured signals), **`confidenceReasons`**, **`rootCause`** / **`causalGraph`**, **`proofTier`** (1–4), **`proofTierLabel`**, **`proofHarness`** (generator metadata when present), **`deterministic`**, **`requiresNetwork`**, **`requiresSecrets`**, **`proofReason`**, optional **`openApiSecurity`** / **`evidenceSignals`**, optional **`fixPreview`**, and **`proofGeneration.failureReason` / `failureCode`** when proof is partial or unsupported.
+
+Authoring proof-backed rules: see **`templates/proof-rule-sdk/README.md`** in the package.
 
 ## CI-friendly output
 

@@ -59,6 +59,67 @@ export interface SpecOperation {
 /** OpenAPI operation with inferred auth requirement (security / security: []). */
 export interface SpecOperationDetail extends SpecOperation {
   requiresAuth: boolean;
+  /** Resolved `security` scheme names for this operation. */
+  securitySchemeRefs: string[];
+  /** Normalized kinds from components.securitySchemes (e.g. bearer, oauth2). */
+  schemeKinds: string[];
+}
+
+function schemeKindFromSchemeObj(obj: Record<string, unknown>): string {
+  const t = obj.type;
+  if (t === "http" && String(obj.scheme ?? "").toLowerCase() === "bearer") return "bearer";
+  if (t === "http" && String(obj.scheme ?? "").toLowerCase() === "basic") return "basic";
+  if (t === "apiKey") return "apiKey";
+  if (t === "oauth2") return "oauth2";
+  if (t === "openIdConnect") return "openIdConnect";
+  if (t === "mutualTLS") return "mutualTLS";
+  return "unknown";
+}
+
+/** Map security scheme name → normalized kind (OAS3 components + Swagger2 securityDefinitions). */
+function buildSecuritySchemeKindIndex(doc: unknown): Map<string, string> {
+  const m = new Map<string, string>();
+  if (!doc || typeof doc !== "object") return m;
+  const root = doc as Record<string, unknown>;
+  const comp = root.components as Record<string, unknown> | undefined;
+  const schemes = comp?.securitySchemes as Record<string, unknown> | undefined;
+  if (schemes && typeof schemes === "object") {
+    for (const [name, obj] of Object.entries(schemes)) {
+      if (obj && typeof obj === "object") {
+        m.set(name, schemeKindFromSchemeObj(obj as Record<string, unknown>));
+      }
+    }
+  }
+  const sd = root.securityDefinitions as Record<string, unknown> | undefined;
+  if (sd && typeof sd === "object") {
+    for (const [name, obj] of Object.entries(sd)) {
+      if (obj && typeof obj === "object" && !m.has(name)) {
+        m.set(name, schemeKindFromSchemeObj(obj as Record<string, unknown>));
+      }
+    }
+  }
+  return m;
+}
+
+function securityRefNames(security: unknown): string[] {
+  if (!Array.isArray(security)) return [];
+  const names: string[] = [];
+  for (const item of security) {
+    if (item && typeof item === "object") {
+      names.push(...Object.keys(item as object));
+    }
+  }
+  return names;
+}
+
+function securityRefsForOperation(
+  opRec: Record<string, unknown>,
+  globalSecurity: unknown
+): string[] {
+  if (Object.prototype.hasOwnProperty.call(opRec, "security")) {
+    return securityRefNames(opRec.security);
+  }
+  return securityRefNames(globalSecurity);
 }
 
 function computeRequiresAuth(
@@ -85,6 +146,7 @@ function extractOperationDetailsFromDoc(doc: unknown, specFile: string): SpecOpe
   const o = doc as Record<string, unknown>;
   const paths = o.paths;
   const globalSecurity = o.security;
+  const schemeIndex = buildSecuritySchemeKindIndex(doc);
   if (!paths || typeof paths !== "object") return [];
   const out: SpecOperationDetail[] = [];
   for (const [pathTemplate, item] of Object.entries(paths as Record<string, unknown>)) {
@@ -96,12 +158,17 @@ function extractOperationDetailsFromDoc(doc: unknown, specFile: string): SpecOpe
       const opRec = op as Record<string, unknown>;
       const segs = openApiPathToSegments(pathTemplate);
       const structure = structureKey(segs);
+      const requiresAuth = computeRequiresAuth(opRec, globalSecurity);
+      const securitySchemeRefs = securityRefsForOperation(opRec, globalSecurity);
+      const schemeKinds = [...new Set(securitySchemeRefs.map((r) => schemeIndex.get(r) ?? "unknown"))];
       out.push({
         method: method.toUpperCase(),
         pathTemplate,
         specFile,
         structure,
-        requiresAuth: computeRequiresAuth(opRec, globalSecurity),
+        requiresAuth,
+        securitySchemeRefs,
+        schemeKinds,
       });
     }
   }
@@ -228,8 +295,8 @@ export function runOpenApiDriftAudit(routes: RouteNode[], specPaths: string[]): 
 
   for (const [key, route] of codeByKey) {
     if (!specByKey.has(key)) {
-      findings.push(
-        baseFinding(
+      findings.push({
+        ...baseFinding(
           "API-INV-001",
           `Express route not documented in OpenAPI: ${route.method} ${route.fullPath}`,
           "Undocumented endpoints expand attack surface and hide authorization gaps (OWASP API9). Clients and gateways may omit them from policy, tests, and review.",
@@ -237,18 +304,23 @@ export function runOpenApiDriftAudit(routes: RouteNode[], specPaths: string[]): 
           route.file,
           route.line,
           "OPENAPI_UNDOCUMENTED_ROUTE"
-        )
-      );
+        ),
+        route: findingRouteFromNode(route),
+      });
     }
   }
 
   for (const [key, specOp] of specByKey) {
     const route = codeByKey.get(key);
     if (route && specOp.requiresAuth && !chainMatchesList(route.middlewares, AUTH_MIDDLEWARE)) {
+      const kinds =
+        specOp.schemeKinds.length > 0 ? specOp.schemeKinds.join(", ") : "unknown-scheme";
+      const refs =
+        specOp.securitySchemeRefs.length > 0 ? specOp.securitySchemeRefs.join(", ") : "—";
       findings.push({
         ...baseFinding(
           "API-AUTH-001",
-          `OpenAPI requires auth for ${specOp.method} ${specOp.pathTemplate}, but static route lacks recognizable auth middleware: ${route.method} ${route.fullPath}`,
+          `OpenAPI requires auth (${kinds}; schemes: ${refs}) for ${specOp.method} ${specOp.pathTemplate}, but static route lacks recognizable auth middleware: ${route.method} ${route.fullPath}`,
           "The published contract marks this operation as secured; if the live handler is public, clients and gateways may misjudge exposure (OWASP API2/API5).",
           "Enforce authentication consistent with the spec, or adjust the OpenAPI security requirements to match reality.",
           route.file,
@@ -256,6 +328,12 @@ export function runOpenApiDriftAudit(routes: RouteNode[], specPaths: string[]): 
           "OPENAPI_AUTH_MISMATCH"
         ),
         route: findingRouteFromNode(route),
+        openApiSecurity: {
+          schemeRefs: specOp.securitySchemeRefs,
+          schemeKinds: specOp.schemeKinds,
+          specFile: specOp.specFile,
+          pathTemplate: specOp.pathTemplate,
+        },
       });
     }
   }

@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import {
   summarizeFindings,
+  summarizeProofCoverageByRuleFamily,
   formatProjectJson,
   findingToJson,
   sortFindingsStable,
@@ -142,6 +143,63 @@ app.post('/api/login', (req, res) => { res.send('ok'); });
       json.findings.map((f) => f.ruleId),
       sorted.map((f) => f.ruleId)
     );
+  });
+
+  it("summarizeProofCoverageByRuleFamily buckets unclassified and per-family tiers", () => {
+    const findings = [
+      {
+        ruleId: "crypto.hash.weak",
+        message: "m",
+        severity: "error",
+        severityLabel: "HIGH",
+        category: "crypto",
+        line: 1,
+        column: 0,
+        proofGeneration: {
+          status: "provable_locally",
+          wasGenerated: true,
+          generatorId: "g",
+          autoFilled: [],
+          manualNeeded: [],
+        },
+      },
+      {
+        ruleId: "UNKNOWN-XYZ",
+        message: "u",
+        severity: "warning",
+        severityLabel: "MEDIUM",
+        category: "injection",
+        line: 2,
+        column: 0,
+      },
+    ];
+    const byFam = summarizeProofCoverageByRuleFamily(findings);
+    assert.ok(byFam["crypto.hash"]);
+    assert.strictEqual(byFam["crypto.hash"].total_findings, 1);
+    assert.strictEqual(byFam["crypto.hash"].provable, 1);
+    assert.ok(byFam.unclassified);
+    assert.strictEqual(byFam.unclassified.total_findings, 1);
+  });
+
+  it("formatProjectJson includes proofCoverageByRuleFamily in summary", () => {
+    const project = {
+      fileResults: [],
+      routes: [],
+      findings: [
+        {
+          ruleId: "crypto.hash.weak",
+          message: "w",
+          severity: "error",
+          severityLabel: "HIGH",
+          category: "crypto",
+          line: 1,
+          column: 0,
+        },
+      ],
+    };
+    const json = JSON.parse(formatProjectJson(project));
+    assert.ok(json.summary.proofCoverageByRuleFamily);
+    assert.ok(json.summary.proofCoverageByRuleFamily["crypto.hash"]);
   });
 
   it("formatProjectJson benchmarkMetadata adds run, findingsPerFile, ruleFamily", () => {

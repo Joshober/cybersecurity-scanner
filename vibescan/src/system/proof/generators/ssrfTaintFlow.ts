@@ -7,6 +7,7 @@ const SSRF_RULE_RE =
 
 export const ssrfTaintFlowGenerator: ProofGenerator = {
   id: "taint.ssrf_sink",
+  harness: { isolation: "mock", notes: "Stubbed request/URL sink; no live egress" },
 
   supports(f: Finding): boolean {
     return SSRF_RULE_RE.test(f.ruleId) || f.findingKind === "INSUFFICIENT_SSRF_DEFENSE";

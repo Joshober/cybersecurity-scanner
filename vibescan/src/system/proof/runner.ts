@@ -10,6 +10,15 @@ import type { Finding } from "../types.js";
 
 export type ProofRunResult = "pass" | "fail" | "inconclusive";
 
+/** Per-attempt outcome when `--retries` > 1. */
+export type ProofRunStability = "stable" | "flaky" | "error";
+
+export interface ProofRunAttempt {
+  durationMs: number;
+  exitCode: number | null;
+  result: ProofRunResult;
+}
+
 export interface ProofRunEntry {
   findingId: string;
   ruleId: string;
@@ -17,17 +26,27 @@ export interface ProofRunEntry {
   proofGenerated: boolean;
   proofExecuted: boolean;
   result: ProofRunResult;
-  durationMs: number;
+  /** Last run exit code (same as final attempt when retries=1). */
   exitCode: number | null;
+  /** Sum of all attempt durations. */
+  durationMs: number;
   stderrTail?: string;
   /** Heuristic: non-zero exit with empty tests or spawn error. */
   envNotes?: string[];
+  /** Number of `node --test` attempts for this proof file. */
+  retries?: number;
+  /** Each attempt’s outcome (length equals retries when executed). */
+  perRun?: ProofRunAttempt[];
+  /** stable: all attempts agreed; flaky: mixed pass/fail; error: spawn or no-tests. */
+  stability?: ProofRunStability;
 }
 
 export interface ProofRunLog {
   version: 1;
   generatedAt: string;
   fromJson?: string;
+  /** Retries per proof file (default 1). */
+  retriesPerFile?: number;
   entries: ProofRunEntry[];
   summary: {
     total: number;
@@ -35,6 +54,8 @@ export interface ProofRunLog {
     pass: number;
     fail: number;
     inconclusive: number;
+    /** Entries where stability is flaky (omitted in older logs). */
+    flaky?: number;
     totalDurationMs: number;
   };
 }
@@ -137,6 +158,57 @@ export interface RunProofHarnessOptions {
   fromJson: string;
   /** Write log here (default: proof-run-log.json next to fromJson). */
   outputLog?: string;
+  /** Run each proof test file this many times (default 1). Mixed outcomes mark flaky. */
+  retries?: number;
+}
+
+function aggregateRetries(attempts: ProofRunAttempt[]): {
+  result: ProofRunResult;
+  stability: ProofRunStability;
+  durationMs: number;
+  exitCode: number | null;
+  envNotes: string[];
+} {
+  const durationMs = attempts.reduce((s, a) => s + a.durationMs, 0);
+  const last = attempts[attempts.length - 1];
+  const exitCode = last?.exitCode ?? null;
+  const outcomes = attempts.map((a) => a.result);
+  const hasPass = outcomes.includes("pass");
+  const hasFail = outcomes.includes("fail");
+  const hasInc = outcomes.includes("inconclusive");
+
+  if (outcomes.every((o) => o === "pass")) {
+    return { result: "pass", stability: "stable", durationMs, exitCode, envNotes: [] };
+  }
+  if (outcomes.every((o) => o === "fail")) {
+    return { result: "fail", stability: "stable", durationMs, exitCode, envNotes: [] };
+  }
+  if (hasPass && hasFail) {
+    return {
+      result: "inconclusive",
+      stability: "flaky",
+      durationMs,
+      exitCode,
+      envNotes: ["Mixed pass/fail across retries."],
+    };
+  }
+  if ((hasPass || hasFail) && hasInc) {
+    return {
+      result: "inconclusive",
+      stability: "flaky",
+      durationMs,
+      exitCode,
+      envNotes: ["Mixed outcomes across retries (includes inconclusive)."],
+    };
+  }
+  const spawnFail = attempts.some((a) => a.exitCode === null);
+  return {
+    result: "inconclusive",
+    stability: spawnFail ? "error" : "stable",
+    durationMs,
+    exitCode,
+    envNotes: spawnFail ? ["Runner error on at least one attempt (null exit)."] : [],
+  };
 }
 
 /**
@@ -147,6 +219,7 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
   if (!existsSync(fromJson)) {
     throw new Error(`Proof harness: JSON not found: ${fromJson}`);
   }
+  const retries = Math.max(1, Math.min(20, options.retries ?? 1));
   const text = readFileSync(fromJson, "utf-8");
   const rows = rowsFromJson(text);
   const findings = rows.length ? rows.map(syntheticFindingFromRow) : loadFindingsFromProjectJson(text);
@@ -156,6 +229,7 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
   let pass = 0;
   let fail = 0;
   let inconclusive = 0;
+  let flaky = 0;
   let executed = 0;
   let totalDurationMs = 0;
 
@@ -176,6 +250,7 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
         durationMs: 0,
         exitCode: null,
         envNotes: ["No generated proof path on this finding."],
+        stability: "error",
       });
       inconclusive++;
       continue;
@@ -193,21 +268,35 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
         durationMs: 0,
         exitCode: null,
         envNotes: [`File not found: ${testPath}`],
+        stability: "error",
       });
       inconclusive++;
       continue;
     }
 
     executed++;
-    const run = runOneTestFile(testPath);
-    totalDurationMs += run.durationMs;
-    const { result, envNotes } = resultFromExit(run.exitCode, run.stderr, run.error);
-    if (result === "pass") pass++;
-    else if (result === "fail") fail++;
+    const attempts: ProofRunAttempt[] = [];
+    let lastStderr = "";
+    for (let i = 0; i < retries; i++) {
+      const run = runOneTestFile(testPath);
+      lastStderr = run.stderr;
+      const { result: r0 } = resultFromExit(run.exitCode, run.stderr, run.error);
+      attempts.push({
+        durationMs: run.durationMs,
+        exitCode: run.exitCode,
+        result: r0,
+      });
+    }
+
+    const agg = aggregateRetries(attempts);
+    totalDurationMs += agg.durationMs;
+    if (agg.stability === "flaky") flaky++;
+    if (agg.result === "pass") pass++;
+    else if (agg.result === "fail") fail++;
     else inconclusive++;
 
     const stderrTail =
-      run.stderr.length > 400 ? `${run.stderr.slice(-400)}` : run.stderr || undefined;
+      lastStderr.length > 400 ? `${lastStderr.slice(-400)}` : lastStderr || undefined;
 
     entries.push({
       findingId,
@@ -215,11 +304,14 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
       generatedPath: testPath,
       proofGenerated,
       proofExecuted: true,
-      result,
-      durationMs: run.durationMs,
-      exitCode: run.exitCode,
+      result: agg.result,
+      durationMs: agg.durationMs,
+      exitCode: agg.exitCode,
+      retries,
+      perRun: attempts,
+      stability: agg.stability,
       ...(stderrTail ? { stderrTail } : {}),
-      ...(envNotes.length ? { envNotes } : {}),
+      ...(agg.envNotes.length ? { envNotes: agg.envNotes } : {}),
     });
   }
 
@@ -227,6 +319,7 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
     version: 1,
     generatedAt: new Date().toISOString(),
     fromJson,
+    retriesPerFile: retries,
     entries,
     summary: {
       total: entries.length,
@@ -234,6 +327,7 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
       pass,
       fail,
       inconclusive,
+      flaky,
       totalDurationMs,
     },
   };

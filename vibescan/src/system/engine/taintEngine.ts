@@ -388,6 +388,11 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
     const sev: Severity =
       severity === "critical" ? "critical" : severity === "warning" ? "warning" : "error";
 
+    const evidenceSignals: Finding["evidenceSignals"] | undefined =
+      ruleId === "injection.sql.tainted-flow"
+        ? { sanitization: "none" }
+        : { sanitization: "unknown" };
+
     const finding: Finding = {
       ruleId,
       message,
@@ -407,6 +412,7 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
       endColumn: loc.end?.column,
       filePath: opts.filePath,
       source: source.split("\n")[loc.start.line - 1],
+      evidenceSignals,
     };
     findings.push(finding);
   }

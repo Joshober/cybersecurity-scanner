@@ -4,6 +4,7 @@ import type { Finding } from "../../types.js";
 
 export const prototypePollutionGenerator: ProofGenerator = {
   id: "prototype.pollution",
+  harness: { isolation: "pure", notes: "In-process merge/__proto__ harness" },
 
   supports(f: Finding): boolean {
     return (

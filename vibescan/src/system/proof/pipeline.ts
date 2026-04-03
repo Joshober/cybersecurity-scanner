@@ -55,6 +55,7 @@ export function emitProofTests(
     }
 
     const result = gen.emit(f, ctx);
+    if (gen.harness) f.proofHarness = gen.harness;
     if (!result.body.trim()) {
       f.proofGeneration = result.proofGeneration;
       continue;

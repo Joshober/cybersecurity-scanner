@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ProjectScanResult, Finding, ScanResult } from "./types.js";
+import { attachProofFailureReason } from "./evidence.js";
 import { findingDisplayFile } from "./format.js";
 
 function toolVersion(): string {
@@ -58,6 +59,7 @@ export function formatProjectSarif(project: ProjectScanResult): string {
   const results = findings.map((f) => {
     const uri = findingDisplayFile(f) || "unknown";
     const line = Math.max(1, f.line || 1);
+    const pg = f.proofGeneration ? attachProofFailureReason({ ...f.proofGeneration }) : undefined;
     return {
       ruleId: f.ruleId,
       level: severityToLevel(f.severity),
@@ -66,9 +68,11 @@ export function formatProjectSarif(project: ProjectScanResult): string {
         category: f.category,
         cwe: f.cwe,
         remediation: f.remediation ?? f.fix,
-        ...(f.proofGeneration
+        ...(pg
           ? {
-              vibescanProofGeneration: f.proofGeneration,
+              vibescanProofGeneration: pg,
+              ...(pg.failureCode != null ? { vibescanProofFailureCode: pg.failureCode } : {}),
+              ...(pg.failureReason != null ? { vibescanProofFailureReason: pg.failureReason } : {}),
             }
           : {}),
       },

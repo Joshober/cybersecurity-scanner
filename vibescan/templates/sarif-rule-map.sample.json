@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "mappings": [
+    {
+      "tool": "CodeQL",
+      "ruleIdPrefix": "js/hardcoded-credentials",
+      "mapToRuleId": "crypto.jwt.weak-secret-literal"
+    },
+    {
+      "tool": "Semgrep",
+      "ruleIdPrefix": "javascript.lang.security.audit",
+      "mapToRuleId": "injection.eval"
+    }
+  ]
+}

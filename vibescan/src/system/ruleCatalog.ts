@@ -333,7 +333,7 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "mw.cookie.missing-flags": doc({
     title: "Session cookie missing security flags",
-    pattern: "Set-Cookie missing httpOnly and/or secure in Express-style handlers.",
+    pattern: "Set-Cookie missing httpOnly and/or secure in Express-style or similar HTTP handlers.",
     risk: "Token theft via XSS or downgraded connections.",
     falsePositives: "Intentionally public cookies (not session tokens).",
     remediation: "httpOnly: true, secure: true, sameSite: 'strict' or 'lax'.",
@@ -353,9 +353,9 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "AUTH-003": doc({
     title: "Missing auth middleware",
-    pattern: "Sensitive route has no auth middleware in Express graph.",
+    pattern: "Sensitive route has no recognizable auth middleware in the static route graph (Express or Next.js App Router).",
     risk: "Unauthenticated access to privileged operations.",
-    falsePositives: "Global auth in unmodeled wrapper; non-Express frameworks.",
+    falsePositives: "Global auth in unmodeled wrapper; Next.js root middleware or layouts not modeled as per-route middleware; other frameworks.",
     remediation: "Attach requireAuth (or equivalent) before handlers on sensitive verbs.",
     secureExample: "router.post('/admin/users', requireAuth, requireRole('admin'), handler);",
     defaultConfidence: 0.72,
@@ -443,9 +443,9 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "API-INV-001": doc({
     title: "Undocumented API route (OpenAPI drift)",
-    pattern: "Express route exists with no matching OpenAPI operation.",
+    pattern: "Static route (Express or Next.js App Router) exists with no matching OpenAPI operation.",
     risk: "Hidden endpoints skip contract tests, gateway policy, and review.",
-    falsePositives: "Non-Express servers, dynamic routes, or multi-service graphs.",
+    falsePositives: "Servers not modeled here, dynamic routes, or multi-service graphs.",
     remediation: "Add the operation to OpenAPI or document why it is out of scope.",
     secureExample: "// Mirror routes in openapi.yaml with security schemes",
     defaultConfidence: 0.68,
@@ -453,7 +453,7 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "API-INV-002": doc({
     title: "Ghost OpenAPI operation",
-    pattern: "Spec declares an operation static Express extraction did not find.",
+    pattern: "Spec declares an operation static route extraction (Express / Next.js App Router) did not find.",
     risk: "Dead documentation confuses consumers; may hide removed attack surface.",
     falsePositives: "Handlers in another language, gateway-only routes.",
     remediation: "Remove stale spec paths or align code with the published contract.",
@@ -463,9 +463,9 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "API-AUTH-001": doc({
     title: "OpenAPI security requirement vs static middleware",
-    pattern: "Operation declares security in OpenAPI; Express route graph shows no recognizable auth middleware.",
+    pattern: "Operation declares security in OpenAPI; static route graph shows no recognizable auth middleware (Express or Next.js App Router handlers).",
     risk: "Contract says authenticated; static analysis suggests a public handler—verify authorization.",
-    falsePositives: "Custom auth wrappers, gateway auth, or non-Express stacks.",
+    falsePositives: "Custom auth wrappers, gateway auth, Next.js middleware or session checks not shown as Express-style middleware chains.",
     remediation: "Add middleware matching your spec security scheme or align the spec with deployment behavior.",
     secureExample: "// app.use('/api', authenticate); app.get('/items/:id', handler)",
     defaultConfidence: 0.62,
@@ -498,7 +498,8 @@ export function getRuleDocumentation(ruleId: string): RuleDocumentation {
   return CATALOG[ruleId] ?? prefixMatch(ruleId) ?? GENERIC;
 }
 
-function confidenceFromSignals(f: Finding): number {
+/** Base 0–1 score from rule family / taint heuristics (used with structured dimensions). */
+export function confidenceFromSignals(f: Finding): number {
   const kind = f.findingKind as FindingKind | undefined;
   if (kind === "SLOPSQUAT_CANDIDATE" || kind === "POSSIBLY_PRIVATE" || f.ruleId === "SLOP-001") {
     return 0.62;
@@ -507,11 +508,6 @@ function confidenceFromSignals(f: Finding): number {
   if (f.ruleId.startsWith("AUTH-") || f.ruleId.startsWith("MW-")) return 0.71;
   if (f.ruleId.startsWith("API-")) return 0.63;
   return getRuleDocumentation(f.ruleId).defaultConfidence;
-}
-
-/** Confidence score (0–1) for display and JSON export. */
-export function getConfidenceScore(finding: Finding): number {
-  return Math.round(confidenceFromSignals(finding) * 100) / 100;
 }
 
 export const RULE_REFERENCE_README_ANCHOR = DOC_BASE;

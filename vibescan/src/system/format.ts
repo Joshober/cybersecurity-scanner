@@ -1,10 +1,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Finding, ScanResult, ProjectScanResult, Severity, Category } from "./types.js";
-import { getConfidenceScore, getRuleDocumentation, type RuleDocumentation } from "./ruleCatalog.js";
+import { getRuleDocumentation, type RuleDocumentation } from "./ruleCatalog.js";
 import {
   computeFindingId,
   summarizeProofCoverage,
+  getConfidenceScore,
+  confidenceDimensionsForFinding,
   confidenceReasonForFinding,
   confidenceReasonsForFinding,
   rootCauseGraphForFinding,
@@ -13,10 +15,33 @@ import {
   proofMetricsForFinding,
   fixPreviewForFinding,
   attachProofFailureReason,
+  type ProofCoverageSummary,
 } from "./evidence.js";
 
 export { summarizeProofCoverage } from "./evidence.js";
 export type { ProofCoverageSummary, ProofMetrics } from "./evidence.js";
+
+/** Proof tier counts per rule family (`unclassified` when `ruleFamilyForRuleId` is undefined). */
+export function summarizeProofCoverageByRuleFamily(
+  findings: Finding[]
+): Record<string, ProofCoverageSummary> {
+  const buckets = new Map<string, Finding[]>();
+  for (const f of findings) {
+    const fam = ruleFamilyForRuleId(f.ruleId) ?? "unclassified";
+    let arr = buckets.get(fam);
+    if (!arr) {
+      arr = [];
+      buckets.set(fam, arr);
+    }
+    arr.push(f);
+  }
+  const out: Record<string, ProofCoverageSummary> = {};
+  for (const fam of [...buckets.keys()].sort((a, b) => a.localeCompare(b))) {
+    const list = buckets.get(fam)!;
+    out[fam] = summarizeProofCoverage(list);
+  }
+  return out;
+}
 
 /** Aggregated counts for benchmarks / CI. */
 export interface FindingsSummary {
@@ -273,6 +298,7 @@ export function findingToJson(
   const fixPv = includeEvidenceFields ? fixPreviewForFinding(f) : undefined;
   const conf = getConfidenceScore(f);
   const pm = includeEvidenceFields ? proofMetricsForFinding(f) : undefined;
+  const confDims = includeEvidenceFields ? confidenceDimensionsForFinding(f) : undefined;
   const row: Record<string, unknown> = {
     ruleId: f.ruleId,
     message: f.message,
@@ -298,7 +324,9 @@ export function findingToJson(
     filePath: f.filePath,
     confidence: conf,
     ...(f.route ? { route: f.route } : {}),
+    ...(f.openApiSecurity ? { openApiSecurity: f.openApiSecurity } : {}),
     ...(f.proofHints ? { proofHints: f.proofHints } : {}),
+    ...(f.proofHarness && includeEvidenceFields ? { proofHarness: f.proofHarness } : {}),
     ...(f.proofGeneration
       ? { proofGeneration: attachProofFailureReason({ ...f.proofGeneration }) }
       : {}),
@@ -323,6 +351,7 @@ export function findingToJson(
               }
             : {}),
           ...(fixPv ? { fixPreview: fixPv } : {}),
+          ...(confDims ? { confidenceDimensions: confDims } : {}),
         }
       : {}),
   };
@@ -351,6 +380,7 @@ export function formatJson(results: ScanResult[]): string {
       summary: {
         ...summarizeFindings(allFindings),
         proofCoverage: summarizeProofCoverage(allFindings),
+        proofCoverageByRuleFamily: summarizeProofCoverageByRuleFamily(allFindings),
       },
       results: results.map((r) => ({
         filePath: r.filePath,
@@ -374,6 +404,7 @@ export function formatProjectJson(
   const summaryOut: Record<string, unknown> = {
     ...summary,
     proofCoverage: summarizeProofCoverage(sortedFlat),
+    proofCoverageByRuleFamily: summarizeProofCoverageByRuleFamily(sortedFlat),
   };
   if (options?.benchmarkMetadata) {
     summaryOut.findingsPerFile = findingsPerFileCounts(sortedFlat);

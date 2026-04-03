@@ -36,6 +36,33 @@ node vibescan/scripts/run-generated-proofs.mjs ./vibescan-proofs
 
 Exit code follows `node --test`: `0` if all tests pass, non-zero on failure.
 
+### Recorded harness (`vibescan prove --run`)
+
+The log includes **`retriesPerFile`**, and each entry may include **`perRun`** (per attempt), **`stability`** (`stable` | `flaky` | `error`), and **`summary.flaky`** when retries are used:
+
+```bash
+npx @jobersteadt/vibescan prove --run --from ./vibescan.json --retries 3 --output ./proof-run-log.json
+```
+
+- **stable**: all attempts agreed on pass/fail.
+- **flaky**: mixed outcomes across retries (treated as inconclusive for pass/fail counts).
+- **error**: spawn failure or inconclusive runs (e.g. no tests found).
+
+Generated project JSON can include **`proofHarness`** on a finding (`isolation: mock | pure`) when the proof generator declares it.
+
+## SARIF import and merge
+
+- **`vibescan import-sarif results.sarif`**: optional **`vibescan-sarif-rule-map.json`** at the repo root, or **`--rule-map path.json`**. See **`templates/sarif-rule-map.sample.json`** in the package.
+- **`vibescan import-sarif results.sarif --project . --emit-proofs ./proofs`**: native scan + imports; imports at the same **file path + line** as a native finding are dropped in favor of the native row.
+
+## Fix preview (before/after proofs)
+
+```bash
+npx @jobersteadt/vibescan fix-preview --project-root . --patch ./fix.diff --output ./fix-preview-result.json
+```
+
+Requires **`patch`** (e.g. Git Bash) or a **`git apply`**-compatible apply after `git init` in the temp tree. Temps are deleted after the command finishes.
+
 ### GitHub Actions (example)
 
 ```yaml

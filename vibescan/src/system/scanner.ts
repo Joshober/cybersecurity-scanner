@@ -4,6 +4,7 @@ import type { Finding, ScannerOptions, ScanResult, ProjectScanResult } from "./t
 import type { Rule } from "./utils/rule-types.js";
 import { parseFile } from "./parser/parseFile.js";
 import { extractRouteGraph } from "./parser/routeGraph.js";
+import { extractNextAppRouteHandlers } from "./parser/nextRouteGraph.js";
 import {
   runRuleEngine,
   runTaintEngine,
@@ -62,7 +63,9 @@ export function scan(
         })
       : [];
 
-  const routes = extractRouteGraph(ast, src, filePath);
+  const expressRoutes = extractRouteGraph(ast, src, filePath);
+  const nextRoutes = extractNextAppRouteHandlers(ast, src, filePath, options.projectRoot);
+  const routes = [...expressRoutes, ...nextRoutes];
   const appAudit = runAppLevelAudit(ast, src, { hasRoutes: routes.length > 0, filePath });
   const appAuditFiltered = filterByThreshold(appAudit, options.severityThreshold);
 
@@ -80,7 +83,7 @@ export function scanProject(
   options: ScannerOptions = {}
 ): ProjectScanResult {
   const fileResults: ScanResult[] = [];
-  const allRoutes = extractRouteGraphFromFiles(files);
+  const allRoutes = extractRouteGraphFromFiles(files, options.projectRoot);
   const allFindings: Finding[] = [];
 
   for (const f of files) {
@@ -123,12 +126,16 @@ export function scanProject(
   };
 }
 
-function extractRouteGraphFromFiles(files: { path: string; source: string }[]): import("./types.js").RouteNode[] {
+function extractRouteGraphFromFiles(
+  files: { path: string; source: string }[],
+  projectRoot?: string
+): import("./types.js").RouteNode[] {
   const routes: import("./types.js").RouteNode[] = [];
   for (const f of files) {
     const pr = parseFile(f.source, f.path);
     if (!pr) continue;
     routes.push(...extractRouteGraph(pr.ast, pr.source, f.path));
+    routes.push(...extractNextAppRouteHandlers(pr.ast, pr.source, f.path, projectRoot));
   }
   return routes;
 }

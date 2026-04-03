@@ -47,6 +47,8 @@ describe("OpenAPI drift / inventory", () => {
       auth001.some((f) => f.message.includes("/api/items")),
       `expected API-AUTH-001 for secured spec vs public route, got: ${auth001.map((f) => f.message).join(";")}`
     );
+    const a = auth001.find((f) => f.message.includes("/api/items"));
+    assert.ok(a?.openApiSecurity?.schemeKinds?.includes("bearer"), "expected bearer in scheme kinds");
   });
 
   it("discoverOpenApiSpecPaths finds openapi.yaml under fixture root", () => {

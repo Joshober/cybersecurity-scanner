@@ -1,4 +1,4 @@
-import type { Finding, ProofGeneration } from "../types.js";
+import type { Finding, ProofGeneration, ProofHarnessMeta } from "../types.js";
 
 export interface ProofGenContext {
   outputDir: string;
@@ -16,6 +16,8 @@ export interface ProofEmitResult {
 /** One proof-oriented generator module. */
 export interface ProofGenerator {
   readonly id: string;
+  /** Declared isolation strategy for exported JSON / CI. */
+  readonly harness?: ProofHarnessMeta;
   supports(f: Finding): boolean;
   emit(f: Finding, ctx: ProofGenContext): ProofEmitResult;
 }

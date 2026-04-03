@@ -17,6 +17,7 @@ export {
   projectFindingsToScanResults,
   summarizeFindings,
   summarizeProofCoverage,
+  summarizeProofCoverageByRuleFamily,
   findingToJson,
   findingDisplayFile,
 } from "./format.js";
@@ -26,13 +27,20 @@ export {
   proofCoverageTier,
   proofTierLabelFromNumber,
   proofMetricsForFinding,
+  getConfidenceScore,
+  confidenceDimensionsForFinding,
   confidenceReasonForFinding,
   confidenceReasonsForFinding,
   rootCauseGraphForFinding,
   rootCauseGraphV2ForFinding,
   fixPreviewForFinding,
 } from "./evidence.js";
-export type { ProofMetrics, ProofCoverageSummary, RootCauseGraphV2 } from "./evidence.js";
+export type {
+  ProofMetrics,
+  ProofCoverageSummary,
+  RootCauseGraphV2,
+  ConfidenceDimensions,
+} from "./evidence.js";
 export {
   escapeHtml,
   buildHtmlReport,
@@ -58,11 +66,15 @@ export type {
   ProofTierLabel,
   ProofFailureCode,
 } from "./types.js";
+export type { ProofHarnessMeta } from "./types.js";
 export { emitProofTests } from "./proof/pipeline.js";
 export type { EmitProofTestsOptions } from "./proof/pipeline.js";
 export { runProofHarness } from "./proof/runner.js";
 export type { ProofRunLog, RunProofHarnessOptions } from "./proof/runner.js";
 export { importSarifFromFile, importSarifText } from "./importers/sarif/importSarif.js";
 export type { ImportSarifResult, ImportedFindingRow } from "./importers/sarif/importSarif.js";
+export { mergeSarifWithProjectScan } from "./importers/sarif/mergeSarifProject.js";
+export { loadSarifRuleMapFile, mapExternalRuleId, resolveRuleMapPath } from "./importers/sarif/ruleMap.js";
+export type { SarifRuleMapEntry, SarifRuleMapFile } from "./importers/sarif/ruleMap.js";
 export { generateComparisonMarkdown } from "./reports/comparison/report.js";
 export type { Rule, RuleContext } from "./utils/rule-types.js";

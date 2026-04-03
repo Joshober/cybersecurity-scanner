@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import process from "node:process";
 import type { Finding } from "../types.js";
@@ -128,6 +128,7 @@ function main(): void {
     if (rest[0] === "--run") {
       let fromPath: string | undefined;
       let outLog: string | undefined;
+      let retries: number | undefined;
       for (let i = 1; i < rest.length; i++) {
         if (rest[i] === "--from" && rest[i + 1]) {
           fromPath = resolve(rest[++i]);
@@ -137,16 +138,23 @@ function main(): void {
           outLog = resolve(rest[++i]);
           continue;
         }
+        if (rest[i] === "--retries" && rest[i + 1]) {
+          retries = parseInt(rest[++i], 10);
+          continue;
+        }
       }
       if (!fromPath) {
-        console.error("Usage: vibescan prove --run --from <project.json> [--output <proof-run-log.json>]");
+        console.error(
+          "Usage: vibescan prove --run --from <project.json> [--output <proof-run-log.json>] [--retries N]"
+        );
         process.exit(1);
       }
       try {
-        const log = runProofHarness({ fromJson: fromPath, outputLog: outLog });
+        const log = runProofHarness({ fromJson: fromPath, outputLog: outLog, retries });
         const logPath = outLog ?? join(dirname(fromPath), "proof-run-log.json");
+        const flaky = "flaky" in log.summary ? `, ${log.summary.flaky} flaky` : "";
         console.error(
-          `Proof run: ${log.summary.pass} pass, ${log.summary.fail} fail, ${log.summary.inconclusive} inconclusive (${log.summary.executed} executed). Wrote ${logPath}`
+          `Proof run: ${log.summary.pass} pass, ${log.summary.fail} fail, ${log.summary.inconclusive} inconclusive (${log.summary.executed} executed${flaky}). Wrote ${logPath}`
         );
         process.exit(log.summary.fail > 0 ? 1 : 0);
       } catch (e) {
@@ -172,6 +180,56 @@ function main(): void {
       process.exit(1);
     }
     process.exit(spawnCli(scanCliPath, scanArgs));
+  }
+
+  if (first === "fix-preview") {
+    void import("./fixPreview.js")
+      .then((m) => {
+        const rest = argv.slice(1);
+        let projectRoot: string | undefined;
+        let patchFile: string | undefined;
+        let outJson: string | undefined;
+        let retries: number | undefined;
+        for (let i = 0; i < rest.length; i++) {
+          if (rest[i] === "--project-root" && rest[i + 1]) {
+            projectRoot = resolve(rest[++i]);
+            continue;
+          }
+          if (rest[i] === "--patch" && rest[i + 1]) {
+            patchFile = resolve(rest[++i]);
+            continue;
+          }
+          if (rest[i] === "--output" && rest[i + 1]) {
+            outJson = resolve(rest[++i]);
+            continue;
+          }
+          if (rest[i] === "--retries" && rest[i + 1]) {
+            retries = parseInt(rest[++i], 10);
+            continue;
+          }
+        }
+        if (!projectRoot || !patchFile) {
+          console.error(
+            "Usage: vibescan fix-preview --project-root <dir> --patch <file.diff> [--output <result.json>] [--retries N]"
+          );
+          process.exit(1);
+        }
+        const r = m.runFixPreview({ projectRoot, patchFile, retries });
+        const payload = JSON.stringify(r, null, 2);
+        if (outJson) {
+          writeFileSync(outJson, payload, "utf-8");
+          console.error(`Wrote ${outJson}`);
+        } else {
+          console.log(payload);
+        }
+        m.cleanupFixPreviewTemps(r);
+        process.exit(0);
+      })
+      .catch((e) => {
+        console.error(e);
+        process.exit(1);
+      });
+    return;
   }
 
   if (first === "import-sarif") {

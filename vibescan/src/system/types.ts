@@ -79,6 +79,19 @@ export interface Finding {
   proofHints?: ProofHints;
   /** Result of proof-oriented test generation when the pipeline ran (see `emitProofTests`). */
   proofGeneration?: ProofGeneration;
+  /** Declared harness contract for generated proofs (from generator metadata). */
+  proofHarness?: ProofHarnessMeta;
+  /** When the finding comes from OpenAPI reconciliation (e.g. API-AUTH-001). */
+  openApiSecurity?: {
+    schemeRefs: string[];
+    schemeKinds: string[];
+    specFile?: string;
+    pathTemplate?: string;
+  };
+  /** Optional structured signals for confidence scoring (set by engines when available). */
+  evidenceSignals?: {
+    sanitization?: "none" | "partial" | "parameterized" | "unknown";
+  };
 }
 
 /** Scanner-populated hints for generated proof tests (optional per rule). */
@@ -135,6 +148,15 @@ export interface ProofGeneration {
   requiresSecrets?: boolean;
   /** Proof depends on non-secret environment variables (e.g. NODE_ENV). */
   requiresEnv?: boolean;
+}
+
+/** How the proof test isolates behavior (for JSON / CI metadata). */
+export type ProofHarnessIsolation = "mock" | "pure";
+
+/** Optional metadata attached by proof generators. */
+export interface ProofHarnessMeta {
+  isolation: ProofHarnessIsolation;
+  notes?: string;
 }
 
 /** `static` = rule-based scan only. `ai` = same scan + writes an IDE paste-in prompt (Cursor / Claude Code); no remote API. */

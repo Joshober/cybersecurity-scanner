@@ -16,6 +16,7 @@ function fileLikelyHasJwtVerifyWithSecret(source: string, secret: string): boole
 
 export const jwtWeakSecretGenerator: ProofGenerator = {
   id: "jwt.weak_secret",
+  harness: { isolation: "pure", notes: "HS256 sign/verify without network" },
 
   supports(f: Finding): boolean {
     return f.ruleId === "crypto.jwt.weak-secret-literal";

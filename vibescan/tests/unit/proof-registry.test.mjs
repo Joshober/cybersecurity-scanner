@@ -8,6 +8,7 @@ describe("proofGenerators registry", () => {
   it("has deterministic order and unique ids", () => {
     const ids = proofGenerators.map((g) => g.id);
     assert.strictEqual(new Set(ids).size, ids.length);
+    assert.ok(ids.includes("openapi.route_contract"));
     assert.ok(ids.includes("jwt.weak_secret"));
     assert.ok(ids.includes("prototype.pollution"));
   });

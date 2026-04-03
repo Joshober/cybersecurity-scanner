@@ -4,6 +4,7 @@ import type { Finding } from "../../types.js";
 
 export const bolaIdorRouteFlowGenerator: ProofGenerator = {
   id: "route.bola_idor_flow",
+  harness: { isolation: "mock", notes: "Mock principals and canAccess; no HTTP server" },
 
   supports(f: Finding): boolean {
     return f.ruleId === "AUTH-005";
