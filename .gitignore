@@ -7,6 +7,9 @@ dvna/
 # DVNA under benchmarks layout (see benchmarks/dvna/README.md)
 benchmarks/dvna/dvna/
 
+# Optional second benchmark corpus (see docs/vibescan/BENCHMARK-SECOND-CORPUS.md)
+benchmarks/nodegoat/NodeGoat/
+
 # Build output (push source only)
 dist/
 
@@ -38,6 +41,12 @@ coverage/
 
 # Optional
 .cache/
+
+# CodeQL CLI bundle and zip (see benchmarks/scripts/run-codeql-dvna.ps1)
+benchmarks/.cache/
+
+# CodeQL databases are large; keep committed SARIF + manifests. Regenerate DB with benchmarks/scripts/run-codeql-dvna.ps1
+benchmarks/results/**/codeql-db/
 
 # BEGIN secure-arch generated ignores (extra key material; .env already above)
 !.env.example

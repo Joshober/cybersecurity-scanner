@@ -34,6 +34,7 @@ test('${ctx.safeBaseName}: BOLA flow skipped — no route on finding', () => {
           autoFilled,
           manualNeeded,
           generatorId: "route.bola_idor_flow",
+          failureCode: "runtime_route_registration",
           notes: "Object-scoped route flow needs method/fullPath/params from the route graph.",
         },
       };
@@ -77,6 +78,7 @@ test('${ctx.safeBaseName}: BOLA / IDOR table (mock identities)', () => {
         autoFilled,
         manualNeeded,
         generatorId: "route.bola_idor_flow",
+        failureCode: "missing_auth_context",
         notes:
           "Table-driven mock for object-scoped routes. Structural metadata from scan only — not a live IDOR proof.",
       },

@@ -30,6 +30,34 @@
           "type": "object",
           "description": "Present when benchmark metadata is enabled.",
           "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "proofCoverage": {
+          "type": "object",
+          "description": "Share of findings by proof tier; always present in project JSON from formatProjectJson.",
+          "properties": {
+            "total_findings": { "type": "integer", "minimum": 0 },
+            "provable": { "type": "integer", "minimum": 0 },
+            "partial": { "type": "integer", "minimum": 0 },
+            "structural": { "type": "integer", "minimum": 0 },
+            "detection_only": { "type": "integer", "minimum": 0 },
+            "proof_coverage_percent": { "type": "number" },
+            "deterministic_proof_percent": {
+              "type": "number",
+              "description": "Among findings with wasGenerated proof, share where deterministic is true (0–100)."
+            },
+            "proof_pipeline_not_run": { "type": "boolean" },
+            "by_tier": {
+              "type": "object",
+              "properties": {
+                "tier_1": { "type": "integer" },
+                "tier_2": { "type": "integer" },
+                "tier_3": { "type": "integer" },
+                "tier_4": { "type": "integer" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
         }
       },
       "additionalProperties": true

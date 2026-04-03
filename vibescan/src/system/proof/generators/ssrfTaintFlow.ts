@@ -41,14 +41,18 @@ test('${ctx.safeBaseName}: tainted URL reaches request sink (mock; not live SSRF
 });
 `;
 
+    const complete = !!(f.sourceLabel && f.sinkLabel);
     return {
       body,
       proofGeneration: {
-        status: f.sourceLabel && f.sinkLabel ? "provable_locally" : "needs_manual_completion",
+        status: complete ? "provable_locally" : "needs_manual_completion",
         wasGenerated: true,
         autoFilled,
         manualNeeded,
         generatorId: "taint.ssrf_sink",
+        ...(complete ? {} : { failureCode: "dynamic_url_unresolved" as const }),
+        deterministic: true,
+        requiresNetwork: false,
         notes:
           "Demonstrates tainted URL value flowing into a mocked request sink. Does not prove successful SSRF against a live environment or internal metadata service — only static taint-to-sink reachability in isolation.",
       },

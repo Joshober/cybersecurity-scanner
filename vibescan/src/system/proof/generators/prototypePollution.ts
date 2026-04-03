@@ -59,6 +59,8 @@ test('${ctx.safeBaseName}: __proto__ branch can pollute Object.prototype (local 
         autoFilled,
         manualNeeded,
         generatorId: "prototype.pollution",
+        deterministic: true,
+        requiresNetwork: false,
         notes:
           "Local harness demonstrates a classic __proto__ merge hazard; does not execute your application code. sinkLabel: " +
           sink +

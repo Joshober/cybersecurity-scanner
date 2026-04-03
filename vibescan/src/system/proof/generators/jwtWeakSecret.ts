@@ -49,6 +49,7 @@ export const jwtWeakSecretGenerator: ProofGenerator = {
           autoFilled,
           manualNeeded: ["proofHints.weakJwtSecretLiteral — re-scan with current VibeScan"],
           generatorId: "jwt.weak_secret",
+          failureCode: "environment_secret_required",
           notes:
             "No weak JWT literal on finding; cannot emit a local HS256 proof. Re-run static scan so the rule attaches proofHints.",
         },
@@ -93,6 +94,12 @@ test('${ctx.safeBaseName}: forged HS256 with weak literal verifies locally', () 
         manualNeeded,
         generatorId: "jwt.weak_secret",
         notes,
+        deterministic: true,
+        requiresNetwork: false,
+        requiresSecrets: false,
+        ...(status === "needs_manual_completion"
+          ? { failureCode: "missing_auth_context" as const }
+          : {}),
       },
     };
   },

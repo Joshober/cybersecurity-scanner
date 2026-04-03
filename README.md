@@ -6,13 +6,13 @@
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
-**VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
+**Project overview (benchmarks, research framing, product comparison):** [`PROJECT-OVERVIEW.md`](PROJECT-OVERVIEW.md)
 
-**All plans / runbooks / proposals (index):** [`docs/PLANS.md`](docs/PLANS.md)
+**VibeScan / research / conference notes (consolidated snapshot):** [`docs/vibescan/COMBINED_VIBESCAN_DOCS.md`](docs/vibescan/COMBINED_VIBESCAN_DOCS.md)
 
-**Full repo / architecture handoff (for collaborators or LLMs):** [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md)
+**Research / evaluation spine (consolidated):** [`docs/research-strengthening/COMBINED_RESEARCH_STRENGTHENING.md`](docs/research-strengthening/COMBINED_RESEARCH_STRENGTHENING.md)
 
-**Universal secure-architecture CLI (AI settings + static checks):** [`docs/secure-arch/README.md`](docs/secure-arch/README.md)
+**secure-architecture CLI (YAML settings, `check`, IDE adapters):** [`vibescan/README.md`](vibescan/README.md) (see **secure-arch** there) and [`vibescan/packages/secure-arch-cli/`](vibescan/packages/secure-arch-cli/)
 
 ---
 
@@ -28,7 +28,7 @@ VibeScan’s **scanner** lives under [`vibescan/`](vibescan/) (`vibescan/src/`, 
 | [`vibescan/packages/secure-arch-cli`](vibescan/packages/secure-arch-cli/) | `secure-arch` CLI (`install`, `init`, `check`) |
 | [`vibescan/packages/secure-arch-adapters`](vibescan/packages/secure-arch-adapters/) | Cursor / Amazon Q instruction generators |
 
-Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md).
+Repo roles and the “implemented/documented/evaluated/future” maturity legend are documented in [`docs/vibescan/COMBINED_VIBESCAN_DOCS.md`](docs/vibescan/COMBINED_VIBESCAN_DOCS.md) (handoff section).
 
 ---
 
@@ -234,7 +234,7 @@ export default [
 
 ## Project structure
 
-See [`docs/REPO-HANDOFF.md`](docs/REPO-HANDOFF.md) for a detailed tree and pipeline. Summary:
+See [`PROJECT-OVERVIEW.md`](PROJECT-OVERVIEW.md) and the handoff section in [`docs/vibescan/COMBINED_VIBESCAN_DOCS.md`](docs/vibescan/COMBINED_VIBESCAN_DOCS.md) for a detailed tree and pipeline. Summary:
 
 ```
 vibescan/
@@ -249,11 +249,10 @@ vibescan/
 │   └── secure-arch-adapters/
 architecture/secure-rules/   # YAML settings (templates via secure-arch install)
 docs/
-├── REPO-HANDOFF.md    # Architecture + file map for handoffs
-├── secure-arch/       # secure-arch usage + AI prompts
-├── research-strengthening/
-└── vibescan/          # Poster & submission assets
-results/               # DVNA benchmark outputs (see dvna-evaluation.md)
+├── vibescan/          # COMBINED_VIBESCAN_DOCS.md + topic markdown
+├── research-strengthening/  # COMBINED_RESEARCH_STRENGTHENING.md + topic markdown
+benchmarks/results/    # Frozen tool runs (manifests, SARIF) — see PROJECT-OVERVIEW.md
+results/               # DVNA narrative + adjudication (see dvna-evaluation.md)
 ```
 
 ---

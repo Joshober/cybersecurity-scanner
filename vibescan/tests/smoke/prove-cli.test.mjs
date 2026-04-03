@@ -13,5 +13,7 @@ describe("vibescan prove dispatcher", () => {
     const src = readFileSync(dispatcher, "utf8");
     assert.ok(src.includes('first === "prove"'));
     assert.ok(src.includes("--generate-tests"));
+    assert.ok(src.includes("prove --run"));
+    assert.ok(src.includes("runProofHarness"));
   });
 });

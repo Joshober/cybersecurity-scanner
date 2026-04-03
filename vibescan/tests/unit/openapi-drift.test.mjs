@@ -34,6 +34,7 @@ describe("OpenAPI drift / inventory", () => {
     });
     const inv001 = project.findings.filter((f) => f.ruleId === "API-INV-001");
     const inv002 = project.findings.filter((f) => f.ruleId === "API-INV-002");
+    const auth001 = project.findings.filter((f) => f.ruleId === "API-AUTH-001");
     assert.ok(
       inv001.some((f) => f.message.includes("/internal/hidden")),
       `expected API-INV-001 for hidden route, got: ${inv001.map((f) => f.message).join(";")}`
@@ -41,6 +42,10 @@ describe("OpenAPI drift / inventory", () => {
     assert.ok(
       inv002.some((f) => f.message.includes("/api/legacy/removed")),
       `expected API-INV-002 for ghost op, got: ${inv002.map((f) => f.message).join(";")}`
+    );
+    assert.ok(
+      auth001.some((f) => f.message.includes("/api/items")),
+      `expected API-AUTH-001 for secured spec vs public route, got: ${auth001.map((f) => f.message).join(";")}`
     );
   });
 

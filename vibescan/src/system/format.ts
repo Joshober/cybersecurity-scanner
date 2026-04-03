@@ -2,6 +2,21 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Finding, ScanResult, ProjectScanResult, Severity, Category } from "./types.js";
 import { getConfidenceScore, getRuleDocumentation, type RuleDocumentation } from "./ruleCatalog.js";
+import {
+  computeFindingId,
+  summarizeProofCoverage,
+  confidenceReasonForFinding,
+  confidenceReasonsForFinding,
+  rootCauseGraphForFinding,
+  rootCauseGraphV2ForFinding,
+  proofCoverageTier,
+  proofMetricsForFinding,
+  fixPreviewForFinding,
+  attachProofFailureReason,
+} from "./evidence.js";
+
+export { summarizeProofCoverage } from "./evidence.js";
+export type { ProofCoverageSummary, ProofMetrics } from "./evidence.js";
 
 /** Aggregated counts for benchmarks / CI. */
 export interface FindingsSummary {
@@ -36,6 +51,7 @@ const LEGACY_RULE_FAMILY: Record<string, string> = {
   "MW-004": "middleware.cors",
   "API-INV-001": "api.inventory",
   "API-INV-002": "api.inventory",
+  "API-AUTH-001": "api.auth_conformance",
   "API-POSTURE-001": "api.inventory",
   "WEBHOOK-001": "webhook.verification",
 };
@@ -185,6 +201,7 @@ export function formatFindingDetailed(f: Finding, fileFallback: string, index: n
   lines.push(dim("Why it matters"));
   lines.push(`  ${why}`);
   lines.push(dim(`Confidence: ${conf} (heuristic static analysis; confirm in code review)`));
+  lines.push(dim(`Evidence: ${confidenceReasonForFinding(f)}`));
   lines.push(dim("Suggested fix"));
   lines.push(`  ${fix}`);
   lines.push(dim("Safe pattern (example)"));
@@ -248,10 +265,14 @@ export function findingToJson(
   f: Finding,
   fallbackFile?: string,
   includeRuleFamily = false,
-  includeRuleDocs = false
+  includeRuleDocs = false,
+  includeEvidenceFields = false
 ): Record<string, unknown> {
   const file = findingDisplayFile(f, fallbackFile);
   const doc = getRuleDocumentation(f.ruleId);
+  const fixPv = includeEvidenceFields ? fixPreviewForFinding(f) : undefined;
+  const conf = getConfidenceScore(f);
+  const pm = includeEvidenceFields ? proofMetricsForFinding(f) : undefined;
   const row: Record<string, unknown> = {
     ruleId: f.ruleId,
     message: f.message,
@@ -275,10 +296,35 @@ export function findingToJson(
     sinkLabel: f.sinkLabel,
     file,
     filePath: f.filePath,
-    confidence: getConfidenceScore(f),
+    confidence: conf,
     ...(f.route ? { route: f.route } : {}),
     ...(f.proofHints ? { proofHints: f.proofHints } : {}),
-    ...(f.proofGeneration ? { proofGeneration: f.proofGeneration } : {}),
+    ...(f.proofGeneration
+      ? { proofGeneration: attachProofFailureReason({ ...f.proofGeneration }) }
+      : {}),
+    ...(includeEvidenceFields
+      ? {
+          findingId: computeFindingId(f),
+          confidenceScore: conf,
+          confidenceReason: confidenceReasonForFinding(f),
+          confidenceReasons: confidenceReasonsForFinding(f),
+          rootCause: rootCauseGraphForFinding(f),
+          causalGraph: rootCauseGraphV2ForFinding(f),
+          proofTier: proofCoverageTier(f),
+          ...(pm
+            ? {
+                proofTierLabel: pm.proofTierLabel,
+                deterministic: pm.deterministic,
+                requiresNetwork: pm.requiresNetwork,
+                requiresSecrets: pm.requiresSecrets,
+                requiresEnv: pm.requiresEnv,
+                requiresManualCompletion: pm.requiresManualCompletion,
+                proofReason: pm.proofReason,
+              }
+            : {}),
+          ...(fixPv ? { fixPreview: fixPv } : {}),
+        }
+      : {}),
   };
   if (includeRuleFamily) {
     const rf = ruleFamilyForRuleId(f.ruleId);
@@ -302,11 +348,14 @@ export function formatJson(results: ScanResult[]): string {
   const allFindings = results.flatMap((r) => r.findings);
   return JSON.stringify(
     {
-      summary: summarizeFindings(allFindings),
+      summary: {
+        ...summarizeFindings(allFindings),
+        proofCoverage: summarizeProofCoverage(allFindings),
+      },
       results: results.map((r) => ({
         filePath: r.filePath,
         file: r.filePath,
-        findings: r.findings.map((f) => findingToJson(f, r.filePath)),
+        findings: r.findings.map((f) => findingToJson(f, r.filePath, false, false, true)),
       })),
     },
     null,
@@ -322,7 +371,10 @@ export function formatProjectJson(
   const summary = summarizeFindings(sortedFlat);
   const includeRf = !!options?.includeRuleFamily;
 
-  const summaryOut: Record<string, unknown> = { ...summary };
+  const summaryOut: Record<string, unknown> = {
+    ...summary,
+    proofCoverage: summarizeProofCoverage(sortedFlat),
+  };
   if (options?.benchmarkMetadata) {
     summaryOut.findingsPerFile = findingsPerFileCounts(sortedFlat);
   }
@@ -334,11 +386,11 @@ export function formatProjectJson(
     openApiSpecsUsed: project.openApiSpecsUsed,
     buildId: project.buildId,
     packageJsonPath: project.packageJsonPath,
-    findings: sortedFlat.map((f) => findingToJson(f, undefined, includeRf, true)),
+    findings: sortedFlat.map((f) => findingToJson(f, undefined, includeRf, true, true)),
     fileResults: project.fileResults.map((r) => ({
       filePath: r.filePath,
       file: r.filePath,
-      findings: sortFindingsStable(r.findings).map((f) => findingToJson(f, r.filePath, includeRf, true)),
+      findings: sortFindingsStable(r.findings).map((f) => findingToJson(f, r.filePath, includeRf, true, true)),
       routeCount: r.routes?.length ?? 0,
     })),
   };

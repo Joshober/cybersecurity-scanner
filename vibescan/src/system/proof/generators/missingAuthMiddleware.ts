@@ -32,6 +32,7 @@ test('${ctx.safeBaseName}: structural proof skipped — no route on finding', ()
           autoFilled,
           manualNeeded: ["route graph did not attach to this finding"],
           generatorId: "route.middleware_missing_auth",
+          failureCode: "runtime_route_registration",
           notes:
             "Structural proof requires method/fullPath/middlewares from the route graph. This does not execute your HTTP stack.",
         },
@@ -68,6 +69,7 @@ test('${ctx.safeBaseName}: route graph shows no recognizable auth middleware (st
         autoFilled,
         manualNeeded,
         generatorId: "route.middleware_missing_auth",
+        deterministic: status === "provable_locally",
         notes:
           "Structural/static: encodes Express route graph facts from the scan. Does not prove runtime access to a live server — only that the extracted graph lacks recognizable auth middleware per VibeScan heuristics.",
       },

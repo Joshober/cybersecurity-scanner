@@ -12,13 +12,16 @@ export interface EmitProofTestsOptions {
 const PROOF_CRYPTO_NAME = "vibescan-proof-crypto.mjs";
 
 function unsupportedResult(): ProofGeneration {
+  const msg = "No proof-oriented generator for this rule family or insufficient static context.";
   return {
     status: "unsupported",
     wasGenerated: false,
     autoFilled: [],
     manualNeeded: [],
     generatorId: "unsupported",
-    notes: "No proof-oriented generator for this rule family or insufficient static context.",
+    notes: msg,
+    failureReason: msg,
+    failureCode: "unknown",
   };
 }
 

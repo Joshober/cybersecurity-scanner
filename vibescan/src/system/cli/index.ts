@@ -539,7 +539,9 @@ async function main(): Promise<void> {
         deferredCount: baselineFindings.length,
         freshCount: freshFindings.length,
       };
-      payload.regressions = sortFindingsStable(freshFindings).map((f) => findingToJson(f, undefined, true, true));
+      payload.regressions = sortFindingsStable(freshFindings).map((f) =>
+        findingToJson(f, undefined, true, true, true)
+      );
     }
     console.log(JSON.stringify(payload, null, 2));
   } else if (format === "sarif") {

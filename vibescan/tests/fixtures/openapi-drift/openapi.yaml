@@ -6,9 +6,16 @@ paths:
   /api/items/{id}:
     get:
       summary: Get item
+      security:
+        - bearerAuth: []
   /api/items:
     post:
       summary: Create item
   /api/legacy/removed:
     get:
       summary: Documented but not implemented in Express fixture
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

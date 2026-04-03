@@ -5,7 +5,7 @@ import picomatch from "picomatch";
 import type { ScannerOptions } from "../types.js";
 import { VENDOR_EXCLUDE_GLOBS, pathMatchesVendorExclude } from "../vendorIgnore.js";
 
-const SCAN_EXTENSIONS = ["**/*.js", "**/*.ts", "**/*.mjs", "**/*.cjs"];
+const SCAN_EXTENSIONS = ["**/*.js", "**/*.ts", "**/*.mjs", "**/*.cjs", "**/*.tsx", "**/*.jsx"];
 
 /**
  * Resolve scan targets to absolute file paths (directories expanded via fast-glob).

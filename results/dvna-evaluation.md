@@ -1,4 +1,4 @@
-# DVNA benchmark (status snapshot): VibeScan vs eslint-plugin-security vs Snyk Code vs Bearer vs npm audit
+# DVNA benchmark (status snapshot): VibeScan vs eslint-plugin-security vs Snyk Code vs Bearer vs Semgrep vs CodeQL vs npm audit
 
 This file reports a **preliminary, scope-limited** benchmark snapshot. It is not a finalized head-to-head claim across all baselines.
 
@@ -15,12 +15,22 @@ This file reports a **preliminary, scope-limited** benchmark snapshot. It is not
   - output JSON: `benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json`
 - **npm audit:** `npm install --package-lock-only --ignore-scripts` in `dvna/`, then `npm audit` -> [`npm-audit-dvna.txt`](./npm-audit-dvna.txt).
 - **Snyk Code run (captured artifact):** `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (36 findings: 4 error, 27 warning, 5 note). Sensitivity notes are under `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/reports/sensitivity.md`. OpenAPI drift / route inventory rules (`API-INV-*`, `routeInventory`) have **no direct Snyk equivalent** in-repo; report separately when claiming that contribution.
+- **Semgrep run (frozen artifact):** `benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/`
+  - manifest: [`benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/manifest.json`](../benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/manifest.json)
+  - JSON + SARIF: `semgrep.json`, `semgrep.sarif`
+  - Rules: community packs `p/javascript` + `p/security-audit`; **11** findings on DVNA at the same commit.
+  - **Reproduce:** install Semgrep so it is on `PATH` (e.g. Python `Scripts`), set `PYTHONUTF8=1` on Windows for SARIF output, then execute the `command` and `commandSarif` fields from the manifest at the repository root.
+- **CodeQL run (frozen artifact):** `benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/`
+  - manifest: [`benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/manifest.json`](../benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/manifest.json)
+  - SARIF: `codeql.sarif` (javascript-security-and-quality suite via pack `codeql/javascript-queries`)
+  - CLI bundle **2.25.1**; query pack **codeql/javascript-queries@2.3.6**; **46** results in SARIF for this run.
+  - Full reproduction on Windows: [`benchmarks/scripts/run-codeql-dvna.ps1`](../benchmarks/scripts/run-codeql-dvna.ps1) (one-time CodeQL download under `benchmarks/.cache/`, then `codeql pack download`, database create + analyze).
 
-## Reproducibility TODOs (required before final paper numbers)
+## Reproducibility checklist
 
 - [x] Record DVNA commit SHA used for this run.
 - [x] Record Node and npm versions for the frozen VibeScan run (see run manifest).
-- [ ] Re-run all tools under the same scope policy (first-party-only primary table).
+- [ ] Run every tool against the same scope policy (first-party-only primary table).
 - [x] Execute Bearer and add raw JSON under `benchmarks/results/<run>/` (and link from this doc).
 - [x] Add adjudication sheet reference (TP/FP/FN rationale per finding/case).
 
@@ -39,6 +49,9 @@ DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for
 | Bearer image digest | `sha256:f6701b1b6385c9e564efe680a8391cacc5e94798d7b719a21450064c26a7b2d9` | `benchmarks/results/2026-03-25_223217_dvna_bearer/manifest.json` |
 | Snyk Code CLI | `v1.1303.2` | `snyk --version` (local CLI) |
 | Snyk Code run artifact | `36` findings (`error=4`, `warning=27`, `note=5`) | `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` |
+| Semgrep | `1.157.0` | `benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/manifest.json` |
+| CodeQL CLI bundle | `2.25.1` | `benchmarks/scripts/run-codeql-dvna.ps1` + `benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/manifest.json` |
+| CodeQL JS query pack | `codeql/javascript-queries@2.3.6` | Pack cache under user `.codeql/packages` (see manifest `queryPack`) |
 
 ## Adjudication artifacts (current)
 
@@ -46,6 +59,8 @@ DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for
 - VibeScan run artifact: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json` (summary: 7 findings)
 - Bearer run artifact: `benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json` (summary: 31 findings)
 - Snyk Code artifact: `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (captured and adjudicated)
+- Semgrep artifact: `benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json` (11 findings; optional line-level adjudication extends [`results/dvna-adjudication.md`](./dvna-adjudication.md))
+- CodeQL artifact: `benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif` (46 results; optional SARIF-level adjudication)
 
 Provisional adjudicated precision from the current sheet:
 
@@ -86,18 +101,18 @@ Counts below exclude `public/assets/*.min.js` and count each distinct rule x fil
 
 | DVNA theme (2017) | VibeScan TPs | eslint TPs | Snyk Code TPs | Bearer TPs | npm audit TPs |
 | ----------------- | ------------ | ---------- | ------------- | ---------- | ------------- |
-| Injection | 3 | 1 | 6 | adjudicated* | TODO* |
-| Broken Authentication | 2 | 0 | 0 | adjudicated* | TODO* |
-| Sensitive data / crypto | 2 | 0 | 3 | adjudicated* | TODO* |
-| XXE | 0 | 0 | 0 | adjudicated* | TODO* |
-| Broken Access Control | 0 | 0 | 0 | adjudicated* | TODO* |
-| Security Misconfiguration | 0 | 0 | 0 | adjudicated* | TODO* |
-| XSS | 0** | 0** | 3 | adjudicated* | TODO* |
-| Insecure Deserialization | 0 | 0 | 1 | adjudicated* | TODO* |
+| Injection | 3 | 1 | 6 | adjudicated* | — |
+| Broken Authentication | 2 | 0 | 0 | adjudicated* | — |
+| Sensitive data / crypto | 2 | 0 | 3 | adjudicated* | — |
+| XXE | 0 | 0 | 0 | adjudicated* | — |
+| Broken Access Control | 0 | 0 | 0 | adjudicated* | — |
+| Security Misconfiguration | 0 | 0 | 0 | adjudicated* | — |
+| XSS | 0** | 0** | 3 | adjudicated* | — |
+| Insecure Deserialization | 0 | 0 | 1 | adjudicated* | — |
 | Vulnerable Components | 0 | 0 | 0 | adjudicated* | 1 (aggregate report)*** |
-| Logging / Monitoring | 1 | 0 | 0 | adjudicated* | TODO* |
+| Logging / Monitoring | 1 | 0 | 0 | adjudicated* | — |
 
-\*`npm audit` does not map cleanly to first-party line-level TP counting without an explicit mapping protocol.  
+† **npm audit** column: **—** means no per-theme line-level true-positive count in this table (advisory scope differs from first-party SAST).  
 \**VibeScan and eslint showed vendor-file behavior in broader scans; first-party authored DVNA routes did not produce counted XSS TPs in this pass.  
 \*Bearer per-finding labels and totals are in `results/dvna-adjudication.md` (Summary table); row-level theme allocation is pending normalization.
 \***Single aggregate report with multiple advisories, not one-to-one with OWASP rows.
@@ -105,7 +120,7 @@ Counts below exclude `public/assets/*.min.js` and count each distinct rule x fil
 ## Preliminary interpretation (scope-limited)
 
 - Current numbers support only a **preliminary first-party signal comparison** between VibeScan and eslint-plugin-security under this specific setup.
-- This file does **not** claim complete baseline parity across all tools and scopes, but major SAST baselines (VibeScan, Bearer, Snyk Code, eslint-plugin-security) are now captured and adjudicated for this snapshot policy.
+- This file does **not** claim complete baseline parity across all tools and scopes, but major SAST baselines (VibeScan, Bearer, Snyk Code, Semgrep, CodeQL, eslint-plugin-security) are now captured; VibeScan, Bearer, and Snyk Code are adjudicated in depth for this snapshot policy, with Semgrep and CodeQL available as explainability-heavy comparators (frozen SARIF/JSON).
 - Because tool scopes differ (static app findings vs dependency advisories), direct cross-tool ranking should be avoided unless scope-normalized metrics are added.
 
 ## Remaining work before publication-quality claim

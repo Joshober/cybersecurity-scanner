@@ -30,6 +30,6 @@ export function initAmazonQAdapter(opts: AdapterInitOptions): AdapterResult {
         content: PROMPT(settingsDir),
       },
     ],
-    note: "See docs/secure-arch/README.md in this repo for full portable usage; attach amazon-q-prompt.md when using Amazon Q.",
+    note: "See vibescan/README.md (secure-arch section) for CLI usage; attach the generated amazon-q-prompt.md when using Amazon Q.",
   };
 }

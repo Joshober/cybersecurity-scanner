@@ -130,6 +130,10 @@ These subcommands are served by **`vibescan`** (and `secure`):
 | Command | Purpose |
 |--------|---------|
 | `vibescan scan …` | Static analysis (default pipeline). |
+| `vibescan reproduce <findingId> --from <project.json>` | Run the **generated proof test** for one finding (from JSON: `findingId`, `proofGeneration.generatedPath`). Requires a prior `prove` / `--generate-tests` run. |
+| `vibescan prove --run --from <project.json> [--output proof-run-log.json]` | Run **`node --test`** on every generated proof in a saved project JSON; writes **`proof-run-log.json`** (pass/fail, duration). Non-zero exit if any proof **fails**. |
+| `vibescan import-sarif <file.sarif> [--output out.json]` | Normalize external SARIF results into VibeScan-shaped JSON (**detection-only** proofs). |
+| `vibescan comparison-report --vibescan <project.json> [--proof-log …] [--labels …]` | Markdown summary for benchmarks (proof stats + optional labels). |
 | `vibescan report <results.json>` | Build a **static HTML** report from a prior `--format json` file (no rescan). |
 | `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
 | `vibescan secure-arch init --tool cursor` (or `amazonq`) | Low-level: adapter files only. |
@@ -157,6 +161,19 @@ vibescan secure-arch check --root . --code-evidence off --format human
 ### Legacy `secure` alias
 
 `npx secure …` and `secure …` invoke the same dispatcher as `vibescan` (backward compatibility).
+
+## React, Angular, and npm-audit CVEs
+
+VibeScan flags **insecure usage in source**: for example React **`dangerouslySetInnerHTML`** / **`__html`** when the HTML is not a static literal, and Angular **`DomSanitizer`** **`bypassSecurityTrust*`** methods when the argument is not a static literal. Scans include **`.js`**, **`.ts`**, **`.jsx`**, and **`.tsx`** (JSX is parsed with Acorn plus **acorn-jsx**). Files that mix **TypeScript-only** syntax with JSX may fail to parse; patterns that appear in plain **`.ts`** without JSX (for example `React.createElement` with an options object) are still analyzed.
+
+**Package-level CVEs** in `react`, `react-dom`, `@angular/core`, and other dependencies are out of scope for this static pass—use **`npm audit`**, your registry or Snyk/GitHub Dependabot workflow, or similar **lockfile advisory** tooling alongside VibeScan.
+
+## JSON: proof coverage and evidence fields
+
+Project JSON (`vibescan scan … --format json`) includes:
+
+- **`summary.proofCoverage`** — counts by proof tier, `proof_coverage_percent`, **`deterministic_proof_percent`** (among generated proofs), and `proof_pipeline_not_run` when no proof pipeline attached findings.
+- Per finding (when using project JSON): **`findingId`**, **`confidenceScore`**, **`confidenceReasons`**, **`rootCause`** / **`causalGraph`** (versioned graph), **`proofTier`** (1–4), **`proofTierLabel`**, **`deterministic`**, **`requiresNetwork`**, **`requiresSecrets`**, **`proofReason`**, optional **`fixPreview`**, and **`proofGeneration.failureReason` / `failureCode`** when proof is partial or unsupported.
 
 ## CI-friendly output
 
@@ -216,7 +233,13 @@ Run generated tests:
 
 ```bash
 node --test ./vibescan-generated-tests/
+# Or run all proofs from a saved scan JSON (writes proof-run-log.json):
+vibescan prove --run --from ./vibescan.json
 ```
+
+Or: `node scripts/run-generated-proofs.mjs ./vibescan-generated-tests` from a checkout that includes the helper under `vibescan/scripts/`. Compare before/after scans with `vibescan/scripts/fix-impact-preview.mjs`.
+
+**CI and JSON flags:** See [`docs/vibescan/CI-PROVE.md`](../docs/vibescan/CI-PROVE.md) (determinism fields: `requiresNetwork`, `requiresSecrets`, `requiresEnv`).
 
 **Proof statuses** (per finding, in JSON / SARIF `vibescanProofGeneration`): `provable_locally`, `needs_manual_completion`, `unsupported`. Examples: JWT proofs use **HS256 forge + verify** with the weak literal from the scanner; **SSRF** proofs use a **mock sink** to show taint → request API (not live SSRF); **missing-auth** route findings encode **structural** route/middleware facts from the graph, not a live HTTP stack.
 
@@ -254,6 +277,10 @@ For long-lived editor rules, prefer **`vibescan export-ai-rules`** (reads projec
 VibeScan maps each rule id to documentation: **what pattern matched**, **why it is risky**, **common false positives**, **how to fix**, **safe example**, and **links** (OWASP/CWE/README). The CLI **`--format human`** and **JSON** output surface **`confidence`** and **`ruleDocumentation`** for consumers.
 
 This section is the anchor for links emitted in-tool; the catalog ships in the package (`ruleCatalog`).
+
+## Rule SDK (proof-backed generators)
+
+To add a proof-capable family, copy [`src/system/proof/generators/_template.ts`](src/system/proof/generators/_template.ts), implement `supports` / `emit`, register in [`src/system/proof/registry.ts`](src/system/proof/registry.ts), and add tests. Use **`failureCode`** values from [`src/system/proof/taxonomy.ts`](src/system/proof/taxonomy.ts) when proof is incomplete.
 
 ## Publish verification
 From the `vibescan/` directory, run:

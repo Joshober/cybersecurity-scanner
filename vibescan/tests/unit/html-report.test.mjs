@@ -13,6 +13,17 @@ test("projectJsonToHtmlReport renders summary and finding row", () => {
       bySeverity: { critical: 1, error: 0, warning: 0, info: 0 },
       byRuleId: { "RULE-X": 1 },
       byCategory: { crypto: 1, injection: 0, api_inventory: 0 },
+      proofCoverage: {
+        total_findings: 1,
+        provable: 0,
+        partial: 0,
+        structural: 0,
+        detection_only: 1,
+        proof_coverage_percent: 0,
+        deterministic_proof_percent: 0,
+        by_tier: { tier_1: 0, tier_2: 0, tier_3: 0, tier_4: 1 },
+        proof_pipeline_not_run: true,
+      },
     },
     findings: [
       {
@@ -32,6 +43,7 @@ test("projectJsonToHtmlReport renders summary and finding row", () => {
   assert.match(html, /Test finding/);
   assert.match(html, /CWE-327/);
   assert.match(html, /vibescan-data|filter-sev/); // interactive controls present
+  assert.match(html, /Proof coverage/);
 });
 
 test("buildHtmlReport empty findings", () => {

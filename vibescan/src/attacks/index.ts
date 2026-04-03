@@ -17,6 +17,8 @@ import { nosqlInjectionRule } from "./injection/nosql-injection.js";
 import { xpathInjectionRule } from "./injection/xpath-injection.js";
 import { logInjectionRule } from "./injection/log-injection.js";
 import { xssRule } from "./browser/xss.js";
+import { reactDangerouslyInnerHtmlRule } from "./browser/react-dangerously-html.js";
+import { angularSanitizerBypassRule } from "./browser/angular-sanitizer-bypass.js";
 import { pathTraversalRule } from "./file/path-traversal.js";
 import { insecureCookieRule } from "./injection/insecure-cookie.js";
 import { ipGuardSsrRule } from "../system/ai/ipGuard.js";
@@ -40,6 +42,8 @@ export const injectionRules: Rule[] = [
   commandInjectionRule,
   pathTraversalRule,
   xssRule,
+  reactDangerouslyInnerHtmlRule,
+  angularSanitizerBypassRule,
   nosqlInjectionRule,
   xpathInjectionRule,
   logInjectionRule,

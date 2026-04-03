@@ -13,6 +13,8 @@ This file is the canonical TP/FP/FN adjudication artifact for the DVNA benchmark
 - VibeScan: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json`
 - Bearer: `benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json`
 - Snyk Code baseline: `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (captured and adjudicated)
+- Semgrep: `benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json` (11 findings; extend this sheet for line-level labels as needed)
+- CodeQL: `benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif` (46 SARIF results; extend this sheet for per-result labels as needed)
 - Legacy baselines:
   - `results/eslint-dvna.txt`
   - `results/npm-audit-dvna.txt`
@@ -24,6 +26,8 @@ This file is the canonical TP/FP/FN adjudication artifact for the DVNA benchmark
 | VibeScan | 7 | adjudicated in this sheet |
 | Bearer | 31 | adjudicated in this sheet |
 | Snyk Code | 36 | adjudicated in this sheet |
+| Semgrep | 11 | captured (line-level adjudication optional) |
+| CodeQL | 46 (SARIF results) | captured (per-result adjudication optional) |
 | eslint-plugin-security | text output captured | partial (theme-level TP counts in `results/dvna-evaluation.md`) |
 | npm audit | text output captured | out-of-scope for direct line-level TP/FP/FN |
 

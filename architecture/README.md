@@ -12,7 +12,7 @@ This folder contains project-level secure-architecture settings material used by
 
 ## Canonical command docs
 
-Use [`docs/secure-arch/README.md`](../docs/secure-arch/README.md) for command usage and CI integration.
+Use [`vibescan/README.md`](../vibescan/README.md) ( **secure-arch** section) for command usage and CI integration.
 
 Typical lifecycle:
 

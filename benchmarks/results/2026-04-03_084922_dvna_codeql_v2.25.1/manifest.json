@@ -1,0 +1,29 @@
+{
+  "benchmarkName": "Damn Vulnerable Node Application (DVNA)",
+  "benchmarkSlug": "dvna",
+  "tool": "codeql",
+  "bundleVersion": "2.25.1",
+  "queryPack": {
+    "name": "codeql/javascript-queries",
+    "version": "2.3.6",
+    "suite": "codeql/javascript-queries:codeql-suites/javascript-security-and-quality.qls"
+  },
+  "sourceRepo": {
+    "originLabel": "benchmarks/dvna/dvna",
+    "commitHash": "9ba473add536f66ac9007966acb2a775dd31277a"
+  },
+  "scannerRepo": {
+    "commitHash": "af248e25ee35d278c7a84759707abf6a1a59caf7"
+  },
+  "command": [
+    "codeql pack download codeql/javascript-queries",
+    "codeql database create <out>/codeql-db --language=javascript --source-root=benchmarks/dvna/dvna --overwrite",
+    "codeql database analyze <out>/codeql-db codeql/javascript-queries:codeql-suites/javascript-security-and-quality.qls --format=sarifv2.1.0 --output=<out>/codeql.sarif"
+  ],
+  "artifacts": [
+    "codeql.sarif",
+    "codeql-db/ (optional local; listed in .gitignore — regenerate via benchmarks/scripts/run-codeql-dvna.ps1)"
+  ],
+  "runDateUtc": "2026-04-03T13:49:52.4939734Z",
+  "notes": "Full reproduction: benchmarks/scripts/run-codeql-dvna.ps1 (downloads CodeQL CLI bundle v2.25.1 and query pack)."
+}

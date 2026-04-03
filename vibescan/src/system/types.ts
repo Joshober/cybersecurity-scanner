@@ -27,6 +27,8 @@ export interface FindingRouteRef {
   path: string;
   fullPath: string;
   middlewares: string[];
+  /** Human-readable notes on middleware order or recognized controls. */
+  middlewareEvidence?: string[];
 }
 
 // Express-style route extracted for middleware audit and tooling.
@@ -85,6 +87,29 @@ export interface ProofHints {
   weakJwtSecretLiteral?: string;
 }
 
+/** String tier for JSON / benchmarks (maps from numeric proofCoverageTier). */
+export type ProofTierLabel = "provable" | "partial" | "structural" | "detection_only";
+
+/**
+ * Structured proof failure (see `proof/taxonomy.ts`).
+ * Set by generators when status is unsupported or needs_manual_completion.
+ */
+export type ProofFailureCode =
+  | "unknown"
+  | "unresolved_dynamic_dispatch"
+  | "unresolved_import"
+  | "runtime_route_registration"
+  | "external_dependency_required"
+  | "missing_auth_context"
+  | "environment_secret_required"
+  | "dynamic_url_unresolved";
+
+/** Optional detail when proof cannot complete. */
+export interface ProofFailureDetail {
+  evidence: string[];
+  manualSteps: string[];
+}
+
 /** Outcome of local proof-oriented test generation for one finding. */
 export interface ProofGeneration {
   status: "provable_locally" | "needs_manual_completion" | "unsupported";
@@ -94,6 +119,22 @@ export interface ProofGeneration {
   manualNeeded: string[];
   notes?: string;
   generatorId: string;
+  /** Machine-readable boundary when proof is partial or unavailable (JSON export). */
+  failureReason?: string;
+  /** Classified reason when proof is partial or unsupported. */
+  failureCode?: ProofFailureCode;
+  failureDetail?: ProofFailureDetail;
+  /**
+   * Local proof is repeatable without network (heuristic; generators may set).
+   * When omitted and a `.test.mjs` was emitted for provable_locally, treated as true in metrics.
+   */
+  deterministic?: boolean;
+  /** Proof needs network access to validate (heuristic). */
+  requiresNetwork?: boolean;
+  /** Proof needs secrets from environment (heuristic). */
+  requiresSecrets?: boolean;
+  /** Proof depends on non-secret environment variables (e.g. NODE_ENV). */
+  requiresEnv?: boolean;
 }
 
 /** `static` = rule-based scan only. `ai` = same scan + writes an IDE paste-in prompt (Cursor / Claude Code); no remote API. */

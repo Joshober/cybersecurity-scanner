@@ -1,0 +1,48 @@
+{
+  "benchmarkName": "Damn Vulnerable Node Application (DVNA)",
+  "benchmarkSlug": "dvna",
+  "tool": "semgrep",
+  "toolVersion": "1.157.0",
+  "sourceRepo": {
+    "url": "https://github.com/appsecco/dvna",
+    "originLabel": "benchmarks/dvna/dvna",
+    "commitHash": "9ba473add536f66ac9007966acb2a775dd31277a"
+  },
+  "scannerRepo": {
+    "commitHash": "af248e25ee35d278c7a84759707abf6a1a59caf7"
+  },
+  "environment": {
+    "os": "win32",
+    "python": "3.12",
+    "semgrepPath": "%APPDATA%\\Python\\Python312\\Scripts\\semgrep.exe"
+  },
+  "command": [
+    "semgrep",
+    "scan",
+    "--config", "p/javascript",
+    "--config", "p/security-audit",
+    "benchmarks/dvna/dvna",
+    "--json",
+    "--output", "benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json"
+  ],
+  "commandSarif": [
+    "semgrep",
+    "scan",
+    "--config", "p/javascript",
+    "--config", "p/security-audit",
+    "benchmarks/dvna/dvna",
+    "--sarif",
+    "--output", "benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.sarif"
+  ],
+  "notes": "Semgrep scans files tracked by git under the target path. Set PYTHONUTF8=1 on Windows when writing SARIF to avoid Unicode errors. Rules: community packs p/javascript + p/security-audit.",
+  "summary": {
+    "findings": 11,
+    "rulesRun": 85,
+    "targetsScanned": 148
+  },
+  "artifacts": [
+    "semgrep.json",
+    "semgrep.sarif"
+  ],
+  "runDateUtc": "2026-04-03T00:00:00Z"
+}

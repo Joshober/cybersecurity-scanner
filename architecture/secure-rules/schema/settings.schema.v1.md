@@ -2,7 +2,7 @@
 
 Portable YAML consumed by `@secure-arch/core` and `secure-arch check`.
 
-Canonical usage docs: [`docs/secure-arch/README.md`](../../../docs/secure-arch/README.md).
+Canonical usage docs: [`vibescan/README.md`](../../../vibescan/README.md) ( **secure-arch** section).
 
 ## Files
 

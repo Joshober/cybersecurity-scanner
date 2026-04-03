@@ -5,7 +5,7 @@
 
 import type { Category, ProjectScanResult, Severity } from "./types.js";
 import { getRuleDocumentation } from "./ruleCatalog.js";
-import { summarizeFindings, type FindingsSummary } from "./format.js";
+import { summarizeFindings, summarizeProofCoverage, type FindingsSummary } from "./format.js";
 
 function summarizeRows(rows: HtmlReportFindingRow[]): FindingsSummary {
   const bySeverity: Record<Severity, number> = {
@@ -77,6 +77,8 @@ export interface HtmlReportMeta {
   generatedAt?: string;
   buildId?: string;
   projectLabel?: string;
+  /** Shown in HTML header when provided (e.g. path to proof-run-log.json). */
+  proofRunLogPath?: string;
 }
 
 function asString(v: unknown): string | undefined {
@@ -194,6 +196,26 @@ function severityClass(sev: string | undefined): string {
   return "sev-unknown";
 }
 
+function proofCoverageSection(
+  pc: Record<string, unknown> | undefined,
+  logPath: string | undefined
+): string {
+  if (!pc || typeof pc !== "object") return "";
+  const prov = pc.provable;
+  const det = pc.deterministic_proof_percent;
+  const cov = pc.proof_coverage_percent;
+  const lines: string[] = [
+    `<section class="proof-coverage" style="margin-bottom:1rem;padding:0.85rem 1rem;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-size:0.88rem;">`,
+    `<h2 style="margin:0 0 0.5rem;font-size:1rem;">Proof coverage</h2>`,
+    `<p style="margin:0.2rem 0;color:var(--muted);">Provable: <strong>${escapeHtml(String(prov ?? "—"))}</strong> · Coverage %: <strong>${escapeHtml(String(cov ?? "—"))}</strong> · Deterministic (generated) %: <strong>${escapeHtml(String(det ?? "—"))}</strong></p>`,
+  ];
+  if (logPath) {
+    lines.push(`<p style="margin:0.35rem 0 0;color:var(--muted);">Proof run log: <code>${escapeHtml(logPath)}</code></p>`);
+  }
+  lines.push(`</section>`);
+  return lines.join("");
+}
+
 function proofBlock(row: HtmlReportFindingRow): string {
   const p = row.proofGeneration;
   if (!p) return "";
@@ -201,6 +223,7 @@ function proofBlock(row: HtmlReportFindingRow): string {
   const gen = escapeHtml(String(p.generatorId ?? ""));
   const was = p.wasGenerated === true ? "yes" : "no";
   const path = p.generatedPath != null ? escapeHtml(String(p.generatedPath)) : "";
+  const failCode = p.failureCode != null ? escapeHtml(String(p.failureCode)) : "";
   const lines: string[] = [
     `<div class="proof-box">`,
     `<strong>Proof-oriented test generation</strong>`,
@@ -208,6 +231,7 @@ function proofBlock(row: HtmlReportFindingRow): string {
     `<div class="kv"><span>Generator</span><span>${gen}</span></div>`,
     `<div class="kv"><span>Generated</span><span>${escapeHtml(was)}</span></div>`,
   ];
+  if (failCode) lines.push(`<div class="kv"><span>Failure code</span><span><code>${failCode}</code></span></div>`);
   if (path) lines.push(`<div class="kv"><span>Path</span><span><code>${path}</code></span></div>`);
   if (Array.isArray(p.manualNeeded) && p.manualNeeded.length) {
     lines.push(
@@ -226,8 +250,10 @@ export function buildHtmlReport(input: {
   findings: HtmlReportFindingRow[];
   summary: FindingsSummary;
   meta?: HtmlReportMeta;
+  /** From summary.proofCoverage in project JSON or summarizeProofCoverage(). */
+  proofCoverage?: Record<string, unknown>;
 }): string {
-  const { findings, summary, meta } = input;
+  const { findings, summary, meta, proofCoverage } = input;
   const title = "VibeScan security report";
   const when = meta?.generatedAt ?? new Date().toISOString();
   const ver = meta?.toolVersion ?? "";
@@ -514,6 +540,7 @@ ${headExtra}
       <p class="sub">${summary.totalFindings} finding(s) · filter and expand rows below</p>
     </header>
     <div class="cards">${cardHtml}</div>
+    ${proofCoverageSection(proofCoverage, meta?.proofRunLogPath)}
     <div class="toolbar">
       <div>
         <label for="filter-q">Search</label>
@@ -560,10 +587,12 @@ export function projectScanToHtmlReport(
 ): string {
   const findings = project.findings as unknown as HtmlReportFindingRow[];
   const summary = summarizeFindings(project.findings);
+  const proofCoverage = summarizeProofCoverage(project.findings) as unknown as Record<string, unknown>;
   return buildHtmlReport({
     findings,
     summary,
     meta: { ...meta, buildId: meta?.buildId ?? project.buildId },
+    proofCoverage,
   });
 }
 
@@ -577,9 +606,18 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
   const rows = extractFindingsFromProjectJson(data);
   const m = metaFromProjectJson(data);
   const summary = summarizeRows(rows);
+  let proofCoverage: Record<string, unknown> | undefined;
+  if (data && typeof data === "object") {
+    const sum = (data as Record<string, unknown>).summary;
+    if (sum && typeof sum === "object") {
+      const pc = (sum as Record<string, unknown>).proofCoverage;
+      if (pc && typeof pc === "object") proofCoverage = pc as Record<string, unknown>;
+    }
+  }
   return buildHtmlReport({
     findings: rows,
     summary,
     meta: { ...meta, buildId: meta?.buildId ?? m.buildId },
+    proofCoverage,
   });
 }

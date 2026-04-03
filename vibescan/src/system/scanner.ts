@@ -37,7 +37,7 @@ export function scan(
   filePath: string,
   options: ScannerOptions = {}
 ): ScanResult {
-  const parseResult = parseFile(source);
+  const parseResult = parseFile(source, filePath);
   if (!parseResult) {
     return { filePath, findings: [], source };
   }
@@ -126,7 +126,7 @@ export function scanProject(
 function extractRouteGraphFromFiles(files: { path: string; source: string }[]): import("./types.js").RouteNode[] {
   const routes: import("./types.js").RouteNode[] = [];
   for (const f of files) {
-    const pr = parseFile(f.source);
+    const pr = parseFile(f.source, f.path);
     if (!pr) continue;
     routes.push(...extractRouteGraph(pr.ast, pr.source, f.path));
   }
