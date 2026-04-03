@@ -134,7 +134,7 @@ These subcommands are served by **`vibescan`** (and `secure`):
 | `vibescan prove --run --from <project.json> [--output proof-run-log.json] [--retries N]` | Run **`node --test`** on each generated proof; writes **`proof-run-log.json`** (pass/fail, duration, optional **stability** / **perRun** when `N>1`). Non-zero exit if any proof **fails**. |
 | `vibescan import-sarif <file.sarif> [--output out.json] [--rule-map map.json]` | Normalize external SARIF into VibeScan-shaped JSON; optional **rule map** maps tool rule id prefixes to canonical VibeScan ids. |
 | `vibescan import-sarif <file.sarif> --project <root> [--rule-map …] [--emit-proofs <dir>]` | **Merge scan:** native project scan + SARIF rows; drops imports that **collide on file:line** with native findings; optional proof emission. |
-| `vibescan fix-preview --project-root <dir> --patch <file.diff> [--output result.json] [--retries N]` | Copy project to temp trees, **apply patch** (`patch` or `git apply` after `git init`), run scan + proofs **before/after**, print JSON result. |
+| `vibescan fix-preview --project-root <dir> --patch <file.diff> [--from <project.json> --finding-id <id>] [--output result.json] [--retries N]` | Same as above; with **`--from`** + **`--finding-id`**, result JSON includes **`findingDiff`** (proof harness rows before/after for that id). Both flags are required together. |
 | `vibescan comparison-report --vibescan <project.json> [--proof-log …] [--labels …]` | Markdown summary for benchmarks (proof stats + optional labels). |
 | `vibescan report <results.json>` | Build a **static HTML** report from a prior `--format json` file (no rescan). |
 | `vibescan secure-arch install …` | Install secure-arch YAML templates + schema under your project. |
@@ -142,6 +142,11 @@ These subcommands are served by **`vibescan`** (and `secure`):
 | `vibescan secure-arch check …` | Validate architecture YAML + optional code evidence. |
 | **`vibescan export-ai-rules …`** | **Governance export:** reads **`vibescan.config.json`** + secure-arch settings path; by default writes **Cursor** rules, **Amazon Q** prompt, **`vibescan-ai-governance.md`**, and **`vibescan.policy.json`**, each bannered as *generated from your project’s security policy*. |
 | `vibescan init …` | Creates **`vibescan.config.json`** (from sample) and **`.github/workflows/vibescan.yml`** when missing, then runs **`secure-arch init`** with the same arguments. |
+
+### Limitations and expectations
+
+- **SARIF → proof** is best-effort: mapped rule ids do not populate **`proofHints`**; merge prefers **native** findings at the same file and line as an imported row.
+- The **proof harness** is **metadata plus per–rule-family generators**, not a single universal mock or snapshot runtime for every rule.
 
 ### `export-ai-rules` (project-aware)
 

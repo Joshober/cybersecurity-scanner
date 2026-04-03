@@ -108,8 +108,7 @@ export function importSarifText(
     const message = String(msg?.text ?? r.message ?? "");
     const { severity, label } = levelToSeverity(r.level as string | undefined);
     const loc0 = Array.isArray(r.locations) ? (r.locations[0] as Record<string, unknown>) : undefined;
-    const phys = loc0?.physicalLocation as Record<string, unknown> | undefined;
-    const { file, line, column } = extractUri(phys);
+    const { file, line, column } = extractUri(loc0);
     const category = inferCategoryFromProps(props);
     const displayRuleId = mapped ?? `${sourceLabel}:${ruleId}`;
 

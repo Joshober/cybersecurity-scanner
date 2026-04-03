@@ -71,6 +71,7 @@ export { emitProofTests } from "./proof/pipeline.js";
 export type { EmitProofTestsOptions } from "./proof/pipeline.js";
 export { runProofHarness } from "./proof/runner.js";
 export type { ProofRunLog, RunProofHarnessOptions } from "./proof/runner.js";
+export { findProofRunEntryByFindingId } from "./proof/runner.js";
 export { importSarifFromFile, importSarifText } from "./importers/sarif/importSarif.js";
 export type { ImportSarifResult, ImportedFindingRow } from "./importers/sarif/importSarif.js";
 export { mergeSarifWithProjectScan } from "./importers/sarif/mergeSarifProject.js";

@@ -336,6 +336,15 @@ export function runProofHarness(options: RunProofHarnessOptions): ProofRunLog {
   return log;
 }
 
+/** Locate harness entry for a stable `findingId` (from project JSON / `computeFindingId`). */
+export function findProofRunEntryByFindingId(
+  log: ProofRunLog | null,
+  findingId: string
+): ProofRunEntry | undefined {
+  if (!log) return undefined;
+  return log.entries.find((e) => e.findingId === findingId);
+}
+
 /** Serialize log to path (for callers that already built log in memory). */
 export function writeProofRunLog(log: ProofRunLog, outputPath: string): void {
   writeFileSync(outputPath, JSON.stringify(log, null, 2), "utf-8");

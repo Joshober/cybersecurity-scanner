@@ -190,6 +190,8 @@ function main(): void {
         let patchFile: string | undefined;
         let outJson: string | undefined;
         let retries: number | undefined;
+        let fromProjectJson: string | undefined;
+        let findingId: string | undefined;
         for (let i = 0; i < rest.length; i++) {
           if (rest[i] === "--project-root" && rest[i + 1]) {
             projectRoot = resolve(rest[++i]);
@@ -197,6 +199,14 @@ function main(): void {
           }
           if (rest[i] === "--patch" && rest[i + 1]) {
             patchFile = resolve(rest[++i]);
+            continue;
+          }
+          if (rest[i] === "--from" && rest[i + 1]) {
+            fromProjectJson = resolve(rest[++i]);
+            continue;
+          }
+          if (rest[i] === "--finding-id" && rest[i + 1]) {
+            findingId = rest[++i];
             continue;
           }
           if (rest[i] === "--output" && rest[i + 1]) {
@@ -210,11 +220,17 @@ function main(): void {
         }
         if (!projectRoot || !patchFile) {
           console.error(
-            "Usage: vibescan fix-preview --project-root <dir> --patch <file.diff> [--output <result.json>] [--retries N]"
+            "Usage: vibescan fix-preview --project-root <dir> --patch <file.diff> [--from <project.json> --finding-id <id>] [--output <result.json>] [--retries N]"
           );
           process.exit(1);
         }
-        const r = m.runFixPreview({ projectRoot, patchFile, retries });
+        const r = m.runFixPreview({
+          projectRoot,
+          patchFile,
+          retries,
+          fromProjectJson,
+          findingId,
+        });
         const payload = JSON.stringify(r, null, 2);
         if (outJson) {
           writeFileSync(outJson, payload, "utf-8");
@@ -277,6 +293,8 @@ function main(): void {
     const boot = runVibeScanProjectBootstrap(__dirname, process.cwd());
     for (const c of boot.created) console.log(`vibescan init: created ${c}`);
     for (const s of boot.skipped) console.log(`vibescan init: ${s}`);
+    const pkgRoot = resolve(__dirname, "..", "..", "..");
+    console.error(`vibescan init: proof rule SDK — see ${join(pkgRoot, "templates", "proof-rule-sdk", "README.md")}`);
     if (!existsSync(secureArchCliPath)) {
       console.error(`Missing vendored secure-arch CLI: ${secureArchCliPath}`);
       process.exit(1);

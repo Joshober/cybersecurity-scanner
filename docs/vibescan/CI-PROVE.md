@@ -61,6 +61,8 @@ Generated project JSON can include **`proofHarness`** on a finding (`isolation: 
 npx @jobersteadt/vibescan fix-preview --project-root . --patch ./fix.diff --output ./fix-preview-result.json
 ```
 
+Optional **`--from ./vibescan.json`** and **`--finding-id vs1-…`** (must pass both): correlates with a row in the saved project JSON and adds **`findingDiff`** (proof **`result`** before vs after for that id).
+
 Requires **`patch`** (e.g. Git Bash) or a **`git apply`**-compatible apply after `git init` in the temp tree. Temps are deleted after the command finishes.
 
 ### GitHub Actions (example)

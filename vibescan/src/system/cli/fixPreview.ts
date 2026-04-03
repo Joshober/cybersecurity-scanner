@@ -10,13 +10,31 @@ import { collectScanFiles } from "./collectFiles.js";
 import { scanProject } from "../scanner.js";
 import { formatProjectJson } from "../format.js";
 import { emitProofTests } from "../proof/pipeline.js";
-import { runProofHarness, type ProofRunLog } from "../proof/runner.js";
+import {
+  runProofHarness,
+  findProofRunEntryByFindingId,
+  type ProofRunLog,
+  type ProofRunEntry,
+} from "../proof/runner.js";
 import type { ScannerOptions } from "../types.js";
 
 export interface FixPreviewOptions {
   projectRoot: string;
   patchFile: string;
   retries?: number;
+  /** Saved project JSON (formatProjectJson); required with `findingId`. */
+  fromProjectJson?: string;
+  /** Stable id from JSON `findingId`; requires `fromProjectJson`. */
+  findingId?: string;
+}
+
+/** Per-finding proof status before vs after patch (optional). */
+export interface FixPreviewFindingDiff {
+  lookup: "matched" | "not_in_from_json";
+  before?: ProofRunEntry;
+  after?: ProofRunEntry;
+  /** True when both entries exist and `result` differs. */
+  resultChanged: boolean;
 }
 
 export interface FixPreviewResult {
@@ -30,6 +48,10 @@ export interface FixPreviewResult {
   proofLogAfter: ProofRunLog | null;
   summaryBeforeFindings: number;
   summaryAfterFindings: number;
+  /** Set when `--from` + `--finding-id` passed to CLI. */
+  fromProjectJson?: string;
+  findingId?: string;
+  findingDiff?: FixPreviewFindingDiff;
 }
 
 function copyWorkspace(src: string, dest: string): void {
@@ -74,7 +96,45 @@ function scanToProjectJson(root: string, proofsRel: string): { jsonPath: string;
   return { jsonPath, findings: project.findings.length };
 }
 
+function findingIdInSavedProjectJson(absPath: string, findingId: string): boolean {
+  const text = readFileSync(absPath, "utf-8");
+  const j = JSON.parse(text) as { findings?: Array<{ findingId?: string }> };
+  const rows = Array.isArray(j.findings) ? j.findings : [];
+  return rows.some((r) => r.findingId === findingId);
+}
+
+function buildFindingDiff(
+  fromPath: string | undefined,
+  findingId: string | undefined,
+  logBefore: ProofRunLog,
+  logAfter: ProofRunLog
+): FixPreviewFindingDiff | undefined {
+  if (!fromPath || !findingId) return undefined;
+  const lookup = findingIdInSavedProjectJson(fromPath, findingId) ? "matched" : "not_in_from_json";
+  const before = findProofRunEntryByFindingId(logBefore, findingId);
+  const after = findProofRunEntryByFindingId(logAfter, findingId);
+  const resultChanged =
+    before != null &&
+    after != null &&
+    before.result !== undefined &&
+    after.result !== undefined &&
+    before.result !== after.result;
+  return { lookup, before, after, resultChanged };
+}
+
 export function runFixPreview(options: FixPreviewOptions): FixPreviewResult {
+  const fromJsonOpt = options.fromProjectJson;
+  const findingIdOpt = options.findingId;
+  if ((fromJsonOpt && !findingIdOpt) || (!fromJsonOpt && findingIdOpt)) {
+    throw new Error("fix-preview: `--from` and `--finding-id` must be passed together (or neither).");
+  }
+  if (fromJsonOpt && findingIdOpt) {
+    const p = resolve(fromJsonOpt);
+    if (!existsSync(p)) {
+      throw new Error(`fix-preview: --from file not found: ${p}`);
+    }
+  }
+
   const projectRoot = resolve(options.projectRoot);
   const patchAbs = resolve(options.patchFile);
   if (!existsSync(patchAbs)) {
@@ -110,6 +170,12 @@ export function runFixPreview(options: FixPreviewOptions): FixPreviewResult {
     retries,
   });
 
+  const fromResolved = fromJsonOpt ? resolve(fromJsonOpt) : undefined;
+  const findingDiff =
+    fromResolved && findingIdOpt
+      ? buildFindingDiff(fromResolved, findingIdOpt, proofLogBefore, proofLogAfter)
+      : undefined;
+
   return {
     version: 1,
     projectRoot,
@@ -121,6 +187,10 @@ export function runFixPreview(options: FixPreviewOptions): FixPreviewResult {
     proofLogAfter,
     summaryBeforeFindings: beforeScan.findings,
     summaryAfterFindings: afterScan.findings,
+    ...(fromResolved && findingIdOpt
+      ? { fromProjectJson: relative(projectRoot, fromResolved) || fromResolved, findingId: findingIdOpt }
+      : {}),
+    ...(findingDiff ? { findingDiff } : {}),
   };
 }
 
