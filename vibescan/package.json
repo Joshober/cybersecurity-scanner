@@ -29,11 +29,13 @@
   "scripts": {
     "build": "tsc",
     "prepack": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
-    "test": "npm run build && node --test \"tests/unit/*.test.mjs\"",
+    "test": "npm run build && npm run test:unit",
     "release:check": "npm run prepack && npm pack --dry-run --ignore-scripts",
     "release:quick": "npm pack --dry-run",
     "prepublishOnly": "npm run prepack",
-    "policy-eval": "node scripts/policy-eval.mjs"
+    "policy-eval": "node scripts/policy-eval.mjs",
+    "test:unit": "node --test \"tests/unit/*.test.mjs\"",
+    "ci:verify-fixture-formats": "node scripts/verify-fixture-formats.mjs"
   },
   "keywords": [
     "security",
