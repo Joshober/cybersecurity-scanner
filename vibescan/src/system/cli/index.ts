@@ -3,8 +3,8 @@
 // CLI: VibeScan / secure — scan [paths...] — project scan, optional registry check, generated tests.
 
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve, join, relative } from "node:path";
+import { readFileSync, statSync, writeFileSync } from "node:fs";
+import { dirname, resolve, join, relative } from "node:path";
 import { scanProjectAsync } from "../scanner.js";
 import {
   formatHuman,
@@ -428,9 +428,16 @@ async function main(): Promise<void> {
     path: resolve(path),
     source: readFileSync(resolve(path), "utf-8"),
   }));
-  const projectRoot =
-    options.projectRoot ??
-    (inputPaths.length > 0 ? resolve(inputPaths[0]) : process.cwd());
+  const inferredRoot = (() => {
+    if (inputPaths.length === 0) return process.cwd();
+    const firstPath = resolve(inputPaths[0]);
+    try {
+      return statSync(firstPath).isDirectory() ? firstPath : dirname(firstPath);
+    } catch {
+      return dirname(firstPath);
+    }
+  })();
+  const projectRoot = options.projectRoot ?? inferredRoot;
   options = { ...options, projectRoot };
   const rawProject = await scanProjectAsync(entries, options, projectRoot);
   const project = withFilteredFindings(rawProject);
