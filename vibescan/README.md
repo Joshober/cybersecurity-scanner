@@ -153,7 +153,7 @@ These subcommands are served by **`vibescan`** (and `secure`):
 ```bash
 vibescan export-ai-rules --root .
 # Optional: --emit all|cursor,amazonq,markdown,policy   (default: all)
-# --settings <rel> overrides secure-arch folder (else aiExport.settings or architecture/secure-rules)
+# --settings <rel> overrides secure-arch folder (else aiExport.settings or vibescan/architecture/secure-rules)
 ```
 
 Uses vendored **`@secure-arch/adapters`**, optional **`vibescan.config.json`**, and emits a **JSON policy** digest for downstream tooling. When config exists and Cursor output is included, also writes **`.cursor/rules/vibescan-static-scan.mdc`**.

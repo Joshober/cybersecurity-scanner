@@ -222,7 +222,7 @@ Mechanisms:
 
 ### Universal secure-architecture layer
 
-- **Settings in YAML** under [`architecture/secure-rules/`](../architecture/secure-rules/) (AI tools fill templates; they do not “validate” security by themselves).
+- **Settings in YAML** under [`vibescan/architecture/secure-rules/`](../../vibescan/architecture/secure-rules/) (AI tools fill templates; they do not “validate” security by themselves).
 - **Static checker** — [`@secure-arch/core`](../vibescan/packages/secure-arch-core/) loads YAML, runs **ARCH-*** rules, and optionally correlates **JS/TS** evidence via **`vibescan`** (`ARCH-E*`) plus **Python/Java** heuristics (`ARCH-H*`).
 - **CLI** — [`secure-arch`](../vibescan/packages/secure-arch-cli/src/cli.ts): `install`, `init --tool cursor|amazonq`, `check`.
 - **Docs** — [vibescan/README.md](../../vibescan/README.md) (secure-arch section).
@@ -281,7 +281,7 @@ CyberSecurity/
 │   ├── secure-arch/             ← secure-arch usage + AI prompts
 │   ├── research-strengthening/  ← paper/poster methodology hub
 │   └── vibescan/                ← poster HTML, abstract, pitch, QR, checklist
-├── architecture/secure-rules/   ← YAML settings (after secure-arch install)
+├── architecture/secure-rules/   ← under vibescan/; YAML settings (after secure-arch install)
 ├── benchmarks/                  ← DVNA README + seeded corpora + scripts + dated run outputs
 ├── results/                     ← DVNA benchmark outputs + evaluation markdown (legacy; see benchmarks/results/archive)
 ├── vibescan/
@@ -1437,7 +1437,7 @@ After edits, re-count against the web form limit. Prefer cutting duplicate adjec
 
 **Intent:** Keep **research merges** independent of **layout/refactor** work. Academic work should land on `master` from `docs/research-strengthening` (or similar) without waiting for a megamerge.
 
-**Hybrid layout (this repo’s `main`):** The scanner lives under **`vibescan/`**. **secure-arch** is under `vibescan/packages/secure-arch-*`, `architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into a nested scanner package.
+**Hybrid layout (this repo’s `main`):** The scanner lives under **`vibescan/`**. **secure-arch** is under `vibescan/packages/secure-arch-*`, `vibescan/architecture/secure-rules/`, and `docs/secure-arch/`—NewLayout features without relocating VibeScan into a nested scanner package.
 
 ## What to verify on `Jober/NewLayout` first
 
@@ -2802,7 +2802,7 @@ Boolean `true` means: **violations of this expectation fail the policy check** (
 
 ## Relation to secure-arch YAML
 
-[`vibescan/packages/secure-arch-core`](../../vibescan/packages/secure-arch-core/) loads `architecture/secure-rules/*.yaml` into **ArchitectureFacts**. A future step is to **generate** the JSON policy above from those facts (or merge both in one CI job). This repo keeps the PoC as **standalone JSON** so it runs without building secure-arch.
+[`vibescan/packages/secure-arch-core`](../../vibescan/packages/secure-arch-core/) loads `vibescan/architecture/secure-rules/*.yaml` (by default, relative to repo root) into **ArchitectureFacts**. A future step is to **generate** the JSON policy above from those facts (or merge both in one CI job). This repo keeps the PoC as **standalone JSON** so it runs without building secure-arch.
 
 ## Limitations
 

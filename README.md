@@ -247,7 +247,9 @@ vibescan/
 │   ├── secure-arch-core/  # Settings schema + ARCH-* checks + evidence
 │   ├── secure-arch-cli/   # secure-arch CLI
 │   └── secure-arch-adapters/
-architecture/secure-rules/   # YAML settings (templates via secure-arch install)
+└── architecture/
+    └── secure-rules/        # YAML policy for secure-arch (templates via install)
+
 docs/
 ├── vibescan/          # COMBINED_VIBESCAN_DOCS.md + topic markdown
 ├── research-strengthening/  # COMBINED_RESEARCH_STRENGTHENING.md + topic markdown

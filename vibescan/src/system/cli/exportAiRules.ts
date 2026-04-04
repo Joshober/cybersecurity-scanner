@@ -227,7 +227,7 @@ Options:
   --emit     Comma-separated outputs (default: all)
   --tool     When set with a partial --emit list, still limits to that tool for adapter files only
   --root     Project root (default cwd)
-  --settings secure-arch folder relative to root (default: architecture/secure-rules or aiExport.settings)
+  --settings secure-arch folder relative to root (default: vibescan/architecture/secure-rules or aiExport.settings)
 
 When config exists and Cursor rules are emitted, also writes .cursor/rules/vibescan-static-scan.mdc.
 `);
@@ -281,7 +281,7 @@ export async function runExportAiRulesCliAsync(argv: string[], cliDir: string): 
   const settingsRelative =
     parsed.settings ??
     (fileCfg?.aiExport && typeof fileCfg.aiExport.settings === "string" ? fileCfg.aiExport.settings : undefined) ??
-    "architecture/secure-rules";
+    "vibescan/architecture/secure-rules";
 
   const emit = parseEmitList(parsed.emit);
   const version = readScannerPackageVersion();

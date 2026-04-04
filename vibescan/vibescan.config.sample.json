@@ -21,6 +21,6 @@
   ],
   "aiExport": {
     "tool": "cursor",
-    "settings": "architecture/secure-rules"
+    "settings": "vibescan/architecture/secure-rules"
   }
 }

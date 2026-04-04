@@ -22,7 +22,7 @@ Commands:
 
 Options:
   --root          Project root (default: cwd)
-  --settings      Settings directory relative to root (default: architecture/secure-rules)
+  --settings      Settings directory relative to root (default: vibescan/architecture/secure-rules)
   --force         Overwrite templates on install
   --code-evidence off | js-ts | all   (default: js-ts)
   --paths         Extra scan paths for code evidence (default: .)
@@ -76,7 +76,7 @@ async function main(): Promise<void> {
   const args = parseArgs(argv);
   const cmd = String(args._cmd ?? "");
   const projectRoot = resolve(process.cwd(), String(args.root ?? "."));
-  const settingsRelative = String(args.settings ?? "architecture/secure-rules");
+  const settingsRelative = String(args.settings ?? "vibescan/architecture/secure-rules");
   const settingsDir = join(projectRoot, settingsRelative);
 
   if (cmd === "install") {

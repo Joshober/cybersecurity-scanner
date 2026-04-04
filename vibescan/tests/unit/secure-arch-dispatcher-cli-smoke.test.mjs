@@ -102,7 +102,7 @@ describe("CLI dispatcher - secure-arch", () => {
       const content = readFileSync(ruleFile, "utf-8");
       assert.ok(content.includes("Generated from your project's security policy"), "Expected governance banner.");
       assert.ok(content.includes("Secure architecture — fill YAML settings only"), "Expected rule content marker.");
-      assert.ok(content.includes("architecture/secure-rules/**/*"), "Expected rule globs marker.");
+      assert.ok(content.includes("vibescan/architecture/secure-rules/**/*"), "Expected rule globs marker.");
       assert.ok(existsSync(join(tmpProjectRoot, "vibescan-ai-governance.md")), "Expected generic governance markdown.");
       const pol = JSON.parse(readFileSync(join(tmpProjectRoot, "vibescan.policy.json"), "utf-8"));
       assert.strictEqual(pol.kind, "vibescan.securityPolicyExport");
@@ -114,7 +114,7 @@ describe("CLI dispatcher - secure-arch", () => {
         JSON.stringify({
           rules: { crypto: true, injection: true },
           severityThreshold: "error",
-          aiExport: { tool: "cursor", settings: "architecture/secure-rules" },
+          aiExport: { tool: "cursor", settings: "vibescan/architecture/secure-rules" },
         }),
         "utf-8"
       );

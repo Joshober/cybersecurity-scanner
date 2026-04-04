@@ -6,5 +6,5 @@ Do **not** store secrets here.
 
 Keep command and policy workflow references in:
 
-- [`vibescan/README.md`](../../vibescan/README.md) ( **secure-arch** section)
-- [`architecture/README.md`](../README.md)
+- [`vibescan/README.md`](../../README.md) (**secure-arch** section)
+- [`architecture/README.md`](../README.md) (this tree)

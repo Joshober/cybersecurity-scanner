@@ -26,7 +26,7 @@ export interface LoadResult {
 }
 
 /**
- * Load architecture/secure-rules/*.yaml and produce merged ArchitectureFacts.
+ * Load <settingsDir>/*.yaml (default: vibescan/architecture/secure-rules) and produce merged ArchitectureFacts.
  */
 export function loadArchitectureSettings(settingsDir: string): LoadResult {
   const schemaErrors: LoadResult["schemaErrors"] = [];
