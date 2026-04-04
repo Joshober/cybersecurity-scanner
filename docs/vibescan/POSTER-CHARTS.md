@@ -1,10 +1,11 @@
-# Poster charts (DVNA multi-tool detection + VibeScan proof coverage)
+# Poster charts (DVNA multi-tool heatmap + VibeScan proof coverage)
 
 This repo includes **data tables** and a **small generator** for conference-style figures:
 
-- **Ground-truth case list:** `results/dvna-case-catalog.json` (eleven DVNA case families from `results/dvna-adjudication.md`).
+- **Ground-truth case list:** `results/dvna-case-catalog.json` (eleven DVNA rows: `family`, `rowTitle`, `rowSubtitle`, anchors; `caseOrder` defines heatmap row order).
 - **Tool × case detection matrix:** `results/dvna-detection-matrix.json` (edit when adjudication changes).
-- **Generator:** `benchmarks/scripts/dvna-poster-charts.mjs` → writes HTML + Chart.js under `results/charts/`.
+- **Fair comparison notes:** `results/dvna-benchmark-interpretation.md` (scope, rule packs, framework context, detection vs proof).
+- **Generator:** `benchmarks/scripts/dvna-poster-charts.mjs` → writes **`dvna-detection-rate-poster.html`** (HTML/CSS **heatmap**), **`dvna-proof-coverage-poster.html`** (HTML/CSS **horizontal bars** for VibeScan proof tiers), and **`dvna-proof-vs-peers-poster.html`** (single table: **DVNA case hits** for each product vs **VibeScan-only** tier columns; peers show **—** because this benchmark does not ingest their proof-tier metadata).
 
 ## Generate figures
 
@@ -16,7 +17,7 @@ node benchmarks/scripts/dvna-poster-charts.mjs
 
 The script **exits with an error** if any charted SAST tool (everything except `npm audit` gaps) is missing a **boolean** `true`/`false` for one of the eleven case ids — i.e. it enforces **full matrix coverage** for the figure.
 
-Optional: attach a VibeScan project JSON so **proof markers** (larger points) map to cases that have `proofGeneration` with `provable_locally` + `wasGenerated`:
+Optional: attach a VibeScan project JSON so **◆ proof markers** appear on **VibeScan** cells where `proofGeneration` has `provable_locally` + `wasGenerated`:
 
 ```bash
 node benchmarks/scripts/dvna-poster-charts.mjs ^
@@ -54,10 +55,10 @@ Controlled snippets under `benchmarks/seeds/framework-vulns/` pair with `results
 node benchmarks/scripts/run-framework-vuln-scan.mjs
 ```
 
-## Academic scope note (chart subtitle)
+## Academic scope note
 
-Use the same language as your poster: **only families with an explicit ground-truth row appear on the X-axis** (here, the eleven DVNA case keys). Tools that do not provide line-level SAST parity for those cases (e.g. **npm audit**) are omitted or shown as gaps—not as artificial zeroes.
+The heatmap lists **eleven grounded DVNA case rows** (some share a title with different **scenario** subtitles). **npm audit** is omitted from tool columns when the matrix marks it as **gap** scope (dependency advisories ≠ first-party line SAST). See `results/dvna-benchmark-interpretation.md` for judge-facing framing.
 
-## Companion chart
+## Companion figure
 
-`dvna-proof-coverage-poster.html` reads `summary.proofCoverage` from the optional VibeScan JSON to contrast **detection** vs **proof tier/actionability**.
+`dvna-proof-coverage-poster.html` is a **self-contained HTML/CSS** horizontal bar view of `summary.proofCoverage` (or recomputed tiers from findings)—no Chart.js CDN, so it works offline and in locked-down browsers.

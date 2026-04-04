@@ -2,13 +2,14 @@
 
 This file reports a **preliminary, scope-limited** benchmark snapshot. It is not a finalized head-to-head claim across all baselines.
 
-## Poster charts (detection rate × case family)
+## Poster charts (detection heatmap × case families)
 
-Regenerate HTML figures (Chart.js) from the frozen adjudication matrix:
+Regenerate HTML from the frozen adjudication matrix:
 
 - Data: `results/dvna-case-catalog.json`, `results/dvna-detection-matrix.json`
+- Interpretation (scope, rule packs, fair gaps): [**results/dvna-benchmark-interpretation.md**](./dvna-benchmark-interpretation.md)
 - Script: `node benchmarks/scripts/dvna-poster-charts.mjs` (optional `--vibescan-json`, `--fill-codeql`)
-- Output: `results/charts/dvna-detection-rate-poster.html`, `dvna-proof-coverage-poster.html`
+- Output: `results/charts/dvna-detection-rate-poster.html` (**heatmap**), `dvna-proof-coverage-poster.html` (VibeScan proof tiers)
 
 See [**docs/vibescan/POSTER-CHARTS.md**](../docs/vibescan/POSTER-CHARTS.md) for usage and scope notes.
 

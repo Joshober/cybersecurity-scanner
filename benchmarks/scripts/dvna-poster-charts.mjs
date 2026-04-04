@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * Build poster-style HTML charts from results/dvna-case-catalog.json + results/dvna-detection-matrix.json.
+ * Build DVNA benchmark figures from results/dvna-case-catalog.json + results/dvna-detection-matrix.json.
  *
  * Usage:
  *   node benchmarks/scripts/dvna-poster-charts.mjs
  *   node benchmarks/scripts/dvna-poster-charts.mjs --vibescan-json benchmarks/results/.../vibescan-project.json
  *   node benchmarks/scripts/dvna-poster-charts.mjs --fill-codeql benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif
  *
- * Outputs: results/charts/dvna-detection-rate-poster.html, dvna-proof-coverage-poster.html
+ * Outputs:
+ *   results/charts/dvna-detection-rate-poster.html — tool × case heatmap (green/red, optional VibeScan proof ◆)
+ *   results/charts/dvna-proof-coverage-poster.html — VibeScan proof tier bar chart
+ *   results/charts/dvna-proof-vs-peers-poster.html — same-run table: DVNA case detection vs VibeScan proof tiers (peers N/A)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -40,7 +43,7 @@ function caseIdForFinding(finding, cases) {
   return null;
 }
 
-/** Heuristic: provable locally + generated test file = poster proof marker */
+/** Provable locally + generated test file = optional heatmap overlay on VibeScan column */
 function proofMarkerForCase(caseId, findingsByCase) {
   const rows = findingsByCase.get(caseId) || [];
   for (const f of rows) {
@@ -102,7 +105,19 @@ function validateDetectionMatrix(catalog, matrix) {
   console.log("OK: detection matrix has full true/false coverage for all charted SAST tools × cases.");
 }
 
-/** When summary.proofCoverage is missing (legacy JSON), recompute via packaged evidence helpers. */
+/** Catalog v2: caseOrder; v1: cases array only */
+function orderedCases(catalog) {
+  const byId = new Map(catalog.cases.map((c) => [c.id, c]));
+  if (Array.isArray(catalog.caseOrder)) {
+    return catalog.caseOrder.map((id) => {
+      const c = byId.get(id);
+      if (!c) throw new Error(`Unknown case id in caseOrder: ${id}`);
+      return c;
+    });
+  }
+  return [...catalog.cases];
+}
+
 async function proofCoverageFromFindings(findings) {
   if (!Array.isArray(findings) || findings.length === 0) return null;
   try {
@@ -127,21 +142,46 @@ function parseArgs(argv) {
   return out;
 }
 
-/** One distinct color per tool id so lines do not blend on the poster chart. */
-const TOOL_LINE_COLORS = {
-  vibescan: "rgb(34, 197, 94)",
-  bearer: "rgb(59, 130, 246)",
-  "snyk-code": "rgb(168, 85, 247)",
-  semgrep: "rgb(234, 88, 12)",
-  codeql: "rgb(219, 39, 119)",
-  "eslint-security": "rgb(13, 148, 136)",
-};
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
-function lineColorForTool(toolId, idx) {
-  if (TOOL_LINE_COLORS[toolId]) return TOOL_LINE_COLORS[toolId];
-  const seed = String(toolId).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  const hue = (idx * 53 + seed) % 360;
-  return `hsl(${hue} 62% 44%)`;
+function buildHeatmapTableBody(cases, tools, codeqlHits, findingsByCase) {
+  let prevFamily = null;
+  let html = "";
+  const colCount = 1 + tools.length;
+
+  for (const c of cases) {
+    if (c.family && c.family !== prevFamily) {
+      html += `<tr class="family-header"><th scope="colgroup" colspan="${colCount}">${escapeHtml(c.family)}</th></tr>`;
+      prevFamily = c.family;
+    }
+
+    const title = escapeHtml(c.rowTitle ?? c.chartLabel ?? c.id);
+    const sub = (c.rowSubtitle ?? "").trim();
+    const subHtml = sub ? `<div class="case-sub">${escapeHtml(sub)}</div>` : "";
+
+    html += `<tr><th scope="row" class="case-cell"><div class="case-title">${title}</div>${subHtml}</th>`;
+
+    for (const t of tools) {
+      let hitMap = { ...t.detections };
+      if (t.id === "codeql" && codeqlHits) hitMap = { ...hitMap, ...codeqlHits };
+      const hit = hitMap[c.id] === true;
+      const showProof =
+        t.id === "vibescan" && findingsByCase.size > 0 && proofMarkerForCase(c.id, findingsByCase);
+      const proofSpan = showProof
+        ? ` <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span>`
+        : "";
+      const label = hit ? "Detected" : "Missed";
+      html += `<td class="${hit ? "hit" : "miss"}" data-hit="${hit}" title="${label}">${label}${proofSpan}</td>`;
+    }
+    html += "</tr>";
+  }
+  return html;
 }
 
 async function main() {
@@ -149,14 +189,12 @@ async function main() {
   const catalog = JSON.parse(readFileSync(catalogPath, "utf-8"));
   const matrix = JSON.parse(readFileSync(matrixPath, "utf-8"));
   validateDetectionMatrix(catalog, matrix);
-  const cases = catalog.cases;
+  const cases = orderedCases(catalog);
 
   let codeqlHits = null;
   if (args.fillCodeql && existsSync(args.fillCodeql)) {
-    codeqlHits = parseCodeqlCaseHits(args.fillCodeql, cases);
+    codeqlHits = parseCodeqlCaseHits(args.fillCodeql, catalog.cases);
   }
-
-  const labelsWithN = cases.map((c) => `${c.chartLabel} (n=${c.n})`);
 
   /** @type {Map<string, object[]>} */
   const findingsByCase = new Map();
@@ -164,7 +202,7 @@ async function main() {
     const proj = readJsonFile(args.vibescanJson);
     const findings = proj.findings || [];
     for (const f of findings) {
-      const cid = caseIdForFinding(f, cases);
+      const cid = caseIdForFinding(f, catalog.cases);
       if (!cid) continue;
       if (!findingsByCase.has(cid)) findingsByCase.set(cid, []);
       findingsByCase.get(cid).push(f);
@@ -172,53 +210,8 @@ async function main() {
   }
 
   const tools = matrix.tools.filter((t) => t.chartMode !== "gap");
-
-  const datasets = tools.map((t, idx) => {
-    let hitMap = { ...t.detections };
-    if (t.id === "codeql" && codeqlHits) {
-      hitMap = { ...hitMap, ...codeqlHits };
-    }
-    const data = cases.map((c) => {
-      const v = hitMap[c.id];
-      if (v === null || v === undefined) return null;
-      return v ? 100 : 0;
-    });
-    const isHighlight = t.highlight === true;
-    const color = lineColorForTool(t.id, idx);
-    const borderWidth = isHighlight ? 4 : 2;
-    const pointRadius = cases.map((c) => {
-      if (!isHighlight) return 3;
-      const hasProof =
-        findingsByCase.size > 0
-          ? proofMarkerForCase(c.id, findingsByCase)
-          : false;
-      return hasProof ? 10 : 4;
-    });
-    return {
-      label: t.label,
-      data,
-      borderColor: color,
-      backgroundColor: "transparent",
-      borderWidth,
-      tension: 0.25,
-      spanGaps: false,
-      pointRadius,
-      pointBorderColor: isHighlight
-        ? cases.map((c) =>
-            findingsByCase.size > 0 && proofMarkerForCase(c.id, findingsByCase)
-              ? "rgba(13, 27, 42, 1)"
-              : color
-          )
-        : color,
-      pointBackgroundColor: isHighlight
-        ? cases.map((c) =>
-            findingsByCase.size > 0 && proofMarkerForCase(c.id, findingsByCase)
-              ? "rgba(255, 255, 255, 0.95)"
-              : color
-          )
-        : color,
-    };
-  });
+  const theadTools = tools.map((t) => `<th scope="col" class="tool-col">${escapeHtml(t.label)}</th>`).join("\n");
+  const tbody = buildHeatmapTableBody(cases, tools, codeqlHits, findingsByCase);
 
   const proofSummary = { tiers: null, source: null, tiersDerived: false };
   if (args.vibescanJson && existsSync(args.vibescanJson)) {
@@ -234,55 +227,61 @@ async function main() {
 
   mkdirSync(outDir, { recursive: true });
 
-  const htmlDetection = `<!DOCTYPE html>
+  const vibescanJsonNote = args.vibescanJson && existsSync(args.vibescanJson)
+    ? `<p class="scope"><strong>VibeScan run JSON:</strong> ${escapeHtml(args.vibescanJson)}</p>`
+    : "";
+
+  const heatmapHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DVNA — detection rate by case family</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <title>DVNA — detection heatmap (tools × cases)</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
     h1 { font-size: 1.25rem; color: #0d1b2a; }
     .scope { max-width: 960px; font-size: 0.85rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
-    .chart-wrap { max-width: 1100px; background: #fff; padding: 16px 16px 8px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
-    canvas { max-height: 520px; }
-    .legend-proof { font-size: 0.8rem; color: #334155; margin-top: 8px; }
+    .table-wrap { max-width: 1200px; overflow-x: auto; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    table.heatmap { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+    .heatmap th, .heatmap td { border: 1px solid #e2e8f0; padding: 8px 10px; vertical-align: middle; text-align: center; }
+    .heatmap th.scope.row { text-align: left; }
+    .family-header th { background: #e2e8f0; color: #0f172a; font-weight: 700; text-align: left; font-size: 0.85rem; }
+    .case-cell { background: #f8fafc; text-align: left !important; min-width: 200px; }
+    .case-title { font-weight: 600; color: #0f172a; }
+    .case-sub { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-weight: 400; }
+    .tool-col { background: #f1f5f9; font-weight: 600; }
+    td.hit { background: #22c55e; color: #fff; font-weight: 600; }
+    td.miss { background: #ef4444; color: #fff; font-weight: 600; }
+    .proof-mark { margin-left: 4px; font-size: 0.95rem; color: #fef08a; text-shadow: 0 0 1px #0f172a; }
+    .legend { margin-top: 16px; font-size: 0.8rem; color: #334155; max-width: 960px; }
+    .legend-interpret { margin-top: 20px; font-size: 0.8rem; color: #475569; max-width: 960px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
   </style>
 </head>
 <body>
-  <h1>Detection rate by DVNA case family (ground-truth rows, n=1 each)</h1>
+  <h1>DVNA detection heatmap</h1>
   <p class="scope">${escapeHtml(matrix.scopeNote)}</p>
   <p class="scope"><strong>Metric:</strong> ${escapeHtml(matrix.metricDefinition)}</p>
   <p class="scope"><strong>Data:</strong> ${escapeHtml(matrix.source)}</p>
-  <div class="chart-wrap">
-    <canvas id="c"></canvas>
-    <p class="legend-proof">Larger / diamond markers on <strong>VibeScan</strong> indicate a generated deterministic proof artifact (<code>proofGeneration.wasGenerated</code> + <code>provable_locally</code>) when a VibeScan JSON path was passed to the generator.</p>
+  ${vibescanJsonNote}
+  <p class="scope">How to read this chart: rows group cases by <strong>family</strong>; subtitles distinguish scenarios (e.g. three NoSQL Injection contexts). Columns are static-analysis tools (excludes npm audit–style dependency-only scope). See <code>results/dvna-benchmark-interpretation.md</code> for fair comparison framing.</p>
+  <div class="table-wrap">
+    <table class="heatmap">
+      <thead>
+        <tr>
+          <th scope="col" class="case-cell">Case</th>
+          ${theadTools}
+        </tr>
+      </thead>
+      <tbody>
+        ${tbody}
+      </tbody>
+    </table>
   </div>
-  <script>
-    const labels = ${JSON.stringify(labelsWithN)};
-    const datasets = ${JSON.stringify(datasets)};
-    const ctx = document.getElementById('c').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          title: { display: true, text: 'TP / (TP + FN) proxy: 100% if case detected, 0% if missed (per family)' },
-          legend: { position: 'bottom' },
-        },
-        scales: {
-          y: { min: 0, max: 100, title: { display: true, text: 'Detection rate (%)' } },
-          x: { ticks: { maxRotation: 55, minRotation: 35 } },
-        },
-      },
-    });
-  </script>
+  <p class="legend"><strong>Legend:</strong> green = detected for this row’s anchors in <code>results/dvna-case-catalog.json</code>; red = missed. ◆ on <strong>VibeScan</strong> = deterministic local proof artifact when a project JSON was passed to the generator.</p>
+  <p class="legend-interpret">Gaps mean “not covered in this evaluated configuration and scope,” not necessarily that a tool can never find this class. npm audit is advisory scope; Semgrep/CodeQL depend on rule packs; route/auth/session contexts need framework modeling; most peers target detection rather than deterministic proofs.</p>
 </body>
 </html>`;
 
-  writeFileSync(join(outDir, "dvna-detection-rate-poster.html"), htmlDetection, "utf-8");
+  writeFileSync(join(outDir, "dvna-detection-rate-poster.html"), heatmapHtml, "utf-8");
 
   const proofBars =
     proofSummary.tiers && typeof proofSummary.tiers === "object"
@@ -292,19 +291,126 @@ async function main() {
   const htmlProof = buildProofHtml(proofSummary, proofBars);
   writeFileSync(join(outDir, "dvna-proof-coverage-poster.html"), htmlProof, "utf-8");
 
-  console.log(`Wrote ${join(outDir, "dvna-detection-rate-poster.html")}`);
+  const htmlVsPeers = buildProofVsPeersHtml(matrix, tools, cases, proofSummary, codeqlHits);
+  writeFileSync(join(outDir, "dvna-proof-vs-peers-poster.html"), htmlVsPeers, "utf-8");
+
+  console.log(`Wrote ${join(outDir, "dvna-detection-rate-poster.html")} (heatmap)`);
   console.log(`Wrote ${join(outDir, "dvna-proof-coverage-poster.html")}`);
+  console.log(`Wrote ${join(outDir, "dvna-proof-vs-peers-poster.html")} (detection vs proof tiers)`);
   if (codeqlHits) {
     console.log("CodeQL case hits (heuristic from SARIF):", codeqlHits);
   }
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function caseIdsFromCatalog(cases) {
+  return cases.map((c) => c.id);
+}
+
+function caseHitsForTool(tool, caseIds, codeqlHits) {
+  let hitMap = { ...tool.detections };
+  if (tool.id === "codeql" && codeqlHits) hitMap = { ...hitMap, ...codeqlHits };
+  const n = caseIds.filter((id) => hitMap[id] === true).length;
+  return { hits: n, of: caseIds.length };
+}
+
+/**
+ * Cross-tool poster: heatmap metric (case detection) alongside VibeScan-only proof tiers.
+ * Peers do not emit `summary.proofCoverage` in this benchmark — tier cells are explicitly N/A.
+ */
+function buildProofVsPeersHtml(matrix, tools, cases, proofSummary, codeqlHits) {
+  const caseIds = caseIdsFromCatalog(cases);
+  const tiers = proofSummary.tiers && typeof proofSummary.tiers === "object" ? proofSummary.tiers : null;
+  const vsHasProof =
+    tiers &&
+    typeof tiers.provable === "number" &&
+    typeof tiers.total_findings === "number";
+
+  const rows = tools
+    .map((t) => {
+      const { hits, of } = caseHitsForTool(t, caseIds, codeqlHits);
+      const isVs = t.id === "vibescan";
+      const pct = of > 0 ? Math.round((hits / of) * 1000) / 10 : 0;
+      const detCell = `${hits}/${of} <span class="muted">(${pct}%)</span>`;
+      let t1 = "—";
+      let t2 = "—";
+      let t3 = "—";
+      let t4 = "—";
+      let nFind = "—";
+      if (isVs && vsHasProof) {
+        t1 = String(tiers.provable);
+        t2 = String(tiers.partial);
+        t3 = String(tiers.structural);
+        t4 = String(tiers.detection_only);
+        nFind = String(tiers.total_findings);
+      }
+      const rowClass = isVs ? ' class="row-vibescan"' : "";
+      return `<tr${rowClass}>
+  <th scope="row">${escapeHtml(t.label)}${t.highlight ? ' <span class="badge">heatmap focus</span>' : ""}</th>
+  <td>${escapeHtml(t.role || "sast")}</td>
+  <td class="num">${detCell}</td>
+  <td class="num">${t1}</td>
+  <td class="num">${t2}</td>
+  <td class="num">${t3}</td>
+  <td class="num">${t4}</td>
+  <td class="num">${nFind}</td>
+</tr>`;
+    })
+    .join("\n");
+
+  const proofSource = proofSummary.source
+    ? `<p class="scope"><strong>VibeScan proof source:</strong> ${escapeHtml(proofSummary.source)}</p>`
+    : `<p class="scope"><strong>VibeScan proof source:</strong> none — pass <code>--vibescan-json</code> with a project JSON from <code>scan --generate-tests</code> to populate tier columns.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DVNA — detection vs proof tiers (VibeScan vs peers)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.25rem; color: #0d1b2a; }
+    h2 { font-size: 1rem; color: #334155; margin-top: 28px; }
+    .scope { max-width: 980px; font-size: 0.85rem; color: #475569; margin-bottom: 14px; line-height: 1.55; }
+    .table-wrap { max-width: 1100px; overflow-x: auto; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    table.compare { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+    .compare th, .compare td { border: 1px solid #e2e8f0; padding: 8px 10px; vertical-align: middle; }
+    .compare thead th { background: #f1f5f9; font-weight: 600; text-align: left; }
+    .compare tbody th { text-align: left; font-weight: 600; background: #fafafa; }
+    .compare td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .compare tr.row-vibescan th, .compare tr.row-vibescan td { background: #ecfdf5; }
+    .muted { color: #64748b; font-weight: 400; }
+    .badge { font-size: 0.7rem; font-weight: 600; color: #047857; background: #d1fae5; padding: 2px 6px; border-radius: 4px; }
+    .footnote { margin-top: 18px; font-size: 0.8rem; color: #475569; max-width: 980px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+    code { font-size: 0.88em; }
+  </style>
+</head>
+<body>
+  <h1>DVNA — case detection vs proof tiers (cross-product)</h1>
+  <p class="scope">This table joins two different evaluation axes: (1) <strong>line-anchored case detection</strong> — same eleven DVNA rows as the heatmap — versus (2) <strong>VibeScan proof actionability</strong> (<code>summary.proofCoverage</code> tiers on the <em>full</em> VibeScan finding list from one run, typically after <code>--generate-tests</code>). Those tiers are not comparable to “extra hits”; they describe how findings are packaged for local follow-up.</p>
+  <p class="scope"><strong>Detection matrix:</strong> ${escapeHtml(matrix.source || matrix.metric || "results/dvna-detection-matrix.json")}</p>
+  ${proofSource}
+  <div class="table-wrap">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Role</th>
+          <th scope="col" title="Green/red heatmap metric">DVNA cases hit</th>
+          <th scope="col" title="VibeScan tier 1">Tier 1<br/><span class="muted">provable</span></th>
+          <th scope="col">Tier 2<br/><span class="muted">partial</span></th>
+          <th scope="col">Tier 3<br/><span class="muted">structural</span></th>
+          <th scope="col">Tier 4<br/><span class="muted">detect only</span></th>
+          <th scope="col" title="VibeScan finding count">Findings<br/><span class="muted">(VS scan)</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote"><strong>Reading N/A:</strong> Bearer, Snyk Code, Semgrep, CodeQL, and eslint-plugin-security are represented here only on the <strong>detection</strong> axis for these eleven anchors. They do not publish VibeScan’s four-tier proof schema in our benchmark artifacts, so tier columns show an em dash — not “zero proofs,” but <em>not evaluated on this axis</em>. For tool philosophy and scope, see <code>results/dvna-benchmark-interpretation.md</code>.</p>
+</body>
+</html>`;
 }
 
 function extractProofBars(pc) {
@@ -317,6 +423,32 @@ function extractProofBars(pc) {
   return out.length ? out : null;
 }
 
+const PROOF_TIER_BAR_COLORS = ["#22c55e", "#84cc16", "#eab308", "#94a3b8"];
+
+/** CSS horizontal bars only — no Chart.js CDN (offline/file:// safe, readable long labels). */
+function proofTierBarsHtml(rows) {
+  if (!rows.length) {
+    return "<p class=\"scope\">No tier summary in this JSON. Run <code>cd vibescan &amp;&amp; npm run build</code> and regenerate, or ensure <code>summary.proofCoverage</code> / findings are present.</p>";
+  }
+  const maxVal = Math.max(...rows.map((r) => r.value), 1);
+  const total = rows.reduce((s, r) => s + r.value, 0);
+  const bars = rows
+    .map((r, i) => {
+      const pct = maxVal > 0 ? Math.round((r.value / maxVal) * 1000) / 10 : 0;
+      const color = PROOF_TIER_BAR_COLORS[i] ?? "#64748b";
+      return `<div class="tier-row">
+  <div class="tier-label">${escapeHtml(r.label)}</div>
+  <div class="tier-track" title="${r.value} finding(s)">
+    <div class="tier-fill" style="width: ${pct}%; background: ${color};"></div>
+  </div>
+  <div class="tier-num">${r.value}</div>
+</div>`;
+    })
+    .join("\n");
+  return `<p class="tier-summary">Total findings counted: <strong>${total}</strong> (sum of tier buckets)</p>
+<div class="tier-bars" role="list" aria-label="VibeScan proof tier counts">${bars}</div>`;
+}
+
 function buildProofHtml(proofSummary, proofBars) {
   const rows = proofBars || [];
   const hasData = rows.length > 0;
@@ -327,63 +459,49 @@ function buildProofHtml(proofSummary, proofBars) {
     val("tier 2") === 0 &&
     val("tier 3") === 0 &&
     val("tier 4") > 0;
-  const payload = JSON.stringify(
-    hasData
-      ? {
-          labels: rows.map((x) => x.label),
-          data: rows.map((x) => x.value),
-        }
-      : {
-          labels: ["(no findings or could not load vibescan/dist/system/evidence.js)"],
-          data: [0],
-        }
-  );
+  const tiersMeta = proofSummary.tiers && typeof proofSummary.tiers === "object" ? proofSummary.tiers : null;
+  const pipelineNote =
+    tiersMeta?.proof_pipeline_not_run === true
+      ? "<p class=\"scope\"><strong>Note:</strong> <code>proof_pipeline_not_run</code> — no finding in this run carried a <code>proofGeneration</code> block (typical for <code>scan</code> without <code>--generate-tests</code>). Tiers still classify expected proof <em>actionability</em>; counts are not from executed proof files.</p>"
+      : "";
   const derivedNote = proofSummary.tiersDerived
-    ? "<p class=\"scope\"><strong>Note:</strong> Tiers recomputed from <code>findings[]</code> via <code>summarizeProofCoverage</code> (legacy JSON lacked <code>summary.proofCoverage</code>).</p>"
+    ? "<p class=\"scope\"><strong>Note:</strong> Tiers recomputed from <code>findings[]</code> via <code>summarizeProofCoverage</code> (source JSON lacked <code>summary.proofCoverage</code>).</p>"
     : "";
   const dvnaNote = onlyDetection
     ? "<p class=\"scope\">On DVNA, many rules surface as <strong>tier 4 (detection only)</strong> until a proof-oriented generator exists for that pattern; this is expected and distinct from cross-tool <em>detection</em> rate.</p>"
     : "";
+  const chartBody = hasData ? proofTierBarsHtml(rows) : proofTierBarsHtml([]);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>VibeScan — proof tier counts (DVNA)</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
   <style>
     body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
     h1 { font-size: 1.25rem; color: #0d1b2a; }
     .scope { max-width: 720px; font-size: 0.85rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
-    .chart-wrap { max-width: 800px; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .chart-wrap { max-width: 820px; background: #fff; padding: 20px 20px 24px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .chart-wrap h2 { font-size: 1rem; margin: 0 0 16px; color: #334155; font-weight: 600; }
+    .tier-summary { margin: 0 0 14px; font-size: 0.9rem; color: #475569; }
+    .tier-bars { display: flex; flex-direction: column; gap: 12px; }
+    .tier-row { display: grid; grid-template-columns: minmax(200px, 1.1fr) 3fr auto; gap: 10px 14px; align-items: center; font-size: 0.82rem; }
+    .tier-label { color: #0f172a; line-height: 1.35; }
+    .tier-track { height: 22px; background: #e2e8f0; border-radius: 6px; overflow: hidden; min-width: 0; }
+    .tier-fill { height: 100%; border-radius: 6px; min-width: 0; transition: width 0.2s ease; }
+    .tier-num { font-weight: 700; font-variant-numeric: tabular-nums; color: #0f172a; min-width: 2.25rem; text-align: right; }
   </style>
 </head>
 <body>
   <h1>Proof coverage (VibeScan only) — tier bucket counts</h1>
-  <p class="scope">Companion to detection-rate chart: actionability differs from raw detection. Uses <code>summary.proofCoverage</code> when present, otherwise recomputes from findings.</p>
+  <p class="scope">Companion to the DVNA heatmap: <strong>actionability</strong> (proof tier) differs from raw <strong>detection</strong>. Data comes from <code>summary.proofCoverage</code> in the project JSON when present; otherwise from <code>summarizeProofCoverage(findings)</code> at generation time.</p>
   ${proofSummary.source ? `<p class="scope"><strong>Source JSON:</strong> ${escapeHtml(proofSummary.source)}</p>` : ""}
+  ${pipelineNote}
   ${derivedNote}
   ${dvnaNote}
-  <div class="chart-wrap"><canvas id="p"></canvas></div>
-  <script>
-    const P = ${payload};
-    const ctx = document.getElementById('p').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: P.labels,
-        datasets: [{
-          label: 'Findings in tier',
-          data: P.data,
-          backgroundColor: ['#22c55e','#84cc16','#eab308','#94a3b8'],
-        }],
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false }, title: { display: true, text: 'VibeScan proof tiers on benchmark corpus' } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-      },
-    });
-  </script>
+  <div class="chart-wrap">
+    <h2>VibeScan proof tiers on benchmark corpus</h2>
+    ${chartBody}
+  </div>
 </body>
 </html>`;
 }

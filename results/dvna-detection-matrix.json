@@ -2,8 +2,8 @@
   "version": 1,
   "source": "VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.",
   "metric": "caseHit",
-  "metricDefinition": "Per case family (n=1), tool 'detects' if adjudication lists a TP finding aligned to that case's DVNA location (same policy as recall table: 11 case keys).",
-  "scopeNote": "First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—shown as gaps on the line chart, not 0% SAST parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.",
+  "metricDefinition": "Per DVNA case (n=1, catalog anchors), a heatmap cell is green when adjudication lists a TP aligned to that location; red when missed—in this evaluated configuration and scope (not universal capability).",
+  "scopeNote": "First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—omitted from SAST columns in the heatmap, not scored as 0% app-code parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.",
   "tools": [
     {
       "id": "vibescan",

@@ -74,8 +74,8 @@ describe("generateTests (proof-oriented)", () => {
   it("unsupported rule yields no file but proofGeneration", () => {
     const findings = [
       minimalFinding({
-        ruleId: "injection.sql.string-concat",
-        message: "sql",
+        ruleId: "injection.__vibescan_fixture_no_proof",
+        message: "no generator registered for this synthetic id",
       }),
     ];
     const out = generateTests(findings, dir);

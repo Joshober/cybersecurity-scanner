@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DVNA — detection vs proof tiers (VibeScan vs peers)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.25rem; color: #0d1b2a; }
+    h2 { font-size: 1rem; color: #334155; margin-top: 28px; }
+    .scope { max-width: 980px; font-size: 0.85rem; color: #475569; margin-bottom: 14px; line-height: 1.55; }
+    .table-wrap { max-width: 1100px; overflow-x: auto; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    table.compare { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+    .compare th, .compare td { border: 1px solid #e2e8f0; padding: 8px 10px; vertical-align: middle; }
+    .compare thead th { background: #f1f5f9; font-weight: 600; text-align: left; }
+    .compare tbody th { text-align: left; font-weight: 600; background: #fafafa; }
+    .compare td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .compare tr.row-vibescan th, .compare tr.row-vibescan td { background: #ecfdf5; }
+    .muted { color: #64748b; font-weight: 400; }
+    .badge { font-size: 0.7rem; font-weight: 600; color: #047857; background: #d1fae5; padding: 2px 6px; border-radius: 4px; }
+    .footnote { margin-top: 18px; font-size: 0.8rem; color: #475569; max-width: 980px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+    code { font-size: 0.88em; }
+  </style>
+</head>
+<body>
+  <h1>DVNA — case detection vs proof tiers (cross-product)</h1>
+  <p class="scope">This table joins two different evaluation axes: (1) <strong>line-anchored case detection</strong> — same eleven DVNA rows as the heatmap — versus (2) <strong>VibeScan proof actionability</strong> (<code>summary.proofCoverage</code> tiers on the <em>full</em> VibeScan finding list from one run, typically after <code>--generate-tests</code>). Those tiers are not comparable to “extra hits”; they describe how findings are packaged for local follow-up.</p>
+  <p class="scope"><strong>Detection matrix:</strong> VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.</p>
+  <p class="scope"><strong>VibeScan proof source:</strong> C:\Users\Josh\Downloads\CyberSecurity\benchmarks\results\2026-04-04_050100_dvna_vibescan_cli\vibescan-project.json</p>
+  <div class="table-wrap">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Role</th>
+          <th scope="col" title="Green/red heatmap metric">DVNA cases hit</th>
+          <th scope="col" title="VibeScan tier 1">Tier 1<br/><span class="muted">provable</span></th>
+          <th scope="col">Tier 2<br/><span class="muted">partial</span></th>
+          <th scope="col">Tier 3<br/><span class="muted">structural</span></th>
+          <th scope="col">Tier 4<br/><span class="muted">detect only</span></th>
+          <th scope="col" title="VibeScan finding count">Findings<br/><span class="muted">(VS scan)</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-vibescan">
+  <th scope="row">VibeScan <span class="badge">heatmap focus</span></th>
+  <td>sast</td>
+  <td class="num">11/11 <span class="muted">(100%)</span></td>
+  <td class="num">25</td>
+  <td class="num">0</td>
+  <td class="num">0</td>
+  <td class="num">0</td>
+  <td class="num">25</td>
+</tr>
+<tr>
+  <th scope="row">Bearer</th>
+  <td>sast</td>
+  <td class="num">8/11 <span class="muted">(72.7%)</span></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+</tr>
+<tr>
+  <th scope="row">Snyk Code</th>
+  <td>sast</td>
+  <td class="num">7/11 <span class="muted">(63.6%)</span></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+</tr>
+<tr>
+  <th scope="row">Semgrep</th>
+  <td>sast</td>
+  <td class="num">4/11 <span class="muted">(36.4%)</span></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+</tr>
+<tr>
+  <th scope="row">CodeQL</th>
+  <td>sast</td>
+  <td class="num">6/11 <span class="muted">(54.5%)</span></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+</tr>
+<tr>
+  <th scope="row">eslint-plugin-security</th>
+  <td>sast</td>
+  <td class="num">1/11 <span class="muted">(9.1%)</span></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote"><strong>Reading N/A:</strong> Bearer, Snyk Code, Semgrep, CodeQL, and eslint-plugin-security are represented here only on the <strong>detection</strong> axis for these eleven anchors. They do not publish VibeScan’s four-tier proof schema in our benchmark artifacts, so tier columns show an em dash — not “zero proofs,” but <em>not evaluated on this axis</em>. For tool philosophy and scope, see <code>results/dvna-benchmark-interpretation.md</code>.</p>
+</body>
+</html>

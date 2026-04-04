@@ -2,46 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DVNA — detection rate by case family</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <title>DVNA — detection heatmap (tools × cases)</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
     h1 { font-size: 1.25rem; color: #0d1b2a; }
     .scope { max-width: 960px; font-size: 0.85rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
-    .chart-wrap { max-width: 1100px; background: #fff; padding: 16px 16px 8px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
-    canvas { max-height: 520px; }
-    .legend-proof { font-size: 0.8rem; color: #334155; margin-top: 8px; }
+    .table-wrap { max-width: 1200px; overflow-x: auto; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    table.heatmap { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+    .heatmap th, .heatmap td { border: 1px solid #e2e8f0; padding: 8px 10px; vertical-align: middle; text-align: center; }
+    .heatmap th.scope.row { text-align: left; }
+    .family-header th { background: #e2e8f0; color: #0f172a; font-weight: 700; text-align: left; font-size: 0.85rem; }
+    .case-cell { background: #f8fafc; text-align: left !important; min-width: 200px; }
+    .case-title { font-weight: 600; color: #0f172a; }
+    .case-sub { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-weight: 400; }
+    .tool-col { background: #f1f5f9; font-weight: 600; }
+    td.hit { background: #22c55e; color: #fff; font-weight: 600; }
+    td.miss { background: #ef4444; color: #fff; font-weight: 600; }
+    .proof-mark { margin-left: 4px; font-size: 0.95rem; color: #fef08a; text-shadow: 0 0 1px #0f172a; }
+    .legend { margin-top: 16px; font-size: 0.8rem; color: #334155; max-width: 960px; }
+    .legend-interpret { margin-top: 20px; font-size: 0.8rem; color: #475569; max-width: 960px; border-top: 1px solid #e2e8f0; padding-top: 12px; }
   </style>
 </head>
 <body>
-  <h1>Detection rate by DVNA case family (ground-truth rows, n=1 each)</h1>
-  <p class="scope">First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—shown as gaps on the line chart, not 0% SAST parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.</p>
-  <p class="scope"><strong>Metric:</strong> Per case family (n=1), tool 'detects' if adjudication lists a TP finding aligned to that case's DVNA location (same policy as recall table: 11 case keys).</p>
+  <h1>DVNA detection heatmap</h1>
+  <p class="scope">First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—omitted from SAST columns in the heatmap, not scored as 0% app-code parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.</p>
+  <p class="scope"><strong>Metric:</strong> Per DVNA case (n=1, catalog anchors), a heatmap cell is green when adjudication lists a TP aligned to that location; red when missed—in this evaluated configuration and scope (not universal capability).</p>
   <p class="scope"><strong>Data:</strong> VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.</p>
-  <div class="chart-wrap">
-    <canvas id="c"></canvas>
-    <p class="legend-proof">Larger / diamond markers on <strong>VibeScan</strong> indicate a generated deterministic proof artifact (<code>proofGeneration.wasGenerated</code> + <code>provable_locally</code>) when a VibeScan JSON path was passed to the generator.</p>
+  <p class="scope"><strong>VibeScan run JSON:</strong> C:\Users\Josh\Downloads\CyberSecurity\benchmarks\results\2026-04-04_050100_dvna_vibescan_cli\vibescan-project.json</p>
+  <p class="scope">How to read this chart: rows group cases by <strong>family</strong>; subtitles distinguish scenarios (e.g. three NoSQL Injection contexts). Columns are static-analysis tools (excludes npm audit–style dependency-only scope). See <code>results/dvna-benchmark-interpretation.md</code> for fair comparison framing.</p>
+  <div class="table-wrap">
+    <table class="heatmap">
+      <thead>
+        <tr>
+          <th scope="col" class="case-cell">Case</th>
+          <th scope="col" class="tool-col">VibeScan</th>
+<th scope="col" class="tool-col">Bearer</th>
+<th scope="col" class="tool-col">Snyk Code</th>
+<th scope="col" class="tool-col">Semgrep</th>
+<th scope="col" class="tool-col">CodeQL</th>
+<th scope="col" class="tool-col">eslint-plugin-security</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="family-header"><th scope="colgroup" colspan="7">Injection</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">SQL Injection</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td></tr><tr><th scope="row" class="case-cell"><div class="case-title">Command Injection</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr><th scope="row" class="case-cell"><div class="case-title">NoSQL Injection</div><div class="case-sub">route-path case</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr><th scope="row" class="case-cell"><div class="case-title">NoSQL Injection</div><div class="case-sub">auth-context case</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr><th scope="row" class="case-cell"><div class="case-title">NoSQL Injection</div><div class="case-sub">session-context case</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr class="family-header"><th scope="colgroup" colspan="7">Redirect and Navigation</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">Open Redirect</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr class="family-header"><th scope="colgroup" colspan="7">Integrity</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">Unsafe Deserialization</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr class="family-header"><th scope="colgroup" colspan="7">Secrets and Crypto</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">Hardcoded Secret</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr><th scope="row" class="case-cell"><div class="case-title">Weak Cryptographic Hash</div></th><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr class="family-header"><th scope="colgroup" colspan="7">Auth and Access Control</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">Insecure Env Secret Fallback</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr><tr class="family-header"><th scope="colgroup" colspan="7">XSS and Client-Side Output</th></tr><tr><th scope="row" class="case-cell"><div class="case-title">DOM-Based XSS</div></th><td class="hit" data-hit="true" title="Detected">Detected <span class="proof-mark" title="Deterministic local proof artifact (provable_locally + wasGenerated)">◆</span></td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="hit" data-hit="true" title="Detected">Detected</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td><td class="miss" data-hit="false" title="Missed">Missed</td></tr>
+      </tbody>
+    </table>
   </div>
-  <script>
-    const labels = ["SQLi (n=1)","Cmd inj. (n=1)","Open redir. (n=1)","Deser (n=1)","NoSQL (routes) (n=1)","NoSQL (auth) (n=1)","NoSQL (session) (n=1)","Weak hash (n=1)","Hardcoded secret (n=1)","Env fallback (n=1)","DOM XSS (n=1)"];
-    const datasets = [{"label":"VibeScan","data":[100,100,100,100,100,100,100,100,100,100,100],"borderColor":"rgb(34, 197, 94)","backgroundColor":"transparent","borderWidth":4,"tension":0.25,"spanGaps":false,"pointRadius":[4,4,4,4,4,4,4,4,4,4,4],"pointBorderColor":["rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)"],"pointBackgroundColor":["rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)"]},{"label":"Bearer","data":[100,100,100,0,100,100,100,100,100,0,0],"borderColor":"rgb(59, 130, 246)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(59, 130, 246)","pointBackgroundColor":"rgb(59, 130, 246)"},{"label":"Snyk Code","data":[100,100,100,100,0,0,0,100,100,0,100],"borderColor":"rgb(168, 85, 247)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(168, 85, 247)","pointBackgroundColor":"rgb(168, 85, 247)"},{"label":"Semgrep","data":[100,0,100,100,0,0,0,0,100,0,0],"borderColor":"rgb(234, 88, 12)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(234, 88, 12)","pointBackgroundColor":"rgb(234, 88, 12)"},{"label":"CodeQL","data":[100,100,100,100,0,0,0,0,100,100,0],"borderColor":"rgb(219, 39, 119)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(219, 39, 119)","pointBackgroundColor":"rgb(219, 39, 119)"},{"label":"eslint-plugin-security","data":[100,0,0,0,0,0,0,0,0,0,0],"borderColor":"rgb(13, 148, 136)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(13, 148, 136)","pointBackgroundColor":"rgb(13, 148, 136)"}];
-    const ctx = document.getElementById('c').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          title: { display: true, text: 'TP / (TP + FN) proxy: 100% if case detected, 0% if missed (per family)' },
-          legend: { position: 'bottom' },
-        },
-        scales: {
-          y: { min: 0, max: 100, title: { display: true, text: 'Detection rate (%)' } },
-          x: { ticks: { maxRotation: 55, minRotation: 35 } },
-        },
-      },
-    });
-  </script>
+  <p class="legend"><strong>Legend:</strong> green = detected for this row’s anchors in <code>results/dvna-case-catalog.json</code>; red = missed. ◆ on <strong>VibeScan</strong> = deterministic local proof artifact when a project JSON was passed to the generator.</p>
+  <p class="legend-interpret">Gaps mean “not covered in this evaluated configuration and scope,” not necessarily that a tool can never find this class. npm audit is advisory scope; Semgrep/CodeQL depend on rule packs; route/auth/session contexts need framework modeling; most peers target detection rather than deterministic proofs.</p>
 </body>
 </html>

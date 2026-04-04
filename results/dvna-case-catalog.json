@@ -1,96 +1,120 @@
 {
-  "version": 1,
+  "version": 2,
   "corpus": "DVNA",
   "corpusCommit": "9ba473add536f66ac9007966acb2a775dd31277a",
-  "description": "Eleven deduplicated DVNA case families from results/dvna-adjudication.md (FN policy). Each row is n=1 for poster detection-rate charts: rate = 100% if tool detects the case, 0% if not.",
+  "description": "DVNA ground-truth cases (n=1 each) for benchmarks and heatmap charts. Stable keys are `id` (for results/dvna-detection-matrix.json). Display uses `family`, `rowTitle`, and `rowSubtitle` (scenario).",
+  "caseOrder": [
+    "sqli-apphandler",
+    "cmd-inject-apphandler",
+    "nosql-apphandler",
+    "nosql-auth",
+    "nosql-passport",
+    "open-redirect",
+    "insecure-deser",
+    "hardcoded-session-secret",
+    "weak-hash-auth",
+    "default-secret-fallback",
+    "dom-xss"
+  ],
   "cases": [
     {
       "id": "sqli-apphandler",
-      "chartLabel": "SQLi",
-      "posterFamily": "Injection",
-      "n": 1,
+      "family": "Injection",
+      "rowTitle": "SQL Injection",
+      "rowSubtitle": "",
       "anchorSuffix": "core/appHandler.js",
-      "anchorLines": [11]
+      "anchorLines": [11],
+      "n": 1
     },
     {
       "id": "cmd-inject-apphandler",
-      "chartLabel": "Cmd inj.",
-      "posterFamily": "Injection",
-      "n": 1,
+      "family": "Injection",
+      "rowTitle": "Command Injection",
+      "rowSubtitle": "",
       "anchorSuffix": "core/appHandler.js",
-      "anchorLines": [39]
-    },
-    {
-      "id": "open-redirect",
-      "chartLabel": "Open redir.",
-      "posterFamily": "AuthZ / redirect",
-      "n": 1,
-      "anchorSuffix": "core/appHandler.js",
-      "anchorLines": [188]
-    },
-    {
-      "id": "insecure-deser",
-      "chartLabel": "Deser",
-      "posterFamily": "Integrity",
-      "n": 1,
-      "anchorSuffix": "core/appHandler.js",
-      "anchorLines": [218]
+      "anchorLines": [39],
+      "n": 1
     },
     {
       "id": "nosql-apphandler",
-      "chartLabel": "NoSQL (routes)",
-      "posterFamily": "Injection",
-      "n": 1,
+      "family": "Injection",
+      "rowTitle": "NoSQL Injection",
+      "rowSubtitle": "route-path case",
       "anchorSuffix": "core/appHandler.js",
-      "anchorLines": [59, 85, 107, 145]
+      "anchorLines": [59, 85, 107, 145],
+      "n": 1
     },
     {
       "id": "nosql-auth",
-      "chartLabel": "NoSQL (auth)",
-      "posterFamily": "Injection",
-      "n": 1,
+      "family": "Injection",
+      "rowTitle": "NoSQL Injection",
+      "rowSubtitle": "auth-context case",
       "anchorSuffix": "core/authHandler.js",
-      "anchorLines": [21, 43, 49, 72, 78]
+      "anchorLines": [21, 43, 49, 72, 78],
+      "n": 1
     },
     {
       "id": "nosql-passport",
-      "chartLabel": "NoSQL (session)",
-      "posterFamily": "Injection",
-      "n": 1,
+      "family": "Injection",
+      "rowTitle": "NoSQL Injection",
+      "rowSubtitle": "session-context case",
       "anchorSuffix": "core/passport.js",
-      "anchorLines": [13, 31, 55, 65]
+      "anchorLines": [13, 31, 55, 65],
+      "n": 1
     },
     {
-      "id": "weak-hash-auth",
-      "chartLabel": "Weak hash",
-      "posterFamily": "Crypto / auth",
-      "n": 1,
-      "anchorSuffix": "core/authHandler.js",
-      "anchorLines": [49, 78]
+      "id": "open-redirect",
+      "family": "Redirect and Navigation",
+      "rowTitle": "Open Redirect",
+      "rowSubtitle": "",
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [188],
+      "n": 1
+    },
+    {
+      "id": "insecure-deser",
+      "family": "Integrity",
+      "rowTitle": "Unsafe Deserialization",
+      "rowSubtitle": "",
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [218],
+      "n": 1
     },
     {
       "id": "hardcoded-session-secret",
-      "chartLabel": "Hardcoded secret",
-      "posterFamily": "Crypto / secrets",
-      "n": 1,
+      "family": "Secrets and Crypto",
+      "rowTitle": "Hardcoded Secret",
+      "rowSubtitle": "",
       "anchorSuffix": "server.js",
-      "anchorLines": [23, 24]
+      "anchorLines": [23, 24],
+      "n": 1
+    },
+    {
+      "id": "weak-hash-auth",
+      "family": "Secrets and Crypto",
+      "rowTitle": "Weak Cryptographic Hash",
+      "rowSubtitle": "",
+      "anchorSuffix": "core/authHandler.js",
+      "anchorLines": [49, 78],
+      "n": 1
     },
     {
       "id": "default-secret-fallback",
-      "chartLabel": "Env fallback",
-      "posterFamily": "Crypto / secrets",
-      "n": 1,
+      "family": "Auth and Access Control",
+      "rowTitle": "Insecure Env Secret Fallback",
+      "rowSubtitle": "",
       "anchorSuffix": "models/index.js",
-      "anchorLines": [6]
+      "anchorLines": [6],
+      "n": 1
     },
     {
       "id": "dom-xss",
-      "chartLabel": "DOM XSS",
-      "posterFamily": "XSS",
-      "n": 1,
+      "family": "XSS and Client-Side Output",
+      "rowTitle": "DOM-Based XSS",
+      "rowSubtitle": "",
       "anchorSuffix": "views/app/adminusers.ejs",
-      "anchorLines": [40, 41, 42]
+      "anchorLines": [40, 41, 42],
+      "n": 1
     }
   ]
 }
