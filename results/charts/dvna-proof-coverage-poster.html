@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan — proof tier counts (DVNA)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.25rem; color: #0d1b2a; }
+    .scope { max-width: 720px; font-size: 0.85rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
+    .chart-wrap { max-width: 800px; background: #fff; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+  </style>
+</head>
+<body>
+  <h1>Proof coverage (VibeScan only) — tier bucket counts</h1>
+  <p class="scope">Companion to detection-rate chart: actionability differs from raw detection. Uses <code>summary.proofCoverage</code> when present, otherwise recomputes from findings.</p>
+  <p class="scope"><strong>Source JSON:</strong> C:\Users\Josh\Downloads\CyberSecurity\benchmarks\results\2026-04-04_044003_dvna_vibescan_cli\vibescan-project.json</p>
+  
+  <p class="scope">On DVNA, many rules surface as <strong>tier 4 (detection only)</strong> until a proof-oriented generator exists for that pattern; this is expected and distinct from cross-tool <em>detection</em> rate.</p>
+  <div class="chart-wrap"><canvas id="p"></canvas></div>
+  <script>
+    const P = {"labels":["Provable locally (tier 1)","Partial proof (tier 2)","Structural (tier 3)","Detection only (tier 4)"],"data":[0,0,0,25]};
+    const ctx = document.getElementById('p').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: P.labels,
+        datasets: [{
+          label: 'Findings in tier',
+          data: P.data,
+          backgroundColor: ['#22c55e','#84cc16','#eab308','#94a3b8'],
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, title: { display: true, text: 'VibeScan proof tiers on benchmark corpus' } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    });
+  </script>
+</body>
+</html>

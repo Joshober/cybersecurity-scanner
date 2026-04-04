@@ -1,0 +1,1437 @@
+{
+  "summary": {
+    "totalFindings": 7,
+    "bySeverity": {
+      "critical": 1,
+      "error": 4,
+      "warning": 2,
+      "info": 0
+    },
+    "byRuleId": {
+      "injection.sql.tainted-flow": 2,
+      "injection.sql.string-concat": 1,
+      "SEC-004": 1,
+      "injection.path-traversal": 1,
+      "injection.log": 1,
+      "crypto.secrets.hardcoded": 1
+    },
+    "byCategory": {
+      "crypto": 2,
+      "injection": 5,
+      "api_inventory": 0
+    },
+    "proofCoverage": {
+      "total_findings": 7,
+      "provable": 0,
+      "partial": 0,
+      "structural": 0,
+      "detection_only": 7,
+      "proof_coverage_percent": 0,
+      "deterministic_proof_percent": 0,
+      "by_tier": {
+        "tier_1": 0,
+        "tier_2": 0,
+        "tier_3": 0,
+        "tier_4": 7
+      },
+      "proof_pipeline_not_run": true
+    },
+    "proofCoverageByRuleFamily": {
+      "crypto.secrets": {
+        "total_findings": 2,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 2,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 2
+        },
+        "proof_pipeline_not_run": true
+      },
+      "injection.log": {
+        "total_findings": 1,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 1,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 1
+        },
+        "proof_pipeline_not_run": true
+      },
+      "injection.path-traversal": {
+        "total_findings": 1,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 1,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 1
+        },
+        "proof_pipeline_not_run": true
+      },
+      "injection.sql": {
+        "total_findings": 3,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 3,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 3
+        },
+        "proof_pipeline_not_run": true
+      }
+    },
+    "findingsPerFile": {
+      "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js": 3,
+      "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js": 2,
+      "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js": 1,
+      "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js": 1
+    }
+  },
+  "routes": [],
+  "routeInventory": [],
+  "packageJsonPath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\package.json",
+  "findings": [
+    {
+      "ruleId": "injection.sql.tainted-flow",
+      "message": "SQL Injection risk",
+      "why": "Untrusted input flows into a SQL query via string concatenation.",
+      "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 11,
+      "column": 1,
+      "endLine": 13,
+      "endColumn": 3,
+      "sourceLabel": "req.body",
+      "sinkLabel": "sequelize.query",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "confidence": 0.83,
+      "findingId": "vs1-5571170680562ee0",
+      "confidenceScore": 0.83,
+      "confidenceReason": "Static taint path: req.body → sequelize.query.",
+      "confidenceReasons": [
+        "Static taint path: req.body → sequelize.query."
+      ],
+      "rootCause": {
+        "kind": "taint",
+        "path": [
+          "req.body",
+          "sequelize.query"
+        ],
+        "missing": [
+          "validated sanitization / parameterization before sink"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "taint",
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "req.body",
+            "role": "source"
+          },
+          {
+            "id": "n1",
+            "label": "sequelize.query",
+            "role": "sink"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n0",
+            "to": "n1",
+            "label": "data flow"
+          }
+        ],
+        "missingControls": [
+          "validated sanitization / parameterization before sink"
+        ]
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": true,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "none"
+      },
+      "ruleFamily": "injection.sql",
+      "ruleDocumentation": {
+        "title": "SQL injection (taint)",
+        "pattern": "Dataflow from request/source to SQL sink without sanitization.",
+        "risk": "Attacker-controlled SQL fragments executed by the app.",
+        "falsePositives": "Sanitizers AST may not see; verify ORMs and query builders.",
+        "remediation": "Bind parameters; never interpolate user input into SQL text.",
+        "secureExample": "pool.execute(\"SELECT * FROM posts WHERE id = ?\", [id]);",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/89.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.sql.string-concat",
+      "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+      "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+      "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 39,
+      "column": 1,
+      "endLine": 44,
+      "endColumn": 3,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "confidence": 0.86,
+      "findingId": "vs1-a9465e2103ebd499",
+      "confidenceScore": 0.86,
+      "confidenceReason": "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments.",
+      "confidenceReasons": [
+        "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js:39",
+          "injection.sql.string-concat"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js:39",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.sql.string-concat",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleFamily": "injection.sql",
+      "ruleDocumentation": {
+        "title": "SQL built via string concatenation",
+        "pattern": "Query strings assembled with user-controlled fragments.",
+        "risk": "Classic SQL injection leading to data exfiltration or destruction.",
+        "falsePositives": "Constants only; ensure no dynamic segments from request data.",
+        "remediation": "Parameterized queries / prepared statements.",
+        "secureExample": "db.query(\"SELECT * FROM u WHERE id = ?\", [userId]);",
+        "referenceUrls": [
+          "https://owasp.org/www-community/attacks/SQL_Injection",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.sql.tainted-flow",
+      "message": "SQL Injection risk",
+      "why": "Untrusted input flows into a SQL query via string concatenation.",
+      "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 39,
+      "column": 1,
+      "endLine": 44,
+      "endColumn": 3,
+      "sourceLabel": "req.body",
+      "sinkLabel": ".exec",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "confidence": 0.83,
+      "findingId": "vs1-bf6bda3a7f095914",
+      "confidenceScore": 0.83,
+      "confidenceReason": "Static taint path: req.body → .exec.",
+      "confidenceReasons": [
+        "Static taint path: req.body → .exec."
+      ],
+      "rootCause": {
+        "kind": "taint",
+        "path": [
+          "req.body",
+          ".exec"
+        ],
+        "missing": [
+          "validated sanitization / parameterization before sink"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "taint",
+        "nodes": [
+          {
+            "id": "n0",
+            "label": "req.body",
+            "role": "source"
+          },
+          {
+            "id": "n1",
+            "label": ".exec",
+            "role": "sink"
+          }
+        ],
+        "edges": [
+          {
+            "from": "n0",
+            "to": "n1",
+            "label": "data flow"
+          }
+        ],
+        "missingControls": [
+          "validated sanitization / parameterization before sink"
+        ]
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": true,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "none"
+      },
+      "ruleFamily": "injection.sql",
+      "ruleDocumentation": {
+        "title": "SQL injection (taint)",
+        "pattern": "Dataflow from request/source to SQL sink without sanitization.",
+        "risk": "Attacker-controlled SQL fragments executed by the app.",
+        "falsePositives": "Sanitizers AST may not see; verify ORMs and query builders.",
+        "remediation": "Bind parameters; never interpolate user input into SQL text.",
+        "secureExample": "pool.execute(\"SELECT * FROM posts WHERE id = ?\", [id]);",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/89.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "SEC-004",
+      "message": "Insecure env var fallback — if env var unset, hardcoded secret is used",
+      "why": "If the app runs without the env var set, a guessable default may be used in production.",
+      "fix": "Remove fallback. Throw error if env var is missing at startup.",
+      "remediation": "Remove fallback. Throw error if env var is missing at startup.",
+      "severity": "critical",
+      "severityLabel": "CRITICAL",
+      "category": "crypto",
+      "cwe": 547,
+      "owasp": "A02:2021",
+      "findingKind": "ENV_FALLBACK",
+      "line": 6,
+      "column": 10,
+      "endLine": 6,
+      "endColumn": 47,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "confidence": 0.88,
+      "findingId": "vs1-fd168d16303e0df5",
+      "confidenceScore": 0.88,
+      "confidenceReason": "Pattern rule SEC-004: Secret material falls back to a weak literal when env/config is missing.",
+      "confidenceReasons": [
+        "Pattern rule SEC-004: Secret material falls back to a weak literal when env/config is missing."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:6",
+          "SEC-004"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:6",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "SEC-004",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Remove fallback. Throw error if env var is missing at startup.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleFamily": "crypto.secrets",
+      "ruleDocumentation": {
+        "title": "Weak or default secret fallback",
+        "pattern": "Secret material falls back to a weak literal when env/config is missing.",
+        "risk": "Deployments without proper env setup silently use attacker-guessable secrets.",
+        "falsePositives": "Test fixtures with clearly fake literals; ensure production paths use vault/env only.",
+        "remediation": "Fail closed when secrets are missing; load from a secrets manager or validated env only.",
+        "secureExample": "const secret = process.env.JWT_SECRET;\nif (!secret || secret.length < 32) throw new Error(\"JWT_SECRET required\");\n",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/798.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.path-traversal",
+      "message": "File path may be derived from user input, enabling path traversal.",
+      "why": "If the path comes from req.query, req.params, or similar, an attacker can use '../' to read or write outside intended directories.",
+      "fix": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 37,
+      "column": 0,
+      "endLine": 38,
+      "endColumn": 25,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "confidence": 0.82,
+      "findingId": "vs1-a96b54d9b996cd05",
+      "confidenceScore": 0.82,
+      "confidenceReason": "Pattern rule injection.path-traversal: Filesystem calls combine user paths without normalization/allowlists.",
+      "confidenceReasons": [
+        "Pattern rule injection.path-traversal: Filesystem calls combine user paths without normalization/allowlists."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:37",
+          "injection.path-traversal"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:37",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.path-traversal",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleFamily": "injection.path-traversal",
+      "ruleDocumentation": {
+        "title": "Path traversal (pattern)",
+        "pattern": "Filesystem calls combine user paths without normalization/allowlists.",
+        "risk": "Read/write arbitrary files outside intended directory.",
+        "falsePositives": "Chrooted or strictly allowlisted roots.",
+        "remediation": "resolve + startsWith root check; use path.basename for names only.",
+        "secureExample": "import { resolve } from 'node:path';\nconst safe = resolve(baseDir, path.basename(userInput));\nif (!safe.startsWith(baseDir)) throw new Error('Invalid path');",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/22.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.log",
+      "message": "Log message built from user input without sanitization can lead to log injection.",
+      "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+      "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 24,
+      "column": 4,
+      "endLine": 24,
+      "endColumn": 20,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+      "confidence": 0.78,
+      "findingId": "vs1-58cc72ba379b789a",
+      "confidenceScore": 0.78,
+      "confidenceReason": "Pattern rule injection.log: User data written to logs without newline/control stripping.",
+      "confidenceReasons": [
+        "Pattern rule injection.log: User data written to logs without newline/control stripping."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js:24",
+          "injection.log"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js:24",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.log",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleFamily": "injection.log",
+      "ruleDocumentation": {
+        "title": "Log injection (pattern)",
+        "pattern": "User data written to logs without newline/control stripping.",
+        "risk": "Forged log lines, log forgery, downstream parser confusion.",
+        "falsePositives": "Structured logging with JSON encode may already escape.",
+        "remediation": "Strip CR/LF; bound length; structured logs.",
+        "secureExample": "logger.info({ user: userId, msg: message.replace(/[\\r\\n]/g, ' ') });",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/117.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "crypto.secrets.hardcoded",
+      "message": "Possible hardcoded secret in source.",
+      "why": "Secrets in code get committed to version control and can be leaked. They should not live in source.",
+      "fix": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "crypto",
+      "line": 24,
+      "column": 10,
+      "endLine": 24,
+      "endColumn": 24,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+      "confidence": 0.85,
+      "findingId": "vs1-4bff28848e9b274d",
+      "confidenceScore": 0.85,
+      "confidenceReason": "Pattern rule crypto.secrets.hardcoded: API keys, tokens, or passwords embedded as string literals.",
+      "confidenceReasons": [
+        "Pattern rule crypto.secrets.hardcoded: API keys, tokens, or passwords embedded as string literals."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js:24",
+          "crypto.secrets.hardcoded"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js:24",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "crypto.secrets.hardcoded",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleFamily": "crypto.secrets",
+      "ruleDocumentation": {
+        "title": "Hardcoded secret material",
+        "pattern": "API keys, tokens, or passwords embedded as string literals.",
+        "risk": "Secrets in source leak via git, screenshots, and dependencies.",
+        "falsePositives": "Public client IDs meant to be public; still move sensitive IDs to config.",
+        "remediation": "Replace with environment variables, vault references, or runtime injection.",
+        "secureExample": "const apiKey = process.env.PAYMENT_API_KEY;\nif (!apiKey) throw new Error(\"Missing PAYMENT_API_KEY\");",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/798.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    }
+  ],
+  "fileResults": [
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+      "findings": [
+        {
+          "ruleId": "crypto.secrets.hardcoded",
+          "message": "Possible hardcoded secret in source.",
+          "why": "Secrets in code get committed to version control and can be leaked. They should not live in source.",
+          "fix": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "crypto",
+          "line": 24,
+          "column": 10,
+          "endLine": 24,
+          "endColumn": 24,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js",
+          "confidence": 0.85,
+          "findingId": "vs1-4bff28848e9b274d",
+          "confidenceScore": 0.85,
+          "confidenceReason": "Pattern rule crypto.secrets.hardcoded: API keys, tokens, or passwords embedded as string literals.",
+          "confidenceReasons": [
+            "Pattern rule crypto.secrets.hardcoded: API keys, tokens, or passwords embedded as string literals."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js:24",
+              "crypto.secrets.hardcoded"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\server.js:24",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "crypto.secrets.hardcoded",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use environment variables (process.env.SECRET_KEY) or a secrets manager. Never commit real secrets.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleFamily": "crypto.secrets",
+          "ruleDocumentation": {
+            "title": "Hardcoded secret material",
+            "pattern": "API keys, tokens, or passwords embedded as string literals.",
+            "risk": "Secrets in source leak via git, screenshots, and dependencies.",
+            "falsePositives": "Public client IDs meant to be public; still move sensitive IDs to config.",
+            "remediation": "Replace with environment variables, vault references, or runtime injection.",
+            "secureExample": "const apiKey = process.env.PAYMENT_API_KEY;\nif (!apiKey) throw new Error(\"Missing PAYMENT_API_KEY\");",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/798.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\db.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\db.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\server.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\server.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\vulns.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\config\\vulns.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+      "findings": [
+        {
+          "ruleId": "injection.sql.tainted-flow",
+          "message": "SQL Injection risk",
+          "why": "Untrusted input flows into a SQL query via string concatenation.",
+          "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 11,
+          "column": 1,
+          "endLine": 13,
+          "endColumn": 3,
+          "sourceLabel": "req.body",
+          "sinkLabel": "sequelize.query",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "confidence": 0.83,
+          "findingId": "vs1-5571170680562ee0",
+          "confidenceScore": 0.83,
+          "confidenceReason": "Static taint path: req.body → sequelize.query.",
+          "confidenceReasons": [
+            "Static taint path: req.body → sequelize.query."
+          ],
+          "rootCause": {
+            "kind": "taint",
+            "path": [
+              "req.body",
+              "sequelize.query"
+            ],
+            "missing": [
+              "validated sanitization / parameterization before sink"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "taint",
+            "nodes": [
+              {
+                "id": "n0",
+                "label": "req.body",
+                "role": "source"
+              },
+              {
+                "id": "n1",
+                "label": "sequelize.query",
+                "role": "sink"
+              }
+            ],
+            "edges": [
+              {
+                "from": "n0",
+                "to": "n1",
+                "label": "data flow"
+              }
+            ],
+            "missingControls": [
+              "validated sanitization / parameterization before sink"
+            ]
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": true,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "none"
+          },
+          "ruleFamily": "injection.sql",
+          "ruleDocumentation": {
+            "title": "SQL injection (taint)",
+            "pattern": "Dataflow from request/source to SQL sink without sanitization.",
+            "risk": "Attacker-controlled SQL fragments executed by the app.",
+            "falsePositives": "Sanitizers AST may not see; verify ORMs and query builders.",
+            "remediation": "Bind parameters; never interpolate user input into SQL text.",
+            "secureExample": "pool.execute(\"SELECT * FROM posts WHERE id = ?\", [id]);",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/89.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        },
+        {
+          "ruleId": "injection.sql.string-concat",
+          "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+          "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+          "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 39,
+          "column": 1,
+          "endLine": 44,
+          "endColumn": 3,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "confidence": 0.86,
+          "findingId": "vs1-a9465e2103ebd499",
+          "confidenceScore": 0.86,
+          "confidenceReason": "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments.",
+          "confidenceReasons": [
+            "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js:39",
+              "injection.sql.string-concat"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js:39",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.sql.string-concat",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleFamily": "injection.sql",
+          "ruleDocumentation": {
+            "title": "SQL built via string concatenation",
+            "pattern": "Query strings assembled with user-controlled fragments.",
+            "risk": "Classic SQL injection leading to data exfiltration or destruction.",
+            "falsePositives": "Constants only; ensure no dynamic segments from request data.",
+            "remediation": "Parameterized queries / prepared statements.",
+            "secureExample": "db.query(\"SELECT * FROM u WHERE id = ?\", [userId]);",
+            "referenceUrls": [
+              "https://owasp.org/www-community/attacks/SQL_Injection",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        },
+        {
+          "ruleId": "injection.sql.tainted-flow",
+          "message": "SQL Injection risk",
+          "why": "Untrusted input flows into a SQL query via string concatenation.",
+          "fix": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 39,
+          "column": 1,
+          "endLine": 44,
+          "endColumn": 3,
+          "sourceLabel": "req.body",
+          "sinkLabel": ".exec",
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\appHandler.js",
+          "confidence": 0.83,
+          "findingId": "vs1-bf6bda3a7f095914",
+          "confidenceScore": 0.83,
+          "confidenceReason": "Static taint path: req.body → .exec.",
+          "confidenceReasons": [
+            "Static taint path: req.body → .exec."
+          ],
+          "rootCause": {
+            "kind": "taint",
+            "path": [
+              "req.body",
+              ".exec"
+            ],
+            "missing": [
+              "validated sanitization / parameterization before sink"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "taint",
+            "nodes": [
+              {
+                "id": "n0",
+                "label": "req.body",
+                "role": "source"
+              },
+              {
+                "id": "n1",
+                "label": ".exec",
+                "role": "sink"
+              }
+            ],
+            "edges": [
+              {
+                "from": "n0",
+                "to": "n1",
+                "label": "data flow"
+              }
+            ],
+            "missingControls": [
+              "validated sanitization / parameterization before sink"
+            ]
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use parameterized queries: db.query(\"SELECT * FROM users WHERE id=?\", [id])",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": true,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "none"
+          },
+          "ruleFamily": "injection.sql",
+          "ruleDocumentation": {
+            "title": "SQL injection (taint)",
+            "pattern": "Dataflow from request/source to SQL sink without sanitization.",
+            "risk": "Attacker-controlled SQL fragments executed by the app.",
+            "falsePositives": "Sanitizers AST may not see; verify ORMs and query builders.",
+            "remediation": "Bind parameters; never interpolate user input into SQL text.",
+            "secureExample": "pool.execute(\"SELECT * FROM posts WHERE id = ?\", [id]);",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/89.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\authHandler.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\authHandler.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\passport.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\core\\passport.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+      "findings": [
+        {
+          "ruleId": "SEC-004",
+          "message": "Insecure env var fallback — if env var unset, hardcoded secret is used",
+          "why": "If the app runs without the env var set, a guessable default may be used in production.",
+          "fix": "Remove fallback. Throw error if env var is missing at startup.",
+          "remediation": "Remove fallback. Throw error if env var is missing at startup.",
+          "severity": "critical",
+          "severityLabel": "CRITICAL",
+          "category": "crypto",
+          "cwe": 547,
+          "owasp": "A02:2021",
+          "findingKind": "ENV_FALLBACK",
+          "line": 6,
+          "column": 10,
+          "endLine": 6,
+          "endColumn": 47,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+          "confidence": 0.88,
+          "findingId": "vs1-fd168d16303e0df5",
+          "confidenceScore": 0.88,
+          "confidenceReason": "Pattern rule SEC-004: Secret material falls back to a weak literal when env/config is missing.",
+          "confidenceReasons": [
+            "Pattern rule SEC-004: Secret material falls back to a weak literal when env/config is missing."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:6",
+              "SEC-004"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:6",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "SEC-004",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Remove fallback. Throw error if env var is missing at startup.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleFamily": "crypto.secrets",
+          "ruleDocumentation": {
+            "title": "Weak or default secret fallback",
+            "pattern": "Secret material falls back to a weak literal when env/config is missing.",
+            "risk": "Deployments without proper env setup silently use attacker-guessable secrets.",
+            "falsePositives": "Test fixtures with clearly fake literals; ensure production paths use vault/env only.",
+            "remediation": "Fail closed when secrets are missing; load from a secrets manager or validated env only.",
+            "secureExample": "const secret = process.env.JWT_SECRET;\nif (!secret || secret.length < 32) throw new Error(\"JWT_SECRET required\");\n",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/798.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        },
+        {
+          "ruleId": "injection.path-traversal",
+          "message": "File path may be derived from user input, enabling path traversal.",
+          "why": "If the path comes from req.query, req.params, or similar, an attacker can use '../' to read or write outside intended directories.",
+          "fix": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 37,
+          "column": 0,
+          "endLine": 38,
+          "endColumn": 25,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js",
+          "confidence": 0.82,
+          "findingId": "vs1-a96b54d9b996cd05",
+          "confidenceScore": 0.82,
+          "confidenceReason": "Pattern rule injection.path-traversal: Filesystem calls combine user paths without normalization/allowlists.",
+          "confidenceReasons": [
+            "Pattern rule injection.path-traversal: Filesystem calls combine user paths without normalization/allowlists."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:37",
+              "injection.path-traversal"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\index.js:37",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.path-traversal",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Resolve paths against a fixed base directory and normalize, e.g. path.join(BASE_DIR, path.normalize(userPath)). Do not use user input directly as a path.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleFamily": "injection.path-traversal",
+          "ruleDocumentation": {
+            "title": "Path traversal (pattern)",
+            "pattern": "Filesystem calls combine user paths without normalization/allowlists.",
+            "risk": "Read/write arbitrary files outside intended directory.",
+            "falsePositives": "Chrooted or strictly allowlisted roots.",
+            "remediation": "resolve + startsWith root check; use path.basename for names only.",
+            "secureExample": "import { resolve } from 'node:path';\nconst safe = resolve(baseDir, path.basename(userInput));\nif (!safe.startsWith(baseDir)) throw new Error('Invalid path');",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/22.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\product.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\product.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\user.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\models\\user.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\app.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\app.js",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+      "findings": [
+        {
+          "ruleId": "injection.log",
+          "message": "Log message built from user input without sanitization can lead to log injection.",
+          "why": "Unsanitized input in logs lets attackers insert fake entries, hide actions, or impersonate others via CR/LF and control characters.",
+          "fix": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 24,
+          "column": 4,
+          "endLine": 24,
+          "endColumn": 20,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js",
+          "confidence": 0.78,
+          "findingId": "vs1-58cc72ba379b789a",
+          "confidenceScore": 0.78,
+          "confidenceReason": "Pattern rule injection.log: User data written to logs without newline/control stripping.",
+          "confidenceReasons": [
+            "Pattern rule injection.log: User data written to logs without newline/control stripping."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js:24",
+              "injection.log"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna\\routes\\main.js:24",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.log",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Sanitize log input: strip or escape carriage return and line feed. Limit log entry size. Do not pass raw user input as the log message.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleFamily": "injection.log",
+          "ruleDocumentation": {
+            "title": "Log injection (pattern)",
+            "pattern": "User data written to logs without newline/control stripping.",
+            "risk": "Forged log lines, log forgery, downstream parser confusion.",
+            "falsePositives": "Structured logging with JSON encode may already escape.",
+            "remediation": "Strip CR/LF; bound length; structured logs.",
+            "secureExample": "logger.info({ user: userId, msg: message.replace(/[\\r\\n]/g, ' ') });",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/117.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    }
+  ],
+  "run": {
+    "toolVersion": "1.1.0",
+    "timestamp": "2026-04-04T04:34:35.153Z",
+    "gitCommit": "9ba473add536f66ac9007966acb2a775dd31277a",
+    "scanOptions": {
+      "format": "json",
+      "mode": "static",
+      "excludeVendor": true,
+      "checkRegistry": false,
+      "skipRegistry": false,
+      "crypto": true,
+      "injection": true,
+      "ignoreGlobs": [],
+      "benchmarkMetadata": true
+    }
+  }
+}

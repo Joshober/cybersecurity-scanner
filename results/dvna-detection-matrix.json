@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "source": "VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.",
+  "metric": "caseHit",
+  "metricDefinition": "Per case family (n=1), tool 'detects' if adjudication lists a TP finding aligned to that case's DVNA location (same policy as recall table: 11 case keys).",
+  "scopeNote": "First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—shown as gaps on the line chart, not 0% SAST parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.",
+  "tools": [
+    {
+      "id": "vibescan",
+      "label": "VibeScan",
+      "role": "sast",
+      "highlight": true,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": true,
+        "open-redirect": true,
+        "insecure-deser": true,
+        "nosql-apphandler": true,
+        "nosql-auth": true,
+        "nosql-passport": true,
+        "weak-hash-auth": true,
+        "hardcoded-session-secret": true,
+        "default-secret-fallback": true,
+        "dom-xss": true
+      },
+      "recallNote": "11/11 on eleven DVNA case families (2026-04-04 VibeScan 1.1.0 run); line-level match policy in results/dvna-case-catalog.json."
+    },
+    {
+      "id": "bearer",
+      "label": "Bearer",
+      "role": "sast",
+      "highlight": false,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": true,
+        "open-redirect": true,
+        "insecure-deser": false,
+        "nosql-apphandler": true,
+        "nosql-auth": true,
+        "nosql-passport": true,
+        "weak-hash-auth": true,
+        "hardcoded-session-secret": true,
+        "default-secret-fallback": false,
+        "dom-xss": false
+      },
+      "recallNote": "8/11 in dvna-evaluation.md"
+    },
+    {
+      "id": "snyk-code",
+      "label": "Snyk Code",
+      "role": "sast",
+      "highlight": false,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": true,
+        "open-redirect": true,
+        "insecure-deser": true,
+        "nosql-apphandler": false,
+        "nosql-auth": false,
+        "nosql-passport": false,
+        "weak-hash-auth": true,
+        "hardcoded-session-secret": true,
+        "default-secret-fallback": false,
+        "dom-xss": true
+      },
+      "recallNote": "7/11 in dvna-evaluation.md"
+    },
+    {
+      "id": "semgrep",
+      "label": "Semgrep",
+      "role": "sast",
+      "highlight": false,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": false,
+        "open-redirect": true,
+        "insecure-deser": true,
+        "nosql-apphandler": false,
+        "nosql-auth": false,
+        "nosql-passport": false,
+        "weak-hash-auth": false,
+        "hardcoded-session-secret": true,
+        "default-secret-fallback": false,
+        "dom-xss": false
+      },
+      "recallNote": "Derived from benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json; packs p/javascript + p/security-audit."
+    },
+    {
+      "id": "codeql",
+      "label": "CodeQL",
+      "role": "sast",
+      "highlight": false,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": true,
+        "open-redirect": true,
+        "insecure-deser": true,
+        "nosql-apphandler": false,
+        "nosql-auth": false,
+        "nosql-passport": false,
+        "weak-hash-auth": false,
+        "hardcoded-session-secret": true,
+        "default-secret-fallback": true,
+        "dom-xss": false
+      },
+      "recallNote": "Heuristic case hits from benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif (file suffix + anchor line); subject to manual adjudication like Semgrep."
+    },
+    {
+      "id": "eslint-security",
+      "label": "eslint-plugin-security",
+      "role": "sast",
+      "highlight": false,
+      "detections": {
+        "sqli-apphandler": true,
+        "cmd-inject-apphandler": false,
+        "open-redirect": false,
+        "insecure-deser": false,
+        "nosql-apphandler": false,
+        "nosql-auth": false,
+        "nosql-passport": false,
+        "weak-hash-auth": false,
+        "hardcoded-session-secret": false,
+        "default-secret-fallback": false,
+        "dom-xss": false
+      },
+      "recallNote": "1/11 case recall in dvna-evaluation.md"
+    },
+    {
+      "id": "npm-audit",
+      "label": "npm audit",
+      "role": "sca",
+      "highlight": false,
+      "chartMode": "gap",
+      "detections": {
+        "sqli-apphandler": null,
+        "cmd-inject-apphandler": null,
+        "open-redirect": null,
+        "insecure-deser": null,
+        "nosql-apphandler": null,
+        "nosql-auth": null,
+        "nosql-passport": null,
+        "weak-hash-auth": null,
+        "hardcoded-session-secret": null,
+        "default-secret-fallback": null,
+        "dom-xss": null
+      },
+      "recallNote": "Not line-level SAST parity; intentionally omitted from detection-rate polyline."
+    }
+  ]
+}

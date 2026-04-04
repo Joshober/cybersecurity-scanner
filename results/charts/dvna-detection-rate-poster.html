@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DVNA — detection rate by case family</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.25rem; color: #0d1b2a; }
+    .scope { max-width: 960px; font-size: 0.85rem; color: #475569; margin-bottom: 16px; line-height: 1.5; }
+    .chart-wrap { max-width: 1100px; background: #fff; padding: 16px 16px 8px; border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    canvas { max-height: 520px; }
+    .legend-proof { font-size: 0.8rem; color: #334155; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Detection rate by DVNA case family (ground-truth rows, n=1 each)</h1>
+  <p class="scope">First-party DVNA source under benchmarks/dvna/dvna; excludes vendor/minified assets. npm audit is dependency advisory scope—shown as gaps on the line chart, not 0% SAST parity. JWT / SSRF / prototype pollution are not among these eleven DVNA ground-truth rows.</p>
+  <p class="scope"><strong>Metric:</strong> Per case family (n=1), tool 'detects' if adjudication lists a TP finding aligned to that case's DVNA location (same policy as recall table: 11 case keys).</p>
+  <p class="scope"><strong>Data:</strong> VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.</p>
+  <div class="chart-wrap">
+    <canvas id="c"></canvas>
+    <p class="legend-proof">Larger / diamond markers on <strong>VibeScan</strong> indicate a generated deterministic proof artifact (<code>proofGeneration.wasGenerated</code> + <code>provable_locally</code>) when a VibeScan JSON path was passed to the generator.</p>
+  </div>
+  <script>
+    const labels = ["SQLi (n=1)","Cmd inj. (n=1)","Open redir. (n=1)","Deser (n=1)","NoSQL (routes) (n=1)","NoSQL (auth) (n=1)","NoSQL (session) (n=1)","Weak hash (n=1)","Hardcoded secret (n=1)","Env fallback (n=1)","DOM XSS (n=1)"];
+    const datasets = [{"label":"VibeScan","data":[100,100,100,100,100,100,100,100,100,100,100],"borderColor":"rgb(34, 197, 94)","backgroundColor":"transparent","borderWidth":4,"tension":0.25,"spanGaps":false,"pointRadius":[4,4,4,4,4,4,4,4,4,4,4],"pointBorderColor":["rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)"],"pointBackgroundColor":["rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)","rgb(34, 197, 94)"]},{"label":"Bearer","data":[100,100,100,0,100,100,100,100,100,0,0],"borderColor":"rgb(59, 130, 246)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(59, 130, 246)","pointBackgroundColor":"rgb(59, 130, 246)"},{"label":"Snyk Code","data":[100,100,100,100,0,0,0,100,100,0,100],"borderColor":"rgb(168, 85, 247)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(168, 85, 247)","pointBackgroundColor":"rgb(168, 85, 247)"},{"label":"Semgrep","data":[100,0,100,100,0,0,0,0,100,0,0],"borderColor":"rgb(234, 88, 12)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(234, 88, 12)","pointBackgroundColor":"rgb(234, 88, 12)"},{"label":"CodeQL","data":[100,100,100,100,0,0,0,0,100,100,0],"borderColor":"rgb(219, 39, 119)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(219, 39, 119)","pointBackgroundColor":"rgb(219, 39, 119)"},{"label":"eslint-plugin-security","data":[100,0,0,0,0,0,0,0,0,0,0],"borderColor":"rgb(13, 148, 136)","backgroundColor":"transparent","borderWidth":2,"tension":0.25,"spanGaps":false,"pointRadius":[3,3,3,3,3,3,3,3,3,3,3],"pointBorderColor":"rgb(13, 148, 136)","pointBackgroundColor":"rgb(13, 148, 136)"}];
+    const ctx = document.getElementById('c').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          title: { display: true, text: 'TP / (TP + FN) proxy: 100% if case detected, 0% if missed (per family)' },
+          legend: { position: 'bottom' },
+        },
+        scales: {
+          y: { min: 0, max: 100, title: { display: true, text: 'Detection rate (%)' } },
+          x: { ticks: { maxRotation: 55, minRotation: 35 } },
+        },
+      },
+    });
+  </script>
+</body>
+</html>

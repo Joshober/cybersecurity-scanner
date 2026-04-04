@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "corpus": "DVNA",
+  "corpusCommit": "9ba473add536f66ac9007966acb2a775dd31277a",
+  "description": "Eleven deduplicated DVNA case families from results/dvna-adjudication.md (FN policy). Each row is n=1 for poster detection-rate charts: rate = 100% if tool detects the case, 0% if not.",
+  "cases": [
+    {
+      "id": "sqli-apphandler",
+      "chartLabel": "SQLi",
+      "posterFamily": "Injection",
+      "n": 1,
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [11]
+    },
+    {
+      "id": "cmd-inject-apphandler",
+      "chartLabel": "Cmd inj.",
+      "posterFamily": "Injection",
+      "n": 1,
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [39]
+    },
+    {
+      "id": "open-redirect",
+      "chartLabel": "Open redir.",
+      "posterFamily": "AuthZ / redirect",
+      "n": 1,
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [188]
+    },
+    {
+      "id": "insecure-deser",
+      "chartLabel": "Deser",
+      "posterFamily": "Integrity",
+      "n": 1,
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [218]
+    },
+    {
+      "id": "nosql-apphandler",
+      "chartLabel": "NoSQL (routes)",
+      "posterFamily": "Injection",
+      "n": 1,
+      "anchorSuffix": "core/appHandler.js",
+      "anchorLines": [59, 85, 107, 145]
+    },
+    {
+      "id": "nosql-auth",
+      "chartLabel": "NoSQL (auth)",
+      "posterFamily": "Injection",
+      "n": 1,
+      "anchorSuffix": "core/authHandler.js",
+      "anchorLines": [21, 43, 49, 72, 78]
+    },
+    {
+      "id": "nosql-passport",
+      "chartLabel": "NoSQL (session)",
+      "posterFamily": "Injection",
+      "n": 1,
+      "anchorSuffix": "core/passport.js",
+      "anchorLines": [13, 31, 55, 65]
+    },
+    {
+      "id": "weak-hash-auth",
+      "chartLabel": "Weak hash",
+      "posterFamily": "Crypto / auth",
+      "n": 1,
+      "anchorSuffix": "core/authHandler.js",
+      "anchorLines": [49, 78]
+    },
+    {
+      "id": "hardcoded-session-secret",
+      "chartLabel": "Hardcoded secret",
+      "posterFamily": "Crypto / secrets",
+      "n": 1,
+      "anchorSuffix": "server.js",
+      "anchorLines": [23, 24]
+    },
+    {
+      "id": "default-secret-fallback",
+      "chartLabel": "Env fallback",
+      "posterFamily": "Crypto / secrets",
+      "n": 1,
+      "anchorSuffix": "models/index.js",
+      "anchorLines": [6]
+    },
+    {
+      "id": "dom-xss",
+      "chartLabel": "DOM XSS",
+      "posterFamily": "XSS",
+      "n": 1,
+      "anchorSuffix": "views/app/adminusers.ejs",
+      "anchorLines": [40, 41, 42]
+    }
+  ]
+}

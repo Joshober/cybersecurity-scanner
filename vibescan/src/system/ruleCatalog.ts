@@ -79,7 +79,8 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
   }),
   "crypto.hash.weak": doc({
     title: "Weak cryptographic hash",
-    pattern: "MD5, SHA1, or other weak hashes used for sensitive integrity/password workflows.",
+    pattern:
+      "MD5/SHA1 via crypto.createHash, or MD5 helpers such as the `md5` npm module, used in security-sensitive workflows.",
     risk: "Fast hashes enable collision and brute-force attacks.",
     falsePositives: "Non-security uses (checksums of public blobs) may be acceptable—suppress with justification.",
     remediation: "Use SHA-256+ for integrity; use Argon2/bcrypt/scrypt for passwords.",
@@ -238,6 +239,38 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
     secureExample: "// Prefer bound text or DomSanitizer.sanitize with strict context",
     defaultConfidence: 0.84,
     referenceUrls: ["https://angular.dev/best-practices/security/", DOC_BASE],
+  }),
+  "injection.open-redirect": doc({
+    title: "Open redirect",
+    pattern:
+      "Redirect helpers (res.redirect, Response.redirect, NextResponse.redirect, …) take a target derived from req/request (including request.nextUrl.searchParams.get(...)) without validation.",
+    risk: "Attackers craft links that send users to phishing or malware sites while appearing to originate from your domain.",
+    falsePositives: "Redirects built only from server-side allow lists.",
+    remediation: "Allow-list redirect targets or use relative paths only; reject absolute URLs from untrusted input.",
+    secureExample: 'const next = ALLOWED.has(req.query.next) ? req.query.next : "/home";\nres.redirect(next);',
+    defaultConfidence: 0.84,
+    referenceUrls: ["https://cwe.mitre.org/data/definitions/601.html", DOC_BASE],
+  }),
+  "injection.deserialize.untrusted": doc({
+    title: "Unsafe deserialization",
+    pattern: "Calls such as `unserialize` on non-literal data (uploads, buffers, request fields).",
+    risk: "Attacker-controlled object graphs can lead to remote code execution.",
+    falsePositives: "Test doubles with literals only.",
+    remediation: "Prefer JSON with strict schemas; avoid `node-serialize` / pickle-style APIs on untrusted input.",
+    secureExample: "// const data = JSON.parse(buf) with schema validation; no object-type gadgets",
+    defaultConfidence: 0.88,
+    referenceUrls: ["https://cwe.mitre.org/data/definitions/502.html", DOC_BASE],
+  }),
+  "injection.orm.request-in-query": doc({
+    title: "ORM query with request-derived filters",
+    pattern: "Sequelize-style find/create/update where `where` or fields include req.* or common auth identifiers (e.g. passport-local `username`).",
+    risk: "Injection-style operator abuse or unintended data access when user input shapes the query object.",
+    falsePositives: "Heavily validated DTOs passed as variables; review key names flagged.",
+    remediation: "Validate inputs; use typed where clauses; avoid spreading req.body into model calls.",
+    secureExample:
+      "await User.findOne({ where: { login: await normalizeLogin(req.body.login) } }); // after validation",
+    defaultConfidence: 0.78,
+    referenceUrls: ["https://cwe.mitre.org/data/definitions/943.html", DOC_BASE],
   }),
   "injection.noql": doc({
     title: "NoSQL injection",

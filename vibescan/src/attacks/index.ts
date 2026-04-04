@@ -14,6 +14,9 @@ import { codeInjectionRule } from "./injection/code-injection.js";
 import { sqlInjectionRule } from "./injection/sql-injection.js";
 import { commandInjectionRule } from "./injection/command-injection.js";
 import { nosqlInjectionRule } from "./injection/nosql-injection.js";
+import { openRedirectRule } from "./injection/open-redirect.js";
+import { insecureDeserializeRule } from "./injection/insecure-deserialize.js";
+import { ormRequestInputRule } from "./injection/orm-request-input.js";
 import { xpathInjectionRule } from "./injection/xpath-injection.js";
 import { logInjectionRule } from "./injection/log-injection.js";
 import { xssRule } from "./browser/xss.js";
@@ -40,11 +43,14 @@ export const injectionRules: Rule[] = [
   codeInjectionRule,
   sqlInjectionRule,
   commandInjectionRule,
+  openRedirectRule,
+  insecureDeserializeRule,
   pathTraversalRule,
   xssRule,
   reactDangerouslyInnerHtmlRule,
   angularSanitizerBypassRule,
   nosqlInjectionRule,
+  ormRequestInputRule,
   xpathInjectionRule,
   logInjectionRule,
   insecureCookieRule,

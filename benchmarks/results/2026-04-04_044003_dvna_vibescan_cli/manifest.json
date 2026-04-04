@@ -1,0 +1,122 @@
+{
+  "benchmarkName": "",
+  "benchmarkSlug": "",
+  "sourceRepo": {
+    "url": "",
+    "originLabel": "",
+    "commitHash": "",
+    "branchOrTag": ""
+  },
+  "scannerRepo": {
+    "url": "",
+    "commitHash": ""
+  },
+  "toolVersions": {
+    "node": "v20.17.0",
+    "secureCodeScanner": "1.1.0",
+    "vibescanCli": "1.1.0"
+  },
+  "scope": {
+    "includedFiles": [
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/server.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/db.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/server.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/vulns.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/appHandler.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/authHandler.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/passport.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/index.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/product.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/user.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/routes/app.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/routes/main.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/forgotpw.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/learn.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/login.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/register.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/resetpw.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/admin.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/adminusers.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/bulkproducts.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/calc.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/modifyproduct.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/ping.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/products.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/useredit.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/app/usersearch.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/common/footer.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/common/head.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/common/navigation.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/layout.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a10_logging/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a10_logging/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a10_logging/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a1_injection/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a1_injection/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a1_injection/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a2_broken_auth/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a2_broken_auth/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a2_broken_auth/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a3_sensitive_data/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a3_sensitive_data/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a3_sensitive_data/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a4_xxe/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a4_xxe/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a4_xxe/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a5_broken_access_control/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a5_broken_access_control/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a5_broken_access_control/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a6_sec_misconf/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a6_sec_misconf/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a6_sec_misconf/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a7_xss/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a7_xss/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a7_xss/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a8_ides/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a8_ides/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a8_ides/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a9_vuln_component/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a9_vuln_component/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/a9_vuln_component/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_csrf/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_csrf/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_csrf/scenario.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_redirect/description.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_redirect/reference.ejs",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/views/vulnerabilities/ax_redirect/scenario.ejs"
+    ],
+    "excludedFiles": [],
+    "excludedGlobs": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.git/**"
+    ],
+    "projectRoot": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "buildId": "",
+    "openApiSpecsUsed": []
+  },
+  "runDate": {
+    "utcIso8601": "2026-04-04T04:40:04.248Z",
+    "timezone": "America/Chicago"
+  },
+  "outputs": {
+    "directory": "",
+    "artifacts": []
+  },
+  "cliArgv": [
+    "scan",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "--format",
+    "json",
+    "--project-root",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "--exclude-vendor",
+    "--manifest",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\results\\2026-04-04_044003_dvna_vibescan_cli\\manifest.json"
+  ],
+  "environment": {
+    "os": "win32",
+    "shell": "C:\\WINDOWS\\system32\\cmd.exe"
+  },
+  "notes": ""
+}

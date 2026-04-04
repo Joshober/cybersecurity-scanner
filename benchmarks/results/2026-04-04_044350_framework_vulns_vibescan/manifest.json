@@ -1,0 +1,61 @@
+{
+  "benchmarkName": "",
+  "benchmarkSlug": "",
+  "sourceRepo": {
+    "url": "",
+    "originLabel": "",
+    "commitHash": "",
+    "branchOrTag": ""
+  },
+  "scannerRepo": {
+    "url": "",
+    "commitHash": ""
+  },
+  "toolVersions": {
+    "node": "v20.17.0",
+    "secureCodeScanner": "1.1.0",
+    "vibescanCli": "1.1.0"
+  },
+  "scope": {
+    "includedFiles": [
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/angular/bypass.component.ts",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/lib/db.ts",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/app/redirect/route.ts",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/app/sql/route.ts",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/app/xss/page.tsx"
+    ],
+    "excludedFiles": [],
+    "excludedGlobs": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.git/**"
+    ],
+    "projectRoot": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns",
+    "buildId": "",
+    "openApiSpecsUsed": []
+  },
+  "runDate": {
+    "utcIso8601": "2026-04-04T04:43:50.318Z",
+    "timezone": "America/Chicago"
+  },
+  "outputs": {
+    "directory": "",
+    "artifacts": []
+  },
+  "cliArgv": [
+    "scan",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns",
+    "--format",
+    "json",
+    "--project-root",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns",
+    "--exclude-vendor",
+    "--manifest",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\results\\2026-04-04_044350_framework_vulns_vibescan\\manifest.json"
+  ],
+  "environment": {
+    "os": "win32",
+    "shell": "C:\\WINDOWS\\system32\\cmd.exe"
+  },
+  "notes": ""
+}

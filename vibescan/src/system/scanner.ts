@@ -1,8 +1,10 @@
 // Main scan pipeline: parse, pattern rules, taint, route graph, audits, optional registry/tests.
 
+import type { Program } from "estree";
 import type { Finding, ScannerOptions, ScanResult, ProjectScanResult } from "./types.js";
 import type { Rule } from "./utils/rule-types.js";
 import { parseFile } from "./parser/parseFile.js";
+import { extractEjsScriptBlocks } from "./parser/ejsScripts.js";
 import { extractRouteGraph } from "./parser/routeGraph.js";
 import { extractNextAppRouteHandlers } from "./parser/nextRouteGraph.js";
 import {
@@ -32,6 +34,19 @@ function filterByThreshold(findings: Finding[], threshold?: import("./types.js")
   return findings.filter((f) => SEVERITY_ORDER[f.severity] >= min);
 }
 
+function shiftRuleFindings(findings: Finding[], lineDelta: number, fullSource: string): Finding[] {
+  const lines = fullSource.split("\n");
+  return findings.map((f) => {
+    const line = f.line + lineDelta;
+    return {
+      ...f,
+      line,
+      endLine: f.endLine !== undefined ? f.endLine + lineDelta : undefined,
+      source: lines[line - 1] ?? f.source,
+    };
+  });
+}
+
 // Scan one file: parse to AST, run pattern rules, taint, route extraction, app-level audit.
 export function scan(
   source: string,
@@ -39,22 +54,48 @@ export function scan(
   options: ScannerOptions = {}
 ): ScanResult {
   const parseResult = parseFile(source, filePath);
-  if (!parseResult) {
+  const lowerPath = filePath.replace(/\\/g, "/").toLowerCase();
+  const isEjs = lowerPath.endsWith(".ejs");
+
+  if (!parseResult && !isEjs) {
     return { filePath, findings: [], source };
   }
-  const { ast, source: src } = parseResult;
-  const rules = getRules(options);
 
-  const patternFindings: Finding[] = runRuleEngine({
-    filePath,
-    source: src,
-    ast,
-    rules,
-    options,
-  });
+  const rules = getRules(options);
+  let patternFindings: Finding[] = [];
+  let ast: Program;
+  let src: string;
+
+  if (parseResult) {
+    ast = parseResult.ast;
+    src = parseResult.source;
+    patternFindings = runRuleEngine({
+      filePath,
+      source: src,
+      ast,
+      rules,
+      options,
+    });
+  } else {
+    src = source;
+    ast = { type: "Program", body: [], sourceType: "script" } as Program;
+    for (const block of extractEjsScriptBlocks(source)) {
+      if (!block.content.trim()) continue;
+      const pr = parseFile(block.content, filePath);
+      if (!pr) continue;
+      const chunk = runRuleEngine({
+        filePath,
+        source: pr.source,
+        ast: pr.ast,
+        rules,
+        options,
+      });
+      patternFindings.push(...shiftRuleFindings(chunk, block.baseLine - 1, source));
+    }
+  }
 
   const taintFindings: Finding[] =
-    options.injection !== false
+    options.injection !== false && parseResult
       ? runTaintEngine({
           filePath,
           source: src,
@@ -63,10 +104,14 @@ export function scan(
         })
       : [];
 
-  const expressRoutes = extractRouteGraph(ast, src, filePath);
-  const nextRoutes = extractNextAppRouteHandlers(ast, src, filePath, options.projectRoot);
+  const expressRoutes = parseResult ? extractRouteGraph(ast, src, filePath) : [];
+  const nextRoutes = parseResult
+    ? extractNextAppRouteHandlers(ast, src, filePath, options.projectRoot)
+    : [];
   const routes = [...expressRoutes, ...nextRoutes];
-  const appAudit = runAppLevelAudit(ast, src, { hasRoutes: routes.length > 0, filePath });
+  const appAudit = parseResult
+    ? runAppLevelAudit(ast, src, { hasRoutes: routes.length > 0, filePath })
+    : [];
   const appAuditFiltered = filterByThreshold(appAudit, options.severityThreshold);
 
   const findings = filterByThreshold(

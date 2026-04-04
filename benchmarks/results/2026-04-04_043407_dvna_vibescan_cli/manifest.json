@@ -1,0 +1,69 @@
+{
+  "benchmarkName": "",
+  "benchmarkSlug": "",
+  "sourceRepo": {
+    "url": "",
+    "originLabel": "",
+    "commitHash": "",
+    "branchOrTag": ""
+  },
+  "scannerRepo": {
+    "url": "",
+    "commitHash": ""
+  },
+  "toolVersions": {
+    "node": "v20.17.0",
+    "secureCodeScanner": "1.1.0",
+    "vibescanCli": "1.1.0"
+  },
+  "scope": {
+    "includedFiles": [
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/server.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/db.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/server.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/config/vulns.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/appHandler.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/authHandler.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/core/passport.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/index.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/product.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/models/user.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/routes/app.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/dvna/dvna/routes/main.js"
+    ],
+    "excludedFiles": [],
+    "excludedGlobs": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.git/**"
+    ],
+    "projectRoot": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "buildId": "",
+    "openApiSpecsUsed": []
+  },
+  "runDate": {
+    "utcIso8601": "2026-04-04T04:34:08.007Z",
+    "timezone": "America/Chicago"
+  },
+  "outputs": {
+    "directory": "",
+    "artifacts": []
+  },
+  "cliArgv": [
+    "scan",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "--format",
+    "json",
+    "--project-root",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\dvna\\dvna",
+    "--exclude-vendor",
+    "--manifest",
+    "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\results\\2026-04-04_043407_dvna_vibescan_cli\\manifest.json",
+    "--benchmark-metadata"
+  ],
+  "environment": {
+    "os": "win32",
+    "shell": "C:\\WINDOWS\\system32\\cmd.exe"
+  },
+  "notes": ""
+}

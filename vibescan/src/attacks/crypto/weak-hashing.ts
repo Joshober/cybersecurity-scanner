@@ -19,6 +19,10 @@ export const weakHashingRule: Rule = {
   check(context: RuleContext, node: Node) {
     if (node.type !== "CallExpression") return;
     const name = getCalleeName(node);
+    if (name === "md5" || name === "MD5") {
+      context.report(node, { algo: "md5" });
+      return;
+    }
     if (name !== "crypto.createHash" && name !== "createHash") return;
     const arg = node.arguments[0];
     if (!arg) return;

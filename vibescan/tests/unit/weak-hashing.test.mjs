@@ -10,6 +10,9 @@ describe("weak-hashing", () => {
       "crypto.hash.weak"
     );
   });
+  it("vulnerable: md5 npm helper flagged", () => {
+    assertHasRuleId(scanSource("const md5=require('md5'); md5(req.query.login);"), "crypto.hash.weak");
+  });
   it("safe: SHA-256 not flagged", () => {
     assertNoRuleId(
       scanSource("const c=require('crypto'); c.createHash('sha256').update(x).digest('hex');"),

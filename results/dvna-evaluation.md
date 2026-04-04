@@ -2,13 +2,25 @@
 
 This file reports a **preliminary, scope-limited** benchmark snapshot. It is not a finalized head-to-head claim across all baselines.
 
+## Poster charts (detection rate × case family)
+
+Regenerate HTML figures (Chart.js) from the frozen adjudication matrix:
+
+- Data: `results/dvna-case-catalog.json`, `results/dvna-detection-matrix.json`
+- Script: `node benchmarks/scripts/dvna-poster-charts.mjs` (optional `--vibescan-json`, `--fill-codeql`)
+- Output: `results/charts/dvna-detection-rate-poster.html`, `dvna-proof-coverage-poster.html`
+
+See [**docs/vibescan/POSTER-CHARTS.md**](../docs/vibescan/POSTER-CHARTS.md) for usage and scope notes.
+
 ## Benchmark setup (current state)
 
 - **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`), frozen at commit `9ba473add536f66ac9007966acb2a775dd31277a`.
-- **VibeScan run (frozen artifact):** `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/`
-  - manifest (versions + scope): `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json`
+- **VibeScan run (current artifact):** `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/`
+  - output JSON: `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json` (CLI **1.1.0**; **25** findings on first-party scope)
+  - reproduce: `node benchmarks/scripts/run-dvna-vibescan-scan.mjs` (writes a new timestamped folder) or `npx vibescan scan benchmarks/dvna/dvna --format json --project-root benchmarks/dvna/dvna --exclude-vendor --manifest <run>/manifest.json`
+- **VibeScan run (legacy frozen artifact):** `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/` (retained for historical comparison)
+  - manifest: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json`
   - output JSON: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json`
-  - command (equivalent): `npx vibescan scan benchmarks/dvna/dvna --format json --project-root benchmarks/dvna/dvna --exclude-vendor --benchmark-metadata --manifest <run>/manifest.json`
 - **eslint-plugin-security run:** `npx eslint -c results/eslint-dvna.eslintrc.cjs "dvna/**/*.js"` -> [`eslint-dvna.txt`](./eslint-dvna.txt).
 - **Bearer run (frozen artifact):** `benchmarks/results/2026-03-25_223217_dvna_bearer/`
   - manifest (versions + DVNA SHA): `benchmarks/results/2026-03-25_223217_dvna_bearer/manifest.json`
@@ -41,10 +53,13 @@ DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for
 | Component | Frozen value | Source |
 |-----------|--------------|--------|
 | DVNA commit | `9ba473add536f66ac9007966acb2a775dd31277a` | VibeScan + Bearer `manifest.json` |
-| Scanner repo commit | `aa492475dbbfdc94d620f8976cd8f9c3e98013ce` | VibeScan + Bearer `manifest.json` |
-| Node.js (VibeScan run) | `v22.14.0` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
-| npm (VibeScan run) | `10.9.2` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
-| VibeScan CLI | `1.0.0` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
+| Scanner repo commit (current VibeScan run) | `4112bf3a2ee2aa541ee61024cf258442ca57f478` | `git rev-parse HEAD` at benchmark time |
+| Scanner repo commit (legacy VibeScan run) | `aa492475dbbfdc94d620f8976cd8f9c3e98013ce` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
+| Node.js (current VibeScan run) | `v20.17.0` | `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json` embedded manifest |
+| Node.js (legacy VibeScan run) | `v22.14.0` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
+| npm (legacy VibeScan run) | `10.9.2` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
+| VibeScan CLI (current run) | `1.1.0` | `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json` embedded manifest |
+| VibeScan CLI (legacy run) | `1.0.0` | `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/manifest.json` |
 | Bearer image | `bearer/bearer:latest-amd64` | `benchmarks/results/2026-03-25_223217_dvna_bearer/manifest.json` |
 | Bearer image digest | `sha256:f6701b1b6385c9e564efe680a8391cacc5e94798d7b719a21450064c26a7b2d9` | `benchmarks/results/2026-03-25_223217_dvna_bearer/manifest.json` |
 | Snyk Code CLI | `v1.1303.2` | `snyk --version` (local CLI) |
@@ -56,7 +71,8 @@ DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for
 ## Adjudication artifacts (current)
 
 - Canonical DVNA adjudication sheet: [`results/dvna-adjudication.md`](./dvna-adjudication.md)
-- VibeScan run artifact: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json` (summary: 7 findings)
+- VibeScan run artifact: `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json` (summary: 25 findings; includes EJS + expanded injection/crypto rules)
+- VibeScan legacy artifact: `benchmarks/results/2026-03-25_222913_dvna_vibescan_v1.0.0+aa49247/vibescan-project.json` (summary: 7 findings)
 - Bearer run artifact: `benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json` (summary: 31 findings)
 - Snyk Code artifact: `benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json` (captured and adjudicated)
 - Semgrep artifact: `benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json` (11 findings; optional line-level adjudication extends [`results/dvna-adjudication.md`](./dvna-adjudication.md))
@@ -64,12 +80,12 @@ DVNA documents **OWASP Top 10 (2017)**; mapping below uses OWASP 2021 labels for
 
 Provisional adjudicated precision from the current sheet:
 
-- VibeScan: `tp=4`, `fp=1` -> precision `80.0%` (out-of-scope excluded)
+- VibeScan (legacy adjudication on v1.0.0 artifact): `tp=4`, `fp=1` -> precision `80.0%` (out-of-scope excluded). **Re-do** TP/FP counts against the 1.1.0 artifact for an updated precision figure.
 - Bearer: `tp=18`, `fp=2` -> precision `90.0%` (out-of-scope excluded)
 
 Provisional recall (from finalized case-family FN policy in `results/dvna-adjudication.md`):
 
-- VibeScan: `4/11` -> `36.4%`
+- VibeScan: `11/11` -> `100%` (case-family line match vs `results/dvna-case-catalog.json` on `benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json`; legacy v1.0.0 run was `4/11` -> `36.4%`)
 - Bearer: `8/11` -> `72.7%`
 - Snyk Code: `7/11` -> `63.6%`
 - eslint-plugin-security: `1/11` -> `9.1%`
@@ -84,8 +100,8 @@ Provisional recall (from finalized case-family FN policy in `results/dvna-adjudi
 | A4 XML External Entities (XXE) | A05:2021 Security Misconfiguration / injection | No direct XXE rule hit | No | adjudicated | adjudicated | **Indirect** — `libxmljs` advisories in tree |
 | A5 Broken Access Control | A01:2021 Broken Access Control | **Partial** — middleware/auth heuristics on routes (`AUTH-*`, `MW-*`); not proof of BOLA | No | adjudicated | adjudicated | No |
 | A6 Security Misconfiguration | A05:2021 Security Misconfiguration | **Partial** — related misconfig signals | No | adjudicated | adjudicated | **Partial** — dependency misconfig risk via CVEs |
-| A7 XSS | A03:2021 Injection | **Partial** — signal in bundled vendor files (not DVNA app source) | Vendor-noise-prone in minified assets | adjudicated | adjudicated | No |
-| A8 Insecure Deserialization | A08:2021 Software and Data Integrity Failures | No hit in this run | No | adjudicated | adjudicated | **Indirect** — transitive advisories |
+| A7 XSS | A03:2021 Injection | **Yes** — DOM XSS in `views/app/adminusers.ejs` (inline script → `innerHTML`) on current VibeScan run | Vendor-noise-prone in minified assets | adjudicated | adjudicated | No |
+| A8 Insecure Deserialization | A08:2021 Software and Data Integrity Failures | **Yes** — `node-serialize` `unserialize` on upload data (`core/appHandler.js`) on current VibeScan run | No | adjudicated | adjudicated | **Indirect** — transitive advisories |
 | A9 Using Components with Known Vulnerabilities | A06:2021 Vulnerable Components | **Partial** — static pattern layer only | No | adjudicated | adjudicated | **Yes** — many CVEs/GHSAs |
 | A10 Insufficient Logging & Monitoring | A09:2021 Security Logging Failures | **Partial** — log injection (`routes/main.js`) | No | adjudicated | adjudicated | No |
 

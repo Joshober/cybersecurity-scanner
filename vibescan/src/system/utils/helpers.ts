@@ -1,6 +1,6 @@
 // Shared AST helpers used by attack detection rules.
 
-import type { CallExpression, Node } from "estree";
+import type { CallExpression, Node, MemberExpression } from "estree";
 
 export function getCalleeName(node: CallExpression): string | null {
   const callee = node.callee;
@@ -16,6 +16,13 @@ export function getCalleeName(node: CallExpression): string | null {
       return `${obj.object.name}.${obj.property.name}.${callee.property.name}`;
     }
   }
+  return null;
+}
+
+/** Rightmost method name for chained calls, e.g. `db.User.findAll` → `findAll`. */
+export function getCallMethodName(node: CallExpression): string | null {
+  const c = node.callee;
+  if (c.type === "MemberExpression" && c.property.type === "Identifier") return c.property.name;
   return null;
 }
 
@@ -56,6 +63,59 @@ export function isFixedOrZeroIV(node: Node): boolean {
       )
         return true;
     }
+  }
+  return false;
+}
+
+/** Roots treated as server HTTP request objects (Express `req`, Next.js `NextRequest` parameter `request`, etc.). */
+const HTTP_REQUEST_ROOT_IDS = new Set(["req", "request"]);
+
+/** Callee is `request.x.y()` / `req.query.foo()` style chain rooted at an HTTP request object. */
+function calleeChainRootsAtHttpRequest(callee: Node): boolean {
+  if (callee.type === "MemberExpression") {
+    let cur: Node = callee;
+    while (cur.type === "MemberExpression") {
+      const m = cur as MemberExpression;
+      if (m.object.type === "Identifier" && HTTP_REQUEST_ROOT_IDS.has(m.object.name)) return true;
+      cur = m.object;
+    }
+  }
+  return false;
+}
+
+/** True if expression reads from `req` / `request` (cookies, body, query, params, headers, nextUrl, …). */
+export function referencesReq(node: Node | null | undefined): boolean {
+  if (!node) return false;
+  if (node.type === "MemberExpression") {
+    let cur: Node = node;
+    while (cur.type === "MemberExpression") {
+      const m = cur as MemberExpression;
+      if (m.object.type === "Identifier" && HTTP_REQUEST_ROOT_IDS.has(m.object.name)) return true;
+      cur = m.object;
+    }
+    return false;
+  }
+  if (node.type === "BinaryExpression") {
+    return referencesReq(node.left) || referencesReq(node.right);
+  }
+  if (node.type === "LogicalExpression") {
+    return referencesReq(node.left) || referencesReq(node.right);
+  }
+  if (node.type === "ConditionalExpression") {
+    return referencesReq(node.test) || referencesReq(node.consequent) || referencesReq(node.alternate);
+  }
+  if (node.type === "TemplateLiteral") {
+    return node.expressions.some((e) => referencesReq(e));
+  }
+  if (node.type === "CallExpression") {
+    if (calleeChainRootsAtHttpRequest(node.callee as Node)) return true;
+    return node.arguments.some((a) => referencesReq(a as Node));
+  }
+  if (node.type === "ArrayExpression") {
+    return node.elements.some((e) => e != null && referencesReq(e));
+  }
+  if (node.type === "ObjectExpression") {
+    return node.properties.some((p) => p.type === "Property" && referencesReq(p.value as Node));
   }
   return false;
 }

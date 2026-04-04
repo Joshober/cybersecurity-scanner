@@ -1,0 +1,1213 @@
+{
+  "summary": {
+    "totalFindings": 6,
+    "bySeverity": {
+      "critical": 0,
+      "error": 1,
+      "warning": 3,
+      "info": 2
+    },
+    "byRuleId": {
+      "injection.xss.angular-sanitizer-bypass": 1,
+      "MW-003": 2,
+      "injection.open-redirect": 1,
+      "injection.sql.string-concat": 1,
+      "injection.xss.react-dangerously-set-inner-html": 1
+    },
+    "byCategory": {
+      "crypto": 0,
+      "injection": 6,
+      "api_inventory": 0
+    },
+    "proofCoverage": {
+      "total_findings": 6,
+      "provable": 0,
+      "partial": 0,
+      "structural": 0,
+      "detection_only": 6,
+      "proof_coverage_percent": 0,
+      "deterministic_proof_percent": 0,
+      "by_tier": {
+        "tier_1": 0,
+        "tier_2": 0,
+        "tier_3": 0,
+        "tier_4": 6
+      },
+      "proof_pipeline_not_run": true
+    },
+    "proofCoverageByRuleFamily": {
+      "injection.open-redirect": {
+        "total_findings": 1,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 1,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 1
+        },
+        "proof_pipeline_not_run": true
+      },
+      "injection.sql": {
+        "total_findings": 1,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 1,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 1
+        },
+        "proof_pipeline_not_run": true
+      },
+      "injection.xss": {
+        "total_findings": 2,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 2,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 2
+        },
+        "proof_pipeline_not_run": true
+      },
+      "middleware.headers": {
+        "total_findings": 2,
+        "provable": 0,
+        "partial": 0,
+        "structural": 0,
+        "detection_only": 2,
+        "proof_coverage_percent": 0,
+        "deterministic_proof_percent": 0,
+        "by_tier": {
+          "tier_1": 0,
+          "tier_2": 0,
+          "tier_3": 0,
+          "tier_4": 2
+        },
+        "proof_pipeline_not_run": true
+      }
+    }
+  },
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/redirect",
+      "fullPath": "/redirect",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [
+        "searchParams"
+      ],
+      "paramsFields": [],
+      "middlewares": [],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "line": 3,
+      "handlerSource": "function GET(request) {\r\n  return NextResponse.redirect(request.nextUrl.searchParams.get(\"next\") || \"/\");\r\n}"
+    },
+    {
+      "method": "GET",
+      "path": "/sql",
+      "fullPath": "/sql",
+      "params": [],
+      "bodyFields": [],
+      "queryFields": [
+        "searchParams"
+      ],
+      "paramsFields": [],
+      "middlewares": [],
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "line": 3,
+      "handlerSource": "async function GET(request) {\r\n  const id = request.nextUrl.searchParams.get(\"id\");\r\n  await db.query(`SELECT * FROM users WHERE id = '${id}'`);\r\n}"
+    }
+  ],
+  "routeInventory": [
+    {
+      "method": "GET",
+      "path": "/redirect",
+      "fullPath": "/redirect",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "line": 3,
+      "middlewares": [],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    },
+    {
+      "method": "GET",
+      "path": "/sql",
+      "fullPath": "/sql",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "line": 3,
+      "middlewares": [],
+      "tags": [],
+      "sensitivePath": false,
+      "adminPath": false,
+      "objectScoped": false,
+      "hasAuthMiddleware": false
+    }
+  ],
+  "findings": [
+    {
+      "ruleId": "injection.xss.angular-sanitizer-bypass",
+      "message": "DomSanitizer bypass with dynamic content can lead to XSS if the value is user-controlled.",
+      "why": "bypassSecurityTrust* tells Angular to skip sanitization; attacker-controlled strings become executable in the DOM.",
+      "fix": "Do not pass user input into bypass methods; sanitize with a trusted library or avoid HTML injection.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 10,
+      "column": 11,
+      "endLine": 10,
+      "endColumn": 59,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+      "confidence": 0.84,
+      "findingId": "vs1-4b16f9544bfa1b7b",
+      "confidenceScore": 0.84,
+      "confidenceReason": "Pattern rule injection.xss.angular-sanitizer-bypass: bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments.",
+      "confidenceReasons": [
+        "Pattern rule injection.xss.angular-sanitizer-bypass: bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts:10",
+          "injection.xss.angular-sanitizer-bypass"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts:10",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.xss.angular-sanitizer-bypass",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Do not pass user input into bypass methods; sanitize with a trusted library or avoid HTML injection.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "Angular DomSanitizer bypass with dynamic content",
+        "pattern": "bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments.",
+        "risk": "Bypass methods disable Angular sanitization; XSS if the value is user-influenced.",
+        "falsePositives": "Hard-coded trusted snippets only—still prefer non-bypass APIs where possible.",
+        "remediation": "Never pass user input to bypassSecurityTrust*; sanitize and use safe bindings.",
+        "secureExample": "// Prefer bound text or DomSanitizer.sanitize with strict context",
+        "referenceUrls": [
+          "https://angular.dev/best-practices/security/",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "MW-003",
+      "message": "No helmet() call detected in this file — verify security headers are set.",
+      "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+      "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+      "severity": "info",
+      "severityLabel": "LOW",
+      "category": "injection",
+      "cwe": 693,
+      "owasp": "A05:2021",
+      "findingKind": "APP_CONFIG",
+      "line": 1,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "confidence": 0.71,
+      "findingId": "vs1-bf6b020e3cbd3958",
+      "confidenceScore": 0.71,
+      "confidenceReason": "Pattern rule MW-003: App-level audit suspects missing helmet-style headers.",
+      "confidenceReasons": [
+        "Pattern rule MW-003: App-level audit suspects missing helmet-style headers."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:1",
+          "MW-003"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:1",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "MW-003",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use helmet() at app bootstrap or equivalent header middleware.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "Security header gap (heuristic)",
+        "pattern": "App-level audit suspects missing helmet-style headers.",
+        "risk": "Clickjacking, MIME sniffing, XSS without defense-in-depth.",
+        "falsePositives": "Headers set at reverse proxy.",
+        "remediation": "Align app + edge header policy; verify with integration tests.",
+        "secureExample": "app.use(helmet({ contentSecurityPolicy: { directives: { ... } } }));",
+        "referenceUrls": [
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.open-redirect",
+      "message": "Redirect target may be controlled by the user (open redirect / phishing risk).",
+      "why": "Passing request data into redirect APIs (Express res.redirect, Next.js NextResponse.redirect / Response.redirect, etc.) without an allow-list lets attackers send victims to malicious sites.",
+      "fix": "Validate redirect targets against a fixed allow-list or use relative paths only. Reject absolute URLs from untrusted input.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "cwe": 601,
+      "line": 4,
+      "column": 9,
+      "endLine": 4,
+      "endColumn": 79,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "confidence": 0.84,
+      "findingId": "vs1-111931d1dc621a74",
+      "confidenceScore": 0.84,
+      "confidenceReason": "Pattern rule injection.open-redirect: res.redirect (or similar) first argument is derived from req.query / req.body without validation.",
+      "confidenceReasons": [
+        "Pattern rule injection.open-redirect: res.redirect (or similar) first argument is derived from req.query / req.body without validation."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:4",
+          "injection.open-redirect"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:4",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.open-redirect",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Validate redirect targets against a fixed allow-list or use relative paths only. Reject absolute URLs from untrusted input.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "Open redirect",
+        "pattern": "res.redirect (or similar) first argument is derived from req.query / req.body without validation.",
+        "risk": "Attackers craft links that send users to phishing or malware sites while appearing to originate from your domain.",
+        "falsePositives": "Redirects built only from server-side allow lists.",
+        "remediation": "Allow-list redirect targets or use relative paths only; reject absolute URLs from untrusted input.",
+        "secureExample": "const next = ALLOWED.has(req.query.next) ? req.query.next : \"/home\";\nres.redirect(next);",
+        "referenceUrls": [
+          "https://cwe.mitre.org/data/definitions/601.html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "MW-003",
+      "message": "No helmet() call detected in this file — verify security headers are set.",
+      "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+      "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+      "severity": "info",
+      "severityLabel": "LOW",
+      "category": "injection",
+      "cwe": 693,
+      "owasp": "A05:2021",
+      "findingKind": "APP_CONFIG",
+      "line": 1,
+      "column": 0,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "confidence": 0.71,
+      "findingId": "vs1-361fd1960135c739",
+      "confidenceScore": 0.71,
+      "confidenceReason": "Pattern rule MW-003: App-level audit suspects missing helmet-style headers.",
+      "confidenceReasons": [
+        "Pattern rule MW-003: App-level audit suspects missing helmet-style headers."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:1",
+          "MW-003"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:1",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "MW-003",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use helmet() at app bootstrap or equivalent header middleware.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "Security header gap (heuristic)",
+        "pattern": "App-level audit suspects missing helmet-style headers.",
+        "risk": "Clickjacking, MIME sniffing, XSS without defense-in-depth.",
+        "falsePositives": "Headers set at reverse proxy.",
+        "remediation": "Align app + edge header policy; verify with integration tests.",
+        "secureExample": "app.use(helmet({ contentSecurityPolicy: { directives: { ... } } }));",
+        "referenceUrls": [
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.sql.string-concat",
+      "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+      "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+      "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+      "severity": "error",
+      "severityLabel": "HIGH",
+      "category": "injection",
+      "line": 5,
+      "column": 8,
+      "endLine": 5,
+      "endColumn": 58,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "confidence": 0.86,
+      "findingId": "vs1-9728f9517fbb7c33",
+      "confidenceScore": 0.86,
+      "confidenceReason": "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments.",
+      "confidenceReasons": [
+        "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:5",
+          "injection.sql.string-concat"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:5",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.sql.string-concat",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "SQL built via string concatenation",
+        "pattern": "Query strings assembled with user-controlled fragments.",
+        "risk": "Classic SQL injection leading to data exfiltration or destruction.",
+        "falsePositives": "Constants only; ensure no dynamic segments from request data.",
+        "remediation": "Parameterized queries / prepared statements.",
+        "secureExample": "db.query(\"SELECT * FROM u WHERE id = ?\", [userId]);",
+        "referenceUrls": [
+          "https://owasp.org/www-community/attacks/SQL_Injection",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    },
+    {
+      "ruleId": "injection.xss.react-dangerously-set-inner-html",
+      "message": "dangerouslySetInnerHTML with non-literal HTML can cause XSS if the string is user-influenced.",
+      "why": "React skips escaping for __html; any attacker-controlled markup becomes executable in the page context.",
+      "fix": "Avoid raw HTML; use sanitized markup from a trusted pipeline or framework-safe components.",
+      "severity": "warning",
+      "severityLabel": "MEDIUM",
+      "category": "injection",
+      "line": 3,
+      "column": 14,
+      "endLine": 3,
+      "endColumn": 56,
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+      "confidence": 0.82,
+      "findingId": "vs1-9a7c64476d501476",
+      "confidenceScore": 0.82,
+      "confidenceReason": "Pattern rule injection.xss.react-dangerously-set-inner-html: dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes).",
+      "confidenceReasons": [
+        "Pattern rule injection.xss.react-dangerously-set-inner-html: dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes)."
+      ],
+      "rootCause": {
+        "kind": "pattern",
+        "path": [
+          "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx:3",
+          "injection.xss.react-dangerously-set-inner-html"
+        ]
+      },
+      "causalGraph": {
+        "version": 1,
+        "kind": "pattern",
+        "nodes": [
+          {
+            "id": "loc",
+            "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx:3",
+            "role": "pattern"
+          },
+          {
+            "id": "rule",
+            "label": "injection.xss.react-dangerously-set-inner-html",
+            "role": "pattern"
+          }
+        ],
+        "edges": [
+          {
+            "from": "loc",
+            "to": "rule",
+            "label": "matched"
+          }
+        ],
+        "missingControls": []
+      },
+      "proofTier": 4,
+      "proofTierLabel": "detection_only",
+      "deterministic": false,
+      "requiresNetwork": false,
+      "requiresSecrets": false,
+      "requiresEnv": false,
+      "requiresManualCompletion": false,
+      "proofReason": "No proof pipeline output for this finding (detection-only).",
+      "fixPreview": {
+        "remediation_hint": "Avoid raw HTML; use sanitized markup from a trusted pipeline or framework-safe components.",
+        "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+      },
+      "confidenceDimensions": {
+        "pathPresent": false,
+        "routeExtracted": false,
+        "middlewareChainKnown": false,
+        "proofTierLabel": "detection_only",
+        "sanitization": "unknown"
+      },
+      "ruleDocumentation": {
+        "title": "React dangerouslySetInnerHTML with dynamic HTML",
+        "pattern": "dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes).",
+        "risk": "React does not escape __html; attacker-controlled strings become real DOM and scripts.",
+        "falsePositives": "Carefully sanitized HTML from a trusted server-side pipeline.",
+        "remediation": "Prefer plain text or framework components; sanitize HTML with a maintained library if you must render HTML.",
+        "secureExample": "<div>{markdownToSafeReact(children)}</div> // not raw __html from users",
+        "referenceUrls": [
+          "https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html",
+          "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+        ]
+      }
+    }
+  ],
+  "fileResults": [
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+      "findings": [
+        {
+          "ruleId": "injection.xss.angular-sanitizer-bypass",
+          "message": "DomSanitizer bypass with dynamic content can lead to XSS if the value is user-controlled.",
+          "why": "bypassSecurityTrust* tells Angular to skip sanitization; attacker-controlled strings become executable in the DOM.",
+          "fix": "Do not pass user input into bypass methods; sanitize with a trusted library or avoid HTML injection.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 10,
+          "column": 11,
+          "endLine": 10,
+          "endColumn": 59,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts",
+          "confidence": 0.84,
+          "findingId": "vs1-4b16f9544bfa1b7b",
+          "confidenceScore": 0.84,
+          "confidenceReason": "Pattern rule injection.xss.angular-sanitizer-bypass: bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments.",
+          "confidenceReasons": [
+            "Pattern rule injection.xss.angular-sanitizer-bypass: bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts:10",
+              "injection.xss.angular-sanitizer-bypass"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\angular\\bypass.component.ts:10",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.xss.angular-sanitizer-bypass",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Do not pass user input into bypass methods; sanitize with a trusted library or avoid HTML injection.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "Angular DomSanitizer bypass with dynamic content",
+            "pattern": "bypassSecurityTrustHtml / Script / Style / Url / ResourceUrl with non-literal arguments.",
+            "risk": "Bypass methods disable Angular sanitization; XSS if the value is user-influenced.",
+            "falsePositives": "Hard-coded trusted snippets only—still prefer non-bypass APIs where possible.",
+            "remediation": "Never pass user input to bypassSecurityTrust*; sanitize and use safe bindings.",
+            "secureExample": "// Prefer bound text or DomSanitizer.sanitize with strict context",
+            "referenceUrls": [
+              "https://angular.dev/best-practices/security/",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\lib\\db.ts",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\lib\\db.ts",
+      "findings": [],
+      "routeCount": 0
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+      "findings": [
+        {
+          "ruleId": "MW-003",
+          "message": "No helmet() call detected in this file — verify security headers are set.",
+          "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+          "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+          "severity": "info",
+          "severityLabel": "LOW",
+          "category": "injection",
+          "cwe": 693,
+          "owasp": "A05:2021",
+          "findingKind": "APP_CONFIG",
+          "line": 1,
+          "column": 0,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+          "confidence": 0.71,
+          "findingId": "vs1-bf6b020e3cbd3958",
+          "confidenceScore": 0.71,
+          "confidenceReason": "Pattern rule MW-003: App-level audit suspects missing helmet-style headers.",
+          "confidenceReasons": [
+            "Pattern rule MW-003: App-level audit suspects missing helmet-style headers."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:1",
+              "MW-003"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:1",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "MW-003",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use helmet() at app bootstrap or equivalent header middleware.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "Security header gap (heuristic)",
+            "pattern": "App-level audit suspects missing helmet-style headers.",
+            "risk": "Clickjacking, MIME sniffing, XSS without defense-in-depth.",
+            "falsePositives": "Headers set at reverse proxy.",
+            "remediation": "Align app + edge header policy; verify with integration tests.",
+            "secureExample": "app.use(helmet({ contentSecurityPolicy: { directives: { ... } } }));",
+            "referenceUrls": [
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        },
+        {
+          "ruleId": "injection.open-redirect",
+          "message": "Redirect target may be controlled by the user (open redirect / phishing risk).",
+          "why": "Passing request data into redirect APIs (Express res.redirect, Next.js NextResponse.redirect / Response.redirect, etc.) without an allow-list lets attackers send victims to malicious sites.",
+          "fix": "Validate redirect targets against a fixed allow-list or use relative paths only. Reject absolute URLs from untrusted input.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "cwe": 601,
+          "line": 4,
+          "column": 9,
+          "endLine": 4,
+          "endColumn": 79,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts",
+          "confidence": 0.84,
+          "findingId": "vs1-111931d1dc621a74",
+          "confidenceScore": 0.84,
+          "confidenceReason": "Pattern rule injection.open-redirect: res.redirect (or similar) first argument is derived from req.query / req.body without validation.",
+          "confidenceReasons": [
+            "Pattern rule injection.open-redirect: res.redirect (or similar) first argument is derived from req.query / req.body without validation."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:4",
+              "injection.open-redirect"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\redirect\\route.ts:4",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.open-redirect",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Validate redirect targets against a fixed allow-list or use relative paths only. Reject absolute URLs from untrusted input.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "Open redirect",
+            "pattern": "res.redirect (or similar) first argument is derived from req.query / req.body without validation.",
+            "risk": "Attackers craft links that send users to phishing or malware sites while appearing to originate from your domain.",
+            "falsePositives": "Redirects built only from server-side allow lists.",
+            "remediation": "Allow-list redirect targets or use relative paths only; reject absolute URLs from untrusted input.",
+            "secureExample": "const next = ALLOWED.has(req.query.next) ? req.query.next : \"/home\";\nres.redirect(next);",
+            "referenceUrls": [
+              "https://cwe.mitre.org/data/definitions/601.html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 1
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+      "findings": [
+        {
+          "ruleId": "MW-003",
+          "message": "No helmet() call detected in this file — verify security headers are set.",
+          "why": "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
+          "fix": "Use helmet() at app bootstrap or equivalent header middleware.",
+          "severity": "info",
+          "severityLabel": "LOW",
+          "category": "injection",
+          "cwe": 693,
+          "owasp": "A05:2021",
+          "findingKind": "APP_CONFIG",
+          "line": 1,
+          "column": 0,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+          "confidence": 0.71,
+          "findingId": "vs1-361fd1960135c739",
+          "confidenceScore": 0.71,
+          "confidenceReason": "Pattern rule MW-003: App-level audit suspects missing helmet-style headers.",
+          "confidenceReasons": [
+            "Pattern rule MW-003: App-level audit suspects missing helmet-style headers."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:1",
+              "MW-003"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:1",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "MW-003",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use helmet() at app bootstrap or equivalent header middleware.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "Security header gap (heuristic)",
+            "pattern": "App-level audit suspects missing helmet-style headers.",
+            "risk": "Clickjacking, MIME sniffing, XSS without defense-in-depth.",
+            "falsePositives": "Headers set at reverse proxy.",
+            "remediation": "Align app + edge header policy; verify with integration tests.",
+            "secureExample": "app.use(helmet({ contentSecurityPolicy: { directives: { ... } } }));",
+            "referenceUrls": [
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        },
+        {
+          "ruleId": "injection.sql.string-concat",
+          "message": "SQL built with string concatenation or template literals can lead to SQL injection.",
+          "why": "Untrusted input concatenated into a SQL string can break out of the query and execute arbitrary SQL.",
+          "fix": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+          "severity": "error",
+          "severityLabel": "HIGH",
+          "category": "injection",
+          "line": 5,
+          "column": 8,
+          "endLine": 5,
+          "endColumn": 58,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts",
+          "confidence": 0.86,
+          "findingId": "vs1-9728f9517fbb7c33",
+          "confidenceScore": 0.86,
+          "confidenceReason": "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments.",
+          "confidenceReasons": [
+            "Pattern rule injection.sql.string-concat: Query strings assembled with user-controlled fragments."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:5",
+              "injection.sql.string-concat"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\sql\\route.ts:5",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.sql.string-concat",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Use parameterized queries, e.g. db.query('SELECT * FROM users WHERE id = ?', [id]), or an ORM with parameter binding.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "SQL built via string concatenation",
+            "pattern": "Query strings assembled with user-controlled fragments.",
+            "risk": "Classic SQL injection leading to data exfiltration or destruction.",
+            "falsePositives": "Constants only; ensure no dynamic segments from request data.",
+            "remediation": "Parameterized queries / prepared statements.",
+            "secureExample": "db.query(\"SELECT * FROM u WHERE id = ?\", [userId]);",
+            "referenceUrls": [
+              "https://owasp.org/www-community/attacks/SQL_Injection",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 1
+    },
+    {
+      "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+      "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+      "findings": [
+        {
+          "ruleId": "injection.xss.react-dangerously-set-inner-html",
+          "message": "dangerouslySetInnerHTML with non-literal HTML can cause XSS if the string is user-influenced.",
+          "why": "React skips escaping for __html; any attacker-controlled markup becomes executable in the page context.",
+          "fix": "Avoid raw HTML; use sanitized markup from a trusted pipeline or framework-safe components.",
+          "severity": "warning",
+          "severityLabel": "MEDIUM",
+          "category": "injection",
+          "line": 3,
+          "column": 14,
+          "endLine": 3,
+          "endColumn": 56,
+          "file": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+          "filePath": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx",
+          "confidence": 0.82,
+          "findingId": "vs1-9a7c64476d501476",
+          "confidenceScore": 0.82,
+          "confidenceReason": "Pattern rule injection.xss.react-dangerously-set-inner-html: dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes).",
+          "confidenceReasons": [
+            "Pattern rule injection.xss.react-dangerously-set-inner-html: dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes)."
+          ],
+          "rootCause": {
+            "kind": "pattern",
+            "path": [
+              "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx:3",
+              "injection.xss.react-dangerously-set-inner-html"
+            ]
+          },
+          "causalGraph": {
+            "version": 1,
+            "kind": "pattern",
+            "nodes": [
+              {
+                "id": "loc",
+                "label": "C:\\Users\\Josh\\Downloads\\CyberSecurity\\benchmarks\\seeds\\framework-vulns\\nextjs\\app\\xss\\page.tsx:3",
+                "role": "pattern"
+              },
+              {
+                "id": "rule",
+                "label": "injection.xss.react-dangerously-set-inner-html",
+                "role": "pattern"
+              }
+            ],
+            "edges": [
+              {
+                "from": "loc",
+                "to": "rule",
+                "label": "matched"
+              }
+            ],
+            "missingControls": []
+          },
+          "proofTier": 4,
+          "proofTierLabel": "detection_only",
+          "deterministic": false,
+          "requiresNetwork": false,
+          "requiresSecrets": false,
+          "requiresEnv": false,
+          "requiresManualCompletion": false,
+          "proofReason": "No proof pipeline output for this finding (detection-only).",
+          "fixPreview": {
+            "remediation_hint": "Avoid raw HTML; use sanitized markup from a trusted pipeline or framework-safe components.",
+            "expected_effect": "Re-scan should clear the pattern if the vulnerability class is fully addressed; confirm with review."
+          },
+          "confidenceDimensions": {
+            "pathPresent": false,
+            "routeExtracted": false,
+            "middlewareChainKnown": false,
+            "proofTierLabel": "detection_only",
+            "sanitization": "unknown"
+          },
+          "ruleDocumentation": {
+            "title": "React dangerouslySetInnerHTML with dynamic HTML",
+            "pattern": "dangerouslySetInnerHTML / __html with a non-literal expression (including JSX attributes).",
+            "risk": "React does not escape __html; attacker-controlled strings become real DOM and scripts.",
+            "falsePositives": "Carefully sanitized HTML from a trusted server-side pipeline.",
+            "remediation": "Prefer plain text or framework components; sanitize HTML with a maintained library if you must render HTML.",
+            "secureExample": "<div>{markdownToSafeReact(children)}</div> // not raw __html from users",
+            "referenceUrls": [
+              "https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html",
+              "https://github.com/Joshober/cybersecurity-scanner/blob/main/vibescan/README.md#rule-reference"
+            ]
+          }
+        }
+      ],
+      "routeCount": 0
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "description": "Line-anchored cases over benchmarks/seeds/framework-vulns (Angular + Next.js-style). Used by framework-seed-benchmark tests and optional scan script.",
+  "corpusRoot": "benchmarks/seeds/framework-vulns",
+  "cases": [
+    {
+      "id": "angular-sanitizer-bypass-seed",
+      "framework": "angular",
+      "chartLabel": "Angular DomSanitizer bypass",
+      "anchorSuffix": "angular/bypass.component.ts",
+      "anchorLines": [10],
+      "expectedRuleIds": ["injection.xss.angular-sanitizer-bypass"]
+    },
+    {
+      "id": "next-open-redirect-seed",
+      "framework": "nextjs",
+      "chartLabel": "Next.js open redirect",
+      "anchorSuffix": "nextjs/app/redirect/route.ts",
+      "anchorLines": [4],
+      "expectedRuleIds": ["injection.open-redirect"]
+    },
+    {
+      "id": "next-sql-concat-seed",
+      "framework": "nextjs",
+      "chartLabel": "Next.js SQL string concat",
+      "anchorSuffix": "nextjs/app/sql/route.ts",
+      "anchorLines": [5],
+      "expectedRuleIds": ["injection.sql.string-concat"]
+    },
+    {
+      "id": "next-react-xss-seed",
+      "framework": "nextjs",
+      "chartLabel": "Next/React dangerouslySetInnerHTML",
+      "anchorSuffix": "nextjs/app/xss/page.tsx",
+      "anchorLines": [3],
+      "expectedRuleIds": ["injection.xss.react-dangerously-set-inner-html"]
+    }
+  ]
+}
