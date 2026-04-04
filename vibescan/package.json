@@ -13,7 +13,7 @@
     "url": "https://github.com/Joshober/cybersecurity-scanner/issues"
   },
   "homepage": "https://github.com/Joshober/cybersecurity-scanner/tree/main/vibescan#readme",
-  "description": "VibeScan (@jobersteadt/vibescan) — static JS/TS security scan, secure-arch, and IDE rule export. Official CLI: vibescan.",
+  "description": "VibeScan (@jobersteadt/vibescan) - static JS/TS security scan, secure-arch, and IDE rule export. Official CLI: vibescan.",
   "main": "dist/system/index.js",
   "types": "dist/system/index.d.ts",
   "bin": {
@@ -28,9 +28,11 @@
   ],
   "scripts": {
     "build": "tsc",
+    "prepack": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
     "test": "npm run build && node --test \"tests/unit/*.test.mjs\"",
-    "release:check": "npm run build && npm pack --dry-run",
-    "prepublishOnly": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
+    "release:check": "npm run prepack && npm pack --dry-run --ignore-scripts",
+    "release:quick": "npm pack --dry-run",
+    "prepublishOnly": "npm run prepack",
     "policy-eval": "node scripts/policy-eval.mjs"
   },
   "keywords": [
@@ -70,5 +72,12 @@
     "eslint": {
       "optional": true
     }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/system/index.d.ts",
+      "default": "./dist/system/index.js"
+    },
+    "./package.json": "./package.json"
   }
 }

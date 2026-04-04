@@ -111,6 +111,17 @@ gh workflow run publish-github-packages.yml --repo Joshober/cybersecurity-scanne
 
 (Ensure `main` includes the workflow and the new version; the workflow runs `npm publish` from `vibescan/` using `prepublishOnly`.)
 
+### Maintainer packaging checks (before publish)
+
+From `vibescan/`:
+
+```bash
+npm run release:check   # full validation (build + vendoring + pack dry-run)
+npm run release:quick   # fast tarball preview using current dist state
+```
+
+`release:check` is the safer default; it mirrors publish prep once, then runs `npm pack --dry-run --ignore-scripts` so the prepack step does not run twice.
+
 ## Quick start (after local `npm i`)
 
 ```bash
