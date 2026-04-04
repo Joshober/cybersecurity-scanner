@@ -3,10 +3,16 @@
  * Re-run VibeScan on the pinned DVNA checkout and write a fresh project JSON + manifest
  * under benchmarks/results/<UTC>_<slug>/.
  *
+ * By default this injects `--generate-tests` with output under
+ * `benchmarks/results/dvna_vibescan_proofs/` so the JSON includes proofGeneration +
+ * full proof tier rollup (same as `vibescan prove`). Pass `--no-generate-tests` to skip.
+ *
  * Prerequisites: DVNA at benchmarks/dvna/dvna (see benchmarks/dvna/README.md).
  * Usage (from repo root):
  *   node benchmarks/scripts/run-dvna-vibescan-scan.mjs
- *   node benchmarks/scripts/run-dvna-vibescan-scan.mjs --benchmark-metadata --generate-tests
+ *   node benchmarks/scripts/run-dvna-vibescan-scan.mjs --benchmark-metadata
+ *   node benchmarks/scripts/run-dvna-vibescan-scan.mjs --no-generate-tests   # scan only
+ *   node benchmarks/scripts/run-dvna-vibescan-scan.mjs --generate-tests other/dir  # override output dir
  */
 
 import { spawnSync } from "node:child_process";
@@ -34,7 +40,14 @@ function main() {
     console.error(`Missing ${vibescanCli} — run: cd vibescan && npm run build`);
     process.exit(1);
   }
-  const extraArgs = process.argv.slice(2);
+  const rawArgv = process.argv.slice(2);
+  const noGenerateTests = rawArgv.includes("--no-generate-tests");
+  const userArgs = rawArgv.filter((a) => a !== "--no-generate-tests");
+  const userRequestedGen = userArgs.includes("--generate-tests");
+  const proofOutDir = join(repoRoot, "benchmarks", "results", "dvna_vibescan_proofs");
+  mkdirSync(proofOutDir, { recursive: true });
+  const generateTestsArgs =
+    noGenerateTests || userRequestedGen ? [] : ["--generate-tests", proofOutDir];
   const outDir = join(repoRoot, "benchmarks", "results", `${utcStamp()}_dvna_vibescan_cli`);
   mkdirSync(outDir, { recursive: true });
   const manifestPath = join(outDir, "manifest.json");
@@ -66,7 +79,8 @@ function main() {
     "--exclude-vendor",
     "--manifest",
     manifestPath,
-    ...extraArgs,
+    ...generateTestsArgs,
+    ...userArgs,
   ];
 
   const r = spawnSync(process.execPath, args, {

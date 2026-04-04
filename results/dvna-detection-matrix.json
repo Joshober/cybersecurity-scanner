@@ -23,7 +23,9 @@
         "default-secret-fallback": true,
         "dom-xss": true
       },
-      "recallNote": "11/11 on eleven DVNA case families (2026-04-04 VibeScan 1.1.0 run); line-level match policy in results/dvna-case-catalog.json."
+      "recallNote": "11/11 on eleven DVNA case families (2026-04-04 VibeScan 1.1.0 run); line-level match policy in results/dvna-case-catalog.json.",
+      "dvnaRunIssueCount": 25,
+      "dvnaRunIssueCountNote": "Matches summary.totalFindings on the aligned vibescan-project.json (full DVNA tree; first-party scope). Benchmark “11/11” is catalog anchors only, not this count."
     },
     {
       "id": "bearer",
@@ -43,7 +45,9 @@
         "default-secret-fallback": false,
         "dom-xss": false
       },
-      "recallNote": "8/11 in dvna-evaluation.md"
+      "recallNote": "8/11 in dvna-evaluation.md; 31 finding rows in benchmarks/results/2026-03-25_223217_dvna_bearer/bearer.json.",
+      "dvnaRunIssueCount": 31,
+      "dvnaRunIssueCountNote": "Frozen Bearer JSON on DVNA commit per results/dvna-evaluation.md."
     },
     {
       "id": "snyk-code",
@@ -63,7 +67,9 @@
         "default-secret-fallback": false,
         "dom-xss": true
       },
-      "recallNote": "7/11 in dvna-evaluation.md"
+      "recallNote": "7/11 in dvna-evaluation.md; 36 findings in benchmarks/results/2026-03-25_223440_dvna_snykcode_v1.1303.2+aa49247/snyk-code.json.",
+      "dvnaRunIssueCount": 36,
+      "dvnaRunIssueCountNote": "Captured Snyk Code CLI JSON; severities mix error/warning/note."
     },
     {
       "id": "semgrep",
@@ -83,7 +89,9 @@
         "default-secret-fallback": false,
         "dom-xss": false
       },
-      "recallNote": "Derived from benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json; packs p/javascript + p/security-audit."
+      "recallNote": "Derived from benchmarks/results/2026-04-03_dvna_semgrep_1.157.0/semgrep.json; packs p/javascript + p/security-audit. results.length = 11.",
+      "dvnaRunIssueCount": 11,
+      "dvnaRunIssueCountNote": "Semgrep OSS JSON results array on DVNA (frozen run)."
     },
     {
       "id": "codeql",
@@ -103,7 +111,9 @@
         "default-secret-fallback": true,
         "dom-xss": false
       },
-      "recallNote": "Heuristic case hits from benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif (file suffix + anchor line); subject to manual adjudication like Semgrep."
+      "recallNote": "Heuristic case hits from benchmarks/results/2026-04-03_084922_dvna_codeql_v2.25.1/codeql.sarif (file suffix + anchor line); subject to manual adjudication like Semgrep. SARIF results count = 46.",
+      "dvnaRunIssueCount": 46,
+      "dvnaRunIssueCountNote": "codeql.sarif runs[0].results length (javascript-security-and-quality.qls, bundle 2.25.1)."
     },
     {
       "id": "eslint-security",
@@ -123,7 +133,9 @@
         "default-secret-fallback": false,
         "dom-xss": false
       },
-      "recallNote": "1/11 case recall in dvna-evaluation.md"
+      "recallNote": "1/11 case recall in dvna-evaluation.md; 493 warning/error rows in captured results/eslint-dvna.txt (includes vendor/minified assets such as jquery-3.2.1.min.js).",
+      "dvnaRunIssueCount": 493,
+      "dvnaRunIssueCountNote": "Line count of diagnostics in results/eslint-dvna.txt — not first-party-only; heatmap uses stricter case anchors."
     },
     {
       "id": "npm-audit",
