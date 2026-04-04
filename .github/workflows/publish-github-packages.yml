@@ -10,6 +10,10 @@ on:
     types: [published]
   workflow_dispatch:
 
+concurrency:
+  group: publish-github-packages-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   publish:
     if: github.event.repository.fork == false
@@ -35,4 +39,4 @@ jobs:
         working-directory: vibescan
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
-        run: npm publish --registry https://npm.pkg.github.com
+        run: npm publish
