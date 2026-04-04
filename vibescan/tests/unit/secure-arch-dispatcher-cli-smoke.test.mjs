@@ -32,10 +32,16 @@ function ensureVendoredSecureArch() {
     return;
   }
 
-  // Use `cmd.exe` so Windows PATH resolution for `npm` is reliable under the test runner.
-  // Avoid nested quoting issues on Windows by passing the prefix path unquoted.
-  const cmd = `npm --prefix ${monorepoRoot} run build:arch`;
-  const rBuild = spawnSync("cmd.exe", ["/d", "/s", "/c", cmd], { cwd: monorepoRoot, encoding: "utf-8" });
+  const rBuild =
+    process.platform === "win32"
+      ? spawnSync("cmd.exe", ["/d", "/s", "/c", `npm --prefix ${monorepoRoot} run build:arch`], {
+          cwd: monorepoRoot,
+          encoding: "utf-8",
+        })
+      : spawnSync("npm", ["--prefix", monorepoRoot, "run", "build:arch"], {
+          cwd: monorepoRoot,
+          encoding: "utf-8",
+        });
   assert.strictEqual(rBuild.status, 0, rBuild.stderr || rBuild.stdout || String(rBuild.error ?? ""));
 
   const rVendor = spawnSync(process.execPath, [vendorScript], {
@@ -134,4 +140,3 @@ describe("CLI dispatcher - secure-arch", () => {
     }
   });
 });
-

@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test tests/unit/",
+    "test": "npm run build && node --test \"tests/unit/*.test.mjs\"",
     "release:check": "npm run build && npm pack --dry-run",
     "prepublishOnly": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
     "policy-eval": "node scripts/policy-eval.mjs"
