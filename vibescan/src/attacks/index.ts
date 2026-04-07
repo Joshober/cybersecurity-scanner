@@ -1,4 +1,6 @@
 // Attack rules by category: crypto, injection, browser (XSS), file (path-traversal).
+// Some scanner rules still live under `system/ai/` for historical reasons, but they are
+// ordinary deterministic rules in the main catalog rather than optional AI-only features.
 
 import type { Rule } from "../system/utils/rule-types.js";
 import { weakHashingRule } from "./crypto/weak-hashing.js";
@@ -14,6 +16,8 @@ import { codeInjectionRule } from "./injection/code-injection.js";
 import { sqlInjectionRule } from "./injection/sql-injection.js";
 import { commandInjectionRule } from "./injection/command-injection.js";
 import { nosqlInjectionRule } from "./injection/nosql-injection.js";
+import { sstiTemplateUserInputRule } from "./injection/ssti-template-user-input.js";
+import { authzIdorDirectObjectReferenceRule } from "./injection/authz-idor-direct-object-reference.js";
 import { openRedirectRule } from "./injection/open-redirect.js";
 import { insecureDeserializeRule } from "./injection/insecure-deserialize.js";
 import { ormRequestInputRule } from "./injection/orm-request-input.js";
@@ -50,6 +54,8 @@ export const injectionRules: Rule[] = [
   reactDangerouslyInnerHtmlRule,
   angularSanitizerBypassRule,
   nosqlInjectionRule,
+  sstiTemplateUserInputRule,
+  authzIdorDirectObjectReferenceRule,
   ormRequestInputRule,
   xpathInjectionRule,
   logInjectionRule,

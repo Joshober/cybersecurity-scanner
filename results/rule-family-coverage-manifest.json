@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "generatedFrom": {
+    "catalog": "results/framework-vuln-case-catalog.json",
+    "rules": [
+      "vibescan/src/attacks",
+      "vibescan/src/system/ai"
+    ]
+  },
+  "families": [
+    {
+      "family": "injection-core",
+      "ruleIds": ["injection.eval", "injection.sql.string-concat", "injection.command", "injection.open-redirect", "injection.deserialize.untrusted", "injection.path-traversal", "injection.xpath", "injection.log", "injection.noql", "injection.orm.request-in-query"],
+      "caseIds": ["expanded-eval", "next-sql-concat-seed", "expanded-command", "next-open-redirect-seed", "expanded-path-traversal", "expanded-xpath", "expanded-log", "expanded-nosql", "expanded-orm"],
+      "status": "covered"
+    },
+    {
+      "family": "xss-client-and-framework",
+      "ruleIds": ["injection.xss", "injection.xss.angular-sanitizer-bypass", "injection.xss.react-dangerously-set-inner-html"],
+      "caseIds": ["expanded-innerhtml", "angular-sanitizer-bypass-seed", "expanded-angular-bypass", "next-react-xss-seed", "expanded-react-dangerously-html"],
+      "status": "covered"
+    },
+    {
+      "family": "ssrf-and-external-http",
+      "ruleIds": ["RULE-SSRF-002", "SSRF-003"],
+      "caseIds": ["expanded-ssrf-axios", "expanded-ssrf-ip-guard"],
+      "status": "covered"
+    },
+    {
+      "family": "crypto-and-secrets",
+      "ruleIds": ["crypto.hash.weak", "crypto.cipher.weak", "crypto.cipher.deprecated", "crypto.cipher.fixed-iv", "crypto.random.insecure", "crypto.jwt.weak-secret-literal", "crypto.tls.reject-unauthorized", "crypto.secrets.hardcoded", "SEC-004"],
+      "caseIds": ["expanded-crypto-hash", "expanded-crypto-weak-cipher", "expanded-crypto-deprecated-cipher", "expanded-crypto-fixed-iv", "expanded-crypto-random", "expanded-crypto-jwt", "expanded-crypto-tls", "expanded-crypto-hardcoded", "expanded-crypto-env-fallback"],
+      "status": "covered"
+    },
+    {
+      "family": "middleware-cookie",
+      "ruleIds": ["mw.cookie.missing-flags"],
+      "caseIds": ["expanded-cookie"],
+      "status": "covered"
+    },
+    {
+      "family": "research-new-classes",
+      "ruleIds": ["injection.ssti.template-user-input", "authz.idor.direct-object-reference"],
+      "caseIds": ["expanded-ssti", "expanded-idor"],
+      "status": "covered"
+    }
+  ]
+}

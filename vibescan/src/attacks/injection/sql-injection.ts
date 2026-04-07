@@ -2,7 +2,7 @@
 
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
-import { getCalleeName, parseCalleeParts } from "../../system/utils/helpers.js";
+import { describeCalleeName, getCalleeName } from "../../system/utils/helpers.js";
 
 const QUERY_METHODS = new Set(["query", "execute", "exec", "run", "raw", "queryRaw", "executeRaw", "find", "findOne", "findMany", "aggregate", "where", "select"]);
 
@@ -16,9 +16,9 @@ export const sqlInjectionRule: Rule = {
   nodeTypes: ["CallExpression"],
   check(context: RuleContext, node: Node) {
     if (node.type !== "CallExpression") return;
-    const name = getCalleeName(node);
-    if (!name) return;
-    const method = parseCalleeParts(name).method;
+    const resolved = context.getResolvedCallee?.(node);
+    const callee = describeCalleeName(resolved?.calleeName ?? getCalleeName(node));
+    const method = resolved?.importSource && resolved?.symbolName ? resolved.symbolName : callee.methodName;
     if (!method || !QUERY_METHODS.has(method)) return;
     const firstArg = node.arguments[0];
     if (!firstArg) return;

@@ -12,6 +12,18 @@ export function getPrototypeMergeSink(
   return null;
 }
 
+export function getImportedPrototypeMergeSink(
+  importSource: string | undefined,
+  methodName: string
+): { label: string; taintedArgIndex: number } | null {
+  if (!importSource) return null;
+  const mergeMethods = new Set(["merge", "mergeWith", "defaultsDeep"]);
+  if ((importSource === "lodash" || importSource === "lodash-es") && mergeMethods.has(methodName)) {
+    return { label: `${importSource}.${methodName}`, taintedArgIndex: 1 };
+  }
+  return null;
+}
+
 export function isDeepmergeCallee(calleeName: string): boolean {
   return calleeName === "deepmerge" || calleeName === "deepMerge";
 }
@@ -23,6 +35,16 @@ export function getLodashSetSink(
 ): { label: string; taintedArgIndex: number } | null {
   if ((objName === "_" || objName === "lodash") && methodName === "set") {
     return { label: `${objName}.set`, taintedArgIndex: 1 };
+  }
+  return null;
+}
+
+export function getImportedLodashSetSink(
+  importSource: string | undefined,
+  methodName: string
+): { label: string; taintedArgIndex: number } | null {
+  if ((importSource === "lodash" || importSource === "lodash-es") && methodName === "set") {
+    return { label: `${importSource}.set`, taintedArgIndex: 1 };
   }
   return null;
 }

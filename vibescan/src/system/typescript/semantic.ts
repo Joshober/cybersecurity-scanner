@@ -1,9 +1,9 @@
 import type { CallExpression, Node } from "estree";
 import ts from "typescript";
 import type { ParseResult } from "../parser/parseFile.js";
+import { describeCalleeName, getCalleeName, type CalleeDetails } from "../utils/helpers.js";
 
-export interface ResolvedCall {
-  calleeName: string | null;
+export interface ResolvedCall extends CalleeDetails {
   importSource?: string;
   symbolName?: string;
 }
@@ -87,8 +87,9 @@ export function getResolvedCall(
     localSymbol?.getName();
 
   if (ts.isIdentifier(expression)) {
+    const calleeName = expression.text;
     return {
-      calleeName: expression.text,
+      ...describeCalleeName(calleeName),
       importSource,
       symbolName,
     };
@@ -102,18 +103,29 @@ export function getResolvedCall(
       cur = cur.expression;
     }
     if (ts.isIdentifier(cur)) parts.unshift(cur.text);
+    const calleeName = parts.length > 0 ? parts.join(".") : null;
     return {
-      calleeName: parts.length > 0 ? parts.join(".") : null,
+      ...describeCalleeName(calleeName),
       importSource,
       symbolName,
     };
   }
 
+  const calleeName = symbolName ?? null;
   return {
-    calleeName: symbolName ?? null,
+    ...describeCalleeName(calleeName),
     importSource,
     symbolName,
   };
+}
+
+export function getCallResolution(
+  parseResult: ParseResult | null | undefined,
+  node: CallExpression
+): ResolvedCall {
+  const resolved = getResolvedCall(parseResult, node);
+  if (resolved) return resolved;
+  return { ...describeCalleeName(getCalleeName(node)) };
 }
 
 export function getSymbolDeclarationForCall(

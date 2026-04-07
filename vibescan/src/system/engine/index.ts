@@ -8,5 +8,3 @@ export { runAppLevelAudit } from "./appLevelAudit.js";
 export type { AppLevelAuditOptions } from "./appLevelAudit.js";
 export { generateTests } from "./testWriter.js";
 export type { GenerateTestsOptions } from "./testWriter.js";
-export { emitProofTests } from "../proof/pipeline.js";
-export type { EmitProofTestsOptions } from "../proof/pipeline.js";

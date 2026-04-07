@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "description": "Line-anchored cases over benchmarks/seeds/framework-vulns (Angular + Next.js-style). Used by framework-seed-benchmark tests and optional scan script.",
+  "version": 2,
+  "description": "Line-anchored cases over benchmarks/seeds/framework-vulns (framework + expanded rule-family corpus). Used by framework-seed-benchmark tests and optional scan script.",
   "corpusRoot": "benchmarks/seeds/framework-vulns",
   "cases": [
     {
@@ -33,6 +33,198 @@
       "chartLabel": "Next/React dangerouslySetInnerHTML",
       "anchorSuffix": "nextjs/app/xss/page.tsx",
       "anchorLines": [3],
+      "expectedRuleIds": ["injection.xss.react-dangerously-set-inner-html"]
+    },
+    {
+      "id": "expanded-eval",
+      "framework": "node",
+      "chartLabel": "Eval code injection",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [9],
+      "expectedRuleIds": ["injection.eval"]
+    },
+    {
+      "id": "expanded-path-traversal",
+      "framework": "node",
+      "chartLabel": "Path traversal via req input",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [14],
+      "expectedRuleIds": ["injection.path-traversal"]
+    },
+    {
+      "id": "expanded-command",
+      "framework": "node",
+      "chartLabel": "Command injection via execSync",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [11],
+      "expectedRuleIds": ["injection.command"]
+    },
+    {
+      "id": "expanded-xpath",
+      "framework": "node",
+      "chartLabel": "XPath injection",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [15],
+      "expectedRuleIds": ["injection.xpath"]
+    },
+    {
+      "id": "expanded-log",
+      "framework": "node",
+      "chartLabel": "Log injection",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [16],
+      "expectedRuleIds": ["injection.log"]
+    },
+    {
+      "id": "expanded-nosql",
+      "framework": "node",
+      "chartLabel": "NoSQL injection",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [17],
+      "expectedRuleIds": ["injection.noql"]
+    },
+    {
+      "id": "expanded-orm",
+      "framework": "node",
+      "chartLabel": "ORM request input",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [18],
+      "expectedRuleIds": ["injection.orm.request-in-query"]
+    },
+    {
+      "id": "expanded-cookie",
+      "framework": "node",
+      "chartLabel": "Cookie missing flags",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [19],
+      "expectedRuleIds": ["mw.cookie.missing-flags"]
+    },
+    {
+      "id": "expanded-innerhtml",
+      "framework": "node",
+      "chartLabel": "DOM XSS innerHTML",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [20],
+      "expectedRuleIds": ["injection.xss"]
+    },
+    {
+      "id": "expanded-ssrf-ip-guard",
+      "framework": "node",
+      "chartLabel": "SSRF guard bypass pattern",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [21],
+      "expectedRuleIds": ["SSRF-003"]
+    },
+    {
+      "id": "expanded-ssrf-axios",
+      "framework": "node",
+      "chartLabel": "Axios SSRF bypass pattern",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [22],
+      "expectedRuleIds": ["RULE-SSRF-002"]
+    },
+    {
+      "id": "expanded-ssti",
+      "framework": "node",
+      "chartLabel": "SSTI template user input",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [23, 35],
+      "expectedRuleIds": ["injection.ssti.template-user-input"]
+    },
+    {
+      "id": "expanded-idor",
+      "framework": "node",
+      "chartLabel": "IDOR direct object reference",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [24],
+      "expectedRuleIds": ["authz.idor.direct-object-reference"]
+    },
+    {
+      "id": "expanded-crypto-deprecated-cipher",
+      "framework": "node",
+      "chartLabel": "Deprecated cipher API",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [25],
+      "expectedRuleIds": ["crypto.cipher.deprecated"]
+    },
+    {
+      "id": "expanded-crypto-fixed-iv",
+      "framework": "node",
+      "chartLabel": "Fixed IV usage",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [26],
+      "expectedRuleIds": ["crypto.cipher.fixed-iv"]
+    },
+    {
+      "id": "expanded-crypto-weak-cipher",
+      "framework": "node",
+      "chartLabel": "Weak cipher usage",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [27],
+      "expectedRuleIds": ["crypto.cipher.weak"]
+    },
+    {
+      "id": "expanded-crypto-random",
+      "framework": "node",
+      "chartLabel": "Insecure randomness",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [28],
+      "expectedRuleIds": ["crypto.random.insecure"]
+    },
+    {
+      "id": "expanded-crypto-hash",
+      "framework": "node",
+      "chartLabel": "Weak hashing",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [29],
+      "expectedRuleIds": ["crypto.hash.weak"]
+    },
+    {
+      "id": "expanded-crypto-jwt",
+      "framework": "node",
+      "chartLabel": "Weak JWT secret",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [30],
+      "expectedRuleIds": ["crypto.jwt.weak-secret-literal"]
+    },
+    {
+      "id": "expanded-crypto-tls",
+      "framework": "node",
+      "chartLabel": "Disabled TLS verification",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [31],
+      "expectedRuleIds": ["crypto.tls.reject-unauthorized"]
+    },
+    {
+      "id": "expanded-crypto-env-fallback",
+      "framework": "node",
+      "chartLabel": "Insecure env fallback",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [32],
+      "expectedRuleIds": ["SEC-004"]
+    },
+    {
+      "id": "expanded-crypto-hardcoded",
+      "framework": "node",
+      "chartLabel": "Hardcoded secret",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [33],
+      "expectedRuleIds": ["crypto.secrets.hardcoded"]
+    },
+    {
+      "id": "expanded-angular-bypass",
+      "framework": "angular",
+      "chartLabel": "Angular sanitizer bypass method",
+      "anchorSuffix": "expanded/all-rules.js",
+      "anchorLines": [34],
+      "expectedRuleIds": ["injection.xss.angular-sanitizer-bypass"]
+    },
+    {
+      "id": "expanded-react-dangerously-html",
+      "framework": "react",
+      "chartLabel": "React dangerouslySetInnerHTML",
+      "anchorSuffix": "expanded/react-xss.tsx",
+      "anchorLines": [2],
       "expectedRuleIds": ["injection.xss.react-dangerously-set-inner-html"]
     }
   ]

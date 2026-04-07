@@ -7,8 +7,8 @@ This folder lives under **`vibescan/`** and holds secure-architecture YAML + not
 | Path | Purpose |
 |------|---------|
 | `vibescan/architecture/secure-rules/` (from repo root) | Installed/generated policy settings (YAML) and helper notes. |
-| `secure-rules/schema/settings.schema.v1.md` | Human-readable schema reference for settings files. |
-| `secure-rules/ai-notes.md` | Optional non-sensitive traceability notes for policy maintenance. |
+| `vibescan/architecture/secure-rules/schema/settings.schema.v1.md` | Human-readable schema reference for settings files. |
+| `vibescan/architecture/secure-rules/ai-notes.md` | Optional non-sensitive traceability notes for policy maintenance. |
 
 ## Canonical command docs
 

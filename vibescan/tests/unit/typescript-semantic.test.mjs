@@ -150,6 +150,129 @@ export function digest(input: string) {
     );
   });
 
+  it("follows tsconfig path aliases when resolving typed wrappers", () => {
+    withTempProject(
+      {
+        "src/db/queries.ts": `
+declare const db: { query(sql: string): unknown };
+
+export function runUserLookup(id: string) {
+  return db.query("SELECT * FROM users WHERE id=" + id);
+}
+`,
+        "src/route.ts": `
+import { runUserLookup } from "@db/queries";
+
+export function handler(req: any) {
+  return runUserLookup(req.query.id);
+}
+`,
+      },
+      ({ root, entries }) => {
+        const project = scanProject(entries, {
+          projectRoot: root,
+          injection: true,
+          tsAnalysis: "semantic",
+        });
+        assert.ok(
+          project.findings.some((finding) => finding.ruleId === "injection.sql.tainted-flow"),
+          `expected path-alias wrapper taint finding, got: ${project.findings.map((f) => f.ruleId).join(", ") || "none"}`
+        );
+      },
+      {
+        tsconfig: {
+          compilerOptions: {
+            target: "ES2020",
+            module: "ESNext",
+            moduleResolution: "Node",
+            strict: true,
+            esModuleInterop: true,
+            skipLibCheck: true,
+            baseUrl: ".",
+            paths: {
+              "@db/*": ["src/db/*"],
+            },
+          },
+          include: ["src/**/*.ts"],
+        },
+      }
+    );
+  });
+
+  it("flags child_process import aliases in semantic mode", () => {
+    withTempProject(
+      {
+        "src/command.ts": `
+import { execSync as run } from "node:child_process";
+
+export function handler(dir: string) {
+  return run(\`ls \${dir}\`);
+}
+`,
+      },
+      ({ root, entries }) => {
+        const project = scanProject(entries, {
+          projectRoot: root,
+          injection: true,
+          tsAnalysis: "semantic",
+        });
+        assert.ok(
+          project.findings.some((finding) => finding.ruleId === "injection.command"),
+          `expected command alias finding, got: ${project.findings.map((f) => f.ruleId).join(", ") || "none"}`
+        );
+      }
+    );
+  });
+
+  it("flags fs import aliases in semantic mode", () => {
+    withTempProject(
+      {
+        "src/read.ts": `
+import { readFile as readText } from "node:fs/promises";
+
+export async function handler(userPath: string) {
+  return readText(userPath);
+}
+`,
+      },
+      ({ root, entries }) => {
+        const project = scanProject(entries, {
+          projectRoot: root,
+          injection: true,
+          tsAnalysis: "semantic",
+        });
+        assert.ok(
+          project.findings.some((finding) => finding.ruleId === "injection.path-traversal"),
+          `expected fs alias finding, got: ${project.findings.map((f) => f.ruleId).join(", ") || "none"}`
+        );
+      }
+    );
+  });
+
+  it("uses semantic types to avoid string-only log findings on numbers", () => {
+    withTempProject(
+      {
+        "src/log.ts": `
+export function handler() {
+  const status: number = 200;
+  console.log(status);
+}
+`,
+      },
+      ({ root, entries }) => {
+        const project = scanProject(entries, {
+          projectRoot: root,
+          injection: true,
+          tsAnalysis: "semantic",
+        });
+        assert.ok(
+          !project.findings.some((finding) => finding.ruleId === "injection.log"),
+          `expected no string-only log finding, got: ${project.findings.map((f) => f.ruleId).join(", ") || "none"}`
+        );
+      }
+    );
+  });
+
   it("extracts typed Next.js handlers wrapped in satisfies expressions", () => {
     withTempProject(
       {

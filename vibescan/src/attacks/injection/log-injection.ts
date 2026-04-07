@@ -2,12 +2,17 @@
 
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
-import { getCalleeName, parseCalleeParts, isDynamicOrUserInput } from "../../system/utils/helpers.js";
-
-const LOG_METHODS = new Set([
-  "log", "info", "warn", "error", "debug", "trace",
-  "write", "child",  // Winston-style log methods.
-]);
+import {
+  describeCalleeName,
+  getCalleeName,
+  isDynamicOrUserInput,
+  looksStringLikeType,
+} from "../../system/utils/helpers.js";
+import {
+  getImportedLogSinkCallee,
+  getLogSinkCallee,
+  LOG_SINK_METHODS,
+} from "../../system/sinks/index.js";
 
 export const logInjectionRule: Rule = {
   id: "injection.log",
@@ -19,17 +24,19 @@ export const logInjectionRule: Rule = {
   nodeTypes: ["CallExpression"],
   check(context: RuleContext, node: Node) {
     if (node.type !== "CallExpression") return;
-    const name = getCalleeName(node);
-    if (!name) return;
-    const { obj, method } = parseCalleeParts(name);
-    if (!method || !LOG_METHODS.has(method)) return;
-    const objLower = obj?.toLowerCase() ?? null;
-    const isConsole = objLower === "console";
-    const isLogger = objLower ? ["logger", "log", "winston", "pino", "bunyan"].includes(objLower) : false;
-    const isBareLog = !obj && LOG_METHODS.has(method);
-    if (!isConsole && !isLogger && !isBareLog) return;
+    const resolved = context.getResolvedCallee?.(node);
+    const callee = describeCalleeName(resolved?.calleeName ?? getCalleeName(node));
+    const method = resolved?.importSource && resolved?.symbolName ? resolved.symbolName : callee.methodName;
+    if (!method) return;
+    const sink =
+      getLogSinkCallee(callee.objectName ?? "", method) ??
+      getImportedLogSinkCallee(resolved?.importSource, method);
+    const isBareLog = !callee.objectName && sink === null && LOG_SINK_METHODS.has(method);
+    if (!sink && !isBareLog) return;
     const firstArg = node.arguments[0];
     if (!firstArg) return;
+    const typeText = context.getTypeText?.(firstArg);
+    if (!looksStringLikeType(typeText)) return;
     if (isDynamicOrUserInput(firstArg)) context.report(node);
   },
 };

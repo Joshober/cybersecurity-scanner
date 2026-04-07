@@ -13,9 +13,11 @@
     "build": "npm run build -w @jobersteadt/vibescan",
     "build:arch": "npm run build -w @secure-arch/core -w @secure-arch/adapters -w @secure-arch/cli",
     "test:arch": "npm run build:arch && npm run test -w @secure-arch/core -w @secure-arch/cli -w @secure-arch/adapters",
-    "benchmark:validate": "npm run build && node benchmarks/scripts/validate-committed-benchmarks.mjs && node benchmarks/scripts/dvna-poster-charts.mjs",
+    "benchmark:validate": "npm run build && node benchmarks/scripts/validate-committed-benchmarks.mjs && node benchmarks/scripts/validate-rule-family-coverage.mjs && node benchmarks/scripts/dvna-poster-charts.mjs",
     "benchmark:framework": "npm run build && node benchmarks/scripts/run-framework-vuln-scan.mjs",
     "benchmark:dvna": "npm run build && node benchmarks/scripts/run-dvna-vibescan-scan.mjs",
+    "benchmark:assert-framework-recall": "node benchmarks/scripts/assert-framework-recall.mjs",
+    "benchmark:outperform-readout": "node benchmarks/scripts/generate-outperform-readout.mjs",
     "secure-arch": "node vibescan/packages/secure-arch-cli/dist/cli.js",
     "policy-eval": "node vibescan/scripts/policy-eval.mjs"
   },

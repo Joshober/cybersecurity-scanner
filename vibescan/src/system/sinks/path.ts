@@ -14,6 +14,12 @@ export const FILE_READ_METHODS = new Set([
 ]);
 
 export const FS_OBJECTS = new Set(["fs", "fsPromises", "require"]);
+export const FS_IMPORT_SOURCES = new Set([
+  "fs",
+  "node:fs",
+  "fs/promises",
+  "node:fs/promises",
+]);
 
 // Returns the path sink callee (e.g. fs.readFile) when the call is a path sink.
 export function getPathSinkCallee(
@@ -22,5 +28,14 @@ export function getPathSinkCallee(
 ): string | null {
   if (!FILE_READ_METHODS.has(methodName)) return null;
   if (FS_OBJECTS.has(objName)) return `${objName}.${methodName}`;
+  return null;
+}
+
+export function getImportedPathSinkCallee(
+  importSource: string | undefined,
+  methodName: string
+): string | null {
+  if (!importSource || !FILE_READ_METHODS.has(methodName)) return null;
+  if (FS_IMPORT_SOURCES.has(importSource)) return `${importSource}.${methodName}`;
   return null;
 }

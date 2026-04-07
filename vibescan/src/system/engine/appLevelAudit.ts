@@ -1,19 +1,10 @@
 // App-level checks: helmet(), CORS origin: '*'.
 
-import type { CallExpression, Node, ObjectExpression, Program } from "estree";
+import type { Node, ObjectExpression, Program } from "estree";
 import type { Finding } from "../types.js";
 import { walk } from "../walker.js";
+import { getCalleeName } from "../utils/helpers.js";
 import { HELMET_NAMES } from "../utils/middlewareNames.js";
-
-function getCalleeName(node: CallExpression): string | null {
-  const c = node.callee;
-  if (c.type === "Identifier") return c.name;
-  if (c.type === "MemberExpression" && c.property.type === "Identifier") {
-    const o = c.object;
-    if (o.type === "Identifier") return `${o.name}.${c.property.name}`;
-  }
-  return null;
-}
 
 function corsOriginWildcard(opts: ObjectExpression): boolean {
   for (const p of opts.properties) {

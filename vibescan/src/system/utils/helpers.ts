@@ -2,6 +2,14 @@
 
 import type { CallExpression, Node, MemberExpression } from "estree";
 
+export interface CalleeDetails {
+  calleeName: string | null;
+  objectName: string | null;
+  methodName: string | null;
+  tailIdentifier: string | null;
+  pathSegments: string[];
+}
+
 export function getCalleeName(node: CallExpression): string | null {
   const callee = node.callee;
   if (callee.type === "Identifier") return callee.name;
@@ -19,18 +27,40 @@ export function getCalleeName(node: CallExpression): string | null {
   return null;
 }
 
+export function describeCalleeName(fullName: string | null): CalleeDetails {
+  const pathSegments = fullName ? fullName.split(".").filter(Boolean) : [];
+  const methodName = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] ?? null : null;
+  const objectName = pathSegments.length > 1 ? pathSegments[0] ?? null : null;
+  return {
+    calleeName: fullName,
+    objectName,
+    methodName,
+    tailIdentifier: methodName,
+    pathSegments,
+  };
+}
+
+export function getCallDetails(node: CallExpression): CalleeDetails {
+  return describeCalleeName(getCalleeName(node));
+}
+
 /** Rightmost method name for chained calls, e.g. `db.User.findAll` → `findAll`. */
 export function getCallMethodName(node: CallExpression): string | null {
-  const c = node.callee;
-  if (c.type === "MemberExpression" && c.property.type === "Identifier") return c.property.name;
-  return null;
+  const callee = node.callee;
+  if (callee.type === "MemberExpression" && callee.property.type === "Identifier") {
+    return callee.property.name;
+  }
+  return callee.type === "Identifier" ? callee.name : null;
+}
+
+/** For `a.b.c()`, returns `c`. For `foo()`, returns `foo`. */
+export function getCalleeTailIdentifier(node: CallExpression): string | null {
+  return getCallMethodName(node);
 }
 
 export function parseCalleeParts(fullName: string): { obj: string | null; method: string | null } {
-  const parts = fullName.split(".");
-  const method = parts.length > 0 ? parts[parts.length - 1] : null;
-  const obj = parts.length > 1 ? parts[0] : null;
-  return { obj, method };
+  const details = describeCalleeName(fullName);
+  return { obj: details.objectName, method: details.methodName };
 }
 
 export function getStringValue(node: Node): string | null {
@@ -136,4 +166,15 @@ export function isDynamicOrUserInput(node: Node): boolean {
     default:
       return false;
   }
+}
+
+export function looksStringLikeType(typeText: string | undefined): boolean {
+  if (!typeText) return true;
+  const normalized = typeText.toLowerCase();
+  return (
+    normalized.includes("string") ||
+    normalized.includes("template") ||
+    normalized.includes("url") ||
+    normalized.includes("path")
+  );
 }

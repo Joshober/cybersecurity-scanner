@@ -36,9 +36,11 @@ jobs:
       - run: npm ci
       - run: npm run benchmark:validate
       - run: node benchmarks/scripts/run-framework-vuln-scan.mjs --out-dir benchmarks/results/ci_framework_vulns_vibescan
+      - run: node benchmarks/scripts/assert-framework-recall.mjs --json benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json
+      - run: node benchmarks/scripts/generate-outperform-readout.mjs
       - run: test -s benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json
       - run: test -s benchmarks/results/ci_framework_vulns_vibescan/manifest.json
-      - run: git diff --exit-code -- results/charts
+      - run: git diff --exit-code -- results/charts results/outperform-readout.md
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -68,6 +70,8 @@ jobs:
       - run: git -C benchmarks/dvna/dvna fetch --depth 1 origin "$DVNA_COMMIT"
       - run: git -C benchmarks/dvna/dvna checkout "$DVNA_COMMIT"
       - run: node benchmarks/scripts/run-dvna-vibescan-scan.mjs --out-dir "$DVNA_RUN_DIR" --generate-tests "$DVNA_PROOF_DIR"
+      - run: node benchmarks/scripts/run-framework-vuln-scan.mjs --out-dir benchmarks/results/ci_framework_vulns_vibescan
+      - run: node benchmarks/scripts/assert-framework-recall.mjs --json benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json
       - run: test -s "$DVNA_RUN_DIR/vibescan-project.json"
       - run: node vibescan/scripts/run-generated-proofs.mjs "$DVNA_PROOF_DIR"
 

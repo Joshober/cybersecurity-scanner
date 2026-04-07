@@ -14,21 +14,15 @@ import ts from "typescript";
 import { walk } from "../walker.js";
 import type { Finding, ScannerOptions, Severity, SeverityLabel } from "../types.js";
 import type { ParseResult } from "../parser/parseFile.js";
+import { describeCalleeName } from "../utils/helpers.js";
 import { getRequestSourceLabel } from "../sources/express.js";
 import {
-  getSqlSinkCallee,
-  getCommandSinkCallee,
-  getPathSinkCallee,
-  getXpathSinkCallee,
-  getLogSinkCallee,
-  getSsrSinkInfo,
   isAxiosCallExpression,
-  getPrototypeMergeSink,
-  getLodashSetSink,
-  isDeepmergeCallee,
+  matchKnownSink,
+  type KnownSinkKind,
 } from "../sinks/index.js";
 import { looksParameterized } from "../sanitizers/sql.js";
-import { getResolvedCall, getSymbolDeclarationForCall } from "../typescript/semantic.js";
+import { getCallResolution, getSymbolDeclarationForCall } from "../typescript/semantic.js";
 
 const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 3,
@@ -42,22 +36,6 @@ const SEVERITY_LABEL: Record<Severity, SeverityLabel> = {
   warning: "MEDIUM",
   info: "LOW",
 };
-
-function getCalleeName(node: CallExpression): string | null {
-  const callee = node.callee;
-  if (callee.type === "Identifier") return callee.name;
-  if (callee.type === "MemberExpression" && callee.property.type === "Identifier") {
-    const obj = callee.object;
-    if (obj.type === "Identifier") return `${obj.name}.${callee.property.name}`;
-    if (
-      obj.type === "MemberExpression" &&
-      obj.property.type === "Identifier" &&
-      obj.object.type === "Identifier"
-    )
-      return `${obj.object.name}.${obj.property.name}.${callee.property.name}`;
-  }
-  return null;
-}
 
 function getSourceLabelFromMember(node: MemberExpression): string | null {
   if (node.object.type === "Identifier" && node.property.type === "Identifier") {
@@ -111,16 +89,6 @@ export interface TaintEngineOptions {
   options: ScannerOptions;
   parseResult?: ParseResult | null;
 }
-
-type SinkKind =
-  | "sql"
-  | "command"
-  | "path"
-  | "xpath"
-  | "log"
-  | "ssrf"
-  | "axiosConfig"
-  | "proto";
 
 function unwrapExpression(node: Node): Node {
   let current: { type: string; expression?: Node; argument?: Node } = node as unknown as {
@@ -180,87 +148,6 @@ function addDestructuredTaint(
   }
 }
 
-function calleeInfo(
-  node: CallExpression,
-  parseResult?: ParseResult | null
-): {
-  name: string | null;
-  obj: string;
-  method: string;
-  importSource?: string;
-} {
-  const resolved = getResolvedCall(parseResult, node);
-  const name = resolved?.calleeName ?? getCalleeName(node);
-  const parts = name?.split(".") ?? [];
-  return {
-    name,
-    obj: parts.length >= 2 ? parts[parts.length - 2] ?? "" : "",
-    method: parts.length >= 1 ? parts[parts.length - 1] ?? "" : "",
-    importSource: resolved?.importSource,
-  };
-}
-
-function classifySinkCall(
-  node: CallExpression,
-  parseResult?: ParseResult | null
-): {
-  sinkLabel: string;
-  severity: "critical" | "error" | "warning";
-  kind: SinkKind;
-  argIndex: number;
-} | null {
-  const { name, obj, method, importSource } = calleeInfo(node, parseResult);
-  if (name === "fetch") {
-    return { sinkLabel: "fetch", severity: "error", kind: "ssrf", argIndex: 0 };
-  }
-  if (isAxiosCallExpression(node) || importSource === "axios" || name === "axios") {
-    return { sinkLabel: "axios(config)", severity: "error", kind: "axiosConfig", argIndex: 0 };
-  }
-  if (name && isDeepmergeCallee(name)) {
-    return { sinkLabel: name, severity: "error", kind: "proto", argIndex: 1 };
-  }
-  if (!name || !method) return null;
-
-  const sqlSink = getSqlSinkCallee(obj, method);
-  if (sqlSink) return { sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 };
-  const cmdSink = getCommandSinkCallee(obj, method);
-  if (cmdSink) return { sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 };
-  const pathSink = getPathSinkCallee(obj, method);
-  if (pathSink) return { sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 };
-  const xpathSink = getXpathSinkCallee(obj, method);
-  if (xpathSink) return { sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 };
-  const logSink = getLogSinkCallee(obj, method);
-  if (logSink) return { sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 };
-  const ssr = getSsrSinkInfo(name, obj, method);
-  if (ssr) {
-    return {
-      sinkLabel: ssr.label,
-      severity: "error",
-      kind: "ssrf",
-      argIndex: ssr.argIndex,
-    };
-  }
-  const mergeSink = getPrototypeMergeSink(obj, method);
-  if (mergeSink) {
-    return {
-      sinkLabel: mergeSink.label,
-      severity: "error",
-      kind: "proto",
-      argIndex: mergeSink.taintedArgIndex,
-    };
-  }
-  const setSink = getLodashSetSink(obj, method);
-  if (setSink) {
-    return {
-      sinkLabel: setSink.label,
-      severity: "error",
-      kind: "proto",
-      argIndex: setSink.taintedArgIndex,
-    };
-  }
-  return null;
-}
-
 function tsExpressionUsesParam(node: ts.Node | undefined, paramNames: Set<string>): string | null {
   if (!node) return null;
   if (ts.isIdentifier(node) && paramNames.has(node.text)) return node.text;
@@ -311,7 +198,7 @@ function tsExpressionUsesParam(node: ts.Node | undefined, paramNames: Set<string
 
 function tsCallArgUsesParam(
   call: ts.CallExpression,
-  sinkKind: SinkKind,
+  sinkKind: KnownSinkKind,
   argIndex: number,
   paramNames: Set<string>
 ): string | null {
@@ -336,7 +223,7 @@ function classifyTsSinkCall(
 ): {
   sinkLabel: string;
   severity: "critical" | "error" | "warning";
-  kind: SinkKind;
+  kind: KnownSinkKind;
   argIndex: number;
 } | null {
   const expression = call.expression;
@@ -356,48 +243,14 @@ function classifyTsSinkCall(
       importSource = parent.moduleSpecifier.text;
     }
   }
-  const name = expression.getText();
-  const parts = name.split(".");
-  const method = parts[parts.length - 1] ?? "";
-  const obj = parts.length >= 2 ? parts[parts.length - 2] ?? "" : "";
-  if (name === "fetch") return { sinkLabel: "fetch", severity: "error", kind: "ssrf", argIndex: 0 };
-  if (importSource === "axios" || name === "axios") {
-    return { sinkLabel: "axios(config)", severity: "error", kind: "axiosConfig", argIndex: 0 };
-  }
-  if (isDeepmergeCallee(name)) {
-    return { sinkLabel: name, severity: "error", kind: "proto", argIndex: 1 };
-  }
-  const sqlSink = getSqlSinkCallee(obj, method);
-  if (sqlSink) return { sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 };
-  const cmdSink = getCommandSinkCallee(obj, method);
-  if (cmdSink) return { sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 };
-  const pathSink = getPathSinkCallee(obj, method);
-  if (pathSink) return { sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 };
-  const xpathSink = getXpathSinkCallee(obj, method);
-  if (xpathSink) return { sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 };
-  const logSink = getLogSinkCallee(obj, method);
-  if (logSink) return { sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 };
-  const ssr = getSsrSinkInfo(name, obj, method);
-  if (ssr) return { sinkLabel: ssr.label, severity: "error", kind: "ssrf", argIndex: ssr.argIndex };
-  const mergeSink = getPrototypeMergeSink(obj, method);
-  if (mergeSink) {
-    return {
-      sinkLabel: mergeSink.label,
-      severity: "error",
-      kind: "proto",
-      argIndex: mergeSink.taintedArgIndex,
-    };
-  }
-  const setSink = getLodashSetSink(obj, method);
-  if (setSink) {
-    return {
-      sinkLabel: setSink.label,
-      severity: "error",
-      kind: "proto",
-      argIndex: setSink.taintedArgIndex,
-    };
-  }
-  return null;
+  const details = describeCalleeName(expression.getText());
+  return matchKnownSink({
+    calleeName: details.calleeName,
+    objectName: details.objectName,
+    methodName: details.methodName,
+    symbolName: resolvedSymbol?.getName(),
+    importSource,
+  });
 }
 
 function resolveWrapperSink(
@@ -406,7 +259,7 @@ function resolveWrapperSink(
 ): {
   sinkLabel: string;
   severity: "critical" | "error" | "warning";
-  kind: SinkKind;
+  kind: KnownSinkKind;
   argIndex: number;
 } | null {
   const declaration = getSymbolDeclarationForCall(parseResult, node);
@@ -423,7 +276,7 @@ function resolveWrapperSink(
   let resolved: {
     sinkLabel: string;
     severity: "critical" | "error" | "warning";
-    kind: SinkKind;
+    kind: KnownSinkKind;
     argIndex: number;
   } | null = null;
 
@@ -460,7 +313,7 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
     node: CallExpression;
     sinkLabel: string;
     severity: "critical" | "error" | "warning";
-    kind: SinkKind;
+    kind: KnownSinkKind;
     argIndex: number;
   }[] = [];
 
@@ -479,7 +332,15 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
       return;
     }
     if (node.type === "CallExpression") {
-      const directSink = classifySinkCall(node, parseResult);
+      const details = getCallResolution(parseResult, node);
+      const directSink = matchKnownSink({
+        calleeName: details.calleeName,
+        objectName: details.objectName,
+        methodName: details.methodName,
+        symbolName: details.symbolName,
+        importSource: details.importSource,
+        isAxiosObjectCall: isAxiosCallExpression(node),
+      });
       if (directSink) {
         sinkCalls.push({ node, ...directSink });
         return;

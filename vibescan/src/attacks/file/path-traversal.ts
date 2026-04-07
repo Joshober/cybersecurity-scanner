@@ -2,7 +2,15 @@
 
 import type { Node } from "estree";
 import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
-import { getCalleeName, parseCalleeParts } from "../../system/utils/helpers.js";
+import {
+  describeCalleeName,
+  getCalleeName,
+  looksStringLikeType,
+} from "../../system/utils/helpers.js";
+import {
+  getImportedPathSinkCallee,
+  getPathSinkCallee,
+} from "../../system/sinks/index.js";
 
 export const PATH_TRAVERSAL_PAYLOADS = [
   "../../../etc/passwd",
@@ -11,9 +19,6 @@ export const PATH_TRAVERSAL_PAYLOADS = [
   "%252e%252e%252fetc%252fpasswd",
   "..\\..\\..\\windows\\system32",
 ] as const;
-
-const FILE_READ_METHODS = new Set(["readFile", "readFileSync", "readdir", "readdirSync", "createReadStream", "existsSync"]);
-const FS_OBJECTS = new Set(["fs", "fsPromises", "require"]);
 
 export const pathTraversalRule: Rule = {
   id: "injection.path-traversal",
@@ -25,13 +30,18 @@ export const pathTraversalRule: Rule = {
   nodeTypes: ["CallExpression"],
   check(context: RuleContext, node: Node) {
     if (node.type !== "CallExpression") return;
-    const name = getCalleeName(node);
-    if (!name) return;
-    const { obj, method } = parseCalleeParts(name);
-    if (!method || !FILE_READ_METHODS.has(method)) return;
-    if (!obj || !FS_OBJECTS.has(obj)) return;
+    const resolved = context.getResolvedCallee?.(node);
+    const callee = describeCalleeName(resolved?.calleeName ?? getCalleeName(node));
+    const method = resolved?.importSource && resolved?.symbolName ? resolved.symbolName : callee.methodName;
+    if (!method) return;
+    const sink =
+      getPathSinkCallee(callee.objectName ?? "", method) ??
+      getImportedPathSinkCallee(resolved?.importSource, method);
+    if (!sink) return;
     const firstArg = node.arguments[0];
     if (!firstArg) return;
+    const typeText = context.getTypeText?.(firstArg);
+    if (!looksStringLikeType(typeText)) return;
     if (firstArg.type === "Identifier" || firstArg.type === "MemberExpression") context.report(node);
     if (firstArg.type === "TemplateLiteral" && firstArg.expressions.length > 0) context.report(node);
     if (firstArg.type === "BinaryExpression" && firstArg.operator === "+") context.report(node);
