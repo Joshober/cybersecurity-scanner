@@ -287,7 +287,7 @@
         <div class="section-body">
           <ul>
             <li><strong>Dataset A:</strong> DVNA benchmark with 11 adjudicated first-party vulnerability rows.</li>
-            <li><strong>Dataset B:</strong> Expanded VibeScan corpus with 108 all-check rows, including 80 high-volume stress cases.</li>
+            <li><strong>Dataset B:</strong> Expanded VibeScan corpus with 28 unique all-check rows plus 80 stress-repeat rows.</li>
             <li><strong>Combined scope:</strong> 119 scored rows across DVNA and expanded all-check coverage.</li>
             <li><strong>Metric focus:</strong> benchmark recall on anchored rows; raw issue count tracked separately to avoid misleading comparisons.</li>
             <li><strong>Quality control:</strong> deterministic case anchors, expected-rule matching, and CI regression gates.</li>
@@ -304,19 +304,19 @@
               <div class="label">DVNA recall for VibeScan (100.0%)</div>
             </div>
             <div class="metric">
-              <div class="value">108 / 108</div>
-              <div class="label">Expanded all-check corpus recall (100.0%)</div>
+              <div class="value">28</div>
+              <div class="label">Unique expanded benchmark rows beyond DVNA</div>
+            </div>
+            <div class="metric">
+              <div class="value">80</div>
+              <div class="label">Stress-repeat rows used for robustness checks</div>
             </div>
             <div class="metric">
               <div class="value">119 / 119</div>
-              <div class="label">Combined scored benchmark rows hit by VibeScan</div>
-            </div>
-            <div class="metric">
-              <div class="value">#1</div>
-              <div class="label">DVNA recall rank among compared tools in current matrix</div>
+              <div class="label">Combined scored rows hit by VibeScan</div>
             </div>
           </div>
-          <p class="subtle" style="margin-top:10px;">DVNA peer comparison: Bearer 8/11, Snyk Code 7/11, CodeQL 6/11, Semgrep 4/11, eslint-plugin-security 1/11.</p>
+          <p class="subtle" style="margin-top:10px;">DVNA peer comparison: Bearer 8/11, Snyk Code 7/11, CodeQL 6/11, Semgrep 4/11, eslint-plugin-security 1/11. The 80 stress-repeat rows are not presented as 80 unique vulnerability families.</p>
         </div>
       </article>
 
@@ -352,8 +352,8 @@
               <h3>Figure D: Corpus composition</h3>
               <iframe src="../../results/charts/vibescan-coverage-breadth-poster.html" title="VibeScan coverage breadth"></iframe>
               <div class="figure-caption">
-                This chart panel shows how the combined benchmark is composed of DVNA legacy rows, base expanded family
-                rows, and high-volume stress rows.
+                This chart panel separates DVNA rows, unique expanded rows, and stress-repeat rows so the breadth claim
+                remains methodologically defensible.
               </div>
             </div>
             <div class="figure-card">
@@ -365,7 +365,15 @@
               </div>
             </div>
             <div class="figure-card">
-              <h3>Figure F: DVNA detection heatmap</h3>
+              <h3>Figure F: Benchmark validity breakdown</h3>
+              <iframe src="../../results/charts/vibescan-validity-breakdown-chart.html" title="VibeScan validity breakdown chart"></iframe>
+              <div class="figure-caption">
+                This chart distinguishes peer-comparable evaluation rows from VibeScan-specific breadth rows and repeated
+                stress rows, which helps prevent overclaiming from combined totals.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure G: DVNA detection heatmap</h3>
               <iframe src="../../results/charts/dvna-detection-rate-poster.html" title="DVNA detection heatmap"></iframe>
               <div class="figure-caption">
                 The heatmap shows per-case detection outcomes across tools on the legacy DVNA benchmark. It is useful for
@@ -373,7 +381,7 @@
               </div>
             </div>
             <div class="figure-card">
-              <h3>Figure G: Experiment design panel</h3>
+              <h3>Figure H: Experiment design panel</h3>
               <iframe src="../../results/charts/vibescan-experiment-design-poster.html" title="VibeScan experiment design"></iframe>
               <div class="figure-caption">
                 This panel explains the experimental protocol: benchmark selection, deterministic anchor scoring, scanner
@@ -381,7 +389,7 @@
               </div>
             </div>
             <div class="figure-card">
-              <h3>Figure H: Proof tiers vs peers</h3>
+              <h3>Figure I: Proof tiers vs peers</h3>
               <iframe src="../../results/charts/dvna-proof-vs-peers-poster.html" title="DVNA proof tiers versus peers"></iframe>
               <div class="figure-caption">
                 This comparison separates benchmark recall from raw issue volume and proof/actionability tiers, helping
@@ -401,8 +409,8 @@
             checks, and new research extensions such as SSTI and IDOR.
           </p>
           <p>
-            High-volume stress rows were added to make the evaluation more statistically meaningful for poster reporting
-            and to show that the scanner remains stable beyond one-case-per-family demonstrations.
+            High-volume stress rows were added to probe robustness and regression stability. They should be interpreted as
+            repeated stress variants of already-covered behaviors, not as new unique vulnerability families.
           </p>
         </div>
       </article>
@@ -412,9 +420,10 @@
         <div class="section-body">
           <ul>
             <li>VibeScan currently achieves top recall on the scored DVNA matrix (`11/11`).</li>
-            <li>The expanded VibeScan-specific corpus reaches `108/108`, demonstrating coverage beyond legacy benchmark scope.</li>
-            <li>The combined benchmark lane now evaluates `119` scored rows, making the experiment more representative than DVNA alone.</li>
-            <li>Presentation matters: recall, proof tiers, and raw issue counts must be shown as separate signals.</li>
+            <li>The benchmark now includes 28 unique expanded rows beyond DVNA, demonstrating coverage beyond the legacy corpus.</li>
+            <li>An additional 80 stress-repeat rows show stable behavior under repeated vulnerable variants.</li>
+            <li>The combined benchmark lane evaluates 119 scored rows, but those rows serve different roles and should be interpreted separately.</li>
+            <li>Presentation matters: recall, proof tiers, unique breadth, and raw issue counts must be shown as separate signals.</li>
           </ul>
         </div>
       </article>

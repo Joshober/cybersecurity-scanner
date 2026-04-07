@@ -35,69 +35,66 @@
   </style>
 </head>
 <body>
-<h1>Rule-family coverage chart</h1>
-<p class="scope">This bar chart shows how benchmarked base cases are distributed across mapped VibeScan rule families.</p>
+<h1>Rule-family base-case coverage chart</h1>
+<p class="scope">This bar chart shows how many <strong>unique base benchmark cases</strong> are mapped to each VibeScan rule family before adding stress-repeat rows.</p>
 <div class="card">
-  <svg viewBox="0 0 920 420" width="100%" role="img" aria-label="Base benchmark cases by family">
-<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Base benchmark cases by family</text>
+  <svg viewBox="0 0 920 360" width="100%" role="img" aria-label="Unique benchmark cases by family">
+<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Unique benchmark cases by family</text>
+<line x1="55" y1="270" x2="880" y2="270" stroke="#64748b" stroke-width="1.5"></line>
+<line x1="55" y1="50" x2="55" y2="270" stroke="#64748b" stroke-width="1.5"></line>
 
-<line x1="170" y1="42" x2="170" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-<text x="170" y="408" font-size="11" text-anchor="middle" fill="#475569">0%</text>
-
-
-<line x1="327.5" y1="42" x2="327.5" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-<text x="327.5" y="408" font-size="11" text-anchor="middle" fill="#475569">25%</text>
+<line x1="55" y1="270" x2="880" y2="270" stroke="#e2e8f0"></line>
+<text x="45" y="274" font-size="11" text-anchor="end" fill="#475569">0</text>
 
 
-<line x1="485" y1="42" x2="485" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-<text x="485" y="408" font-size="11" text-anchor="middle" fill="#475569">50%</text>
+<line x1="55" y1="221.11111111111111" x2="880" y2="221.11111111111111" stroke="#e2e8f0"></line>
+<text x="45" y="225.11111111111111" font-size="11" text-anchor="end" fill="#475569">2</text>
 
 
-<line x1="642.5" y1="42" x2="642.5" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-<text x="642.5" y="408" font-size="11" text-anchor="middle" fill="#475569">75%</text>
+<line x1="55" y1="147.77777777777777" x2="880" y2="147.77777777777777" stroke="#e2e8f0"></line>
+<text x="45" y="151.77777777777777" font-size="11" text-anchor="end" fill="#475569">5</text>
 
 
-<line x1="800" y1="42" x2="800" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-<text x="800" y="408" font-size="11" text-anchor="middle" fill="#475569">100%</text>
+<line x1="55" y1="98.88888888888889" x2="880" y2="98.88888888888889" stroke="#e2e8f0"></line>
+<text x="45" y="102.88888888888889" font-size="11" text-anchor="end" fill="#475569">7</text>
 
 
-<text x="158" y="70" font-size="13" text-anchor="end" fill="#0f172a">injection-core</text>
-<rect x="170" y="56" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="56" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="72" font-size="12" fill="#0f172a">9/9 (100.0%)</text>
+<line x1="55" y1="50" x2="880" y2="50" stroke="#e2e8f0"></line>
+<text x="45" y="54" font-size="11" text-anchor="end" fill="#475569">9</text>
 
 
-<text x="158" y="112" font-size="13" text-anchor="end" fill="#0f172a">xss-client-and-framework</text>
-<rect x="170" y="98" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="98" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="114" font-size="12" fill="#0f172a">5/5 (100.0%)</text>
+<rect x="55" y="50" width="119.16666666666667" height="220" rx="6" fill="#1d4ed8"></rect>
+<text x="114.58333333333334" y="42" font-size="11" text-anchor="middle" fill="#0f172a">9</text>
+<text x="114.58333333333334" y="328" font-size="11" text-anchor="middle" fill="#334155">injection core</text>
 
 
-<text x="158" y="154" font-size="13" text-anchor="end" fill="#0f172a">ssrf-and-external-http</text>
-<rect x="170" y="140" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="140" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="156" font-size="12" fill="#0f172a">2/2 (100.0%)</text>
+<rect x="196.16666666666669" y="147.77777777777777" width="119.16666666666667" height="122.22222222222223" rx="6" fill="#16a34a"></rect>
+<text x="255.75000000000003" y="139.77777777777777" font-size="11" text-anchor="middle" fill="#0f172a">5</text>
+<text x="255.75000000000003" y="328" font-size="11" text-anchor="middle" fill="#334155">xss client and framework</text>
 
 
-<text x="158" y="196" font-size="13" text-anchor="end" fill="#0f172a">crypto-and-secrets</text>
-<rect x="170" y="182" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="182" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="198" font-size="12" fill="#0f172a">9/9 (100.0%)</text>
+<rect x="337.33333333333337" y="221.11111111111111" width="119.16666666666667" height="48.888888888888886" rx="6" fill="#7c3aed"></rect>
+<text x="396.9166666666667" y="213.11111111111111" font-size="11" text-anchor="middle" fill="#0f172a">2</text>
+<text x="396.9166666666667" y="328" font-size="11" text-anchor="middle" fill="#334155">ssrf and external http</text>
 
 
-<text x="158" y="238" font-size="13" text-anchor="end" fill="#0f172a">middleware-cookie</text>
-<rect x="170" y="224" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="224" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="240" font-size="12" fill="#0f172a">1/1 (100.0%)</text>
+<rect x="478.50000000000006" y="50" width="119.16666666666667" height="220" rx="6" fill="#b45309"></rect>
+<text x="538.0833333333334" y="42" font-size="11" text-anchor="middle" fill="#0f172a">9</text>
+<text x="538.0833333333334" y="328" font-size="11" text-anchor="middle" fill="#334155">crypto and secrets</text>
 
 
-<text x="158" y="280" font-size="13" text-anchor="end" fill="#0f172a">research-new-classes</text>
-<rect x="170" y="266" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="170" y="266" width="630" height="22" rx="11" fill="#64748b"></rect>
-<text x="810" y="282" font-size="12" fill="#0f172a">2/2 (100.0%)</text>
+<rect x="619.6666666666667" y="245.55555555555554" width="119.16666666666667" height="24.444444444444443" rx="6" fill="#0f766e"></rect>
+<text x="679.2500000000001" y="237.55555555555554" font-size="11" text-anchor="middle" fill="#0f172a">1</text>
+<text x="679.2500000000001" y="328" font-size="11" text-anchor="middle" fill="#334155">middleware cookie</text>
 
+
+<rect x="760.8333333333335" y="221.11111111111111" width="119.16666666666667" height="48.888888888888886" rx="6" fill="#dc2626"></rect>
+<text x="820.4166666666669" y="213.11111111111111" font-size="11" text-anchor="middle" fill="#0f172a">2</text>
+<text x="820.4166666666669" y="328" font-size="11" text-anchor="middle" fill="#334155">research new classes</text>
+
+<text x="460" y="352" font-size="12" text-anchor="middle" fill="#334155">Mapped VibeScan families</text>
 </svg>
-  <p class="legend">Each family shown here has base benchmark coverage. High-volume stress rows are additional rows layered on top of these mapped families.</p>
+  <p class="legend">This figure is intentionally limited to the unique base corpus. High-volume stress rows are excluded so the chart reflects breadth rather than repeated stress variants.</p>
 </div>
 </body>
 </html>

@@ -237,6 +237,45 @@ ${svgText(width / 2, height - 16, `Total benchmark rows: ${total}`, 'font-size="
 </svg>`;
 }
 
+function buildCountBarSvg(rows, { width = 920, height = 360, title = "", xLabel = "" } = {}) {
+  const margin = { top: 50, right: 40, bottom: 90, left: 55 };
+  const chartW = width - margin.left - margin.right;
+  const chartH = height - margin.top - margin.bottom;
+  const maxY = Math.max(...rows.map((r) => r.value), 1);
+  const gap = 22;
+  const barW = (chartW - gap * (rows.length - 1)) / rows.length;
+  const ticks = [0, Math.round(maxY * 0.25), Math.round(maxY * 0.5), Math.round(maxY * 0.75), maxY]
+    .filter((v, i, arr) => arr.indexOf(v) === i)
+    .map((tick) => {
+      const y = margin.top + chartH - (tick / maxY) * chartH;
+      return `
+<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"></line>
+${svgText(margin.left - 10, y + 4, String(tick), 'font-size="11" text-anchor="end" fill="#475569"')}
+`;
+    })
+    .join("\n");
+  const bars = rows
+    .map((row, idx) => {
+      const x = margin.left + idx * (barW + gap);
+      const h = (row.value / maxY) * chartH;
+      const y = margin.top + chartH - h;
+      return `
+<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="6" fill="${row.color || "#1d4ed8"}"></rect>
+${svgText(x + barW / 2, y - 8, String(row.value), 'font-size="11" text-anchor="middle" fill="#0f172a"')}
+${svgText(x + barW / 2, height - 32, row.label, 'font-size="11" text-anchor="middle" fill="#334155"')}
+`;
+    })
+    .join("\n");
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${escapeHtml(title)}">
+${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
+<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
+<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
+${ticks}
+${bars}
+${xLabel ? svgText(width / 2, height - 8, xLabel, 'font-size="12" text-anchor="middle" fill="#334155"') : ""}
+</svg>`;
+}
+
 function main() {
   const dvnaMatrix = readJson("results/dvna-detection-matrix.json");
   const expandedMatrix = readJson("results/vibescan-expanded-detection-matrix.json");
@@ -263,13 +302,10 @@ function main() {
     { label: "DVNA + base", value: dvnaCatalog.cases.length + baseExpandedCount },
     { label: "DVNA + all", value: expandedMatrix.rows.combined.total },
   ];
-  const familyBars = (manifest.families || []).map((family) => ({
-    label: family.family,
-    hits: family.caseIds.length,
-    total: family.caseIds.length,
-    percent: 100,
-    id: family.family,
-    rawIssues: 0,
+  const familyBars = (manifest.families || []).map((family, idx) => ({
+    label: family.family.replace(/-/g, " "),
+    value: family.caseIds.length,
+    color: ["#1d4ed8", "#16a34a", "#7c3aed", "#b45309", "#0f766e", "#dc2626"][idx % 6],
   }));
 
   writeChart(
@@ -393,12 +429,12 @@ function main() {
     ${buildStackedBarSvg(
       [
         { label: "DVNA", value: dvnaCatalog.cases.length, color: "#1d4ed8" },
-        { label: "Base expanded", value: baseExpandedCount, color: "#16a34a" },
-        { label: "High-volume", value: highVolumeCount, color: "#b45309" },
+        { label: "Unique expanded", value: baseExpandedCount, color: "#16a34a" },
+        { label: "Stress repeats", value: highVolumeCount, color: "#b45309" },
       ],
       { title: "Benchmark row composition" }
     )}
-    <p class="legend">Combined benchmark breadth is now ${expandedMatrix.rows.combined.total} scored rows, which is substantially larger than DVNA alone and better reflects scanner scope.</p>
+    <p class="legend">Combined benchmark breadth is now ${expandedMatrix.rows.combined.total} scored rows. The <strong>80 stress-repeat rows</strong> are repeated variants used to test stability and scale, not 80 distinct vulnerability families.</p>
   </section>
 </div>`
   );
@@ -439,11 +475,29 @@ function main() {
   writeChart(
     "vibescan-family-coverage-chart.html",
     "VibeScan Family Coverage Chart",
-    `<h1>Rule-family coverage chart</h1>
-<p class="scope">This bar chart shows how benchmarked base cases are distributed across mapped VibeScan rule families.</p>
+    `<h1>Rule-family base-case coverage chart</h1>
+<p class="scope">This bar chart shows how many <strong>unique base benchmark cases</strong> are mapped to each VibeScan rule family before adding stress-repeat rows.</p>
 <div class="card">
-  ${buildHorizontalBarSvg(familyBars, { title: "Base benchmark cases by family" })}
-  <p class="legend">Each family shown here has base benchmark coverage. High-volume stress rows are additional rows layered on top of these mapped families.</p>
+  ${buildCountBarSvg(familyBars, { title: "Unique benchmark cases by family", xLabel: "Mapped VibeScan families" })}
+  <p class="legend">This figure is intentionally limited to the unique base corpus. High-volume stress rows are excluded so the chart reflects breadth rather than repeated stress variants.</p>
+</div>`
+  );
+
+  writeChart(
+    "vibescan-validity-breakdown-chart.html",
+    "VibeScan Validity Breakdown Chart",
+    `<h1>Benchmark validity breakdown</h1>
+<p class="scope">This chart separates peer-comparable benchmark rows from VibeScan-specific unique coverage rows and repeated stress rows.</p>
+<div class="card">
+  ${buildCountBarSvg(
+    [
+      { label: "Peer-comparable DVNA", value: dvnaCatalog.cases.length, color: "#1d4ed8" },
+      { label: "Unique expanded", value: baseExpandedCount, color: "#16a34a" },
+      { label: "Stress repeats", value: highVolumeCount, color: "#b45309" },
+    ],
+    { title: "Rows by evaluation role", xLabel: "Evaluation role" }
+  )}
+  <p class="legend">Use DVNA rows for cross-tool comparison, unique expanded rows for VibeScan breadth, and stress repeats for robustness claims. Mixing all three without explanation can overstate the result.</p>
 </div>`
   );
 
@@ -455,6 +509,7 @@ function main() {
   console.log(`Wrote ${join(chartsDir, "vibescan-dvna-recall-bar-chart.html")}`);
   console.log(`Wrote ${join(chartsDir, "vibescan-recall-vs-volume-scatter.html")}`);
   console.log(`Wrote ${join(chartsDir, "vibescan-family-coverage-chart.html")}`);
+  console.log(`Wrote ${join(chartsDir, "vibescan-validity-breakdown-chart.html")}`);
 }
 
 main();
