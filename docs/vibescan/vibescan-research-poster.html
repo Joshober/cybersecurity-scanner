@@ -1,461 +1,638 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VibeScan Academic Poster</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VibeScan: Recall-Oriented Evaluation of a Static Security Scanner for JavaScript Applications</title>
   <style>
     :root {
-      --blue: #1f4fa3;
-      --blue-dark: #163b7a;
-      --bg: #edf1f7;
+      --blue: #1e3a5f;
+      --blue-light: #2563eb;
+      --green: #16a34a;
+      --bg: #f8fafc;
       --card: #ffffff;
-      --border: #c9d4e7;
-      --text: #152034;
-      --muted: #445169;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
     }
-
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      font-family: "Arial", "Helvetica", sans-serif;
+      font-family: "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.4;
-      padding: 18px;
+      line-height: 1.45;
+      padding: 12px;
     }
-
     .poster {
-      max-width: 1500px;
+      max-width: 1440px;
       margin: 0 auto;
       background: var(--card);
       border: 1px solid var(--border);
-      box-shadow: 0 8px 24px rgba(16, 36, 74, 0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
 
+    /* --- Header --- */
     .header {
-      background: linear-gradient(180deg, var(--blue), var(--blue-dark));
+      background: linear-gradient(135deg, var(--blue) 0%, #0f172a 100%);
       color: #fff;
-      padding: 28px 36px;
+      padding: 24px 32px;
       text-align: center;
     }
-
     .header h1 {
-      margin: 0;
-      font-size: clamp(2rem, 2.6vw, 3rem);
-      letter-spacing: 0.01em;
+      font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
     }
-
-    .header p {
-      margin: 8px 0 0;
-      font-size: clamp(1rem, 1.3vw, 1.3rem);
-      opacity: 0.95;
-    }
-
-    .meta {
-      margin-top: 8px;
-      font-size: 0.98rem;
+    .header .subtitle {
+      margin-top: 6px;
+      font-size: clamp(0.85rem, 1.1vw, 1.1rem);
       opacity: 0.9;
+      font-weight: 400;
+    }
+    .header .meta {
+      margin-top: 6px;
+      font-size: 0.88rem;
+      opacity: 0.75;
     }
 
+    /* --- 3-column grid --- */
     .content {
-      padding: 16px;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: 1fr 1.15fr 1.15fr;
+      gap: 0;
     }
+    .col {
+      padding: 16px 18px;
+      border-right: 1px solid var(--border);
+    }
+    .col:last-child { border-right: none; }
 
-    .section {
+    /* --- Section blocks --- */
+    .sec { margin-bottom: 16px; }
+    .sec-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid var(--blue-light);
+    }
+    .sec p, .sec li {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .sec p { margin-bottom: 8px; }
+    .sec ul {
+      padding-left: 16px;
+      margin-bottom: 8px;
+    }
+    .sec li { margin-bottom: 4px; }
+
+    /* --- Key numbers strip --- */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .kpi-box {
+      text-align: center;
+      padding: 10px 4px;
       border: 1px solid var(--border);
-      background: #fff;
+      border-radius: 8px;
+      background: #f0f9ff;
+    }
+    .kpi-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--blue);
+    }
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
-    .section-title {
-      margin: 0;
-      background: var(--blue);
-      color: #fff;
-      font-size: 1.55rem;
-      padding: 10px 14px;
-      letter-spacing: 0.01em;
+    /* --- Figure blocks --- */
+    .fig {
+      margin-bottom: 14px;
+    }
+    .fig-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .fig-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fafbfd;
+    }
+    .fig-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
     }
 
-    .section-body {
-      padding: 14px 16px;
-      font-size: 1rem;
+    /* --- Dataset table --- */
+    .ds-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 8px 0;
     }
-
-    .section-body p { margin: 0 0 10px; }
-
-    .section-body ul {
-      margin: 0;
-      padding-left: 18px;
+    .ds-table th, .ds-table td {
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      text-align: left;
     }
+    .ds-table th { background: #f1f5f9; font-weight: 600; }
 
-    .section-body li { margin-bottom: 8px; }
-
-    .flow {
-      display: grid;
-      grid-template-columns: 1fr;
+    /* --- Footer --- */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 10px 18px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
-    .step {
-      border: 1px solid var(--border);
-      border-left: 5px solid var(--blue);
-      border-radius: 6px;
-      background: #f7f9fd;
-      padding: 8px 10px;
-      font-size: 0.95rem;
-    }
-
-    .step strong {
-      display: block;
-      margin-bottom: 2px;
-      color: var(--blue-dark);
-    }
-
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .metric {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px;
-      background: #f9fbff;
-    }
-
-    .metric .value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--blue-dark);
-    }
-
-    .metric .label {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .full-width {
-      grid-column: 1 / -1;
-    }
-
-    .subtle {
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .figure-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .figure-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #f9fbff;
-      padding: 10px;
-    }
-
-    .figure-card h3 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      color: var(--blue-dark);
-    }
-
-    .figure-caption {
-      margin-top: 8px;
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .figure-card iframe {
-      width: 100%;
-      height: 280px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #fff;
-    }
-
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 12px 18px 18px;
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 1100px) {
-      .content { grid-template-columns: 1fr 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      .content { grid-template-columns: 1fr; }
-      .results-grid { grid-template-columns: 1fr; }
-    }
-
+    /* --- Print --- */
     @media print {
-      @page { size: A0 landscape; margin: 10mm; }
+      @page { size: A1 landscape; margin: 8mm; }
       body { background: #fff; padding: 0; }
-      .poster { box-shadow: none; max-width: none; }
-      .section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .poster { box-shadow: none; max-width: none; border: none; }
+      .header, .sec-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    @media (max-width: 1000px) {
+      .content { grid-template-columns: 1fr; }
+      .col { border-right: none; border-bottom: 1px solid var(--border); }
     }
   </style>
 </head>
 <body>
-  <main class="poster">
-    <header class="header">
-      <h1>VibeScan: A Benchmark-Driven Static Security Scanner for AI-Generated JavaScript Applications</h1>
-      <p>A Data Science Poster on Experimental Design, Corpus Expansion, and Recall-Oriented Evaluation</p>
-      <div class="meta">Cybersecurity Scanner Research Team · 2026</div>
-    </header>
+<main class="poster">
 
-    <section class="content">
-      <article class="section">
-        <h2 class="section-title">Abstract</h2>
-        <div class="section-body">
-          <p>
-            AI-assisted software development accelerates delivery but often introduces insecure defaults, missing guardrails,
-            and hidden data-flow risks. We study <strong>VibeScan</strong>, a static-analysis security scanner for JavaScript and
-            TypeScript applications with a benchmark-driven evaluation workflow.
-          </p>
-          <p>
-            Our experiment combines a pinned DVNA benchmark with an expanded all-check corpus designed to exercise every
-            active VibeScan rule family plus new research classes. We report recall-oriented outcomes, corpus breadth,
-            and proof/actionability context rather than raw issue volume alone.
-          </p>
+  <header class="header">
+    <h1>VibeScan: Recall-Oriented Evaluation of a Static Security Scanner for JavaScript Applications</h1>
+    <div class="subtitle">A Benchmark-Driven Study of Detection Recall, Coverage Gaps, and Alert-Volume Misinterpretation</div>
+    <div class="meta">Josh Obersteadt &middot; Consortium for Computing Sciences in Colleges (CCSC) &middot; 2026</div>
+  </header>
+
+  <section class="content">
+
+    <!-- ============ COLUMN 1 ============ -->
+    <div class="col">
+
+      <div class="sec">
+        <h2 class="sec-title">Abstract</h2>
+        <p>
+          AI-assisted code generation accelerates software delivery but routinely introduces insecure defaults
+          such as unsanitized inputs, weak cryptographic choices, and missing access controls. Static analysis
+          tools can detect these patterns, yet evaluating scanner effectiveness is complicated by reliance on
+          narrow legacy benchmarks and the common but misleading practice of equating raw alert volume with
+          detection quality.
+        </p>
+        <p>
+          We present a benchmark-driven evaluation of <strong>VibeScan</strong>, a JavaScript/TypeScript
+          static-analysis scanner, using (1) the Damn Vulnerable Node.js Application (DVNA) as a standardized
+          11-case cross-tool benchmark and (2) an expanded 39-case corpus covering all six VibeScan rule
+          families. VibeScan achieves <strong>100.0% recall</strong> on DVNA
+          (next-best: Bearer at 72.7%), while exposing that DVNA
+          alone understates scanner breadth by missing entire vulnerability classes. We further show that raw
+          alert count is not a reliable proxy for recall in this dataset.
+        </p>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Research Questions</h2>
+        <ul>
+          <li><strong>RQ1:</strong> Can a JS/TS-focused static scanner achieve top recall on a standard vulnerable application benchmark?</li>
+          <li><strong>RQ2:</strong> Do legacy benchmarks like DVNA understate the coverage breadth of a scanner with broader rule families?</li>
+          <li><strong>RQ3:</strong> Is raw alert count a reliable indicator of benchmark recall across tools?</li>
+        </ul>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Background</h2>
+        <p>
+          DVNA is an intentionally vulnerable Express/Node.js application commonly used to evaluate SAST tools.
+          It contains 11 adjudicated vulnerability families spanning injection, cryptography, access control,
+          and cross-site scripting. Prior evaluations typically report detection counts, which conflate scanner
+          noise with benchmark coverage.
+        </p>
+        <p>
+          We compare six SAST tools: VibeScan, Bearer, Snyk Code, Semgrep, CodeQL, and eslint-plugin-security.
+          Each tool was run on a pinned DVNA commit with frozen configurations. Results were scored against
+          line-anchored ground-truth cases rather than raw finding counts.
+        </p>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Discussion</h2>
+        <p>
+          <strong>RQ1 (Recall):</strong> VibeScan ranks first on DVNA with 11/11 recall. The gap over Bearer
+          (8/11) and Snyk Code (7/11) stems from coverage of NoSQL injection contexts and environment-secret
+          fallback patterns that most peer tools miss.
+        </p>
+        <p>
+          <strong>RQ2 (Coverage gap):</strong> DVNA exercises only 5 of VibeScan's 6 rule families, omitting
+          SSRF, cookie-flag, SSTI, and IDOR cases. Expanding the corpus from 11 to 39
+          unique cases reveals that legacy benchmarks systematically undercount scanner capability.
+        </p>
+        <p>
+          <strong>RQ3 (Volume vs. recall):</strong> eslint-plugin-security reports 493 alerts but detects only
+          1/11 cases. CodeQL reports 46 alerts but detects 6/11. More alerts do not correspond to higher recall
+          in this dataset.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ============ COLUMN 2 ============ -->
+    <div class="col">
+
+      <div class="sec">
+        <h2 class="sec-title">Method</h2>
+        <table class="ds-table">
+          <thead><tr><th>Dataset</th><th>Cases</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr><td>A: DVNA benchmark</td><td>11</td><td>Cross-tool recall comparison (6 SAST tools)</td></tr>
+            <tr><td>B: Expanded corpus</td><td>28 unique</td><td>VibeScan-specific breadth across all 6 rule families</td></tr>
+            <tr><td>B+: Stress repeats</td><td>80</td><td>Robustness validation (not unique families)</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Each case is defined by a line-anchored ground-truth entry with expected rule identifiers.
+          A case is "hit" when the scanner reports a finding matching both the anchor file and line range.
+          Scoring is deterministic and enforced by CI regression gates.
+        </p>
+      </div>
+
+      <div class="fig">
+        <div class="fig-label">Figure 1 &mdash; DVNA Recall by Tool</div>
+        <div class="fig-card"><svg viewBox="0 0 480 256" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">DVNA Recall by Tool</text>
+<line x1="150" y1="32" x2="150" y2="228" stroke="#cbd5e1" stroke-dasharray="2 2"/>
+<text x="150" y="250" font-size="9" text-anchor="middle" fill="#64748b">0%</text>
+<line x1="207.5" y1="32" x2="207.5" y2="228" stroke="#cbd5e1" stroke-dasharray="2 2"/>
+<text x="207.5" y="250" font-size="9" text-anchor="middle" fill="#64748b">25%</text>
+<line x1="265" y1="32" x2="265" y2="228" stroke="#cbd5e1" stroke-dasharray="2 2"/>
+<text x="265" y="250" font-size="9" text-anchor="middle" fill="#64748b">50%</text>
+<line x1="322.5" y1="32" x2="322.5" y2="228" stroke="#cbd5e1" stroke-dasharray="2 2"/>
+<text x="322.5" y="250" font-size="9" text-anchor="middle" fill="#64748b">75%</text>
+<line x1="380" y1="32" x2="380" y2="228" stroke="#cbd5e1" stroke-dasharray="2 2"/>
+<text x="380" y="250" font-size="9" text-anchor="middle" fill="#64748b">100%</text>
+<text x="142" y="54" font-size="11" text-anchor="end" fill="#1e293b">VibeScan</text>
+<rect x="150" y="41" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="41" width="230" height="18" rx="9" fill="#16a34a"/>
+<text x="386" y="54" font-size="10" fill="#334155">11/11 (100.0%)</text>
+<text x="142" y="86" font-size="11" text-anchor="end" fill="#1e293b">Bearer</text>
+<rect x="150" y="73" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="73" width="167.27272727272728" height="18" rx="9" fill="#94a3b8"/>
+<text x="386" y="86" font-size="10" fill="#334155">8/11 (72.7%)</text>
+<text x="142" y="118" font-size="11" text-anchor="end" fill="#1e293b">Snyk Code</text>
+<rect x="150" y="105" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="105" width="146.36363636363637" height="18" rx="9" fill="#94a3b8"/>
+<text x="386" y="118" font-size="10" fill="#334155">7/11 (63.6%)</text>
+<text x="142" y="150" font-size="11" text-anchor="end" fill="#1e293b">CodeQL</text>
+<rect x="150" y="137" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="137" width="125.45454545454544" height="18" rx="9" fill="#94a3b8"/>
+<text x="386" y="150" font-size="10" fill="#334155">6/11 (54.5%)</text>
+<text x="142" y="182" font-size="11" text-anchor="end" fill="#1e293b">Semgrep</text>
+<rect x="150" y="169" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="169" width="83.63636363636364" height="18" rx="9" fill="#94a3b8"/>
+<text x="386" y="182" font-size="10" fill="#334155">4/11 (36.4%)</text>
+<text x="142" y="214" font-size="11" text-anchor="end" fill="#1e293b">eslint-plugin-security</text>
+<rect x="150" y="201" width="230" height="18" rx="9" fill="#e2e8f0"/>
+<rect x="150" y="201" width="20.90909090909091" height="18" rx="9" fill="#94a3b8"/>
+<text x="386" y="214" font-size="10" fill="#334155">1/11 (9.1%)</text>
+</svg></div>
+        <div class="fig-caption">
+          Benchmark recall on 11 adjudicated DVNA cases. VibeScan achieves 100% recall; the next-best tool
+          (Bearer) reaches 72.7%. Bar length represents recall, not
+          raw alert count.
         </div>
-      </article>
+      </div>
 
-      <article class="section">
-        <h2 class="section-title">Research Questions</h2>
-        <div class="section-body">
-          <ul>
-            <li>Can a lightweight static-analysis scanner achieve high recall on vulnerable JavaScript applications generated or modified with AI assistance?</li>
-            <li>How much benchmark coverage is missed when evaluation relies only on legacy corpora such as DVNA?</li>
-            <li>Can we pair high recall with reproducible artifacts, proof-aware output, and CI regression gates?</li>
-            <li>How should scanner results be communicated so benchmark recall is not confused with raw issue count?</li>
-          </ul>
+      <div class="fig">
+        <div class="fig-label">Figure 2 &mdash; Recall vs. Raw Alert Volume</div>
+        <div class="fig-card"><svg viewBox="0 0 480 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs. Raw Alert Volume</text>
+<line x1="50" y1="272" x2="450" y2="272" stroke="#64748b" stroke-width="1"/>
+<line x1="50" y1="36" x2="50" y2="272" stroke="#64748b" stroke-width="1"/>
+<line x1="50" y1="36" x2="50" y2="272" stroke="#e2e8f0"/>
+<text x="50" y="306" font-size="9" text-anchor="middle" fill="#64748b">0</text>
+<line x1="131.13590263691685" y1="36" x2="131.13590263691685" y2="272" stroke="#e2e8f0"/>
+<text x="131.13590263691685" y="306" font-size="9" text-anchor="middle" fill="#64748b">100</text>
+<line x1="212.27180527383368" y1="36" x2="212.27180527383368" y2="272" stroke="#e2e8f0"/>
+<text x="212.27180527383368" y="306" font-size="9" text-anchor="middle" fill="#64748b">200</text>
+<line x1="293.40770791075056" y1="36" x2="293.40770791075056" y2="272" stroke="#e2e8f0"/>
+<text x="293.40770791075056" y="306" font-size="9" text-anchor="middle" fill="#64748b">300</text>
+<line x1="374.54361054766736" y1="36" x2="374.54361054766736" y2="272" stroke="#e2e8f0"/>
+<text x="374.54361054766736" y="306" font-size="9" text-anchor="middle" fill="#64748b">400</text>
+<line x1="455.6795131845842" y1="36" x2="455.6795131845842" y2="272" stroke="#e2e8f0"/>
+<text x="455.6795131845842" y="306" font-size="9" text-anchor="middle" fill="#64748b">500</text>
+<line x1="50" y1="272" x2="450" y2="272" stroke="#e2e8f0"/>
+<text x="44" y="275" font-size="9" text-anchor="end" fill="#64748b">0</text>
+<line x1="50" y1="224.8" x2="450" y2="224.8" stroke="#e2e8f0"/>
+<text x="44" y="227.8" font-size="9" text-anchor="end" fill="#64748b">20</text>
+<line x1="50" y1="177.6" x2="450" y2="177.6" stroke="#e2e8f0"/>
+<text x="44" y="180.6" font-size="9" text-anchor="end" fill="#64748b">40</text>
+<line x1="50" y1="130.4" x2="450" y2="130.4" stroke="#e2e8f0"/>
+<text x="44" y="133.4" font-size="9" text-anchor="end" fill="#64748b">60</text>
+<line x1="50" y1="83.19999999999999" x2="450" y2="83.19999999999999" stroke="#e2e8f0"/>
+<text x="44" y="86.19999999999999" font-size="9" text-anchor="end" fill="#64748b">80</text>
+<line x1="50" y1="36" x2="450" y2="36" stroke="#e2e8f0"/>
+<text x="44" y="39" font-size="9" text-anchor="end" fill="#64748b">100</text>
+<circle cx="70.28397565922921" cy="36" r="6" fill="#16a34a" opacity="0.85"/>
+<text x="77.28397565922921" y="30" font-size="9" fill="#334155">VibeScan</text>
+<circle cx="75.15212981744422" cy="100.36363636363635" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="82.15212981744422" y="94.36363636363635" font-size="9" fill="#334155">Bearer</text>
+<circle cx="79.20892494929006" cy="121.81818181818181" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="86.20892494929006" y="115.81818181818181" font-size="9" fill="#334155">Snyk Code</text>
+<circle cx="87.32251521298174" cy="143.27272727272728" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="94.32251521298174" y="137.27272727272728" font-size="9" fill="#334155">CodeQL</text>
+<circle cx="58.92494929006085" cy="186.1818181818182" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="65.92494929006085" y="180.1818181818182" font-size="9" fill="#334155">Semgrep</text>
+<circle cx="450" cy="250.54545454545453" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="457" y="244.54545454545453" font-size="9" fill="#334155">eslint-plugin-security</text>
+<text x="240" y="318" font-size="10" text-anchor="middle" fill="#475569">Raw issues reported on DVNA</text>
+<text x="14" y="154" font-size="10" text-anchor="middle" fill="#475569" transform="rotate(-90 14 154)">Recall (%)</text>
+</svg></div>
+        <div class="fig-caption">
+          Each point represents one tool. The x-axis shows total alerts reported on DVNA; the y-axis shows
+          benchmark recall. Tools reporting more alerts (rightward) do not achieve higher recall (upward),
+          demonstrating that alert volume is not a proxy for detection quality. VibeScan sits at the top-left:
+          highest recall, moderate alert count.
         </div>
-      </article>
+      </div>
 
-      <article class="section">
-        <h2 class="section-title">Hypothesis</h2>
-        <div class="section-body">
-          <p>
-            We hypothesize that a benchmark-driven scanner tuned for JavaScript and TypeScript application structure can
-            outperform generic baseline tools on <strong>scored benchmark recall</strong>, while also surfacing broader coverage when the
-            benchmark corpus is expanded to match the scanner's actual rule surface.
-          </p>
-          <p class="subtle">
-            Secondary hypothesis: proof-aware outputs and CI recall gates make high-recall behavior easier to reproduce and defend in research reporting.
-          </p>
-        </div>
-      </article>
+    </div>
 
-      <article class="section">
-        <h2 class="section-title">System Contributions</h2>
-        <div class="section-body">
-          <p><strong>VibeScan</strong> is a modular static-analysis package that:</p>
-          <ul>
-            <li>Parses JS, JSX, TS, and TSX with semantic TypeScript support when enabled.</li>
-            <li>Combines rule-based detection, taint tracking, route extraction, and third-party trust-boundary analysis.</li>
-            <li>Exports JSON, SARIF, HTML, proof-oriented metadata, and benchmark artifacts.</li>
-            <li>Includes research extensions such as SSTI detection, IDOR-style direct object reference detection, and recall-first benchmark automation.</li>
-          </ul>
-        </div>
-      </article>
+    <!-- ============ COLUMN 3 ============ -->
+    <div class="col">
 
-      <article class="section">
-        <h2 class="section-title">Experimental Design</h2>
-        <div class="section-body">
-          <div class="flow">
-            <div class="step"><strong>Step 1 — Benchmark selection</strong>Pinned DVNA plus an expanded scanner-specific corpus with framework, crypto, SSRF, middleware, and research-class cases.</div>
-            <div class="step"><strong>Step 2 — Ground truth encoding</strong>Use line-anchored case catalogs with expected rule identifiers for deterministic scoring.</div>
-            <div class="step"><strong>Step 3 — Scanner execution</strong>Run VibeScan in reproducible CI-friendly modes with optional proof metadata generation.</div>
-            <div class="step"><strong>Step 4 — Comparative analysis</strong>Compare benchmark recall against peer tools on DVNA and measure VibeScan breadth on the expanded corpus.</div>
+      <div class="sec">
+        <h2 class="sec-title">Results</h2>
+        <div class="kpi-strip">
+          <div class="kpi-box">
+            <div class="kpi-val">100%</div>
+            <div class="kpi-label">DVNA recall<br/>(VibeScan)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">72.7%</div>
+            <div class="kpi-label">DVNA recall<br/>(next-best)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">39</div>
+            <div class="kpi-label">Unique cases<br/>(expanded)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">6</div>
+            <div class="kpi-label">Rule families<br/>covered</div>
           </div>
         </div>
-      </article>
+      </div>
 
-      <article class="section">
-        <h2 class="section-title">Datasets and Methods</h2>
-        <div class="section-body">
-          <ul>
-            <li><strong>Dataset A:</strong> DVNA benchmark with 11 adjudicated first-party vulnerability rows.</li>
-            <li><strong>Dataset B:</strong> Expanded VibeScan corpus with 28 unique all-check rows plus 80 stress-repeat rows.</li>
-            <li><strong>Combined scope:</strong> 119 scored rows across DVNA and expanded all-check coverage.</li>
-            <li><strong>Metric focus:</strong> benchmark recall on anchored rows; raw issue count tracked separately to avoid misleading comparisons.</li>
-            <li><strong>Quality control:</strong> deterministic case anchors, expected-rule matching, and CI regression gates.</li>
-          </ul>
+      <div class="fig">
+        <div class="fig-label">Figure 3 &mdash; Benchmark Coverage Gap</div>
+        <div class="fig-card"><svg viewBox="0 0 480 280" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">Benchmark Coverage: DVNA-Only vs. Expanded</text>
+<line x1="40" y1="210" x2="460" y2="210" stroke="#64748b" stroke-width="1"/>
+<line x1="40" y1="36" x2="40" y2="210" stroke="#64748b" stroke-width="1"/>
+<line x1="40" y1="210" x2="460" y2="210" stroke="#e2e8f0"/>
+<text x="34" y="213" font-size="9" text-anchor="end" fill="#64748b">0</text>
+<line x1="40" y1="165.3846153846154" x2="460" y2="165.3846153846154" stroke="#e2e8f0"/>
+<text x="34" y="168.3846153846154" font-size="9" text-anchor="end" fill="#64748b">10</text>
+<line x1="40" y1="120.76923076923077" x2="460" y2="120.76923076923077" stroke="#e2e8f0"/>
+<text x="34" y="123.76923076923077" font-size="9" text-anchor="end" fill="#64748b">20</text>
+<line x1="40" y1="76.15384615384616" x2="460" y2="76.15384615384616" stroke="#e2e8f0"/>
+<text x="34" y="79.15384615384616" font-size="9" text-anchor="end" fill="#64748b">30</text>
+<line x1="40" y1="31.538461538461547" x2="460" y2="31.538461538461547" stroke="#e2e8f0"/>
+<text x="34" y="34.53846153846155" font-size="9" text-anchor="end" fill="#64748b">40</text>
+<rect x="83.19999999999999" y="187.69230769230768" width="58.800000000000004" height="22.307692307692307" rx="4" fill="#94a3b8"/>
+<text x="112.6" y="182.69230769230768" font-size="10" text-anchor="middle" font-weight="700" fill="#334155">5</text>
+<rect x="148" y="183.23076923076923" width="58.800000000000004" height="26.76923076923077" rx="4" fill="#16a34a"/>
+<text x="177.4" y="178.23076923076923" font-size="10" text-anchor="middle" font-weight="700" fill="#334155">6</text>
+<text x="145" y="226" font-size="10" text-anchor="middle" fill="#334155">Vulnerability</text>
+<text x="145" y="239" font-size="10" text-anchor="middle" fill="#334155">Families</text>
+<rect x="293.2" y="160.92307692307693" width="58.800000000000004" height="49.07692307692307" rx="4" fill="#94a3b8"/>
+<text x="322.59999999999997" y="155.92307692307693" font-size="10" text-anchor="middle" font-weight="700" fill="#334155">11</text>
+<rect x="358" y="36" width="58.800000000000004" height="174" rx="4" fill="#16a34a"/>
+<text x="387.4" y="31" font-size="10" text-anchor="middle" font-weight="700" fill="#334155">39</text>
+<text x="355" y="226" font-size="10" text-anchor="middle" fill="#334155">Unique</text>
+<text x="355" y="239" font-size="10" text-anchor="middle" fill="#334155">Cases</text>
+<rect x="40" y="262" width="10" height="10" rx="2" fill="#94a3b8"/>
+<text x="54" y="270" font-size="9" fill="#475569">DVNA-only</text>
+<rect x="120" y="262" width="10" height="10" rx="2" fill="#16a34a"/>
+<text x="134" y="270" font-size="9" fill="#475569">Expanded corpus</text>
+</svg></div>
+        <div class="fig-caption">
+          DVNA alone tests 11 cases across 5 vulnerability families. Expanding the corpus to include
+          all 6 VibeScan rule families reveals 28 additional unique cases that DVNA
+          misses entirely, including SSRF, cookie-flag, SSTI, and IDOR patterns.
         </div>
-      </article>
+      </div>
 
-      <article class="section">
-        <h2 class="section-title">Results Snapshot</h2>
-        <div class="section-body">
-          <div class="results-grid">
-            <div class="metric">
-              <div class="value">11 / 11</div>
-              <div class="label">DVNA recall for VibeScan (100.0%)</div>
-            </div>
-            <div class="metric">
-              <div class="value">28</div>
-              <div class="label">Unique expanded benchmark rows beyond DVNA</div>
-            </div>
-            <div class="metric">
-              <div class="value">80</div>
-              <div class="label">Stress-repeat rows used for robustness checks</div>
-            </div>
-            <div class="metric">
-              <div class="value">119 / 119</div>
-              <div class="label">Combined scored rows hit by VibeScan</div>
-            </div>
-          </div>
-          <p class="subtle" style="margin-top:10px;">DVNA peer comparison: Bearer 8/11, Snyk Code 7/11, CodeQL 6/11, Semgrep 4/11, eslint-plugin-security 1/11. The 80 stress-repeat rows are not presented as 80 unique vulnerability families.</p>
+      <div class="fig">
+        <div class="fig-label">Figure 4 &mdash; DVNA Detection Heatmap</div>
+        <div class="fig-card"><svg viewBox="0 0 462 350" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="231" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">DVNA Detection Heatmap</text>
+<text x="166" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 166 94)">VibeScan</text>
+<text x="218" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 218 94)">Bearer</text>
+<text x="270" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 270 94)">Snyk Code</text>
+<text x="322" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 322 94)">Semgrep</text>
+<text x="374" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 374 94)">CodeQL</text>
+<text x="426" y="94" font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 426 94)">eslint-plugin-security</text>
+<text x="134" y="114" font-size="9" text-anchor="end" fill="#1e293b">SQL Injection</text>
+<rect x="140" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="321.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="348" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="100" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="425.5" y="113" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<text x="134" y="134" font-size="9" text-anchor="end" fill="#1e293b">Command Injection</text>
+<rect x="140" y="120" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="120" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="120" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="120" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="120" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="120" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="133" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="154" font-size="9" text-anchor="end" fill="#1e293b">NoSQL Injection (route-path case)</text>
+<rect x="140" y="140" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="140" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="140" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="269.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="296" y="140" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="140" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="373.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="400" y="140" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="153" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="174" font-size="9" text-anchor="end" fill="#1e293b">NoSQL Injection (auth-context case)</text>
+<rect x="140" y="160" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="160" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="160" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="269.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="296" y="160" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="160" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="373.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="400" y="160" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="173" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="194" font-size="9" text-anchor="end" fill="#1e293b">NoSQL Injection (session-context case)</text>
+<rect x="140" y="180" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="180" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="180" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="269.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="296" y="180" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="180" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="373.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="400" y="180" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="193" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="214" font-size="9" text-anchor="end" fill="#1e293b">Open Redirect</text>
+<rect x="140" y="200" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="200" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="200" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="200" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="321.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="348" y="200" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="200" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="213" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="234" font-size="9" text-anchor="end" fill="#1e293b">Unsafe Deserialization</text>
+<rect x="140" y="220" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="220" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="217.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="244" y="220" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="220" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="321.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="348" y="220" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="220" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="233" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="254" font-size="9" text-anchor="end" fill="#1e293b">Hardcoded Secret</text>
+<rect x="140" y="240" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="240" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="240" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="240" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="321.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="348" y="240" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="240" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="253" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="274" font-size="9" text-anchor="end" fill="#1e293b">Weak Cryptographic Hash</text>
+<rect x="140" y="260" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="260" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="217.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="244" y="260" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="260" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="260" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="373.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="400" y="260" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="273" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="294" font-size="9" text-anchor="end" fill="#1e293b">Insecure Env Secret Fallback</text>
+<rect x="140" y="280" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="280" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="217.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="244" y="280" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="269.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="296" y="280" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="280" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="373.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="400" y="280" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="293" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<text x="134" y="314" font-size="9" text-anchor="end" fill="#1e293b">DOM-Based XSS</text>
+<rect x="140" y="300" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="165.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="192" y="300" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="217.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="244" y="300" width="51" height="19" rx="3" fill="#22c55e" opacity="0.85"/>
+<text x="269.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✓</text>
+<rect x="296" y="300" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="321.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="348" y="300" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="373.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="400" y="300" width="51" height="19" rx="3" fill="#ef4444" opacity="0.85"/>
+<text x="425.5" y="313" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">✗</text>
+<rect x="140" y="330" width="10" height="10" rx="2" fill="#22c55e"/>
+<text x="154" y="338" font-size="9" fill="#475569">Detected</text>
+<rect x="212" y="330" width="10" height="10" rx="2" fill="#ef4444"/>
+<text x="226" y="338" font-size="9" fill="#475569">Missed</text>
+</svg></div>
+        <div class="fig-caption">
+          Per-case detection outcomes across 6 tools on the 11 DVNA cases. Green = detected, red = missed.
+          VibeScan is the only tool with a fully green column. Most tools miss at least one NoSQL variant or
+          the environment-secret fallback.
         </div>
-      </article>
+      </div>
 
-      <article class="section full-width">
-        <h2 class="section-title">Poster Figures and Captions</h2>
-        <div class="section-body">
-          <div class="figure-grid">
-            <div class="figure-card">
-              <h3>Figure A: DVNA recall bar chart</h3>
-              <iframe src="../../results/charts/vibescan-dvna-recall-bar-chart.html" title="VibeScan DVNA recall bar chart"></iframe>
-              <div class="figure-caption">
-                This bar chart shows benchmark recall across tools on the adjudicated DVNA cases. VibeScan currently
-                ranks first on the scored recall metric.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure B: Recall vs raw issue volume</h3>
-              <iframe src="../../results/charts/vibescan-recall-vs-volume-scatter.html" title="VibeScan recall versus volume scatter"></iframe>
-              <div class="figure-caption">
-                This scatter plot separates benchmark recall from raw issue count, making it clear that more total alerts
-                do not necessarily correspond to better benchmark performance.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure C: Benchmark scope growth</h3>
-              <iframe src="../../results/charts/vibescan-benchmark-growth-chart.html" title="VibeScan benchmark growth chart"></iframe>
-              <div class="figure-caption">
-                This line chart shows how the evaluation scope grew from legacy DVNA-only testing to a broader all-check
-                benchmark with high-volume stress coverage.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure D: Corpus composition</h3>
-              <iframe src="../../results/charts/vibescan-coverage-breadth-poster.html" title="VibeScan coverage breadth"></iframe>
-              <div class="figure-caption">
-                This chart panel separates DVNA rows, unique expanded rows, and stress-repeat rows so the breadth claim
-                remains methodologically defensible.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure E: Rule-family coverage chart</h3>
-              <iframe src="../../results/charts/vibescan-family-coverage-chart.html" title="VibeScan family coverage chart"></iframe>
-              <div class="figure-caption">
-                This chart shows benchmarked base-case coverage across mapped VibeScan families, highlighting that the
-                experiment measures breadth as well as legacy benchmark recall.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure F: Benchmark validity breakdown</h3>
-              <iframe src="../../results/charts/vibescan-validity-breakdown-chart.html" title="VibeScan validity breakdown chart"></iframe>
-              <div class="figure-caption">
-                This chart distinguishes peer-comparable evaluation rows from VibeScan-specific breadth rows and repeated
-                stress rows, which helps prevent overclaiming from combined totals.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure G: DVNA detection heatmap</h3>
-              <iframe src="../../results/charts/dvna-detection-rate-poster.html" title="DVNA detection heatmap"></iframe>
-              <div class="figure-caption">
-                The heatmap shows per-case detection outcomes across tools on the legacy DVNA benchmark. It is useful for
-                demonstrating case-level recall rather than raw issue-count volume.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure H: Experiment design panel</h3>
-              <iframe src="../../results/charts/vibescan-experiment-design-poster.html" title="VibeScan experiment design"></iframe>
-              <div class="figure-caption">
-                This panel explains the experimental protocol: benchmark selection, deterministic anchor scoring, scanner
-                execution, and CI regression gating.
-              </div>
-            </div>
-            <div class="figure-card">
-              <h3>Figure I: Proof tiers vs peers</h3>
-              <iframe src="../../results/charts/dvna-proof-vs-peers-poster.html" title="DVNA proof tiers versus peers"></iframe>
-              <div class="figure-caption">
-                This comparison separates benchmark recall from raw issue volume and proof/actionability tiers, helping
-                prevent the common misinterpretation that more raw alerts implies better benchmark performance.
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
+      <div class="sec">
+        <h2 class="sec-title">Limitations &amp; Future Work</h2>
+        <ul>
+          <li>Peer tools are compared only on the 11-case DVNA subset; the expanded corpus is VibeScan-specific.</li>
+          <li>No precision/false-positive lane is included in this evaluation.</li>
+          <li>DVNA is one vulnerable application class (Express/MongoDB); results may not generalize to other frameworks.</li>
+          <li>The 80 stress-repeat rows test robustness, not unique vulnerability breadth.</li>
+        </ul>
+        <p>
+          Future work: cross-tool evaluation on the expanded corpus, a precision lane, additional real-world
+          benchmark applications, and a developer usability study measuring time-to-triage on VibeScan's
+          proof-oriented outputs versus conventional alert-only tools.
+        </p>
+      </div>
 
-      <article class="section">
-        <h2 class="section-title">Coverage Breadth</h2>
-        <div class="section-body">
-          <p>
-            The expanded corpus was built to cover all active VibeScan rule families rather than only the narrower legacy
-            DVNA slice. This includes injection-core rules, XSS/client output, crypto/secrets, SSRF, cookie/middleware
-            checks, and new research extensions such as SSTI and IDOR.
-          </p>
-          <p>
-            High-volume stress rows were added to probe robustness and regression stability. They should be interpreted as
-            repeated stress variants of already-covered behaviors, not as new unique vulnerability families.
-          </p>
-        </div>
-      </article>
+    </div>
 
-      <article class="section">
-        <h2 class="section-title">Key Findings</h2>
-        <div class="section-body">
-          <ul>
-            <li>VibeScan currently achieves top recall on the scored DVNA matrix (`11/11`).</li>
-            <li>The benchmark now includes 28 unique expanded rows beyond DVNA, demonstrating coverage beyond the legacy corpus.</li>
-            <li>An additional 80 stress-repeat rows show stable behavior under repeated vulnerable variants.</li>
-            <li>The combined benchmark lane evaluates 119 scored rows, but those rows serve different roles and should be interpreted separately.</li>
-            <li>Presentation matters: recall, proof tiers, unique breadth, and raw issue counts must be shown as separate signals.</li>
-          </ul>
-        </div>
-      </article>
+  </section>
 
-      <article class="section full-width">
-        <h2 class="section-title">Interpretation, Limitations, and Future Work</h2>
-        <div class="section-body">
-          <p>
-            The main empirical result is that <strong>VibeScan currently achieves the highest recall in the scored DVNA matrix while
-            also sustaining full recall on a broader scanner-specific corpus</strong>. This suggests that benchmark expansion is essential:
-            DVNA alone understates scanner breadth.
-          </p>
-          <p>
-            <strong>Important interpretation note:</strong> peer tools may show higher raw issue counts, but those counts are not equivalent to
-            benchmark recall. The poster therefore separates recall, proof/actionability tiers, and raw issue volume.
-          </p>
-          <p>
-            <strong>Limitations:</strong> peer tools are only compared on the DVNA subset in the current readout, and the expanded corpus
-            is intentionally VibeScan-focused rather than a universal cross-tool benchmark.
-          </p>
-          <p>
-            <strong>Future work:</strong> add a precision/noise lane, refresh peer tool reruns on the expanded corpus, incorporate more realistic
-            framework benchmarks, and study remediation quality and developer adoption in end-to-end workflows.
-          </p>
-        </div>
-      </article>
-    </section>
+  <footer class="footer">
+    <span>DVNA: github.com/appsecco/dvna (commit 9ba473a) &middot; VibeScan v1.1.0 &middot; npm: @jobersteadt/vibescan</span>
+    <span>Data: results/dvna-detection-matrix.json &middot; results/framework-vuln-case-catalog.json &middot; results/rule-family-coverage-manifest.json</span>
+  </footer>
 
-    <footer class="footer">
-      Poster template intentionally formatted for academic presentation style with print-friendly layout and embedded
-      benchmark figures. Supporting chart assets live under <code>results/charts/</code>.
-    </footer>
-  </main>
+</main>
 </body>
 </html>

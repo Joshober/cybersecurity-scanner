@@ -1,4 +1,16 @@
 #!/usr/bin/env node
+/**
+ * Generate the CCSC data-science poster as a single self-contained HTML file
+ * with 4 inline SVG charts, plus standalone chart files under results/charts/.
+ *
+ * Usage:  node benchmarks/scripts/generate-research-poster-charts.mjs
+ * Output: docs/vibescan/vibescan-research-poster.html  (main poster)
+ *         results/charts/vibescan-dvna-recall-bar-chart.html
+ *         results/charts/vibescan-recall-vs-volume-scatter.html
+ *         results/charts/vibescan-coverage-gap-chart.html
+ *         results/charts/vibescan-dvna-heatmap-mini.html
+ */
+
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,12 +18,13 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..", "..");
 const chartsDir = join(repoRoot, "results", "charts");
+const posterPath = join(repoRoot, "docs", "vibescan", "vibescan-research-poster.html");
 
 function readJson(relPath) {
   return JSON.parse(readFileSync(join(repoRoot, relPath), "utf8"));
 }
 
-function escapeHtml(value) {
+function esc(value) {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -19,497 +32,742 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
-function basePage(title, body, extraCss = "") {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>${escapeHtml(title)}</title>
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
-    h1 { font-size: 1.45rem; margin: 0 0 10px; }
-    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
-    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
-    .grid { display: grid; gap: 18px; margin-top: 18px; }
-    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
-    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
-    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
-    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
-    .muted { color: #64748b; }
-    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
-    .bar-list { display: flex; flex-direction: column; gap: 12px; }
-    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
-    .bar-label { font-size: 0.88rem; color: #0f172a; }
-    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-    .fill { height: 100%; border-radius: 999px; }
-    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
-    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
-    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
-    .family-table th { background: #f1f5f9; }
-    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
-    .accent-green { color: #047857; }
-    .accent-blue { color: #1d4ed8; }
-    .accent-amber { color: #b45309; }
-    .accent-red { color: #b91c1c; }
-    ${extraCss}
-  </style>
-</head>
-<body>
-${body}
-</body>
-</html>`;
+function txt(x, y, text, extra = "") {
+  return `<text x="${x}" y="${y}" ${extra}>${esc(text)}</text>`;
 }
 
-function writeChart(fileName, title, body, extraCss = "") {
-  mkdirSync(chartsDir, { recursive: true });
-  writeFileSync(join(chartsDir, fileName), basePage(title, body, extraCss), "utf8");
-}
+// ---------------------------------------------------------------------------
+// Data loading
+// ---------------------------------------------------------------------------
 
-function pct(n, d) {
-  return d > 0 ? (n / d) * 100 : 0;
-}
-
-function compareRows(matrix) {
-  return (matrix.tools || [])
+function loadCompareRows(matrix) {
+  return matrix.tools
     .filter((t) => t.chartMode !== "gap")
     .map((tool) => {
       const vals = Object.values(tool.detections || {});
       const hits = vals.filter((v) => v === true).length;
+      const total = vals.length;
       return {
         id: tool.id,
         label: tool.label,
         hits,
-        total: vals.length,
-        percent: pct(hits, vals.length),
+        total,
+        percent: total > 0 ? (hits / total) * 100 : 0,
         rawIssues: Number(tool.dvnaRunIssueCount || 0),
       };
     })
     .sort((a, b) => b.percent - a.percent);
 }
 
-function svgText(x, y, text, extra = "") {
-  return `<text x="${x}" y="${y}" ${extra}>${escapeHtml(text)}</text>`;
-}
+// ---------------------------------------------------------------------------
+// Chart 1: DVNA Recall horizontal bar chart
+// ---------------------------------------------------------------------------
 
-function buildHorizontalBarSvg(rows, { width = 920, height = 420, title = "" } = {}) {
-  const margin = { top: 50, right: 120, bottom: 40, left: 170 };
+function buildRecallBarSvg(rows, opts = {}) {
+  const { width = 480, title = "DVNA Recall by Tool" } = opts;
+  const margin = { top: 36, right: 100, bottom: 28, left: 150 };
   const chartW = width - margin.left - margin.right;
-  const rowH = 42;
+  const rowH = 32;
   const innerH = rows.length * rowH;
-  const svgH = Math.max(height, margin.top + margin.bottom + innerH);
+  const svgH = margin.top + innerH + margin.bottom;
+
   const bars = rows
     .map((row, idx) => {
       const y = margin.top + idx * rowH;
       const barW = (row.percent / 100) * chartW;
-      const color = row.id === "vibescan" ? "#16a34a" : "#64748b";
-      return `
-${svgText(margin.left - 12, y + 20, row.label, 'font-size="13" text-anchor="end" fill="#0f172a"')}
-<rect x="${margin.left}" y="${y + 6}" width="${chartW}" height="22" rx="11" fill="#e2e8f0"></rect>
-<rect x="${margin.left}" y="${y + 6}" width="${barW}" height="22" rx="11" fill="${color}"></rect>
-${svgText(margin.left + chartW + 10, y + 22, `${row.hits}/${row.total} (${row.percent.toFixed(1)}%)`, 'font-size="12" fill="#0f172a"')}
-`;
+      const color = row.id === "vibescan" ? "#16a34a" : "#94a3b8";
+      return [
+        txt(margin.left - 8, y + 18, row.label, 'font-size="11" text-anchor="end" fill="#1e293b"'),
+        `<rect x="${margin.left}" y="${y + 5}" width="${chartW}" height="18" rx="9" fill="#e2e8f0"/>`,
+        `<rect x="${margin.left}" y="${y + 5}" width="${barW}" height="18" rx="9" fill="${color}"/>`,
+        txt(margin.left + chartW + 6, y + 18, `${row.hits}/${row.total} (${row.percent.toFixed(1)}%)`, 'font-size="10" fill="#334155"'),
+      ].join("\n");
     })
     .join("\n");
+
   const ticks = [0, 25, 50, 75, 100]
-    .map((tick) => {
-      const x = margin.left + (tick / 100) * chartW;
-      return `
-<line x1="${x}" y1="${margin.top - 8}" x2="${x}" y2="${svgH - margin.bottom}" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
-${svgText(x, svgH - 12, `${tick}%`, 'font-size="11" text-anchor="middle" fill="#475569"')}
-`;
+    .map((t) => {
+      const x = margin.left + (t / 100) * chartW;
+      return [
+        `<line x1="${x}" y1="${margin.top - 4}" x2="${x}" y2="${margin.top + innerH}" stroke="#cbd5e1" stroke-dasharray="2 2"/>`,
+        txt(x, svgH - 6, `${t}%`, 'font-size="9" text-anchor="middle" fill="#64748b"'),
+      ].join("\n");
     })
     .join("\n");
-  return `<svg viewBox="0 0 ${width} ${svgH}" width="100%" role="img" aria-label="${escapeHtml(title)}">
-${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
+
+  return `<svg viewBox="0 0 ${width} ${svgH}" width="100%" xmlns="http://www.w3.org/2000/svg">
+${txt(width / 2, 18, title, 'font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a"')}
 ${ticks}
 ${bars}
 </svg>`;
 }
 
-function buildScatterSvg(rows, { width = 920, height = 420, title = "" } = {}) {
-  const margin = { top: 50, right: 40, bottom: 55, left: 65 };
+// ---------------------------------------------------------------------------
+// Chart 2: Recall vs Alert Volume scatter
+// ---------------------------------------------------------------------------
+
+function buildScatterSvg(rows, opts = {}) {
+  const { width = 480, height = 320, title = "Recall vs. Raw Alert Volume" } = opts;
+  const margin = { top: 36, right: 30, bottom: 48, left: 50 };
   const chartW = width - margin.left - margin.right;
   const chartH = height - margin.top - margin.bottom;
   const maxX = Math.max(...rows.map((r) => r.rawIssues), 1);
+
   const xTicks = [0, 100, 200, 300, 400, 500].filter((n) => n <= Math.max(500, maxX));
   const yTicks = [0, 20, 40, 60, 80, 100];
+
+  const xGrid = xTicks
+    .map((t) => {
+      const x = margin.left + (t / maxX) * chartW;
+      return [
+        `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + chartH}" stroke="#e2e8f0"/>`,
+        txt(x, height - 14, String(t), 'font-size="9" text-anchor="middle" fill="#64748b"'),
+      ].join("\n");
+    })
+    .join("\n");
+
+  const yGrid = yTicks
+    .map((t) => {
+      const y = margin.top + chartH - (t / 100) * chartH;
+      return [
+        `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"/>`,
+        txt(margin.left - 6, y + 3, String(t), 'font-size="9" text-anchor="end" fill="#64748b"'),
+      ].join("\n");
+    })
+    .join("\n");
+
   const pts = rows
     .map((row) => {
       const x = margin.left + (row.rawIssues / maxX) * chartW;
       const y = margin.top + chartH - (row.percent / 100) * chartH;
       const color = row.id === "vibescan" ? "#16a34a" : "#2563eb";
-      return `
-<circle cx="${x}" cy="${y}" r="${row.id === "vibescan" ? 7 : 5}" fill="${color}" opacity="0.9"></circle>
-${svgText(x + 8, y - 8, row.label, 'font-size="11" fill="#0f172a"')}
-`;
+      const r = row.id === "vibescan" ? 6 : 4;
+      return [
+        `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" opacity="0.85"/>`,
+        txt(x + 7, y - 6, row.label, 'font-size="9" fill="#334155"'),
+      ].join("\n");
     })
     .join("\n");
-  const xGrid = xTicks
-    .map((tick) => {
-      const x = margin.left + (tick / maxX) * chartW;
-      return `
-<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + chartH}" stroke="#e2e8f0"></line>
-${svgText(x, height - 14, String(tick), 'font-size="11" text-anchor="middle" fill="#475569"')}
-`;
-    })
-    .join("\n");
-  const yGrid = yTicks
-    .map((tick) => {
-      const y = margin.top + chartH - (tick / 100) * chartH;
-      return `
-<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"></line>
-${svgText(margin.left - 10, y + 4, String(tick), 'font-size="11" text-anchor="end" fill="#475569"')}
-`;
-    })
-    .join("\n");
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${escapeHtml(title)}">
-${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
-<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
-<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
+
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" xmlns="http://www.w3.org/2000/svg">
+${txt(width / 2, 18, title, 'font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a"')}
+<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1"/>
+<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1"/>
 ${xGrid}
 ${yGrid}
 ${pts}
-${svgText(width / 2, height - 2, "Raw issues in full DVNA run", 'font-size="12" text-anchor="middle" fill="#334155"')}
-${svgText(16, margin.top + chartH / 2, "Recall (%)", 'font-size="12" text-anchor="middle" fill="#334155" transform="rotate(-90 16 ' + (margin.top + chartH / 2) + ')"')}
+${txt(width / 2, height - 2, "Raw issues reported on DVNA", 'font-size="10" text-anchor="middle" fill="#475569"')}
+${txt(14, margin.top + chartH / 2, "Recall (%)", `font-size="10" text-anchor="middle" fill="#475569" transform="rotate(-90 14 ${margin.top + chartH / 2})"`)}
 </svg>`;
 }
 
-function buildLineSvg(points, { width = 920, height = 420, title = "" } = {}) {
-  const margin = { top: 50, right: 40, bottom: 55, left: 55 };
+// ---------------------------------------------------------------------------
+// Chart 3: Coverage gap grouped bars
+// ---------------------------------------------------------------------------
+
+function buildCoverageGapSvg(dvnaCases, expandedUnique, families, opts = {}) {
+  const { width = 480, height = 280, title = "Benchmark Coverage: DVNA-Only vs. Expanded" } = opts;
+  const margin = { top: 36, right: 20, bottom: 70, left: 40 };
   const chartW = width - margin.left - margin.right;
   const chartH = height - margin.top - margin.bottom;
-  const maxY = Math.max(...points.map((p) => p.value), 1);
-  const coords = points.map((p, idx) => {
-    const x = margin.left + (idx / Math.max(points.length - 1, 1)) * chartW;
-    const y = margin.top + chartH - (p.value / maxY) * chartH;
-    return { ...p, x, y };
-  });
-  const path = coords.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  const ticks = [0, Math.round(maxY * 0.25), Math.round(maxY * 0.5), Math.round(maxY * 0.75), maxY]
-    .filter((v, i, arr) => arr.indexOf(v) === i)
-    .map((tick) => {
-      const y = margin.top + chartH - (tick / maxY) * chartH;
-      return `
-<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"></line>
-${svgText(margin.left - 10, y + 4, String(tick), 'font-size="11" text-anchor="end" fill="#475569"')}
-`;
-    })
-    .join("\n");
-  const circles = coords
-    .map(
-      (p) => `
-<circle cx="${p.x}" cy="${p.y}" r="6" fill="#1d4ed8"></circle>
-${svgText(p.x, height - 14, p.label, 'font-size="11" text-anchor="middle" fill="#334155"')}
-${svgText(p.x, p.y - 10, String(p.value), 'font-size="11" text-anchor="middle" fill="#0f172a"')}
-`
-    )
-    .join("\n");
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${escapeHtml(title)}">
-${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
-<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
-<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
-${ticks}
-<path d="${path}" fill="none" stroke="#1d4ed8" stroke-width="3"></path>
-${circles}
-</svg>`;
-}
 
-function buildStackedBarSvg(parts, { width = 920, height = 260, title = "" } = {}) {
-  const margin = { top: 50, right: 40, bottom: 50, left: 40 };
-  const chartW = width - margin.left - margin.right;
-  const total = parts.reduce((sum, p) => sum + p.value, 0);
-  let currentX = margin.left;
-  const rects = parts
-    .map((part) => {
-      const w = (part.value / total) * chartW;
-      const rect = `<rect x="${currentX}" y="${margin.top + 40}" width="${w}" height="44" fill="${part.color}"></rect>
-${svgText(currentX + w / 2, margin.top + 70, `${part.label} (${part.value})`, 'font-size="12" text-anchor="middle" fill="#fff" font-weight="700"')}`;
-      currentX += w;
-      return rect;
-    })
-    .join("\n");
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${escapeHtml(title)}">
-${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
-${rects}
-${svgText(width / 2, height - 16, `Total benchmark rows: ${total}`, 'font-size="12" text-anchor="middle" fill="#334155"')}
-</svg>`;
-}
+  const items = [
+    { label: "Vulnerability\nFamilies", dvna: 5, expanded: families },
+    { label: "Unique\nCases", dvna: dvnaCases, expanded: dvnaCases + expandedUnique },
+  ];
 
-function buildCountBarSvg(rows, { width = 920, height = 360, title = "", xLabel = "" } = {}) {
-  const margin = { top: 50, right: 40, bottom: 90, left: 55 };
-  const chartW = width - margin.left - margin.right;
-  const chartH = height - margin.top - margin.bottom;
-  const maxY = Math.max(...rows.map((r) => r.value), 1);
-  const gap = 22;
-  const barW = (chartW - gap * (rows.length - 1)) / rows.length;
-  const ticks = [0, Math.round(maxY * 0.25), Math.round(maxY * 0.5), Math.round(maxY * 0.75), maxY]
-    .filter((v, i, arr) => arr.indexOf(v) === i)
-    .map((tick) => {
-      const y = margin.top + chartH - (tick / maxY) * chartH;
-      return `
-<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"></line>
-${svgText(margin.left - 10, y + 4, String(tick), 'font-size="11" text-anchor="end" fill="#475569"')}
-`;
+  const maxY = Math.max(...items.flatMap((i) => [i.dvna, i.expanded]));
+  const groupW = chartW / items.length;
+  const barW = groupW * 0.28;
+  const gap = 6;
+
+  const yTicks = [0, 10, 20, 30, 40].filter((v) => v <= maxY + 5);
+  const yGrid = yTicks
+    .map((t) => {
+      const y = margin.top + chartH - (t / maxY) * chartH;
+      return [
+        `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"/>`,
+        txt(margin.left - 6, y + 3, String(t), 'font-size="9" text-anchor="end" fill="#64748b"'),
+      ].join("\n");
     })
     .join("\n");
-  const bars = rows
-    .map((row, idx) => {
-      const x = margin.left + idx * (barW + gap);
-      const h = (row.value / maxY) * chartH;
-      const y = margin.top + chartH - h;
-      return `
-<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="6" fill="${row.color || "#1d4ed8"}"></rect>
-${svgText(x + barW / 2, y - 8, String(row.value), 'font-size="11" text-anchor="middle" fill="#0f172a"')}
-${svgText(x + barW / 2, height - 32, row.label, 'font-size="11" text-anchor="middle" fill="#334155"')}
-`;
+
+  const bars = items
+    .map((item, idx) => {
+      const cx = margin.left + groupW * idx + groupW / 2;
+      const x1 = cx - barW - gap / 2;
+      const x2 = cx + gap / 2;
+
+      const h1 = (item.dvna / maxY) * chartH;
+      const h2 = (item.expanded / maxY) * chartH;
+      const y1 = margin.top + chartH - h1;
+      const y2 = margin.top + chartH - h2;
+
+      const lines = item.label.split("\n");
+      const labelY = margin.top + chartH + 16;
+
+      return [
+        `<rect x="${x1}" y="${y1}" width="${barW}" height="${h1}" rx="4" fill="#94a3b8"/>`,
+        txt(x1 + barW / 2, y1 - 5, String(item.dvna), 'font-size="10" text-anchor="middle" font-weight="700" fill="#334155"'),
+        `<rect x="${x2}" y="${y2}" width="${barW}" height="${h2}" rx="4" fill="#16a34a"/>`,
+        txt(x2 + barW / 2, y2 - 5, String(item.expanded), 'font-size="10" text-anchor="middle" font-weight="700" fill="#334155"'),
+        ...lines.map((line, li) =>
+          txt(cx, labelY + li * 13, line, 'font-size="10" text-anchor="middle" fill="#334155"')
+        ),
+      ].join("\n");
     })
     .join("\n");
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-label="${escapeHtml(title)}">
-${svgText(width / 2, 24, title, 'font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a"')}
-<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
-<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1.5"></line>
-${ticks}
+
+  const legendY = height - 10;
+  const legend = [
+    `<rect x="${margin.left}" y="${legendY - 8}" width="10" height="10" rx="2" fill="#94a3b8"/>`,
+    txt(margin.left + 14, legendY, "DVNA-only", 'font-size="9" fill="#475569"'),
+    `<rect x="${margin.left + 80}" y="${legendY - 8}" width="10" height="10" rx="2" fill="#16a34a"/>`,
+    txt(margin.left + 94, legendY, "Expanded corpus", 'font-size="9" fill="#475569"'),
+  ].join("\n");
+
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" xmlns="http://www.w3.org/2000/svg">
+${txt(width / 2, 18, title, 'font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a"')}
+<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1"/>
+<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b" stroke-width="1"/>
+${yGrid}
 ${bars}
-${xLabel ? svgText(width / 2, height - 8, xLabel, 'font-size="12" text-anchor="middle" fill="#334155"') : ""}
+${legend}
 </svg>`;
 }
+
+// ---------------------------------------------------------------------------
+// Chart 4: Mini heatmap (11 cases x 6 tools)
+// ---------------------------------------------------------------------------
+
+function buildHeatmapSvg(catalog, matrix, opts = {}) {
+  const tools = matrix.tools.filter((t) => t.chartMode !== "gap");
+  const order = catalog.caseOrder || catalog.cases.map((c) => c.id);
+  const byId = new Map(catalog.cases.map((c) => [c.id, c]));
+  const cases = order.map((id) => byId.get(id));
+
+  const cellW = 52;
+  const cellH = 20;
+  const labelW = 130;
+  const headerH = 70;
+  const padTop = 30;
+  const padLeft = 10;
+
+  const width = padLeft + labelW + tools.length * cellW + 10;
+  const height = padTop + headerH + cases.length * cellH + 30;
+  const title = opts.title || "DVNA Detection Heatmap";
+
+  const headers = tools
+    .map((t, ti) => {
+      const x = padLeft + labelW + ti * cellW + cellW / 2;
+      const y = padTop + headerH - 6;
+      return txt(x, y, t.label, `font-size="9" text-anchor="end" fill="#334155" transform="rotate(-40 ${x} ${y})"`);
+    })
+    .join("\n");
+
+  const grid = cases
+    .map((c, ci) => {
+      const y = padTop + headerH + ci * cellH;
+      const sub = c.rowSubtitle ? ` (${c.rowSubtitle})` : "";
+      const label = txt(padLeft + labelW - 6, y + 14, c.rowTitle + sub, 'font-size="9" text-anchor="end" fill="#1e293b"');
+      const cells = tools
+        .map((t, ti) => {
+          const x = padLeft + labelW + ti * cellW;
+          const hit = t.detections[c.id] === true;
+          const fill = hit ? "#22c55e" : "#ef4444";
+          return `<rect x="${x}" y="${y}" width="${cellW - 1}" height="${cellH - 1}" rx="3" fill="${fill}" opacity="0.85"/>
+${txt(x + cellW / 2 - 0.5, y + 13, hit ? "\u2713" : "\u2717", `font-size="11" text-anchor="middle" fill="#fff" font-weight="700"`)}`;
+        })
+        .join("\n");
+      return label + "\n" + cells;
+    })
+    .join("\n");
+
+  const legendY = height - 12;
+  const legend = [
+    `<rect x="${padLeft + labelW}" y="${legendY - 8}" width="10" height="10" rx="2" fill="#22c55e"/>`,
+    txt(padLeft + labelW + 14, legendY, "Detected", 'font-size="9" fill="#475569"'),
+    `<rect x="${padLeft + labelW + 72}" y="${legendY - 8}" width="10" height="10" rx="2" fill="#ef4444"/>`,
+    txt(padLeft + labelW + 86, legendY, "Missed", 'font-size="9" fill="#475569"'),
+  ].join("\n");
+
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" xmlns="http://www.w3.org/2000/svg">
+${txt(width / 2, 18, title, 'font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a"')}
+${headers}
+${grid}
+${legend}
+</svg>`;
+}
+
+// ---------------------------------------------------------------------------
+// Standalone chart HTML wrapper
+// ---------------------------------------------------------------------------
+
+function wrapStandalone(title, svgContent) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${esc(title)}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    .card { max-width: 700px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    h1 { font-size: 1.2rem; margin: 0 0 16px; }
+  </style>
+</head>
+<body>
+  <h1>${esc(title)}</h1>
+  <div class="card">${svgContent}</div>
+</body>
+</html>`;
+}
+
+// ---------------------------------------------------------------------------
+// Main poster HTML
+// ---------------------------------------------------------------------------
+
+function buildPosterHtml(recallSvg, scatterSvg, coverageSvg, heatmapSvg, data) {
+  const { compare, dvnaCases, expandedUnique, familyCount, stressRows } = data;
+  const topRecall = compare[0];
+  const secondRecall = compare[1];
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VibeScan: Recall-Oriented Evaluation of a Static Security Scanner for JavaScript Applications</title>
+  <style>
+    :root {
+      --blue: #1e3a5f;
+      --blue-light: #2563eb;
+      --green: #16a34a;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 12px;
+    }
+    .poster {
+      max-width: 1440px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    /* --- Header --- */
+    .header {
+      background: linear-gradient(135deg, var(--blue) 0%, #0f172a 100%);
+      color: #fff;
+      padding: 24px 32px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    .header .subtitle {
+      margin-top: 6px;
+      font-size: clamp(0.85rem, 1.1vw, 1.1rem);
+      opacity: 0.9;
+      font-weight: 400;
+    }
+    .header .meta {
+      margin-top: 6px;
+      font-size: 0.88rem;
+      opacity: 0.75;
+    }
+
+    /* --- 3-column grid --- */
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1.15fr;
+      gap: 0;
+    }
+    .col {
+      padding: 16px 18px;
+      border-right: 1px solid var(--border);
+    }
+    .col:last-child { border-right: none; }
+
+    /* --- Section blocks --- */
+    .sec { margin-bottom: 16px; }
+    .sec-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid var(--blue-light);
+    }
+    .sec p, .sec li {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .sec p { margin-bottom: 8px; }
+    .sec ul {
+      padding-left: 16px;
+      margin-bottom: 8px;
+    }
+    .sec li { margin-bottom: 4px; }
+
+    /* --- Key numbers strip --- */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .kpi-box {
+      text-align: center;
+      padding: 10px 4px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f0f9ff;
+    }
+    .kpi-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--blue);
+    }
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* --- Figure blocks --- */
+    .fig {
+      margin-bottom: 14px;
+    }
+    .fig-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .fig-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fafbfd;
+    }
+    .fig-caption {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* --- Dataset table --- */
+    .ds-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 8px 0;
+    }
+    .ds-table th, .ds-table td {
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      text-align: left;
+    }
+    .ds-table th { background: #f1f5f9; font-weight: 600; }
+
+    /* --- Footer --- */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 10px 18px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* --- Print --- */
+    @media print {
+      @page { size: A1 landscape; margin: 8mm; }
+      body { background: #fff; padding: 0; }
+      .poster { box-shadow: none; max-width: none; border: none; }
+      .header, .sec-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    @media (max-width: 1000px) {
+      .content { grid-template-columns: 1fr; }
+      .col { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+<main class="poster">
+
+  <header class="header">
+    <h1>VibeScan: Recall-Oriented Evaluation of a Static Security Scanner for JavaScript Applications</h1>
+    <div class="subtitle">A Benchmark-Driven Study of Detection Recall, Coverage Gaps, and Alert-Volume Misinterpretation</div>
+    <div class="meta">Josh Obersteadt &middot; Consortium for Computing Sciences in Colleges (CCSC) &middot; 2026</div>
+  </header>
+
+  <section class="content">
+
+    <!-- ============ COLUMN 1 ============ -->
+    <div class="col">
+
+      <div class="sec">
+        <h2 class="sec-title">Abstract</h2>
+        <p>
+          AI-assisted code generation accelerates software delivery but routinely introduces insecure defaults
+          such as unsanitized inputs, weak cryptographic choices, and missing access controls. Static analysis
+          tools can detect these patterns, yet evaluating scanner effectiveness is complicated by reliance on
+          narrow legacy benchmarks and the common but misleading practice of equating raw alert volume with
+          detection quality.
+        </p>
+        <p>
+          We present a benchmark-driven evaluation of <strong>VibeScan</strong>, a JavaScript/TypeScript
+          static-analysis scanner, using (1) the Damn Vulnerable Node.js Application (DVNA) as a standardized
+          11-case cross-tool benchmark and (2) an expanded 39-case corpus covering all six VibeScan rule
+          families. VibeScan achieves <strong>${topRecall.percent.toFixed(1)}% recall</strong> on DVNA
+          (next-best: ${secondRecall.label} at ${secondRecall.percent.toFixed(1)}%), while exposing that DVNA
+          alone understates scanner breadth by missing entire vulnerability classes. We further show that raw
+          alert count is not a reliable proxy for recall in this dataset.
+        </p>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Research Questions</h2>
+        <ul>
+          <li><strong>RQ1:</strong> Can a JS/TS-focused static scanner achieve top recall on a standard vulnerable application benchmark?</li>
+          <li><strong>RQ2:</strong> Do legacy benchmarks like DVNA understate the coverage breadth of a scanner with broader rule families?</li>
+          <li><strong>RQ3:</strong> Is raw alert count a reliable indicator of benchmark recall across tools?</li>
+        </ul>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Background</h2>
+        <p>
+          DVNA is an intentionally vulnerable Express/Node.js application commonly used to evaluate SAST tools.
+          It contains 11 adjudicated vulnerability families spanning injection, cryptography, access control,
+          and cross-site scripting. Prior evaluations typically report detection counts, which conflate scanner
+          noise with benchmark coverage.
+        </p>
+        <p>
+          We compare six SAST tools: VibeScan, Bearer, Snyk Code, Semgrep, CodeQL, and eslint-plugin-security.
+          Each tool was run on a pinned DVNA commit with frozen configurations. Results were scored against
+          line-anchored ground-truth cases rather than raw finding counts.
+        </p>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Discussion</h2>
+        <p>
+          <strong>RQ1 (Recall):</strong> VibeScan ranks first on DVNA with 11/11 recall. The gap over Bearer
+          (8/11) and Snyk Code (7/11) stems from coverage of NoSQL injection contexts and environment-secret
+          fallback patterns that most peer tools miss.
+        </p>
+        <p>
+          <strong>RQ2 (Coverage gap):</strong> DVNA exercises only 5 of VibeScan's 6 rule families, omitting
+          SSRF, cookie-flag, SSTI, and IDOR cases. Expanding the corpus from 11 to ${dvnaCases + expandedUnique}
+          unique cases reveals that legacy benchmarks systematically undercount scanner capability.
+        </p>
+        <p>
+          <strong>RQ3 (Volume vs. recall):</strong> eslint-plugin-security reports 493 alerts but detects only
+          1/11 cases. CodeQL reports 46 alerts but detects 6/11. More alerts do not correspond to higher recall
+          in this dataset.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ============ COLUMN 2 ============ -->
+    <div class="col">
+
+      <div class="sec">
+        <h2 class="sec-title">Method</h2>
+        <table class="ds-table">
+          <thead><tr><th>Dataset</th><th>Cases</th><th>Scope</th></tr></thead>
+          <tbody>
+            <tr><td>A: DVNA benchmark</td><td>${dvnaCases}</td><td>Cross-tool recall comparison (6 SAST tools)</td></tr>
+            <tr><td>B: Expanded corpus</td><td>${expandedUnique} unique</td><td>VibeScan-specific breadth across all ${familyCount} rule families</td></tr>
+            <tr><td>B+: Stress repeats</td><td>${stressRows}</td><td>Robustness validation (not unique families)</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Each case is defined by a line-anchored ground-truth entry with expected rule identifiers.
+          A case is "hit" when the scanner reports a finding matching both the anchor file and line range.
+          Scoring is deterministic and enforced by CI regression gates.
+        </p>
+      </div>
+
+      <div class="fig">
+        <div class="fig-label">Figure 1 &mdash; DVNA Recall by Tool</div>
+        <div class="fig-card">${recallSvg}</div>
+        <div class="fig-caption">
+          Benchmark recall on 11 adjudicated DVNA cases. VibeScan achieves 100% recall; the next-best tool
+          (${secondRecall.label}) reaches ${secondRecall.percent.toFixed(1)}%. Bar length represents recall, not
+          raw alert count.
+        </div>
+      </div>
+
+      <div class="fig">
+        <div class="fig-label">Figure 2 &mdash; Recall vs. Raw Alert Volume</div>
+        <div class="fig-card">${scatterSvg}</div>
+        <div class="fig-caption">
+          Each point represents one tool. The x-axis shows total alerts reported on DVNA; the y-axis shows
+          benchmark recall. Tools reporting more alerts (rightward) do not achieve higher recall (upward),
+          demonstrating that alert volume is not a proxy for detection quality. VibeScan sits at the top-left:
+          highest recall, moderate alert count.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ COLUMN 3 ============ -->
+    <div class="col">
+
+      <div class="sec">
+        <h2 class="sec-title">Results</h2>
+        <div class="kpi-strip">
+          <div class="kpi-box">
+            <div class="kpi-val">100%</div>
+            <div class="kpi-label">DVNA recall<br/>(VibeScan)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">${secondRecall.percent.toFixed(1)}%</div>
+            <div class="kpi-label">DVNA recall<br/>(next-best)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">${dvnaCases + expandedUnique}</div>
+            <div class="kpi-label">Unique cases<br/>(expanded)</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-val">${familyCount}</div>
+            <div class="kpi-label">Rule families<br/>covered</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fig">
+        <div class="fig-label">Figure 3 &mdash; Benchmark Coverage Gap</div>
+        <div class="fig-card">${coverageSvg}</div>
+        <div class="fig-caption">
+          DVNA alone tests ${dvnaCases} cases across 5 vulnerability families. Expanding the corpus to include
+          all ${familyCount} VibeScan rule families reveals ${expandedUnique} additional unique cases that DVNA
+          misses entirely, including SSRF, cookie-flag, SSTI, and IDOR patterns.
+        </div>
+      </div>
+
+      <div class="fig">
+        <div class="fig-label">Figure 4 &mdash; DVNA Detection Heatmap</div>
+        <div class="fig-card">${heatmapSvg}</div>
+        <div class="fig-caption">
+          Per-case detection outcomes across 6 tools on the 11 DVNA cases. Green = detected, red = missed.
+          VibeScan is the only tool with a fully green column. Most tools miss at least one NoSQL variant or
+          the environment-secret fallback.
+        </div>
+      </div>
+
+      <div class="sec">
+        <h2 class="sec-title">Limitations &amp; Future Work</h2>
+        <ul>
+          <li>Peer tools are compared only on the 11-case DVNA subset; the expanded corpus is VibeScan-specific.</li>
+          <li>No precision/false-positive lane is included in this evaluation.</li>
+          <li>DVNA is one vulnerable application class (Express/MongoDB); results may not generalize to other frameworks.</li>
+          <li>The ${stressRows} stress-repeat rows test robustness, not unique vulnerability breadth.</li>
+        </ul>
+        <p>
+          Future work: cross-tool evaluation on the expanded corpus, a precision lane, additional real-world
+          benchmark applications, and a developer usability study measuring time-to-triage on VibeScan's
+          proof-oriented outputs versus conventional alert-only tools.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <footer class="footer">
+    <span>DVNA: github.com/appsecco/dvna (commit 9ba473a) &middot; VibeScan v1.1.0 &middot; npm: @jobersteadt/vibescan</span>
+    <span>Data: results/dvna-detection-matrix.json &middot; results/framework-vuln-case-catalog.json &middot; results/rule-family-coverage-manifest.json</span>
+  </footer>
+
+</main>
+</body>
+</html>`;
+}
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 
 function main() {
   const dvnaMatrix = readJson("results/dvna-detection-matrix.json");
-  const expandedMatrix = readJson("results/vibescan-expanded-detection-matrix.json");
-  const manifest = readJson("results/rule-family-coverage-manifest.json");
   const dvnaCatalog = readJson("results/dvna-case-catalog.json");
   const frameworkCatalog = readJson("results/framework-vuln-case-catalog.json");
   const highVolumeCatalog = readJson("results/framework-vuln-case-catalog-high-volume.json");
+  const manifest = readJson("results/rule-family-coverage-manifest.json");
 
-  const compare = compareRows(dvnaMatrix);
-  const familyRows = (manifest.families || [])
-    .map(
-      (family) => `<tr>
-  <td>${escapeHtml(family.family)}</td>
-  <td>${family.ruleIds.length}</td>
-  <td>${family.caseIds.length}</td>
-  <td>${escapeHtml(family.status)}</td>
-</tr>`
-    )
-    .join("\n");
-  const baseExpandedCount = frameworkCatalog.cases.length;
-  const highVolumeCount = highVolumeCatalog.cases.length;
-  const growthPoints = [
-    { label: "DVNA only", value: dvnaCatalog.cases.length },
-    { label: "DVNA + base", value: dvnaCatalog.cases.length + baseExpandedCount },
-    { label: "DVNA + all", value: expandedMatrix.rows.combined.total },
-  ];
-  const familyBars = (manifest.families || []).map((family, idx) => ({
-    label: family.family.replace(/-/g, " "),
-    value: family.caseIds.length,
-    color: ["#1d4ed8", "#16a34a", "#7c3aed", "#b45309", "#0f766e", "#dc2626"][idx % 6],
-  }));
+  const compare = loadCompareRows(dvnaMatrix);
+  const dvnaCases = dvnaCatalog.cases.length;
+  const expandedUnique = frameworkCatalog.cases.length;
+  const stressRows = highVolumeCatalog.cases.length;
+  const familyCount = manifest.families.length;
 
-  writeChart(
-    "vibescan-project-overview-poster.html",
-    "VibeScan Project Overview",
-    `<h1>VibeScan: project overview</h1>
-<p class="scope">Poster-friendly overview of the scanner pipeline, major subsystems, and research additions. The focus is deterministic static analysis with semantic TypeScript support, taint flow, route/dependency context, and proof-oriented output.</p>
-<div class="grid two">
-  <section class="card">
-    <h2>System architecture</h2>
-    <div class="flow">
-      <div class="step"><strong>1. CLI</strong><br/>Scan, prove, export, benchmark orchestration.</div>
-      <div class="step"><strong>2. Parse</strong><br/>Acorn for JS and TS-ESLint parser for TS/TSX.</div>
-      <div class="step"><strong>3. Semantic context</strong><br/>TypeScript Program and TypeChecker when enabled.</div>
-      <div class="step"><strong>4. Detection engines</strong><br/>Rule engine + taint engine + route/dependency analysis.</div>
-      <div class="step"><strong>5. Outputs</strong><br/>JSON, SARIF, HTML, proof tests, benchmark artifacts.</div>
-    </div>
-    <p class="legend">Research-oriented additions in this phase include semantic alias resolution, explicit sink classification, SSTI detection, IDOR-style direct object reference detection, and recall-first benchmark lanes.</p>
-  </section>
-  <section class="card">
-    <h2>Core deliverables</h2>
-    <div class="grid three">
-      <div>
-        <div class="kpi">27</div>
-        <div class="muted">active mapped rule IDs</div>
-      </div>
-      <div>
-        <div class="kpi">6</div>
-        <div class="muted">coverage families</div>
-      </div>
-      <div>
-        <div class="kpi">3</div>
-        <div class="muted">major output modes</div>
-      </div>
-    </div>
-    <p class="legend">Outputs support research evidence, developer adoption, and CI regression gates: raw findings, proof/actionability summaries, third-party trust boundaries, and benchmark scoreboards.</p>
-  </section>
-</div>`
+  const recallSvg = buildRecallBarSvg(compare);
+  const scatterSvg = buildScatterSvg(compare);
+  const coverageSvg = buildCoverageGapSvg(dvnaCases, expandedUnique, familyCount);
+  const heatmapSvg = buildHeatmapSvg(dvnaCatalog, dvnaMatrix);
+
+  mkdirSync(chartsDir, { recursive: true });
+  mkdirSync(dirname(posterPath), { recursive: true });
+
+  const posterHtml = buildPosterHtml(recallSvg, scatterSvg, coverageSvg, heatmapSvg, {
+    compare,
+    dvnaCases,
+    expandedUnique,
+    familyCount,
+    stressRows,
+  });
+  writeFileSync(posterPath, posterHtml, "utf8");
+  console.log(`Wrote ${posterPath}`);
+
+  writeFileSync(
+    join(chartsDir, "vibescan-dvna-recall-bar-chart.html"),
+    wrapStandalone("DVNA Recall by Tool", recallSvg),
+    "utf8"
+  );
+  writeFileSync(
+    join(chartsDir, "vibescan-recall-vs-volume-scatter.html"),
+    wrapStandalone("Recall vs. Raw Alert Volume", scatterSvg),
+    "utf8"
+  );
+  writeFileSync(
+    join(chartsDir, "vibescan-coverage-gap-chart.html"),
+    wrapStandalone("Benchmark Coverage Gap", coverageSvg),
+    "utf8"
+  );
+  writeFileSync(
+    join(chartsDir, "vibescan-dvna-heatmap-mini.html"),
+    wrapStandalone("DVNA Detection Heatmap", heatmapSvg),
+    "utf8"
   );
 
-  writeChart(
-    "vibescan-experiment-design-poster.html",
-    "VibeScan Experiment Design",
-    `<h1>Experiment design and benchmark protocol</h1>
-<p class="scope">The evaluation combines frozen DVNA benchmark rows with a VibeScan-specific expanded corpus that exercises all supported rule families and research extensions. This separates benchmark recall, coverage breadth, and raw issue volume.</p>
-<div class="grid three">
-  <section class="card">
-    <span class="pill">Dataset A</span>
-    <h2>DVNA benchmark</h2>
-    <div class="kpi">${dvnaCatalog.cases.length}</div>
-    <div class="muted">line-anchored ground-truth rows</div>
-    <p class="legend">Pinned DVNA commit with adjudicated case anchors for fair cross-tool recall comparison.</p>
-  </section>
-  <section class="card">
-    <span class="pill">Dataset B</span>
-    <h2>Expanded corpus</h2>
-    <div class="kpi">${frameworkCatalog.cases.length + highVolumeCatalog.cases.length}</div>
-    <div class="muted">all-check VibeScan rows</div>
-    <p class="legend">Framework, crypto, SSRF, middleware, research-class, and high-volume stress cases.</p>
-  </section>
-  <section class="card">
-    <span class="pill">Combined</span>
-    <h2>Total scored rows</h2>
-    <div class="kpi">${expandedMatrix.rows.combined.total}</div>
-    <div class="muted">DVNA + expanded corpus</div>
-    <p class="legend">Used for the full-scope VibeScan recall lane and CI gating.</p>
-  </section>
-</div>
-<div class="card" style="margin-top:18px;">
-  <h2>Evaluation flow</h2>
-  <div class="flow">
-    <div class="step"><strong>Corpus setup</strong><br/>Pinned DVNA + framework/expanded seeds.</div>
-    <div class="step"><strong>Scanner run</strong><br/>VibeScan scan and optional proof generation.</div>
-    <div class="step"><strong>Adjudication</strong><br/>Anchor-line scoring with expected rule IDs.</div>
-    <div class="step"><strong>Readout</strong><br/>Recall matrix, proof tiers, outperform summary.</div>
-    <div class="step"><strong>Regression gate</strong><br/>CI fails on covered recall drops.</div>
-  </div>
-  <p class="legend">Peer tools are compared on the DVNA subset only. Expanded all-check rows are used to demonstrate VibeScan coverage breadth beyond DVNA’s original scope.</p>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-results-summary-poster.html",
-    "VibeScan Research Results Summary",
-    `<h1>Research results summary</h1>
-<p class="scope">VibeScan leads the scored DVNA benchmark on recall while also sustaining full recall on the expanded all-check corpus. Raw issue count is tracked separately from benchmark recall.</p>
-<div class="grid two">
-  <section class="card">
-    <h2>DVNA recall leaderboard</h2>
-    ${buildHorizontalBarSvg(compare, { title: "DVNA recall by tool" })}
-    <p class="legend"><strong>Interpretation:</strong> compare tools by recall on the 11 adjudicated DVNA rows. Higher raw issue volume from peers does not imply higher benchmark performance.</p>
-  </section>
-  <section class="card">
-    <h2>Recall vs raw issue volume</h2>
-    ${buildScatterSvg(compare, { title: "Recall versus raw issues" })}
-    <p class="legend">VibeScan is the high-recall outlier: top recall with lower raw issue count than several peers, supporting the claim that more alerts do not automatically mean better benchmark performance.</p>
-  </section>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-coverage-breadth-poster.html",
-    "VibeScan Coverage Breadth",
-    `<h1>Coverage breadth and rule-family mapping</h1>
-<p class="scope">This poster panel explains how supported rule families map to benchmarked evidence rows. It helps distinguish scanner breadth from the smaller legacy DVNA slice.</p>
-<div class="grid two">
-  <section class="card">
-    <h2>Coverage by family</h2>
-    <table class="family-table">
-      <thead>
-        <tr><th>Family</th><th>Rule IDs</th><th>Base cases</th><th>Status</th></tr>
-      </thead>
-      <tbody>
-        ${familyRows}
-      </tbody>
-    </table>
-    <p class="legend">High-volume rows add 80 supplemental stress cases on top of these base family mappings.</p>
-  </section>
-  <section class="card">
-    <h2>Corpus composition</h2>
-    ${buildStackedBarSvg(
-      [
-        { label: "DVNA", value: dvnaCatalog.cases.length, color: "#1d4ed8" },
-        { label: "Unique expanded", value: baseExpandedCount, color: "#16a34a" },
-        { label: "Stress repeats", value: highVolumeCount, color: "#b45309" },
-      ],
-      { title: "Benchmark row composition" }
-    )}
-    <p class="legend">Combined benchmark breadth is now ${expandedMatrix.rows.combined.total} scored rows. The <strong>80 stress-repeat rows</strong> are repeated variants used to test stability and scale, not 80 distinct vulnerability families.</p>
-  </section>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-benchmark-growth-chart.html",
-    "VibeScan Benchmark Scope Growth",
-    `<h1>Benchmark scope growth</h1>
-<p class="scope">A line chart showing how evaluation scope changed from legacy DVNA-only benchmarking to a broader scanner-aligned benchmark suite.</p>
-<div class="card">
-  ${buildLineSvg(growthPoints, { title: "Growth in scored benchmark rows" })}
-  <p class="legend">The benchmark expanded from 11 legacy DVNA rows to 39 combined rows in the first expansion pass and then to 119 total rows after adding high-volume stress coverage.</p>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-dvna-recall-bar-chart.html",
-    "VibeScan DVNA Recall Bar Chart",
-    `<h1>DVNA recall bar chart</h1>
-<p class="scope">This chart compares benchmark recall across tools on the adjudicated DVNA grid.</p>
-<div class="card">
-  ${buildHorizontalBarSvg(compare, { title: "DVNA recall by tool" })}
-  <p class="legend">Bar length represents benchmark recall, not total alert count. VibeScan leads the current matrix with 11/11 hits.</p>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-recall-vs-volume-scatter.html",
-    "VibeScan Recall vs Volume Scatter",
-    `<h1>Recall vs alert volume</h1>
-<p class="scope">This scatter plot separates benchmark recall from raw issue count in the full DVNA run.</p>
-<div class="card">
-  ${buildScatterSvg(compare, { title: "Recall versus raw issues" })}
-  <p class="legend">Points farther upward have higher recall. Points farther right report more raw issues. VibeScan sits high on recall without requiring the highest issue volume.</p>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-family-coverage-chart.html",
-    "VibeScan Family Coverage Chart",
-    `<h1>Rule-family base-case coverage chart</h1>
-<p class="scope">This bar chart shows how many <strong>unique base benchmark cases</strong> are mapped to each VibeScan rule family before adding stress-repeat rows.</p>
-<div class="card">
-  ${buildCountBarSvg(familyBars, { title: "Unique benchmark cases by family", xLabel: "Mapped VibeScan families" })}
-  <p class="legend">This figure is intentionally limited to the unique base corpus. High-volume stress rows are excluded so the chart reflects breadth rather than repeated stress variants.</p>
-</div>`
-  );
-
-  writeChart(
-    "vibescan-validity-breakdown-chart.html",
-    "VibeScan Validity Breakdown Chart",
-    `<h1>Benchmark validity breakdown</h1>
-<p class="scope">This chart separates peer-comparable benchmark rows from VibeScan-specific unique coverage rows and repeated stress rows.</p>
-<div class="card">
-  ${buildCountBarSvg(
-    [
-      { label: "Peer-comparable DVNA", value: dvnaCatalog.cases.length, color: "#1d4ed8" },
-      { label: "Unique expanded", value: baseExpandedCount, color: "#16a34a" },
-      { label: "Stress repeats", value: highVolumeCount, color: "#b45309" },
-    ],
-    { title: "Rows by evaluation role", xLabel: "Evaluation role" }
-  )}
-  <p class="legend">Use DVNA rows for cross-tool comparison, unique expanded rows for VibeScan breadth, and stress repeats for robustness claims. Mixing all three without explanation can overstate the result.</p>
-</div>`
-  );
-
-  console.log(`Wrote ${join(chartsDir, "vibescan-project-overview-poster.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-experiment-design-poster.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-results-summary-poster.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-coverage-breadth-poster.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-benchmark-growth-chart.html")}`);
   console.log(`Wrote ${join(chartsDir, "vibescan-dvna-recall-bar-chart.html")}`);
   console.log(`Wrote ${join(chartsDir, "vibescan-recall-vs-volume-scatter.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-family-coverage-chart.html")}`);
-  console.log(`Wrote ${join(chartsDir, "vibescan-validity-breakdown-chart.html")}`);
+  console.log(`Wrote ${join(chartsDir, "vibescan-coverage-gap-chart.html")}`);
+  console.log(`Wrote ${join(chartsDir, "vibescan-dvna-heatmap-mini.html")}`);
 }
 
 main();
