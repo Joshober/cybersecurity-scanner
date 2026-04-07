@@ -1,18 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { ProjectScanResult, Finding, ScanResult } from "./types.js";
 import { attachProofFailureReason } from "./evidence.js";
 import { findingDisplayFile } from "./format.js";
-
-function toolVersion(): string {
-  try {
-    const pkgPath = join(__dirname, "..", "..", "package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version?: string };
-    return pkg.version ?? "0.0.0";
-  } catch {
-    return "0.0.0";
-  }
-}
+import { readPackageVersion } from "./utils/packageVersion.js";
 
 function severityToLevel(s: Finding["severity"]): "error" | "warning" | "note" | "none" {
   if (s === "critical" || s === "error") return "error";
@@ -102,7 +91,7 @@ export function formatProjectSarif(project: ProjectScanResult): string {
     tool: {
       driver: {
         name: "VibeScan",
-        version: toolVersion(),
+        version: readPackageVersion(),
         informationUri: "https://github.com/Joshober/cybersecurity-scanner",
         rules,
       },

@@ -23,9 +23,11 @@ import {
   runAppLevelAudit,
   generateTests,
   SEVERITY_ORDER,
+  runOpenApiDriftAudit,
+  resolveOpenApiSpecPaths,
+  buildRouteInventory,
+  runRoutePostureFinding,
 } from "./engine/index.js";
-import { runOpenApiDriftAudit, resolveOpenApiSpecPaths } from "./engine/openapiDrift.js";
-import { buildRouteInventory, runRoutePostureFinding } from "./engine/routeInventory.js";
 import { analyzeThirdPartySurface } from "./depsurface/analyzer.js";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";

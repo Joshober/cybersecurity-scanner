@@ -1,0 +1,26 @@
+flowchart TD
+  S1["1. Pattern Matching\nAST node-level checks"]
+  S2["2. Taint / Data Flow\nSource-to-sink tracking within files"]
+  S3["3. Cross-File Analysis\nInter-procedural + type-aware resolution"]
+  S4["4. Route + API Reasoning\nFramework routes · API drift · trust boundaries"]
+  S5["5. Proof Generation + CI Gates\nAuto-generated tests · recall regression enforcement"]
+
+  S1 -->|"eslint-plugin-security stops here · 1/11 recall · 493 alerts"| S2
+  S2 -->|"Semgrep stops here · 4/11 recall · 11 alerts"| S3
+  S3 -->|"CodeQL 6/11 · Snyk Code 7/11 · Bearer 8/11 stop here"| S4
+  S4 -->|"No other evaluated tool reaches this depth"| S5
+
+  VS["VibeScan\n11/11 recall · 25 alerts\nOnly tool reaching full analysis depth"]
+  S5 --> VS
+
+  classDef basic fill:#f3f4f6,stroke:#9ca3af,color:#111827,stroke-width:1px;
+  classDef flow fill:#dbeafe,stroke:#3b82f6,color:#111827,stroke-width:1px;
+  classDef cross fill:#e0e7ff,stroke:#6366f1,color:#111827,stroke-width:1px;
+  classDef advanced fill:#ffedd5,stroke:#ea580c,color:#111827,stroke-width:1px;
+  classDef unique fill:#dcfce7,stroke:#16a34a,color:#111827,stroke-width:2px;
+
+  class S1 basic;
+  class S2 flow;
+  class S3 cross;
+  class S4 advanced;
+  class S5,VS unique;

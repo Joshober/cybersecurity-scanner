@@ -2,13 +2,12 @@
 
 import type { Finding, RouteNode } from "../types.js";
 import { isWebhookLikePath } from "../utils/webhookPathHints.js";
-import { findingRouteFromNode } from "../utils/routeFindingMeta.js";
+import { makeRouteFinding } from "../utils/makeFinding.js";
 
 function handlerUsesBody(src: string): boolean {
   return /\breq\.body\b/.test(src) || /\brequest\.body\b/.test(src);
 }
 
-/** Heuristic tokens — absence elsewhere in handler source is inconclusive for split modules. */
 function hasVerificationHints(src: string): boolean {
   const hints = [
     "constructEvent",
@@ -33,7 +32,7 @@ export function runWebhookAudit(routes: RouteNode[]): Finding[] {
     const src = r.handlerSource;
     if (!handlerUsesBody(src)) continue;
     if (hasVerificationHints(src)) continue;
-    findings.push({
+    findings.push(makeRouteFinding({
       ruleId: "WEBHOOK-001",
       message: `Webhook-style route ${r.method} ${r.fullPath} may lack signature verification`,
       why: "Payment and integration webhooks should validate HMAC or provider signatures before trusting the body.",
@@ -42,15 +41,9 @@ export function runWebhookAudit(routes: RouteNode[]): Finding[] {
       cwe: 345,
       owasp: "A07:2021",
       severity: "warning",
-      severityLabel: "MEDIUM",
       category: "injection",
       findingKind: "MIDDLEWARE_MISSING",
-      line: r.line,
-      column: 0,
-      filePath: r.file,
-      source: `${r.file}:${r.line}`,
-      route: findingRouteFromNode(r),
-    });
+    }, r));
   }
   return findings;
 }

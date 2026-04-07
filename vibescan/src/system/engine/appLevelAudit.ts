@@ -5,6 +5,7 @@ import type { Finding } from "../types.js";
 import { walk } from "../walker.js";
 import { getCalleeName } from "../utils/helpers.js";
 import { HELMET_NAMES } from "../utils/middlewareNames.js";
+import { makeFinding } from "../utils/makeFinding.js";
 
 function corsOriginWildcard(opts: ObjectExpression): boolean {
   for (const p of opts.properties) {
@@ -19,7 +20,6 @@ function corsOriginWildcard(opts: ObjectExpression): boolean {
 }
 
 export interface AppLevelAuditOptions {
-  /** If true and file has Express routes, emit missing-helmet info (reduces noise on non-app files). */
   hasRoutes?: boolean;
   filePath?: string;
 }
@@ -37,7 +37,7 @@ export function runAppLevelAudit(ast: Program, _source: string, opts?: AppLevelA
       if (corsOriginWildcard(node.arguments[0])) {
         const loc = node.loc;
         if (!loc) return;
-        findings.push({
+        findings.push(makeFinding({
           ruleId: "MW-004",
           message: "CORS configured with origin: '*' — any site can read responses.",
           why: "Wildcard origin removes browser same-origin protection for credentialed or sensitive responses.",
@@ -45,19 +45,18 @@ export function runAppLevelAudit(ast: Program, _source: string, opts?: AppLevelA
           cwe: 942,
           owasp: "A05:2021",
           severity: "warning",
-          severityLabel: "MEDIUM",
           category: "injection",
           findingKind: "APP_CONFIG",
           line: loc.start.line,
           column: loc.start.column,
           filePath: opts?.filePath,
-        });
+        }));
       }
     }
   });
 
   if (!sawHelmet && opts?.hasRoutes) {
-    findings.push({
+    findings.push(makeFinding({
       ruleId: "MW-003",
       message: "No helmet() call detected in this file — verify security headers are set.",
       why: "Without secure headers, apps are more vulnerable to XSS, clickjacking, and MIME sniffing.",
@@ -65,13 +64,12 @@ export function runAppLevelAudit(ast: Program, _source: string, opts?: AppLevelA
       cwe: 693,
       owasp: "A05:2021",
       severity: "info",
-      severityLabel: "LOW",
       category: "injection",
       findingKind: "APP_CONFIG",
       line: 1,
       column: 0,
       filePath: opts?.filePath,
-    });
+    }));
   }
 
   return findings;

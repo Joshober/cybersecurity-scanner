@@ -28,11 +28,11 @@ flowchart TD
     ROUTEPRE --> LOOP[For each file + cached ParseResult]
     LOOP --> UNITS[buildAnalysisUnits: split into AnalysisUnit list]
     UNITS --> EACH[For each AnalysisUnit]
-    EACH --> RULES[runRuleEngine: pattern rules + line shift]
+    EACH --> RULES[runRuleEngine: 40+ rules from attacks/]
     RULES --> FULL{fullAst?}
     FULL -- Yes --> TAINT[runTaintEngine: source to sink]
     TAINT --> ROUTE[extractRoutesFromParsed]
-    ROUTE --> APP[runAppLevelAudit: env, cookies, CORS]
+    ROUTE --> APP[runAppLevelAudit via makeFinding]
     FULL -- No --> NEXT[next unit]
     APP --> NEXT
     NEXT --> EACH
@@ -41,11 +41,11 @@ flowchart TD
   end
 
   subgraph CROSS ["Cross-File Post Analysis"]
-    LOOP --> MW[runMiddlewareAudit: helmet, rate-limit, CSRF]
-    MW --> WH[runWebhookAudit: unsigned handlers]
+    LOOP --> MW[runMiddlewareAudit via makeRouteFinding]
+    MW --> WH[runWebhookAudit via makeRouteFinding]
     WH --> OA[runOpenApiDriftAudit: spec vs live routes]
-    OA --> RP[runRoutePostureFinding: auth gaps]
-    RP --> RI[buildRouteInventory: method + path summary]
+    OA --> RP[runRoutePostureFinding via makeFinding]
+    RP --> RI[buildRouteInventory: isObjectScopedRoute]
     RI --> DP[analyzeThirdPartySurface: trust boundary mapping]
   end
 
@@ -57,7 +57,7 @@ flowchart TD
     SIDE --> EXP[writeExports: routes, deps, IDE assist]
     EXP --> FMT{Format?}
     FMT -- json --> JSON[formatProjectJson]
-    FMT -- sarif --> SARIF[formatProjectSarif]
+    FMT -- sarif --> SARIF[formatProjectSarif via readPackageVersion]
     FMT -- html --> HTML[projectScanToHtmlReport]
     FMT -- human --> HUM[formatHuman / formatCompact]
   end
@@ -73,6 +73,97 @@ flowchart TD
   end
 
   DONE[Return findings + summary]
+```
+
+## Architecture Overview
+
+```mermaid
+flowchart LR
+  subgraph INPUT ["Input"]
+    A["Source Code\n.js .ts .tsx .jsx .ejs"]
+    B["Config\n.vibescanrc + CLI args"]
+  end
+
+  subgraph PARSE ["Parse  (parser/)"]
+    FK["fileKind.ts\nclassifyFile → FileKind"]
+    C["Acorn + acorn-jsx\nJS / JSX"]
+    D["ts-eslint + TypeChecker\nTS / TSX"]
+    EJ["EJS handler\nscript block extraction"]
+    PR["ParseResult\nAST + FileKind + ejsBlocks"]
+  end
+
+  subgraph BRIDGE ["Parse → Analyze"]
+    AU["AnalysisUnit\nfullAst flag per unit"]
+    CACHE["Parse cache\nMap‹path, ParseResult›"]
+  end
+
+  subgraph ANALYZE ["Analyze  (analyzeFile)"]
+    E["Rule Engine\n40+ rules in attacks/"]
+    F["Taint Engine\nSource → Sink tracking"]
+    G["Route Analysis\nExpress + Next.js"]
+    H["Third-Party Surface\nTrust boundary mapping"]
+    MF["makeFinding()\nSeverity auto-label"]
+  end
+
+  subgraph AUDIT ["Audits  (engine/)"]
+    MA["Middleware Audit"]
+    WH["Webhook Audit"]
+    AL["App-Level Audit"]
+    RI["Route Inventory\nisObjectScopedRoute"]
+  end
+
+  subgraph SHARED ["Shared Utilities  (utils/)"]
+    PV["packageVersion.ts"]
+    RF["ruleFamily.ts"]
+    MK["makeFinding.ts"]
+  end
+
+  subgraph PIPELINE ["CLI Pipeline"]
+    J["Suppressions + Baseline"]
+    K["Severity Gate"]
+    L["Sidecars + Exports"]
+  end
+
+  subgraph REPORT ["Report"]
+    M["JSON"]
+    N["SARIF"]
+    O["HTML Dashboard"]
+    P["Proof Tests"]
+  end
+
+  A --> FK
+  B --> FK
+  FK --> C
+  FK --> D
+  FK --> EJ
+  C --> PR
+  D --> PR
+  EJ --> PR
+  PR --> CACHE
+  CACHE --> AU
+  AU --> E
+  AU --> F
+  AU --> G
+  E --> MF
+  F --> MF
+  G --> MA
+  G --> WH
+  G --> AL
+  G --> RI
+  MA --> MK
+  WH --> MK
+  AL --> MK
+  MK --> MF
+  G --> H
+  MF --> J
+  H --> J
+  J --> K
+  K --> L
+  L --> M
+  L --> N
+  L --> O
+  L --> P
+  PV --> N
 ```
 
 ## CI Benchmark and Recall Gates
@@ -110,4 +201,35 @@ flowchart TD
     PROOFS --> BASELINE[Store ci_dvna_recall_baseline + proofs]
     BASELINE --> DONE
   end
+```
+
+## Comparison: Analysis Depth — VibeScan vs DVNA Benchmark Tools
+
+```mermaid
+flowchart TD
+  S1["1. Pattern Matching\nAST node-level checks"]
+  S2["2. Taint / Data Flow\nSource-to-sink tracking within files"]
+  S3["3. Cross-File Analysis\nInter-procedural + type-aware resolution"]
+  S4["4. Route + API Reasoning\nFramework routes · API drift · trust boundaries"]
+  S5["5. Proof Generation + CI Gates\nAuto-generated tests · recall regression enforcement"]
+
+  S1 -->|"eslint-plugin-security stops here · 1/11 recall · 493 alerts"| S2
+  S2 -->|"Semgrep stops here · 4/11 recall · 11 alerts"| S3
+  S3 -->|"CodeQL 6/11 · Snyk Code 7/11 · Bearer 8/11 stop here"| S4
+  S4 -->|"No other evaluated tool reaches this depth"| S5
+
+  VS["VibeScan\n11/11 recall · 25 alerts\nOnly tool reaching full analysis depth"]
+  S5 --> VS
+
+  classDef basic fill:#f3f4f6,stroke:#9ca3af,color:#111827,stroke-width:1px;
+  classDef flow fill:#dbeafe,stroke:#3b82f6,color:#111827,stroke-width:1px;
+  classDef cross fill:#e0e7ff,stroke:#6366f1,color:#111827,stroke-width:1px;
+  classDef advanced fill:#ffedd5,stroke:#ea580c,color:#111827,stroke-width:1px;
+  classDef unique fill:#dcfce7,stroke:#16a34a,color:#111827,stroke-width:2px;
+
+  class S1 basic;
+  class S2 flow;
+  class S3 cross;
+  class S4 advanced;
+  class S5,VS unique;
 ```

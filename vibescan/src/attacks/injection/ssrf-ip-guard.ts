@@ -1,9 +1,9 @@
 // SSRF-003 — ip.isPublic / ip.isPrivate used to gate outbound HTTP (insufficient defense; CVE class).
 
 import type { BlockStatement, CallExpression, IfStatement, Node } from "estree";
-import type { Rule, RuleContext } from "../utils/rule-types.js";
-import { getCalleeName } from "../utils/helpers.js";
-import { walk } from "../walker.js";
+import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
+import { getCalleeName } from "../../system/utils/helpers.js";
+import { walk } from "../../system/walker.js";
 
 function isAncestorOf(ancestor: Node, node: Node, getParent: (n: Node) => Node | null): boolean {
   let p: Node | null = node;

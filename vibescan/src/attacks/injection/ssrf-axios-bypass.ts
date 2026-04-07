@@ -1,10 +1,10 @@
 // RULE-SSRF-002 — axios baseURL + user-controlled relative url (CVE-2024-39338 class).
 
-import type { Node } from "estree";
-import type { Rule, RuleContext } from "../utils/rule-types.js";
-import { getCalleeName } from "../utils/helpers.js";
+import type { Node, ObjectExpression } from "estree";
+import type { Rule, RuleContext } from "../../system/utils/rule-types.js";
+import { getCalleeName } from "../../system/utils/helpers.js";
 
-function objectHasBaseUrlAndTaintedUrl(obj: import("estree").ObjectExpression): boolean {
+function objectHasBaseUrlAndTaintedUrl(obj: ObjectExpression): boolean {
   let hasBase = false;
   let taintedUrl = false;
   for (const p of obj.properties) {

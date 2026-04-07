@@ -5,6 +5,12 @@ import { isSensitivePath } from "../utils/sensitiveRoutes.js";
 import { isAdminSensitivePath } from "../utils/adminPaths.js";
 import { AUTH_MIDDLEWARE, chainMatchesList } from "../utils/middlewareNames.js";
 import { isWebhookLikePath } from "../utils/webhookPathHints.js";
+import { makeFinding } from "../utils/makeFinding.js";
+
+/** Route has path parameters (`:id`, etc.) — shared between middleware audit and inventory. */
+export function isObjectScopedRoute(r: RouteNode): boolean {
+  return r.params.length > 0;
+}
 
 function riskTags(r: RouteNode, sensitive: boolean, admin: boolean): string[] {
   const tags: string[] = [];
@@ -29,7 +35,7 @@ export function buildRouteInventory(routes: RouteNode[]): RouteInventoryEntry[] 
       tags: riskTags(r, sensitivePath, adminPath),
       sensitivePath,
       adminPath,
-      objectScoped: r.params.length > 0,
+      objectScoped: isObjectScopedRoute(r),
       hasAuthMiddleware: chainMatchesList(r.middlewares, AUTH_MIDDLEWARE),
     };
   });
@@ -46,14 +52,13 @@ export function runRoutePostureFinding(routes: RouteNode[]): Finding[] {
 
   const primary = risky[0]!;
   return [
-    {
+    makeFinding({
       ruleId: "API-POSTURE-001",
       message: `${risky.length} object-scoped route(s) lack recognizable auth middleware (heuristic; prioritize BOLA/IDOR testing).`,
       why: "Static analysis cannot prove cross-user object access, but undocumented or unauthenticated :id-style routes are a common precondition for broken object-level authorization.",
       remediation: "Verify per-object authorization, add explicit auth middleware, and document routes in OpenAPI.",
       fix: "Verify per-object authorization, add explicit auth middleware, and document routes in OpenAPI.",
       severity: "info",
-      severityLabel: "LOW",
       category: "api_inventory",
       cwe: 285,
       owasp: "API3:2023",
@@ -68,6 +73,6 @@ export function runRoutePostureFinding(routes: RouteNode[]): Finding[] {
         fullPath: primary.fullPath,
         middlewares: [...primary.middlewares],
       },
-    },
+    }),
   ];
 }

@@ -1,6 +1,6 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { Finding, ScanResult, ProjectScanResult, Severity, Category } from "./types.js";
+import { readPackageVersion } from "./utils/packageVersion.js";
+import { ruleFamilyForRuleId } from "./utils/ruleFamily.js";
 import { getRuleDocumentation, type RuleDocumentation } from "./ruleCatalog.js";
 import {
   computeFindingId,
@@ -20,6 +20,7 @@ import {
 
 export { summarizeProofCoverage } from "./evidence.js";
 export type { ProofCoverageSummary, ProofMetrics } from "./evidence.js";
+export { ruleFamilyForRuleId } from "./utils/ruleFamily.js";
 
 /** Proof tier counts per rule family (`unclassified` when `ruleFamilyForRuleId` is undefined). */
 export function summarizeProofCoverageByRuleFamily(
@@ -53,42 +54,11 @@ export interface FindingsSummary {
 
 /** Options for project JSON (benchmark / reproducibility). */
 export interface FormatProjectJsonOptions {
-  /** Add `run` block with version, timestamp, git commit, echoed scan options. */
   benchmarkMetadata?: boolean;
-  /** Add `ruleFamily` on each finding (stable taxonomy for papers). */
   includeRuleFamily?: boolean;
   toolVersion?: string;
   gitCommit?: string | null;
   scanOptions?: Record<string, unknown>;
-}
-
-const LEGACY_RULE_FAMILY: Record<string, string> = {
-  "SEC-004": "crypto.secrets",
-  "SSRF-003": "injection.ssrf",
-  "RULE-SSRF-002": "injection.ssrf",
-  "SLOP-001": "supply_chain.registry",
-  "AUTH-003": "auth.middleware",
-  "AUTH-004": "auth.middleware",
-  "AUTH-005": "auth.middleware",
-  "MW-001": "middleware.order",
-  "MW-002": "middleware.rate_limit",
-  "MW-003": "middleware.headers",
-  "MW-004": "middleware.cors",
-  "API-INV-001": "api.inventory",
-  "API-INV-002": "api.inventory",
-  "API-AUTH-001": "api.auth_conformance",
-  "API-POSTURE-001": "api.inventory",
-  "WEBHOOK-001": "webhook.verification",
-};
-
-/** Stable family label for mixed legacy and dotted rule IDs. */
-export function ruleFamilyForRuleId(ruleId: string): string | undefined {
-  if (LEGACY_RULE_FAMILY[ruleId]) return LEGACY_RULE_FAMILY[ruleId];
-  if (ruleId.includes(".")) {
-    const parts = ruleId.split(".");
-    if (parts.length >= 2) return `${parts[0]}.${parts[1]}`;
-  }
-  return undefined;
 }
 
 function compareFindingsStable(a: Finding, b: Finding): number {
@@ -117,15 +87,9 @@ function findingsPerFileCounts(findings: Finding[]): Record<string, number> {
   return m;
 }
 
-/** Read `version` from repository root package.json (compiled: dist/system/format.js → ../..). */
+/** Read `version` from repository root package.json. */
 export function readScannerPackageVersion(): string {
-  try {
-    const pkgPath = join(__dirname, "..", "..", "package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version?: string };
-    return pkg.version ?? "0.0.0";
-  } catch {
-    return "0.0.0";
-  }
+  return readPackageVersion();
 }
 
 export function summarizeFindings(findings: Finding[]): FindingsSummary {

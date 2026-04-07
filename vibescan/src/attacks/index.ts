@@ -1,6 +1,4 @@
 // Attack rules by category: crypto, injection, browser (XSS), file (path-traversal).
-// Some scanner rules still live under `system/ai/` for historical reasons, but they are
-// ordinary deterministic rules in the main catalog rather than optional AI-only features.
 
 import type { Rule } from "../system/utils/rule-types.js";
 import { weakHashingRule } from "./crypto/weak-hashing.js";
@@ -28,8 +26,8 @@ import { reactDangerouslyInnerHtmlRule } from "./browser/react-dangerously-html.
 import { angularSanitizerBypassRule } from "./browser/angular-sanitizer-bypass.js";
 import { pathTraversalRule } from "./file/path-traversal.js";
 import { insecureCookieRule } from "./injection/insecure-cookie.js";
-import { ipGuardSsrRule } from "../system/ai/ipGuard.js";
-import { axiosBypassRule } from "../system/ai/axiosBypass.js";
+import { ipGuardSsrRule } from "./injection/ssrf-ip-guard.js";
+import { axiosBypassRule } from "./injection/ssrf-axios-bypass.js";
 
 export const cryptoRules: Rule[] = [
   weakHashingRule,
