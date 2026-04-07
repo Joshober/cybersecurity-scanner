@@ -22,10 +22,12 @@ function parseArgs(argv) {
   const out = {
     json: join(repoRoot, "benchmarks", "results", "ci_framework_vulns_vibescan", "vibescan-project.json"),
     catalog: join(repoRoot, "results", "framework-vuln-case-catalog.json"),
+    highVolumeCatalog: join(repoRoot, "results", "framework-vuln-case-catalog-high-volume.json"),
   };
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === "--json" && argv[i + 1]) out.json = resolve(repoRoot, argv[++i]);
     else if (argv[i] === "--catalog" && argv[i + 1]) out.catalog = resolve(repoRoot, argv[++i]);
+    else if (argv[i] === "--high-volume-catalog" && argv[i + 1]) out.highVolumeCatalog = resolve(repoRoot, argv[++i]);
   }
   return out;
 }
@@ -34,10 +36,12 @@ function main() {
   const args = parseArgs(process.argv);
   const project = JSON.parse(readFileSync(args.json, "utf8"));
   const catalog = JSON.parse(readFileSync(args.catalog, "utf8"));
+  const highVolumeCatalog = JSON.parse(readFileSync(args.highVolumeCatalog, "utf8"));
+  const allCases = [...(catalog.cases || []), ...(highVolumeCatalog.cases || [])];
   const findings = Array.isArray(project.findings) ? project.findings : [];
   const failures = [];
 
-  for (const c of catalog.cases || []) {
+  for (const c of allCases) {
     const expected = new Set(c.expectedRuleIds || []);
     const rows = findings.filter((f) => findingMatchesCase(f, c));
     const got = new Set(rows.map((r) => r.ruleId).filter(Boolean));
@@ -58,7 +62,7 @@ function main() {
         .join("\n")}`
     );
   }
-  console.log(`Framework recall assertion passed (${catalog.cases.length} case rows).`);
+  console.log(`Framework recall assertion passed (${allCases.length} case rows).`);
 }
 
 main();

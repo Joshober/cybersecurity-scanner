@@ -15,6 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..", "..");
 const seedRoot = join(repoRoot, "benchmarks", "seeds", "framework-vulns");
 const catalogPath = join(repoRoot, "results", "framework-vuln-case-catalog.json");
+const highVolumeCatalogPath = join(repoRoot, "results", "framework-vuln-case-catalog-high-volume.json");
 const vibescanCli = join(repoRoot, "vibescan", "dist", "system", "cli", "index.js");
 
 function utcStamp() {
@@ -47,6 +48,10 @@ function main() {
   }
 
   const catalog = JSON.parse(readFileSync(catalogPath, "utf-8"));
+  const highVolumeCatalog = existsSync(highVolumeCatalogPath)
+    ? JSON.parse(readFileSync(highVolumeCatalogPath, "utf-8"))
+    : { cases: [] };
+  const allCases = [...(catalog.cases || []), ...(highVolumeCatalog.cases || [])];
   const { outDir: outDirArg, extraScanArgs } = parseArgs(process.argv);
   const outDir = outDirArg ?? join(repoRoot, "benchmarks", "results", `${utcStamp()}_framework_vulns_vibescan`);
   mkdirSync(outDir, { recursive: true });
@@ -59,7 +64,11 @@ function main() {
       {
         benchmarkName: "Framework seeds / VibeScan",
         runDate: { utcIso8601: new Date().toISOString() },
-        scope: { projectRoot: seedRoot, catalog: "results/framework-vuln-case-catalog.json", cases: catalog.cases?.length },
+        scope: {
+          projectRoot: seedRoot,
+          catalog: "results/framework-vuln-case-catalog.json + results/framework-vuln-case-catalog-high-volume.json",
+          cases: allCases.length,
+        },
         outputs: { directory: outDir, vibescanProjectJson: jsonPath },
       },
       null,

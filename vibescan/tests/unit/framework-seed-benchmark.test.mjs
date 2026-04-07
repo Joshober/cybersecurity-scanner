@@ -11,6 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 /** Monorepo root (…/CyberSecurity). */
 const repoRoot = resolve(__dirname, "..", "..", "..");
 const catalogPath = join(repoRoot, "results", "framework-vuln-case-catalog.json");
+const highVolumeCatalogPath = join(repoRoot, "results", "framework-vuln-case-catalog-high-volume.json");
 
 function normRel(p) {
   return String(p || "").replace(/\\/g, "/").toLowerCase();
@@ -28,10 +29,14 @@ describe("framework-vuln seeds (catalog × line anchors)", () => {
   it("catalog exists and every case has a matching primary-rule finding", () => {
     assert.ok(existsSync(catalogPath), `missing ${catalogPath}`);
     const catalog = JSON.parse(readFileSync(catalogPath, "utf-8"));
+    const highVolumeCatalog = existsSync(highVolumeCatalogPath)
+      ? JSON.parse(readFileSync(highVolumeCatalogPath, "utf-8"))
+      : { cases: [] };
+    const allCases = [...(catalog.cases || []), ...(highVolumeCatalog.cases || [])];
     const seedRoot = join(repoRoot, catalog.corpusRoot || "benchmarks/seeds/framework-vulns");
     assert.ok(existsSync(seedRoot), `missing seed root ${seedRoot}`);
 
-    for (const c of catalog.cases) {
+    for (const c of allCases) {
       const absFile = join(seedRoot, c.anchorSuffix.replace(/^\//, ""));
       assert.ok(existsSync(absFile), `missing seed file ${absFile}`);
       const source = readFileSync(absFile, "utf-8");

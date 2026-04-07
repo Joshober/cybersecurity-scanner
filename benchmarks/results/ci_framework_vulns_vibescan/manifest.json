@@ -20,6 +20,7 @@
     "includedFiles": [
       "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/angular/bypass.component.ts",
       "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/expanded/all-rules.js",
+      "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/expanded/high-volume.js",
       "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/expanded/react-xss.tsx",
       "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/lib/db.ts",
       "C:/Users/Josh/Downloads/CyberSecurity/benchmarks/seeds/framework-vulns/nextjs/app/redirect/route.ts",
@@ -37,7 +38,7 @@
     "openApiSpecsUsed": []
   },
   "runDate": {
-    "utcIso8601": "2026-04-07T07:48:24.737Z",
+    "utcIso8601": "2026-04-07T08:02:05.294Z",
     "timezone": "America/Chicago"
   },
   "outputs": {

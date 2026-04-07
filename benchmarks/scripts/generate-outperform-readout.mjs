@@ -15,6 +15,9 @@ function main() {
   const matrix = JSON.parse(readFileSync(join(repoRoot, "results", "dvna-detection-matrix.json"), "utf8"));
   const dvnaCatalog = JSON.parse(readFileSync(join(repoRoot, "results", "dvna-case-catalog.json"), "utf8"));
   const frameworkCatalog = JSON.parse(readFileSync(join(repoRoot, "results", "framework-vuln-case-catalog.json"), "utf8"));
+  const frameworkHighVolumeCatalog = JSON.parse(
+    readFileSync(join(repoRoot, "results", "framework-vuln-case-catalog-high-volume.json"), "utf8")
+  );
   const frameworkRun = JSON.parse(
     readFileSync(
       join(repoRoot, "benchmarks", "results", "ci_framework_vulns_vibescan", "vibescan-project.json"),
@@ -31,7 +34,7 @@ function main() {
   }
 
   const findings = Array.isArray(frameworkRun.findings) ? frameworkRun.findings : [];
-  const frCases = frameworkCatalog.cases || [];
+  const frCases = [...(frameworkCatalog.cases || []), ...(frameworkHighVolumeCatalog.cases || [])];
   const frameworkHits = frCases.filter((c) =>
     findings.some(
       (f) =>
@@ -61,7 +64,7 @@ function main() {
     "",
     "## Notes",
     "- DVNA values come from `results/dvna-detection-matrix.json`.",
-    "- Expanded corpus value comes from `results/framework-vuln-case-catalog.json` + `benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json`.",
+    "- Expanded corpus value comes from `results/framework-vuln-case-catalog.json` + `results/framework-vuln-case-catalog-high-volume.json` + `benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json`.",
     "- Scope caveat: this compares benchmarked SAST rows, not SCA/CVE coverage.",
     "",
   ].join("\n");

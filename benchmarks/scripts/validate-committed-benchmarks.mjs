@@ -34,6 +34,26 @@ function validateFrameworkCatalog() {
   }
 }
 
+function validateFrameworkHighVolumeCatalog() {
+  const catalogPath = join(repoRoot, "results", "framework-vuln-case-catalog-high-volume.json");
+  const catalog = readJson(catalogPath);
+  const corpusRoot = join(repoRoot, catalog.corpusRoot || "benchmarks/seeds/framework-vulns");
+  assert(existsSync(corpusRoot), `Missing high-volume framework corpus root: ${corpusRoot}`);
+  assert(Array.isArray(catalog.cases) && catalog.cases.length > 0, "High-volume framework catalog has no cases.");
+
+  const ids = new Set();
+  for (const c of catalog.cases) {
+    assert(typeof c.id === "string" && c.id.length > 0, "High-volume framework case missing id.");
+    assert(!ids.has(c.id), `Duplicate high-volume framework case id: ${c.id}`);
+    ids.add(c.id);
+    assert(typeof c.anchorSuffix === "string" && c.anchorSuffix.length > 0, `${c.id}: missing anchorSuffix`);
+    assert(Array.isArray(c.anchorLines) && c.anchorLines.length > 0, `${c.id}: missing anchorLines`);
+    assert(Array.isArray(c.expectedRuleIds) && c.expectedRuleIds.length > 0, `${c.id}: missing expectedRuleIds`);
+    const absFile = join(corpusRoot, c.anchorSuffix.replace(/^\//, ""));
+    assert(existsSync(absFile), `${c.id}: missing seed file ${absFile}`);
+  }
+}
+
 function validateDvnaArtifacts() {
   const catalogPath = join(repoRoot, "results", "dvna-case-catalog.json");
   const matrixPath = join(repoRoot, "results", "dvna-detection-matrix.json");
@@ -74,6 +94,7 @@ function validateDvnaArtifacts() {
 
 function main() {
   validateFrameworkCatalog();
+  validateFrameworkHighVolumeCatalog();
   validateDvnaArtifacts();
   console.log("Committed benchmark catalogs, matrix, and chart artifacts look consistent.");
 }
