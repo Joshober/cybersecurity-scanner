@@ -137,6 +137,7 @@ npx vibescan scan . --openapi-spec ./openapi.yaml   # repeat flag for multiple s
 npx vibescan scan . --no-openapi-discovery
 npx vibescan scan . --build-id "$(git rev-parse --short HEAD)"
 npx vibescan scan ./vibescan/src --export-routes ./out/routes.json   # merged Express routes + tagged inventory (static scan)
+npx vibescan scan . --export-third-party-surface ./out/third-party-surface.json
 npx vibescan export-ai-rules --root .   # writes Cursor/Amazon Q/markdown/policy artifacts
 npx vibescan init --tool cursor --root .  # bootstraps config/workflow + secure-arch adapter files
 ```
@@ -185,6 +186,7 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 | `--manifest <path>` | Write run manifest JSON (tool versions, scope, outputs) |
 | `--export-adjudication <stem>` | Write `<stem>.json` and `<stem>.csv` (one row per finding) |
 | `--export-routes <path>` | Write `routeInventory` + raw `routes` JSON (static multi-file scan only) |
+| `--export-third-party-surface <path>` | Write third-party dependency inventory/touchpoints as JSON |
 | `--check-registry` | HEAD `registry.npmjs.org` for missing deps (SLOP-001) |
 | `--project-root <dir>` | Resolve `package.json`, OpenAPI discovery root, registry check, ignore globs |
 | `--openapi-spec <file>` | OpenAPI/Swagger file for drift vs Express routes (repeatable) |
@@ -197,14 +199,15 @@ Project JSON includes `summary` (`totalFindings`, `bySeverity`, `byRuleId`, `byC
 
 ```bash
 npm test -w @jobersteadt/vibescan
-npm run test:arch   # @secure-arch/core (requires build:arch)
+npm run test:arch   # secure-arch core + CLI + adapters (builds arch packages first)
+npm run benchmark:validate
 ```
 
 ---
 
 ## DVNA evaluation (research)
 
-Benchmark outputs and comparison table live under [`results/`](results/) (narrative + adjudication) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/dvna-adjudication.md`](results/dvna-adjudication.md). Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
+Benchmark outputs and comparison table live under [`results/`](results/) (narrative + adjudication) and [`benchmarks/`](benchmarks/) (layout, scripts, dated runs): see [`results/dvna-evaluation.md`](results/dvna-evaluation.md) and [`results/dvna-adjudication.md`](results/dvna-adjudication.md). `npm run benchmark:validate` checks committed catalogs/matrix consistency and regenerates the poster charts. Project JSON schema (benchmark-oriented): [`docs/vibescan/vibescan-benchmark-output.schema.json`](docs/vibescan/vibescan-benchmark-output.schema.json).
 
 ---
 

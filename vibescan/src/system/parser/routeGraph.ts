@@ -71,6 +71,25 @@ function handlerName(node: Expression): string {
   return "anonymous";
 }
 
+function unwrapTypedExpression(node: Expression): Expression {
+  let current: { type: string; expression?: Expression } = node as unknown as {
+    type: string;
+    expression?: Expression;
+  };
+  for (;;) {
+    if (
+      current.type === "TSAsExpression" ||
+      current.type === "TSSatisfiesExpression" ||
+      current.type === "TSNonNullExpression" ||
+      current.type === "ChainExpression"
+    ) {
+      current = current.expression as unknown as { type: string; expression?: Expression };
+      continue;
+    }
+    return current as unknown as Expression;
+  }
+}
+
 function sliceSource(source: string, node: Node): string {
   const loc = node.loc;
   if (!loc?.end) return "";
@@ -128,7 +147,8 @@ function lastHandler(args: CallExpression["arguments"]): EstreeFunction | null {
   for (let i = args.length - 1; i >= 0; i--) {
     const a = args[i];
     if (!a || a.type === "SpreadElement") continue;
-    if (a.type === "FunctionExpression" || a.type === "ArrowFunctionExpression") return a;
+    const expr = unwrapTypedExpression(a as Expression);
+    if (expr.type === "FunctionExpression" || expr.type === "ArrowFunctionExpression") return expr;
   }
   return null;
 }
@@ -139,7 +159,7 @@ function middlewareNamesForArgs(args: CallExpression["arguments"]): string[] {
   for (let i = 0; i < args.length - 1; i++) {
     const a = args[i];
     if (!a || a.type === "SpreadElement") continue;
-    names.push(handlerName(a as Expression));
+    names.push(handlerName(unwrapTypedExpression(a as Expression)));
   }
   return names;
 }

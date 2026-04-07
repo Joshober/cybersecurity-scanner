@@ -20,6 +20,10 @@ export interface RuleContext {
   getSource(node: Node): string | undefined;
   /** ESTree parent; set by the rule engine for rules that need ancestor context. */
   getParent(node: Node): Node | null;
+  /** Semantic call resolution when TypeScript parser services are available. */
+  getResolvedCallee?(node: Node): { calleeName: string | null; importSource?: string; symbolName?: string } | null;
+  /** TypeScript-inferred type text when semantic analysis is active. */
+  getTypeText?(node: Node): string | undefined;
 }
 
 export interface Rule {

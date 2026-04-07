@@ -25,6 +25,35 @@ test("projectJsonToHtmlReport renders summary and finding row", () => {
         proof_pipeline_not_run: true,
       },
     },
+    thirdPartySurface: {
+      summary: {
+        packageCount: 1,
+        importEdgeCount: 1,
+        routeTouchpointCount: 1,
+        sensitiveRouteTouchpointCount: 1,
+        findingTouchpointCount: 1,
+        taintedFlowTouchpointCount: 1,
+        reviewFindingCount: 1,
+      },
+      packages: [
+        {
+          packageName: "axios",
+          dependencyKinds: ["dependency"],
+          files: ["app.js"],
+          routeTouchpoints: [{}],
+          findingTouchpoints: [{}],
+          riskLabels: ["sensitive_route", "tainted_flow"],
+        },
+      ],
+      reviewFindings: [
+        {
+          ruleId: "third_party.route.sensitive-touchpoint",
+          message: "Sensitive route touches external package \"axios\".",
+          filePath: "app.js",
+          line: 10,
+        },
+      ],
+    },
     findings: [
       {
         ruleId: "RULE-X",
@@ -44,6 +73,8 @@ test("projectJsonToHtmlReport renders summary and finding row", () => {
   assert.match(html, /CWE-327/);
   assert.match(html, /vibescan-data|filter-sev/); // interactive controls present
   assert.match(html, /Proof coverage/);
+  assert.match(html, /Third-party dependency surface/);
+  assert.match(html, /axios/);
 });
 
 test("buildHtmlReport empty findings", () => {

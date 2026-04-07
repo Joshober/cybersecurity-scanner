@@ -1,12 +1,13 @@
 // Main scan pipeline: parse, pattern rules, taint, route graph, audits, optional registry/tests.
 
 import type { Program } from "estree";
-import type { Finding, ScannerOptions, ScanResult, ProjectScanResult } from "./types.js";
+import type { Finding, ScannerOptions, ScanResult, ProjectScanResult, ScanWarning } from "./types.js";
 import type { Rule } from "./utils/rule-types.js";
 import { parseFile } from "./parser/parseFile.js";
 import { extractEjsScriptBlocks } from "./parser/ejsScripts.js";
 import { extractRouteGraph } from "./parser/routeGraph.js";
 import { extractNextAppRouteHandlers } from "./parser/nextRouteGraph.js";
+import { createTsProjectContext, type TsProjectContext } from "./parser/tsProject.js";
 import {
   runRuleEngine,
   runTaintEngine,
@@ -18,6 +19,7 @@ import {
 } from "./engine/index.js";
 import { runOpenApiDriftAudit, resolveOpenApiSpecPaths } from "./engine/openapiDrift.js";
 import { buildRouteInventory, runRoutePostureFinding } from "./engine/routeInventory.js";
+import { analyzeThirdPartySurface } from "./depsurface/analyzer.js";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";
 
@@ -51,14 +53,16 @@ function shiftRuleFindings(findings: Finding[], lineDelta: number, fullSource: s
 export function scan(
   source: string,
   filePath: string,
-  options: ScannerOptions = {}
+  options: ScannerOptions = {},
+  scanContext?: { tsProject?: TsProjectContext | null }
 ): ScanResult {
-  const parseResult = parseFile(source, filePath);
+  const warnings: ScanWarning[] = [];
+  const parseResult = parseFile(source, filePath, { tsProject: scanContext?.tsProject });
   const lowerPath = filePath.replace(/\\/g, "/").toLowerCase();
   const isEjs = lowerPath.endsWith(".ejs");
 
   if (!parseResult && !isEjs) {
-    return { filePath, findings: [], source };
+    return { filePath, findings: [], source, warnings };
   }
 
   const rules = getRules(options);
@@ -75,13 +79,14 @@ export function scan(
       ast,
       rules,
       options,
+      parseResult,
     });
   } else {
     src = source;
     ast = { type: "Program", body: [], sourceType: "script" } as Program;
     for (const block of extractEjsScriptBlocks(source)) {
       if (!block.content.trim()) continue;
-      const pr = parseFile(block.content, filePath);
+      const pr = parseFile(block.content, filePath, { tsProject: scanContext?.tsProject });
       if (!pr) continue;
       const chunk = runRuleEngine({
         filePath,
@@ -89,6 +94,7 @@ export function scan(
         ast: pr.ast,
         rules,
         options,
+        parseResult: pr,
       });
       patternFindings.push(...shiftRuleFindings(chunk, block.baseLine - 1, source));
     }
@@ -101,6 +107,7 @@ export function scan(
           source: src,
           ast,
           options,
+          parseResult,
         })
       : [];
 
@@ -119,7 +126,7 @@ export function scan(
     options.severityThreshold
   );
 
-  return { filePath, findings, source: src, routes };
+  return { filePath, findings, source: src, routes, warnings };
 }
 
 /** Multi-file scan: per-file findings + merged route graph + middleware audit + optional registry/tests. */
@@ -128,13 +135,17 @@ export function scanProject(
   options: ScannerOptions = {}
 ): ProjectScanResult {
   const fileResults: ScanResult[] = [];
-  const allRoutes = extractRouteGraphFromFiles(files, options.projectRoot);
+  const packageJsonPath = findPackageJsonNear(options.projectRoot ?? process.cwd());
+  const tsProject = createTsProjectContext(files, options);
+  const allRoutes = extractRouteGraphFromFiles(files, options.projectRoot, tsProject);
   const allFindings: Finding[] = [];
+  const warnings: ScanWarning[] = [...(tsProject?.warnings ?? [])];
 
   for (const f of files) {
-    const one = scan(f.source, f.path, options);
+    const one = scan(f.source, f.path, options, { tsProject });
     fileResults.push(one);
     allFindings.push(...one.findings);
+    if (one.warnings?.length) warnings.push(...one.warnings);
   }
 
   const mw = filterByThreshold(runMiddlewareAudit(allRoutes), options.severityThreshold);
@@ -160,24 +171,33 @@ export function scanProject(
   allFindings.push(...wh);
 
   const routeInventory = buildRouteInventory(allRoutes);
+  const thirdPartySurface = analyzeThirdPartySurface(
+    files,
+    { findings: allFindings, routes: allRoutes, routeInventory },
+    options.projectRoot
+  );
 
   return {
     fileResults,
     routes: allRoutes,
     findings: allFindings,
+    packageJsonPath,
     openApiSpecsUsed: specPaths.length > 0 ? specPaths : undefined,
     routeInventory,
+    thirdPartySurface,
     buildId: options.buildId,
+    warnings: warnings.length > 0 ? warnings : undefined,
   };
 }
 
 function extractRouteGraphFromFiles(
   files: { path: string; source: string }[],
-  projectRoot?: string
+  projectRoot?: string,
+  tsProject?: TsProjectContext | null
 ): import("./types.js").RouteNode[] {
   const routes: import("./types.js").RouteNode[] = [];
   for (const f of files) {
-    const pr = parseFile(f.source, f.path);
+    const pr = parseFile(f.source, f.path, { tsProject });
     if (!pr) continue;
     routes.push(...extractRouteGraph(pr.ast, pr.source, f.path));
     routes.push(...extractNextAppRouteHandlers(pr.ast, pr.source, f.path, projectRoot));
@@ -193,8 +213,7 @@ export async function scanProjectAsync(
   const root = projectRoot ?? options.projectRoot ?? process.cwd();
   const opts: ScannerOptions = { ...options, projectRoot: options.projectRoot ?? root };
   const base = scanProject(files, opts);
-  let packageJsonPath = findPackageJsonNear(root);
-  if (opts.projectRoot) packageJsonPath = findPackageJsonNear(opts.projectRoot) ?? packageJsonPath;
+  const packageJsonPath = base.packageJsonPath ?? findPackageJsonNear(opts.projectRoot ?? root);
 
   if (opts.checkRegistry && !opts.skipRegistry && packageJsonPath) {
     const slop = await checkDependencies(packageJsonPath, { skipRegistry: opts.skipRegistry });
@@ -210,7 +229,16 @@ export async function scanProjectAsync(
     }
   }
 
-  return { ...base, packageJsonPath };
+  return {
+    ...base,
+    packageJsonPath,
+    thirdPartySurface: base.thirdPartySurface
+      ? {
+          ...base.thirdPartySurface,
+          packageJsonPath: base.thirdPartySurface.packageJsonPath ?? packageJsonPath,
+        }
+      : base.thirdPartySurface,
+  };
 }
 
 // Async wrapper around sync scan (API compatibility for callers; mode does not change per-file results).

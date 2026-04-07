@@ -20,7 +20,7 @@ function summarizeRows(rows: HtmlReportFindingRow[]): FindingsSummary {
     info: 0,
   };
   const byRuleId: Record<string, number> = {};
-  const byCategory: Record<Category, number> = { crypto: 0, injection: 0, api_inventory: 0 };
+  const byCategory: Record<Category, number> = { crypto: 0, injection: 0, api_inventory: 0, third_party: 0 };
   for (const r of rows) {
     const s = (r.severity as Severity) ?? "info";
     if (s in bySeverity) bySeverity[s]++;
@@ -84,6 +84,12 @@ export interface HtmlReportMeta {
   projectLabel?: string;
   /** Shown in HTML header when provided (e.g. path to proof-run-log.json). */
   proofRunLogPath?: string;
+}
+
+interface HtmlThirdPartySurface {
+  summary?: Record<string, unknown>;
+  packages?: Array<Record<string, unknown>>;
+  reviewFindings?: Array<Record<string, unknown>>;
 }
 
 function asString(v: unknown): string | undefined {
@@ -277,6 +283,84 @@ function proofBlock(row: HtmlReportFindingRow): string {
   return lines.join("");
 }
 
+function thirdPartySurfaceSection(surface: HtmlThirdPartySurface | undefined): string {
+  if (!surface || typeof surface !== "object") return "";
+  const summary = surface.summary ?? {};
+  const packages = Array.isArray(surface.packages) ? surface.packages : [];
+  const reviewFindings = Array.isArray(surface.reviewFindings) ? surface.reviewFindings : [];
+  if (packages.length === 0 && reviewFindings.length === 0) return "";
+
+  const summaryLine = [
+    `Packages: <strong>${escapeHtml(String(summary.packageCount ?? packages.length))}</strong>`,
+    `Import edges: <strong>${escapeHtml(String(summary.importEdgeCount ?? "—"))}</strong>`,
+    `Sensitive routes: <strong>${escapeHtml(String(summary.sensitiveRouteTouchpointCount ?? "—"))}</strong>`,
+    `Finding touchpoints: <strong>${escapeHtml(String(summary.findingTouchpointCount ?? "—"))}</strong>`,
+    `Review rows: <strong>${escapeHtml(String(summary.reviewFindingCount ?? reviewFindings.length))}</strong>`,
+  ].join(" · ");
+
+  const packageRows = packages
+    .map((pkg) => {
+      const name = escapeHtml(String(pkg.packageName ?? "(unknown)"));
+      const dependencyKinds = Array.isArray(pkg.dependencyKinds)
+        ? escapeHtml(pkg.dependencyKinds.map((v) => String(v)).join(", ") || "unknown")
+        : "unknown";
+      const fileCount = Array.isArray(pkg.files) ? pkg.files.length : 0;
+      const routeCount = Array.isArray(pkg.routeTouchpoints) ? pkg.routeTouchpoints.length : 0;
+      const findingCount = Array.isArray(pkg.findingTouchpoints) ? pkg.findingTouchpoints.length : 0;
+      const risks = Array.isArray(pkg.riskLabels)
+        ? escapeHtml(pkg.riskLabels.map((v) => String(v)).join(", ") || "—")
+        : "—";
+      return `<tr>
+        <td style="padding:0.2rem 0.35rem;"><code>${name}</code></td>
+        <td style="padding:0.2rem 0.35rem;">${dependencyKinds}</td>
+        <td style="text-align:right;padding:0.2rem 0.35rem;">${fileCount}</td>
+        <td style="text-align:right;padding:0.2rem 0.35rem;">${routeCount}</td>
+        <td style="text-align:right;padding:0.2rem 0.35rem;">${findingCount}</td>
+        <td style="padding:0.2rem 0.35rem;">${risks}</td>
+      </tr>`;
+    })
+    .join("");
+
+  const reviewList =
+    reviewFindings.length > 0
+      ? `<details style="margin-top:0.7rem;"><summary style="cursor:pointer;color:var(--accent);">Dependency review findings</summary>
+          <ul class="refs" style="margin-top:0.5rem;">
+            ${reviewFindings
+              .map((row) => {
+                const ruleId = escapeHtml(String(row.ruleId ?? "third_party"));
+                const message = escapeHtml(String(row.message ?? ""));
+                const filePath = escapeHtml(String(row.filePath ?? ""));
+                const line = escapeHtml(String(row.line ?? "—"));
+                return `<li><code>${ruleId}</code> ${message}${filePath ? ` <span style="color:var(--muted)">(${filePath}:${line})</span>` : ""}</li>`;
+              })
+              .join("")}
+          </ul>
+        </details>`
+      : "";
+
+  return `<section class="proof-coverage" style="margin-bottom:1rem;padding:0.85rem 1rem;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-size:0.88rem;">
+    <h2 style="margin:0 0 0.5rem;font-size:1rem;">Third-party dependency surface</h2>
+    <p style="margin:0.2rem 0;color:var(--muted);">${summaryLine}</p>
+    <details style="margin-top:0.6rem;" open>
+      <summary style="cursor:pointer;color:var(--accent);">Package touchpoints</summary>
+      <table style="width:100%;border-collapse:collapse;margin-top:0.45rem;font-size:0.82rem;">
+        <thead>
+          <tr>
+            <th style="text-align:left;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Package</th>
+            <th style="text-align:left;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Kind</th>
+            <th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Files</th>
+            <th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Routes</th>
+            <th style="text-align:right;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Findings</th>
+            <th style="text-align:left;border-bottom:1px solid var(--border);padding:0.25rem 0.35rem;">Risk labels</th>
+          </tr>
+        </thead>
+        <tbody>${packageRows}</tbody>
+      </table>
+    </details>
+    ${reviewList}
+  </section>`;
+}
+
 /**
  * Build HTML from normalized rows + summary (all server-side escaped).
  */
@@ -288,8 +372,9 @@ export function buildHtmlReport(input: {
   proofCoverage?: Record<string, unknown>;
   /** From summary.proofCoverageByRuleFamily when present. */
   proofCoverageByRuleFamily?: Record<string, unknown>;
+  thirdPartySurface?: HtmlThirdPartySurface;
 }): string {
-  const { findings, summary, meta, proofCoverage, proofCoverageByRuleFamily } = input;
+  const { findings, summary, meta, proofCoverage, proofCoverageByRuleFamily, thirdPartySurface } = input;
   const title = "VibeScan security report";
   const when = meta?.generatedAt ?? new Date().toISOString();
   const ver = meta?.toolVersion ?? "";
@@ -577,6 +662,7 @@ ${headExtra}
     </header>
     <div class="cards">${cardHtml}</div>
     ${proofCoverageSection(proofCoverage, meta?.proofRunLogPath, proofCoverageByRuleFamily)}
+    ${thirdPartySurfaceSection(thirdPartySurface)}
     <div class="toolbar">
       <div>
         <label for="filter-q">Search</label>
@@ -634,6 +720,7 @@ export function projectScanToHtmlReport(
     meta: { ...meta, buildId: meta?.buildId ?? project.buildId },
     proofCoverage,
     proofCoverageByRuleFamily,
+    thirdPartySurface: project.thirdPartySurface as unknown as HtmlThirdPartySurface,
   });
 }
 
@@ -649,6 +736,7 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
   const summary = summarizeRows(rows);
   let proofCoverage: Record<string, unknown> | undefined;
   let proofCoverageByRuleFamily: Record<string, unknown> | undefined;
+  let thirdPartySurface: HtmlThirdPartySurface | undefined;
   if (data && typeof data === "object") {
     const sum = (data as Record<string, unknown>).summary;
     if (sum && typeof sum === "object") {
@@ -657,6 +745,8 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
       const pcf = (sum as Record<string, unknown>).proofCoverageByRuleFamily;
       if (pcf && typeof pcf === "object") proofCoverageByRuleFamily = pcf as Record<string, unknown>;
     }
+    const tps = (data as Record<string, unknown>).thirdPartySurface;
+    if (tps && typeof tps === "object") thirdPartySurface = tps as HtmlThirdPartySurface;
   }
   return buildHtmlReport({
     findings: rows,
@@ -664,5 +754,6 @@ export function projectJsonToHtmlReport(jsonText: string, meta?: HtmlReportMeta)
     meta: { ...meta, buildId: meta?.buildId ?? m.buildId },
     proofCoverage,
     proofCoverageByRuleFamily,
+    thirdPartySurface,
   });
 }

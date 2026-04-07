@@ -35,41 +35,13 @@
   <p class="scope"><strong>Actionability</strong> (proof tiers below) is separate from the heatmap’s <strong>eleven benchmark rows</strong>. Tier counts come from <code>summary.proofCoverage</code> for <em>every</em> finding in the chosen JSON — e.g. 25 means 25 finding rows on the scanned DVNA tree, not “11”. The comparison table’s “11/11” column is only how many catalog anchors were hit.</p>
   <p class="scope">Use <code>--proof-coverage-json path/to/vibescan-project.json</code> to drive the bar chart and tier columns from a scan of <strong>any tree</strong> (e.g. whole monorepo with <code>--generate-tests</code>). If omitted, the chart uses the same JSON as <code>--vibescan-json</code> (often the DVNA app only). Counts always reflect <em>every</em> finding in that file, not a subset of the eleven heatmap rows.</p>
   
-  <p class="scope"><strong>Proof tier source JSON:</strong> /workspace/cybersecurity-scanner/benchmarks/results/2026-04-04_050100_dvna_vibescan_cli/vibescan-project.json</p>
+  
   
   
   
   <div class="chart-wrap">
     <h2>VibeScan proof tier distribution</h2>
-    <p class="tier-summary">Total findings counted: <strong>25</strong> (sum of tier buckets)</p>
-<div class="tier-bars" role="list" aria-label="VibeScan proof tier counts"><div class="tier-row">
-  <div class="tier-label">Provable locally (tier 1)</div>
-  <div class="tier-track" title="25 finding(s)">
-    <div class="tier-fill" style="width: 100%; background: #22c55e;"></div>
-  </div>
-  <div class="tier-num">25</div>
-</div>
-<div class="tier-row">
-  <div class="tier-label">Partial proof (tier 2)</div>
-  <div class="tier-track" title="0 finding(s)">
-    <div class="tier-fill" style="width: 0%; background: #84cc16;"></div>
-  </div>
-  <div class="tier-num">0</div>
-</div>
-<div class="tier-row">
-  <div class="tier-label">Structural (tier 3)</div>
-  <div class="tier-track" title="0 finding(s)">
-    <div class="tier-fill" style="width: 0%; background: #eab308;"></div>
-  </div>
-  <div class="tier-num">0</div>
-</div>
-<div class="tier-row">
-  <div class="tier-label">Detection only (tier 4)</div>
-  <div class="tier-track" title="0 finding(s)">
-    <div class="tier-fill" style="width: 0%; background: #94a3b8;"></div>
-  </div>
-  <div class="tier-num">0</div>
-</div></div>
+    <p class="scope">No tier summary in this JSON. Run <code>cd vibescan &amp;&amp; npm run build</code> and regenerate, or ensure <code>summary.proofCoverage</code> / findings are present.</p>
   </div>
   <h2 class="section-title">DVNA benchmark grid vs proof tiers (full scan)</h2>
   <p class="scope"><strong>Rows hit (11):</strong> Counts <strong>line-anchored benchmark scenarios</strong> in <code>results/dvna-case-catalog.json</code> — the same eleven heatmap rows. That number is <em>not</em> how many findings VibeScan reported: the scanner runs on the whole DVNA tree; use <strong>Findings</strong> and the tier columns for full output. <strong>VibeScan</strong> tiers come from <code>summary.proofCoverage</code> (every finding in the JSON). <strong>Peers</strong> have no equivalent schema; <code>dvnaRunIssueCount</code> is charted as 0/0/0/<em>N</em> for shape. Larger <em>N</em> is not “ahead” of VibeScan — different rules, deduping, and noise; see <code>results/dvna-benchmark-interpretation.md</code>.</p>
@@ -93,11 +65,11 @@
   <th scope="row">VibeScan <span class="badge">heatmap focus</span></th>
   <td>sast</td>
   <td class="num">11/11 <span class="muted">(100%)</span></td>
-  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">25</td>
-  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
-  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
-  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
-  <td class="num" title="Matches summary.proofCoverage.total_findings (entire scan in this JSON).">25</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
 </tr>
 <tr>
   <th scope="row">Bearer</th>

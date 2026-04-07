@@ -33,7 +33,9 @@ function createEslintRule(rule: Rule): ESLintRuleNamespace.RuleModule {
         }
       };
       const getSource = () => undefined;
-      const ruleContext = { report, getSource, getParent };
+      const getResolvedCallee = () => null;
+      const getTypeText = () => undefined;
+      const ruleContext = { report, getSource, getParent, getResolvedCallee, getTypeText };
 
       const visit: Record<string, (node: import("estree").Node) => void> = {};
       for (const type of rule.nodeTypes) {

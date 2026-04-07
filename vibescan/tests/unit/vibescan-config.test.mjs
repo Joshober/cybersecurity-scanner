@@ -31,4 +31,33 @@ describe("vibescan config merge", () => {
     const out = applySuppressions(findings, [{ ruleId: "MW-003" }]);
     assert.strictEqual(out.length, 0);
   });
+
+  it("merges TypeScript semantic analysis options", () => {
+    const m = mergeVibeScanConfig(
+      { tsAnalysis: "auto", tsconfigPath: "configs/tsconfig.json", tsFailOpen: true },
+      {
+        formatSet: false,
+        excludeVendorSet: false,
+        rulesSet: false,
+        severitySet: false,
+        checkRegistrySet: false,
+        skipRegistrySet: false,
+        ignoreGlobsSet: false,
+        openApiSpecPathsSet: false,
+        openApiDiscoverySet: false,
+        buildIdSet: false,
+        baselineSet: false,
+        tsAnalysis: "semantic",
+        tsAnalysisSet: true,
+        tsconfigPath: "scan.tsconfig.json",
+        tsconfigPathSet: true,
+        tsFailOpen: false,
+        tsFailOpenSet: true,
+      },
+      { crypto: true, injection: true }
+    );
+    assert.strictEqual(m.scanner.tsAnalysis, "semantic");
+    assert.strictEqual(m.scanner.tsconfigPath, "scan.tsconfig.json");
+    assert.strictEqual(m.scanner.tsFailOpen, false);
+  });
 });

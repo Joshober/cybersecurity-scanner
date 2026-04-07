@@ -29,6 +29,29 @@ function sliceSource(source: string, node: Node): string {
   return [first, ...mid, last].join("\n");
 }
 
+function unwrapTypedFunctionExpression(node: Node | null | undefined): EstreeFunction | null {
+  if (!node) return null;
+  let current: { type: string; expression?: Node } = node as unknown as {
+    type: string;
+    expression?: Node;
+  };
+  for (;;) {
+    if (current.type === "FunctionExpression" || current.type === "ArrowFunctionExpression") {
+      return current as unknown as EstreeFunction;
+    }
+    if (
+      current.type === "TSAsExpression" ||
+      current.type === "TSSatisfiesExpression" ||
+      current.type === "TSNonNullExpression"
+    ) {
+      if (!current.expression) return null;
+      current = current.expression as unknown as { type: string; expression?: Node };
+      continue;
+    }
+    return null;
+  }
+}
+
 function collectReqFields(fn: EstreeFunction): {
   bodyFields: string[];
   queryFields: string[];
@@ -153,10 +176,7 @@ export function extractNextAppRouteHandlers(
     } else if (decl.type === "VariableDeclaration") {
       for (const d of decl.declarations) {
         if (d.id.type !== "Identifier") continue;
-        const fn =
-          d.init && (d.init.type === "FunctionExpression" || d.init.type === "ArrowFunctionExpression")
-            ? d.init
-            : null;
+        const fn = unwrapTypedFunctionExpression(d.init);
         names.push({
           name: d.id.name,
           line: d.loc?.start.line ?? stmt.loc?.start.line ?? 0,

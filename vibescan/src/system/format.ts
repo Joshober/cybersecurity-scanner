@@ -136,7 +136,7 @@ export function summarizeFindings(findings: Finding[]): FindingsSummary {
     info: 0,
   };
   const byRuleId: Record<string, number> = {};
-  const byCategory: Record<Category, number> = { crypto: 0, injection: 0, api_inventory: 0 };
+  const byCategory: Record<Category, number> = { crypto: 0, injection: 0, api_inventory: 0, third_party: 0 };
 
   for (const f of findings) {
     bySeverity[f.severity] = (bySeverity[f.severity] ?? 0) + 1;
@@ -412,17 +412,20 @@ export function formatProjectJson(
 
   const payload: Record<string, unknown> = {
     summary: summaryOut,
+    warnings: project.warnings,
     routes: project.routes,
     routeInventory: project.routeInventory,
     openApiSpecsUsed: project.openApiSpecsUsed,
     buildId: project.buildId,
     packageJsonPath: project.packageJsonPath,
+    thirdPartySurface: project.thirdPartySurface,
     findings: sortedFlat.map((f) => findingToJson(f, undefined, includeRf, true, true)),
     fileResults: project.fileResults.map((r) => ({
       filePath: r.filePath,
       file: r.filePath,
       findings: sortFindingsStable(r.findings).map((f) => findingToJson(f, r.filePath, includeRf, true, true)),
       routeCount: r.routes?.length ?? 0,
+      warnings: r.warnings,
     })),
   };
 

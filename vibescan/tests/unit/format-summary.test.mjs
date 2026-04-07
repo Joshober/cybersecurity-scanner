@@ -65,6 +65,7 @@ describe("summarizeFindings / formatProjectJson", () => {
       const f = json.findings[0];
       assert.ok("file" in f);
     }
+    assert.ok("thirdPartySurface" in json);
   });
 
   it("formatProjectJson includes route on middleware audit findings", () => {
@@ -234,5 +235,66 @@ app.post('/api/login', (req, res) => { res.send('ok'); });
     assert.ok(json.run.timestamp);
     assert.deepStrictEqual(json.summary.findingsPerFile, { "/x.js": 1 });
     assert.strictEqual(json.findings[0].ruleFamily, "crypto.hash");
+  });
+
+  it("formatProjectJson serializes thirdPartySurface when present", () => {
+    const project = {
+      fileResults: [],
+      routes: [],
+      findings: [],
+      thirdPartySurface: {
+        summary: {
+          packageCount: 1,
+          importEdgeCount: 1,
+          routeTouchpointCount: 1,
+          sensitiveRouteTouchpointCount: 1,
+          findingTouchpointCount: 0,
+          taintedFlowTouchpointCount: 0,
+          reviewFindingCount: 1,
+        },
+        imports: [
+          {
+            filePath: "/app.js",
+            packageName: "axios",
+            moduleSpecifier: "axios",
+            line: 1,
+            dependencyKind: "dependency",
+            specifiers: [{ kind: "default", localName: "axios", importedName: "default" }],
+            importedBindings: ["axios"],
+            usageCount: 1,
+            callCount: 1,
+          },
+        ],
+        packages: [
+          {
+            packageName: "axios",
+            dependencyKinds: ["dependency"],
+            files: ["/app.js"],
+            importedBindings: ["axios"],
+            importEdges: [],
+            routeTouchpoints: [],
+            findingTouchpoints: [],
+            riskLabels: ["sensitive_route"],
+            highestSeverity: "warning",
+          },
+        ],
+        reviewFindings: [
+          {
+            ruleId: "third_party.route.sensitive-touchpoint",
+            message: "Sensitive route touches external package \"axios\".",
+            severity: "warning",
+            severityLabel: "MEDIUM",
+            category: "third_party",
+            line: 5,
+            column: 0,
+            filePath: "/app.js",
+          },
+        ],
+      },
+    };
+    const json = JSON.parse(formatProjectJson(project));
+    assert.ok(json.thirdPartySurface);
+    assert.strictEqual(json.thirdPartySurface.summary.packageCount, 1);
+    assert.strictEqual(json.thirdPartySurface.packages[0].packageName, "axios");
   });
 });

@@ -13,6 +13,11 @@ Regenerate HTML from the frozen adjudication matrix:
 
 See [**docs/vibescan/POSTER-CHARTS.md**](../docs/vibescan/POSTER-CHARTS.md) for usage and scope notes.
 
+CI note:
+
+- Fast regression checks can run from committed artifacts/corpora via `npm run benchmark:validate` plus `node benchmarks/scripts/run-framework-vuln-scan.mjs --out-dir <dir>`.
+- Heavier DVNA reruns are better suited to scheduled or manual CI because they require a pinned DVNA checkout and produce larger artifacts/proof outputs.
+
 ## Benchmark setup (current state)
 
 - **DVNA source:** [appsecco/dvna](https://github.com/appsecco/dvna) (shallow clone, `main`), frozen at commit `9ba473add536f66ac9007966acb2a775dd31277a`.

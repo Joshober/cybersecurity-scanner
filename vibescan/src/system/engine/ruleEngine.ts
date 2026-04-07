@@ -2,8 +2,10 @@
 
 import type { Program } from "estree";
 import type { Finding, ProofHints, ScannerOptions, Severity, SeverityLabel } from "../types.js";
+import type { ParseResult } from "../parser/parseFile.js";
 import type { Rule } from "../utils/rule-types.js";
 import { buildParentMap, walk } from "../walker.js";
+import { getResolvedCall, getTypeText } from "../typescript/semantic.js";
 
 const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 3,
@@ -28,7 +30,8 @@ function buildRuleContext(
   findings: Finding[],
   options: ScannerOptions,
   rule: Rule,
-  parentMap: WeakMap<import("estree").Node, import("estree").Node | null>
+  parentMap: WeakMap<import("estree").Node, import("estree").Node | null>,
+  parseResult?: ParseResult | null
 ): import("../utils/rule-types.js").RuleContext {
   const report = (
     node: import("estree").Node,
@@ -101,7 +104,10 @@ function buildRuleContext(
       .slice(loc.start.column);
   };
   const getParent = (node: import("estree").Node) => parentMap.get(node) ?? null;
-  return { report, getSource, getParent };
+  const getResolvedCallee = (node: import("estree").Node) =>
+    node.type === "CallExpression" ? getResolvedCall(parseResult, node) : null;
+  const getTypeTextForNode = (node: import("estree").Node) => getTypeText(parseResult, node);
+  return { report, getSource, getParent, getResolvedCallee, getTypeText: getTypeTextForNode };
 }
 
 function buildNodeTypeMap(rules: Rule[]): Map<string, Rule[]> {
@@ -125,11 +131,12 @@ export interface RunRuleEngineOptions {
   ast: Program;
   rules: Rule[];
   options: ScannerOptions;
+  parseResult?: ParseResult | null;
 }
 
 // Run pattern rules on an AST and return findings.
 export function runRuleEngine(opts: RunRuleEngineOptions): Finding[] {
-  const { filePath, source, ast, rules, options } = opts;
+  const { filePath, source, ast, rules, options, parseResult } = opts;
   const findings: Finding[] = [];
   const nodeTypeMap = buildNodeTypeMap(rules);
   const parentMap = buildParentMap(ast as import("estree").Node);
@@ -138,7 +145,7 @@ export function runRuleEngine(opts: RunRuleEngineOptions): Finding[] {
     const ruleList = nodeTypeMap.get(node.type);
     if (!ruleList) return;
     for (const rule of ruleList) {
-      const context = buildRuleContext(filePath, source, findings, options, rule, parentMap);
+      const context = buildRuleContext(filePath, source, findings, options, rule, parentMap, parseResult);
       try {
         rule.check(context, node);
       } catch {

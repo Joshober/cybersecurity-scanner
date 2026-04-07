@@ -8,7 +8,8 @@
   },
   "files": ["dist"],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "npm --prefix ../../.. run build:arch && node --test tests/"
   },
   "dependencies": {
     "@secure-arch/adapters": "file:../secure-arch-adapters",

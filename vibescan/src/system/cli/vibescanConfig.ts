@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import type { ScannerOptions, Severity } from "../types.js";
+import type { ScannerOptions, Severity, TsAnalysisMode } from "../types.js";
 
 export type OutputFormat = "human" | "compact" | "json" | "sarif";
 
@@ -27,6 +27,10 @@ export interface VibeScanFileConfig {
   openApiDiscovery?: boolean;
   /** Echoed in JSON output and run manifests for deployment correlation. */
   buildId?: string;
+  /** TypeScript semantic analysis controls. */
+  tsAnalysis?: TsAnalysisMode;
+  tsconfigPath?: string;
+  tsFailOpen?: boolean;
   /** Defaults for `vibescan export-ai-rules` when CLI flags are omitted. */
   aiExport?: {
     tool?: "cursor" | "amazonq";
@@ -96,6 +100,12 @@ export function mergeVibeScanConfig(
     buildIdSet?: boolean;
     baseline?: string;
     baselineSet?: boolean;
+    tsAnalysis?: TsAnalysisMode;
+    tsAnalysisSet?: boolean;
+    tsconfigPath?: string;
+    tsconfigPathSet?: boolean;
+    tsFailOpen?: boolean;
+    tsFailOpenSet?: boolean;
   },
   baseScanner: ScannerOptions
 ): MergedCliConfig {
@@ -122,6 +132,9 @@ export function mergeVibeScanConfig(
     scanner.openApiDiscovery = file.openApiDiscovery;
   }
   if (file?.buildId) scanner.buildId = file.buildId;
+  if (file?.tsAnalysis) scanner.tsAnalysis = file.tsAnalysis;
+  if (file?.tsconfigPath) scanner.tsconfigPath = file.tsconfigPath;
+  if (typeof file?.tsFailOpen === "boolean") scanner.tsFailOpen = file.tsFailOpen;
   if (file?.format) format = file.format;
 
   if (cli.rulesSet && cli.crypto !== undefined && cli.injection !== undefined) {
@@ -150,6 +163,15 @@ export function mergeVibeScanConfig(
   }
   if (cli.buildIdSet && cli.buildId !== undefined) {
     scanner.buildId = cli.buildId;
+  }
+  if (cli.tsAnalysisSet && cli.tsAnalysis !== undefined) {
+    scanner.tsAnalysis = cli.tsAnalysis;
+  }
+  if (cli.tsconfigPathSet && cli.tsconfigPath !== undefined) {
+    scanner.tsconfigPath = cli.tsconfigPath;
+  }
+  if (cli.tsFailOpenSet && cli.tsFailOpen !== undefined) {
+    scanner.tsFailOpen = cli.tsFailOpen;
   }
   if (cli.formatSet && cli.format !== undefined) format = cli.format;
   if (cli.baselineSet && cli.baseline !== undefined) baseline = cli.baseline;

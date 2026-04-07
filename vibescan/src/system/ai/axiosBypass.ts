@@ -44,8 +44,10 @@ export const axiosBypassRule: Rule = {
   nodeTypes: ["CallExpression"],
   check(context: RuleContext, node: Node) {
     if (node.type !== "CallExpression") return;
-    const name = getCalleeName(node);
-    if (name !== "axios") return;
+    const resolved = context.getResolvedCallee?.(node);
+    const name = resolved?.calleeName ?? getCalleeName(node);
+    const isAxiosCall = name === "axios" || resolved?.importSource === "axios";
+    if (!isAxiosCall) return;
     const arg0 = node.arguments[0];
     if (!arg0 || arg0.type !== "ObjectExpression") return;
     if (objectHasBaseUrlAndTaintedUrl(arg0)) {

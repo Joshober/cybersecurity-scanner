@@ -10,6 +10,16 @@ Human-readable findings use **severity, impact, location, confidence**, **remedi
 
 **Free (MIT).** No VibeScan API keys. Optional [IDE assist](#ide-assist) is a markdown file you paste into Cursor / Claude Code / similar.
 
+## This monorepo (`CyberSecurity` checkout)
+
+If you opened this file from the **CyberSecurity** repository (not only the published tarball):
+
+- **Scanner** — sources, unit tests, and shipping templates are in **`vibescan/`** (this folder).
+- **secure-arch workspaces** — `@secure-arch/core`, `cli`, `adapters` live under **`vibescan/packages/`** (npm workspaces from the repo root).
+- **Architecture policy (YAML)** for this repo — committed under **`architecture/secure-rules/`** here (from the repo root that path is **`vibescan/architecture/secure-rules/`**). See [**secure-arch**](#secure-arch) and [`architecture/README.md`](architecture/README.md).
+- **Long-form docs** — [`docs/vibescan/`](../docs/vibescan/) (CI/prove, research notes, combined references).
+- **Published package users** — same CLI defaults apply when you install from npm; `secure-arch install` lays down templates under **`vibescan/architecture/secure-rules`** in *your* project root unless you pass **`--settings`**.
+
 ## Easiest: run once without installing
 
 Uses the public npm package; `npx --yes` avoids install prompts (npm 9+):
@@ -49,7 +59,13 @@ If the app lives in a subdirectory, add `defaults.run.working-directory` or `cd 
 
 ## Optional: config file
 
-Copy **`vibescan.config.sample.json`** to **`vibescan.config.json`** at your project root (VibeScan discovers it upward from scan paths). After `npm i`, the sample also lives at **`node_modules/@jobersteadt/vibescan/vibescan.config.sample.json`**. Optional **`aiExport`** defaults for **`vibescan export-ai-rules`** (see below).
+Copy **`vibescan.config.sample.json`** to **`vibescan.config.json`** at your project root (VibeScan discovers it upward from scan paths). After `npm i`, the sample also lives at **`node_modules/@jobersteadt/vibescan/vibescan.config.sample.json`**. Optional **`aiExport`** defaults for **`vibescan export-ai-rules`** (see below), including optional **`aiExport.settings`** (relative path to the secure-arch YAML folder; default **`vibescan/architecture/secure-rules`** when unset).
+
+For TypeScript-heavy repos, the config file can also pin:
+
+- **`tsAnalysis`**: `off`, `auto`, or `semantic`
+- **`tsconfigPath`**: explicit project-relative `tsconfig`
+- **`tsFailOpen`**: whether semantic setup failures fall back to syntax-only parsing
 
 ## Install (npm) — global or transitive
 
@@ -159,6 +175,37 @@ These subcommands are served by **`vibescan`** (and `secure`):
 - **SARIF → proof** is best-effort: mapped rule ids do not populate **`proofHints`**; merge prefers **native** findings at the same file and line as an imported row.
 - The **proof harness** is **metadata plus per–rule-family generators**, not a single universal mock or snapshot runtime for every rule.
 
+### Semantic TypeScript mode
+
+VibeScan now has two TypeScript paths:
+
+- Default JS scanning still uses **Acorn** for plain **`.js`** / **`.jsx`** files.
+- **`.ts`** / **`.tsx`** files are parsed with **`@typescript-eslint/parser`** so TypeScript syntax is understood consistently.
+- When you set **`--ts-analysis auto`** or **`semantic`** (or the equivalent config keys), VibeScan also builds a **`tsconfig`-backed Program + TypeChecker** and threads semantic data into selected analyses.
+
+Practical use:
+
+```bash
+vibescan scan . --ts-analysis auto
+vibescan scan . --ts-analysis semantic --tsconfig ./tsconfig.json
+```
+
+Mode behavior:
+
+- **`off`**: syntax-only scanning; no semantic project creation.
+- **`auto`**: use semantic TS analysis when `tsconfig` setup succeeds, otherwise continue with syntax-only parsing and emit a visible warning in CLI/JSON output.
+- **`semantic`**: require `tsconfig`-backed setup by default; use **`--ts-fail-open`** only when you explicitly want fallback behavior.
+
+Current semantic upgrades focus on the highest-value cases first:
+
+- imported alias resolution for selected rules
+- typed wrapper detection in the taint engine
+- typed route extraction patterns such as handler expressions wrapped in **`satisfies`** / **`as`**
+
+### ESLint plugin note
+
+The standalone CLI has the strongest TypeScript support today because it can build and cache a project-wide **`Program`** once per scan. The ESLint plugin still runs the same rule catalog, but it does **not** yet guarantee semantic parity with the CLI across every TS project shape. If you need the most accurate TypeScript-aware results, prefer the **CLI** path first and treat ESLint integration as a lighter-weight editor surface.
+
 ### `export-ai-rules` (project-aware)
 
 ```bash
@@ -171,10 +218,26 @@ Uses vendored **`@secure-arch/adapters`**, optional **`vibescan.config.json`**, 
 
 ### secure-arch
 
+YAML **architecture / deployment facts** (database exposure, auth, secrets handling, CORS, etc.) live under a directory **relative to `--root`**. Unless you pass **`--settings`**, commands use **`vibescan/architecture/secure-rules`**.
+
+| Step | Command |
+|------|---------|
+| Install templates + schema into that directory | `vibescan secure-arch install --root .` |
+| IDE adapter stubs only (Cursor / Amazon Q) | `vibescan secure-arch init --tool cursor --root .` (or `--tool amazonq`) |
+| Validate YAML + optional code evidence | `vibescan secure-arch check --root .` + `--code-evidence off` / `js-ts` / `all` and `--format human` or `json` |
+
+Examples:
+
 ```bash
 vibescan secure-arch install --root .
+vibescan secure-arch init --tool cursor --root .
 vibescan secure-arch check --root . --code-evidence off --format human
+
+# Custom policy location (e.g. legacy layout)
+vibescan secure-arch check --root . --settings policies/security-arch --code-evidence js-ts
 ```
+
+Human-readable schema reference for editors lives next to the YAML (e.g. **`schema/settings.schema.v1.md`** under your settings directory after `install`).
 
 ### Legacy `secure` alias
 
@@ -182,7 +245,7 @@ vibescan secure-arch check --root . --code-evidence off --format human
 
 ## React, Angular, and npm-audit CVEs
 
-VibeScan flags **insecure usage in source**: for example React **`dangerouslySetInnerHTML`** / **`__html`** when the HTML is not a static literal, and Angular **`DomSanitizer`** **`bypassSecurityTrust*`** methods when the argument is not a static literal. Scans include **`.js`**, **`.ts`**, **`.jsx`**, and **`.tsx`** (JSX is parsed with Acorn plus **acorn-jsx**). Files that mix **TypeScript-only** syntax with JSX may fail to parse; patterns that appear in plain **`.ts`** without JSX (for example `React.createElement` with an options object) are still analyzed.
+VibeScan flags **insecure usage in source**: for example React **`dangerouslySetInnerHTML`** / **`__html`** when the HTML is not a static literal, and Angular **`DomSanitizer`** **`bypassSecurityTrust*`** methods when the argument is not a static literal. Scans include **`.js`**, **`.ts`**, **`.jsx`**, and **`.tsx`**. Plain JS continues to use Acorn; TypeScript files now parse through **`@typescript-eslint/parser`**, and semantic mode can add `tsconfig` / `TypeChecker` context for higher-accuracy TS projects.
 
 **Package-level CVEs** in `react`, `react-dom`, `@angular/core`, and other dependencies are out of scope for this static pass—use **`npm audit`**, your registry or Snyk/GitHub Dependabot workflow, or similar **lockfile advisory** tooling alongside VibeScan.
 
@@ -270,7 +333,7 @@ Or: `node scripts/run-generated-proofs.mjs ./vibescan-generated-tests` from a ch
 - **BOLA / IDOR:** Coverage generates route-aware tests with mocked identities, but does not yet validate real authorization behavior end to end.
 - **SSRF:** Coverage proves tainted input reaches a request sink, but does not yet demonstrate actual outbound network egress.
 - **Regression of generators:** Validation currently relies on behavioral and unit tests rather than checked-in golden generated test fixtures.
-- **Test scripts:** The default `npm test` path covers unit tests only; smoke tests exist separately (under `tests/smoke/`).
+- **Test scripts:** `npm test` now runs the package build plus both **unit** and **smoke** suites; broader benchmark workflows still live separately from the package test command.
 
 ## IDE assist
 

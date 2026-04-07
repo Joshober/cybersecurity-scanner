@@ -8,9 +8,12 @@ import type {
   AssignmentExpression,
   Node,
   Program,
+  ObjectPattern,
 } from "estree";
+import ts from "typescript";
 import { walk } from "../walker.js";
 import type { Finding, ScannerOptions, Severity, SeverityLabel } from "../types.js";
+import type { ParseResult } from "../parser/parseFile.js";
 import { getRequestSourceLabel } from "../sources/express.js";
 import {
   getSqlSinkCallee,
@@ -25,6 +28,7 @@ import {
   isDeepmergeCallee,
 } from "../sinks/index.js";
 import { looksParameterized } from "../sanitizers/sql.js";
+import { getResolvedCall, getSymbolDeclarationForCall } from "../typescript/semantic.js";
 
 const SEVERITY_ORDER: Record<Severity, number> = {
   critical: 3,
@@ -105,6 +109,7 @@ export interface TaintEngineOptions {
   source: string;
   ast: Program;
   options: ScannerOptions;
+  parseResult?: ParseResult | null;
 }
 
 type SinkKind =
@@ -117,9 +122,336 @@ type SinkKind =
   | "axiosConfig"
   | "proto";
 
+function unwrapExpression(node: Node): Node {
+  let current: { type: string; expression?: Node; argument?: Node } = node as unknown as {
+    type: string;
+    expression?: Node;
+    argument?: Node;
+  };
+  for (;;) {
+    if (
+      current.type === "TSAsExpression" ||
+      current.type === "TSSatisfiesExpression" ||
+      current.type === "TSNonNullExpression" ||
+      current.type === "ChainExpression"
+    ) {
+      if (!current.expression) return current as unknown as Node;
+      current = current.expression as unknown as {
+        type: string;
+        expression?: Node;
+        argument?: Node;
+      };
+      continue;
+    }
+    if (current.type === "AwaitExpression") {
+      if (!current.argument) return current as unknown as Node;
+      current = current.argument as unknown as {
+        type: string;
+        expression?: Node;
+        argument?: Node;
+      };
+      continue;
+    }
+    return current as unknown as Node;
+  }
+}
+
+function addDestructuredTaint(
+  pattern: ObjectPattern,
+  sourceLabel: string,
+  addTainted: (idName: string, sourceLabel: string) => void
+): void {
+  for (const prop of pattern.properties) {
+    if (prop.type !== "Property") continue;
+    const key =
+      prop.key.type === "Identifier"
+        ? prop.key.name
+        : prop.key.type === "Literal" && typeof prop.key.value === "string"
+          ? prop.key.value
+          : null;
+    if (!key) continue;
+    if (prop.value.type === "Identifier") {
+      addTainted(prop.value.name, `${sourceLabel}.${key}`);
+      continue;
+    }
+    if (prop.value.type === "AssignmentPattern" && prop.value.left.type === "Identifier") {
+      addTainted(prop.value.left.name, `${sourceLabel}.${key}`);
+    }
+  }
+}
+
+function calleeInfo(
+  node: CallExpression,
+  parseResult?: ParseResult | null
+): {
+  name: string | null;
+  obj: string;
+  method: string;
+  importSource?: string;
+} {
+  const resolved = getResolvedCall(parseResult, node);
+  const name = resolved?.calleeName ?? getCalleeName(node);
+  const parts = name?.split(".") ?? [];
+  return {
+    name,
+    obj: parts.length >= 2 ? parts[parts.length - 2] ?? "" : "",
+    method: parts.length >= 1 ? parts[parts.length - 1] ?? "" : "",
+    importSource: resolved?.importSource,
+  };
+}
+
+function classifySinkCall(
+  node: CallExpression,
+  parseResult?: ParseResult | null
+): {
+  sinkLabel: string;
+  severity: "critical" | "error" | "warning";
+  kind: SinkKind;
+  argIndex: number;
+} | null {
+  const { name, obj, method, importSource } = calleeInfo(node, parseResult);
+  if (name === "fetch") {
+    return { sinkLabel: "fetch", severity: "error", kind: "ssrf", argIndex: 0 };
+  }
+  if (isAxiosCallExpression(node) || importSource === "axios" || name === "axios") {
+    return { sinkLabel: "axios(config)", severity: "error", kind: "axiosConfig", argIndex: 0 };
+  }
+  if (name && isDeepmergeCallee(name)) {
+    return { sinkLabel: name, severity: "error", kind: "proto", argIndex: 1 };
+  }
+  if (!name || !method) return null;
+
+  const sqlSink = getSqlSinkCallee(obj, method);
+  if (sqlSink) return { sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 };
+  const cmdSink = getCommandSinkCallee(obj, method);
+  if (cmdSink) return { sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 };
+  const pathSink = getPathSinkCallee(obj, method);
+  if (pathSink) return { sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 };
+  const xpathSink = getXpathSinkCallee(obj, method);
+  if (xpathSink) return { sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 };
+  const logSink = getLogSinkCallee(obj, method);
+  if (logSink) return { sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 };
+  const ssr = getSsrSinkInfo(name, obj, method);
+  if (ssr) {
+    return {
+      sinkLabel: ssr.label,
+      severity: "error",
+      kind: "ssrf",
+      argIndex: ssr.argIndex,
+    };
+  }
+  const mergeSink = getPrototypeMergeSink(obj, method);
+  if (mergeSink) {
+    return {
+      sinkLabel: mergeSink.label,
+      severity: "error",
+      kind: "proto",
+      argIndex: mergeSink.taintedArgIndex,
+    };
+  }
+  const setSink = getLodashSetSink(obj, method);
+  if (setSink) {
+    return {
+      sinkLabel: setSink.label,
+      severity: "error",
+      kind: "proto",
+      argIndex: setSink.taintedArgIndex,
+    };
+  }
+  return null;
+}
+
+function tsExpressionUsesParam(node: ts.Node | undefined, paramNames: Set<string>): string | null {
+  if (!node) return null;
+  if (ts.isIdentifier(node) && paramNames.has(node.text)) return node.text;
+  if (ts.isPropertyAccessExpression(node)) return tsExpressionUsesParam(node.expression, paramNames);
+  if (ts.isElementAccessExpression(node)) return tsExpressionUsesParam(node.expression, paramNames);
+  if (ts.isAsExpression(node) || ts.isSatisfiesExpression(node) || ts.isNonNullExpression(node)) {
+    return tsExpressionUsesParam(node.expression, paramNames);
+  }
+  if (ts.isParenthesizedExpression(node)) return tsExpressionUsesParam(node.expression, paramNames);
+  if (ts.isAwaitExpression(node)) return tsExpressionUsesParam(node.expression, paramNames);
+  if (ts.isBinaryExpression(node)) {
+    return tsExpressionUsesParam(node.left, paramNames) ?? tsExpressionUsesParam(node.right, paramNames);
+  }
+  if (ts.isTemplateExpression(node)) {
+    for (const span of node.templateSpans) {
+      const match = tsExpressionUsesParam(span.expression, paramNames);
+      if (match) return match;
+    }
+    return null;
+  }
+  if (ts.isCallExpression(node)) {
+    const match = tsExpressionUsesParam(node.expression, paramNames);
+    if (match) return match;
+    for (const arg of node.arguments) {
+      const argMatch = tsExpressionUsesParam(arg, paramNames);
+      if (argMatch) return argMatch;
+    }
+    return null;
+  }
+  if (ts.isObjectLiteralExpression(node)) {
+    for (const prop of node.properties) {
+      if (ts.isPropertyAssignment(prop)) {
+        const match = tsExpressionUsesParam(prop.initializer, paramNames);
+        if (match) return match;
+      }
+    }
+    return null;
+  }
+  if (ts.isArrayLiteralExpression(node)) {
+    for (const element of node.elements) {
+      const match = tsExpressionUsesParam(element, paramNames);
+      if (match) return match;
+    }
+    return null;
+  }
+  return null;
+}
+
+function tsCallArgUsesParam(
+  call: ts.CallExpression,
+  sinkKind: SinkKind,
+  argIndex: number,
+  paramNames: Set<string>
+): string | null {
+  if (sinkKind === "axiosConfig") {
+    const arg0 = call.arguments[0];
+    if (!arg0 || !ts.isObjectLiteralExpression(arg0)) return null;
+    for (const prop of arg0.properties) {
+      if (!ts.isPropertyAssignment(prop)) continue;
+      const key = ts.isIdentifier(prop.name) ? prop.name.text : ts.isStringLiteral(prop.name) ? prop.name.text : null;
+      if (key !== "url") continue;
+      return tsExpressionUsesParam(prop.initializer, paramNames);
+    }
+    return null;
+  }
+  const arg = call.arguments[argIndex];
+  return tsExpressionUsesParam(arg, paramNames);
+}
+
+function classifyTsSinkCall(
+  call: ts.CallExpression,
+  checker: ts.TypeChecker
+): {
+  sinkLabel: string;
+  severity: "critical" | "error" | "warning";
+  kind: SinkKind;
+  argIndex: number;
+} | null {
+  const expression = call.expression;
+  const symbol =
+    checker.getSymbolAtLocation(expression) ??
+    checker.getSymbolAtLocation(expression.getFirstToken() ?? expression);
+  const resolvedSymbol =
+    symbol && symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
+  const importDecl = resolvedSymbol?.declarations?.[0];
+  let importSource: string | undefined;
+  if (
+    importDecl &&
+    (ts.isImportSpecifier(importDecl) || ts.isImportClause(importDecl) || ts.isNamespaceImport(importDecl))
+  ) {
+    const parent = importDecl.parent?.parent;
+    if (parent && ts.isImportDeclaration(parent) && ts.isStringLiteral(parent.moduleSpecifier)) {
+      importSource = parent.moduleSpecifier.text;
+    }
+  }
+  const name = expression.getText();
+  const parts = name.split(".");
+  const method = parts[parts.length - 1] ?? "";
+  const obj = parts.length >= 2 ? parts[parts.length - 2] ?? "" : "";
+  if (name === "fetch") return { sinkLabel: "fetch", severity: "error", kind: "ssrf", argIndex: 0 };
+  if (importSource === "axios" || name === "axios") {
+    return { sinkLabel: "axios(config)", severity: "error", kind: "axiosConfig", argIndex: 0 };
+  }
+  if (isDeepmergeCallee(name)) {
+    return { sinkLabel: name, severity: "error", kind: "proto", argIndex: 1 };
+  }
+  const sqlSink = getSqlSinkCallee(obj, method);
+  if (sqlSink) return { sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 };
+  const cmdSink = getCommandSinkCallee(obj, method);
+  if (cmdSink) return { sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 };
+  const pathSink = getPathSinkCallee(obj, method);
+  if (pathSink) return { sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 };
+  const xpathSink = getXpathSinkCallee(obj, method);
+  if (xpathSink) return { sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 };
+  const logSink = getLogSinkCallee(obj, method);
+  if (logSink) return { sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 };
+  const ssr = getSsrSinkInfo(name, obj, method);
+  if (ssr) return { sinkLabel: ssr.label, severity: "error", kind: "ssrf", argIndex: ssr.argIndex };
+  const mergeSink = getPrototypeMergeSink(obj, method);
+  if (mergeSink) {
+    return {
+      sinkLabel: mergeSink.label,
+      severity: "error",
+      kind: "proto",
+      argIndex: mergeSink.taintedArgIndex,
+    };
+  }
+  const setSink = getLodashSetSink(obj, method);
+  if (setSink) {
+    return {
+      sinkLabel: setSink.label,
+      severity: "error",
+      kind: "proto",
+      argIndex: setSink.taintedArgIndex,
+    };
+  }
+  return null;
+}
+
+function resolveWrapperSink(
+  node: CallExpression,
+  parseResult?: ParseResult | null
+): {
+  sinkLabel: string;
+  severity: "critical" | "error" | "warning";
+  kind: SinkKind;
+  argIndex: number;
+} | null {
+  const declaration = getSymbolDeclarationForCall(parseResult, node);
+  const checker = parseResult?.typeChecker ?? parseResult?.tsProgram?.getTypeChecker();
+  if (!declaration || !declaration.body || !checker) return null;
+  const params = declaration.parameters
+    .map((param, index) =>
+      ts.isIdentifier(param.name) ? { name: param.name.text, index } : null
+    )
+    .filter((param): param is { name: string; index: number } => !!param);
+  if (params.length === 0) return null;
+  const paramNames = new Set(params.map((param) => param.name));
+
+  let resolved: {
+    sinkLabel: string;
+    severity: "critical" | "error" | "warning";
+    kind: SinkKind;
+    argIndex: number;
+  } | null = null;
+
+  const visit = (tsNode: ts.Node): void => {
+    if (resolved) return;
+    if (ts.isCallExpression(tsNode)) {
+      const innerSink = classifyTsSinkCall(tsNode, checker);
+      if (innerSink) {
+        const paramName = tsCallArgUsesParam(tsNode, innerSink.kind, innerSink.argIndex, paramNames);
+        if (paramName) {
+          const param = params.find((item) => item.name === paramName);
+          if (param) {
+            resolved = { ...innerSink, argIndex: param.index };
+            return;
+          }
+        }
+      }
+    }
+    ts.forEachChild(tsNode, visit);
+  };
+
+  visit(declaration.body);
+  return resolved;
+}
+
 // Run taint analysis: find sources, propagate taint, report when tainted data reaches sinks.
 export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
-  const { source, ast, options } = opts;
+  const { source, ast, options, parseResult } = opts;
   const findings: Finding[] = [];
 
   const sourceNodes = new Map<number, string>();
@@ -147,99 +479,14 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
       return;
     }
     if (node.type === "CallExpression") {
-      const name = getCalleeName(node);
-      if (name === "fetch") {
-        sinkCalls.push({
-          node,
-          sinkLabel: "fetch",
-          severity: "error",
-          kind: "ssrf",
-          argIndex: 0,
-        });
+      const directSink = classifySinkCall(node, parseResult);
+      if (directSink) {
+        sinkCalls.push({ node, ...directSink });
         return;
       }
-      if (isAxiosCallExpression(node)) {
-        sinkCalls.push({
-          node,
-          sinkLabel: "axios(config)",
-          severity: "error",
-          kind: "axiosConfig",
-          argIndex: 0,
-        });
-        return;
-      }
-      if (name && isDeepmergeCallee(name)) {
-        sinkCalls.push({
-          node,
-          sinkLabel: name,
-          severity: "error",
-          kind: "proto",
-          argIndex: 1,
-        });
-        return;
-      }
-      if (!name) return;
-      const parts = name.split(".");
-      const method = parts[parts.length - 1];
-      const obj = parts.length >= 2 ? parts[parts.length - 2] : "";
-      if (!method) return;
-
-      const sqlSink = getSqlSinkCallee(obj, method);
-      if (sqlSink) {
-        sinkCalls.push({ node, sinkLabel: sqlSink, severity: "error", kind: "sql", argIndex: 0 });
-        return;
-      }
-      const cmdSink = getCommandSinkCallee(obj, method);
-      if (cmdSink) {
-        sinkCalls.push({ node, sinkLabel: cmdSink, severity: "critical", kind: "command", argIndex: 0 });
-        return;
-      }
-      const pathSink = getPathSinkCallee(obj, method);
-      if (pathSink) {
-        sinkCalls.push({ node, sinkLabel: pathSink, severity: "error", kind: "path", argIndex: 0 });
-        return;
-      }
-      const xpathSink = getXpathSinkCallee(obj, method);
-      if (xpathSink) {
-        sinkCalls.push({ node, sinkLabel: xpathSink, severity: "error", kind: "xpath", argIndex: 0 });
-        return;
-      }
-      const logSink = getLogSinkCallee(obj, method);
-      if (logSink) {
-        sinkCalls.push({ node, sinkLabel: logSink, severity: "warning", kind: "log", argIndex: 0 });
-        return;
-      }
-      const ssr = getSsrSinkInfo(name, obj, method);
-      if (ssr) {
-        sinkCalls.push({
-          node,
-          sinkLabel: ssr.label,
-          severity: "error",
-          kind: "ssrf",
-          argIndex: ssr.argIndex,
-        });
-        return;
-      }
-      const mergeSink = getPrototypeMergeSink(obj, method);
-      if (mergeSink) {
-        sinkCalls.push({
-          node,
-          sinkLabel: mergeSink.label,
-          severity: "error",
-          kind: "proto",
-          argIndex: mergeSink.taintedArgIndex,
-        });
-        return;
-      }
-      const setSink = getLodashSetSink(obj, method);
-      if (setSink) {
-        sinkCalls.push({
-          node,
-          sinkLabel: setSink.label,
-          severity: "error",
-          kind: "proto",
-          argIndex: setSink.taintedArgIndex,
-        });
+      const wrapperSink = resolveWrapperSink(node, parseResult);
+      if (wrapperSink) {
+        sinkCalls.push({ node, ...wrapperSink });
       }
     }
   });
@@ -247,24 +494,32 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
   const tainted = new Map<string, string>();
 
   function exprIsSourceOrTainted(expr: Node): string | null {
-    if (expr.type === "MemberExpression") {
-      const k = nodeKey(expr);
+    const current = unwrapExpression(expr);
+    if (current.type === "MemberExpression") {
+      const k = nodeKey(current);
       const label = sourceNodes.get(k);
       if (label) return label;
     }
-    if (expr.type === "Identifier") {
-      const src = tainted.get(expr.name);
+    if (current.type === "Identifier") {
+      const src = tainted.get(current.name);
       if (src) return src;
     }
-    if (expr.type === "BinaryExpression" && expr.operator === "+") {
-      const l = exprIsSourceOrTainted(expr.left);
+    if (current.type === "BinaryExpression" && current.operator === "+") {
+      const l = exprIsSourceOrTainted(current.left);
       if (l) return l;
-      return exprIsSourceOrTainted(expr.right) ?? null;
+      return exprIsSourceOrTainted(current.right) ?? null;
     }
-    if (expr.type === "TemplateLiteral" && expr.expressions.length > 0) {
-      for (const e of expr.expressions) {
+    if (current.type === "TemplateLiteral" && current.expressions.length > 0) {
+      for (const e of current.expressions) {
         const t = exprIsSourceOrTainted(e);
         if (t) return t;
+      }
+    }
+    if (current.type === "CallExpression") {
+      for (const arg of current.arguments) {
+        if (arg.type === "SpreadElement") continue;
+        const match = exprIsSourceOrTainted(arg);
+        if (match) return match;
       }
     }
     return null;
@@ -277,11 +532,14 @@ export function runTaintEngine(opts: TaintEngineOptions): Finding[] {
   assignments.sort((a, b) => a.key - b.key);
   for (const { node } of assignments) {
     if (node.type === "VariableDeclarator") {
-      const id = node.id.type === "Identifier" ? node.id.name : null;
       const init = node.init;
-      if (id && init) {
+      if (node.id.type === "Identifier" && init) {
+        const id = node.id.name;
         const src = exprIsSourceOrTainted(init);
         if (src) addTainted(id, src);
+      } else if (node.id.type === "ObjectPattern" && init) {
+        const src = exprIsSourceOrTainted(init);
+        if (src) addDestructuredTaint(node.id, src, addTainted);
       }
     } else if (node.type === "AssignmentExpression" && node.left.type === "Identifier") {
       const id = node.left.name;

@@ -15,7 +15,14 @@ import {
   readScannerPackageVersion,
   sortFindingsStable,
 } from "../format.js";
-import type { ScannerOptions, Severity, ScanMode, Finding, ProjectScanResult } from "../types.js";
+import type {
+  ScannerOptions,
+  Severity,
+  ScanMode,
+  Finding,
+  ProjectScanResult,
+  TsAnalysisMode,
+} from "../types.js";
 import { collectScanFiles } from "./collectFiles.js";
 import {
   findVibeScanConfigFile,
@@ -43,6 +50,7 @@ let configPathExplicit: string | undefined;
 let manifestPath: string | undefined;
 let adjudicationStem: string | undefined;
 let exportRoutesPath: string | undefined;
+let exportThirdPartySurfacePath: string | undefined;
 let aiAssistOutPath: string | undefined;
 
 const cliMerge = {
@@ -68,6 +76,12 @@ const cliMerge = {
   openApiDiscoverySet: false,
   buildId: undefined as string | undefined,
   buildIdSet: false,
+  tsAnalysis: undefined as TsAnalysisMode | undefined,
+  tsAnalysisSet: false,
+  tsconfigPath: undefined as string | undefined,
+  tsconfigPathSet: false,
+  tsFailOpen: undefined as boolean | undefined,
+  tsFailOpenSet: false,
 };
 
 let fixSuggestions = false;
@@ -111,6 +125,9 @@ function scanOptionsEcho(
     ignoreGlobs: scanOpts.ignoreGlobs ?? [],
     benchmarkMetadata: benchMeta,
     buildId: scanOpts.buildId,
+    tsAnalysis: scanOpts.tsAnalysis ?? "off",
+    tsconfigPath: scanOpts.tsconfigPath,
+    tsFailOpen: scanOpts.tsFailOpen,
   };
 }
 
@@ -130,6 +147,8 @@ for (let i = 0; i < args.length; i++) {
     manifestPath = resolve(args[++i]);
   } else if (a === "--export-routes" && args[i + 1]) {
     exportRoutesPath = resolve(args[++i]);
+  } else if (a === "--export-third-party-surface" && args[i + 1]) {
+    exportThirdPartySurfacePath = resolve(args[++i]);
   } else if (a === "--export-adjudication" && args[i + 1]) {
     adjudicationStem = args[++i];
   } else if (a === "--mode" && args[i + 1]) {
@@ -201,6 +220,21 @@ for (let i = 0; i < args.length; i++) {
   } else if (a === "--build-id" && args[i + 1]) {
     cliMerge.buildId = args[++i];
     cliMerge.buildIdSet = true;
+  } else if (a === "--ts-analysis" && args[i + 1]) {
+    const mode = args[++i].toLowerCase();
+    if (mode === "off" || mode === "auto" || mode === "semantic") {
+      cliMerge.tsAnalysis = mode as TsAnalysisMode;
+      cliMerge.tsAnalysisSet = true;
+    }
+  } else if (a === "--tsconfig" && args[i + 1]) {
+    cliMerge.tsconfigPath = args[++i];
+    cliMerge.tsconfigPathSet = true;
+  } else if (a === "--ts-fail-open") {
+    cliMerge.tsFailOpen = true;
+    cliMerge.tsFailOpenSet = true;
+  } else if (a === "--no-ts-fail-open") {
+    cliMerge.tsFailOpen = false;
+    cliMerge.tsFailOpenSet = true;
   } else if (a === "--baseline" && args[i + 1]) {
     baselineCliPath = resolve(args[++i]);
     baselineCliSet = true;
@@ -243,6 +277,7 @@ Options:
   --manifest <path>      Write benchmark run manifest JSON
   --export-adjudication <stem>  Write <stem>.json and <stem>.csv (one row per finding)
   --export-routes <path>     Write route inventory JSON (static scan only; merged Express routes)
+  --export-third-party-surface <path>  Write third-party dependency surface JSON sidecar
   --mode static|ai           ai = same rules + write IDE paste-in prompt (no API keys)
   --ai-assist-out <path>     With --mode ai, markdown path (default: <project>/vibescan-ai-assist.md)
   --rules crypto,injection
@@ -262,6 +297,10 @@ Options:
   --openapi-spec <file>   OpenAPI/Swagger file (repeatable; disables discovery)
   --no-openapi-discovery  Do not auto-find openapi.* / swagger.* under project root
   --build-id <id>         Deployment/build label (JSON output + manifest)
+  --ts-analysis off|auto|semantic  TypeScript semantic analysis mode
+  --tsconfig <file>       Explicit tsconfig path for semantic TypeScript analysis
+  --ts-fail-open          Fall back to syntax-only TS parsing when semantic setup fails
+  --no-ts-fail-open       Treat semantic setup failures as fatal
   --baseline <file>       Ignore baseline entries for CI exit (see --write-baseline)
   --write-baseline <file> Write current findings to baseline JSON and exit 0
   --baseline-include-known With --baseline, print deferred findings too (verbose)
@@ -324,6 +363,12 @@ const merged = mergeVibeScanConfig(
     openApiDiscoverySet: cliMerge.openApiDiscoverySet,
     buildId: cliMerge.buildId,
     buildIdSet: cliMerge.buildIdSet,
+    tsAnalysis: cliMerge.tsAnalysis,
+    tsAnalysisSet: cliMerge.tsAnalysisSet,
+    tsconfigPath: cliMerge.tsconfigPath,
+    tsconfigPathSet: cliMerge.tsconfigPathSet,
+    tsFailOpen: cliMerge.tsFailOpen,
+    tsFailOpenSet: cliMerge.tsFailOpenSet,
     baseline: baselineCliPath,
     baselineSet: baselineCliSet,
   },
@@ -376,6 +421,14 @@ function logScan(msg: string): void {
 function withFilteredFindings(project: ProjectScanResult): ProjectScanResult {
   const findings = applySuppressions(project.findings, suppressions);
   return { ...project, findings };
+}
+
+function emitWarnings(project: ProjectScanResult): void {
+  for (const warning of project.warnings ?? []) {
+    const line = `Warning [${warning.code}]: ${warning.message}`;
+    if (structuredStdout) console.error(line);
+    else console.log(line);
+  }
 }
 
 function emitHtmlReport(projectOut: ProjectScanResult): void {
@@ -441,6 +494,7 @@ async function main(): Promise<void> {
   options = { ...options, projectRoot };
   const rawProject = await scanProjectAsync(entries, options, projectRoot);
   const project = withFilteredFindings(rawProject);
+  emitWarnings(project);
 
   if (writeBaselineSet && writeBaselinePath) {
     const entriesOut = findingsToBaselineEntries(projectRoot, project.findings);
@@ -517,6 +571,15 @@ async function main(): Promise<void> {
       "utf-8"
     );
     if (structuredStdout) console.error(`Wrote route export: ${exportRoutesPath}`);
+  }
+
+  if (exportThirdPartySurfacePath) {
+    writeFileSync(
+      exportThirdPartySurfacePath,
+      JSON.stringify(project.thirdPartySurface ?? null, null, 2),
+      "utf-8"
+    );
+    if (structuredStdout) console.error(`Wrote third-party surface export: ${exportThirdPartySurfacePath}`);
   }
 
   const projectOut = { ...project, findings: displayFindings };

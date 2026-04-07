@@ -11,6 +11,9 @@
     "checkRegistry": false,
     "skipRegistry": false
   },
+  "tsAnalysis": "auto",
+  "tsconfigPath": "tsconfig.json",
+  "tsFailOpen": true,
   "baseline": ".vibescan/baseline.json",
   "suppressions": [
     {

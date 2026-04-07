@@ -4,9 +4,15 @@ on:
   push:
     paths:
       - "vibescan/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/vibescan.yml"
   pull_request:
     paths:
       - "vibescan/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/vibescan.yml"
 
 jobs:
   vibescan:
@@ -21,6 +27,7 @@ jobs:
 
       - run: npm ci
       - run: npm test -w @jobersteadt/vibescan
+      - run: npm run test:arch
 
       - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format json > ./vibescan-fixture.out.json
       - run: node ./vibescan/dist/system/cli/index.js scan ./vibescan/tests/fixtures/crypto-safe --format sarif > ./vibescan-fixture.out.sarif

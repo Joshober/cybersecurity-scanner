@@ -23,6 +23,19 @@ function utcStamp() {
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}_${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`;
 }
 
+function parseArgs(argv) {
+  const out = { outDir: null, extraScanArgs: [] };
+  for (let i = 2; i < argv.length; i += 1) {
+    const a = argv[i];
+    if (a === "--out-dir" && argv[i + 1]) {
+      out.outDir = resolve(repoRoot, argv[++i]);
+      continue;
+    }
+    out.extraScanArgs.push(a);
+  }
+  return out;
+}
+
 function main() {
   if (!existsSync(seedRoot)) {
     console.error(`Missing seed corpus: ${seedRoot}`);
@@ -34,7 +47,8 @@ function main() {
   }
 
   const catalog = JSON.parse(readFileSync(catalogPath, "utf-8"));
-  const outDir = join(repoRoot, "benchmarks", "results", `${utcStamp()}_framework_vulns_vibescan`);
+  const { outDir: outDirArg, extraScanArgs } = parseArgs(process.argv);
+  const outDir = outDirArg ?? join(repoRoot, "benchmarks", "results", `${utcStamp()}_framework_vulns_vibescan`);
   mkdirSync(outDir, { recursive: true });
   const manifestPath = join(outDir, "manifest.json");
   const jsonPath = join(outDir, "vibescan-project.json");
@@ -65,6 +79,7 @@ function main() {
     "--exclude-vendor",
     "--manifest",
     manifestPath,
+    ...extraScanArgs,
   ];
 
   const r = spawnSync(process.execPath, args, {

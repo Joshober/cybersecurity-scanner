@@ -12,7 +12,7 @@ export interface ImportedFindingRow {
   message: string;
   severity: string;
   severityLabel: string;
-  category: "injection" | "crypto" | "api_inventory";
+  category: Category;
   line: number;
   column: number;
   filePath?: string;

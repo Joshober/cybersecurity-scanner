@@ -31,6 +31,19 @@ function utcStamp() {
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}_${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`;
 }
 
+function parseArgs(argv) {
+  const out = { outDir: null, userArgs: [] };
+  for (let i = 2; i < argv.length; i += 1) {
+    const a = argv[i];
+    if (a === "--out-dir" && argv[i + 1]) {
+      out.outDir = resolve(repoRoot, argv[++i]);
+      continue;
+    }
+    out.userArgs.push(a);
+  }
+  return out;
+}
+
 function main() {
   if (!existsSync(dvnaRoot)) {
     console.error(`Missing DVNA checkout: ${dvnaRoot}\nSee benchmarks/dvna/README.md`);
@@ -40,7 +53,7 @@ function main() {
     console.error(`Missing ${vibescanCli} — run: cd vibescan && npm run build`);
     process.exit(1);
   }
-  const rawArgv = process.argv.slice(2);
+  const { outDir: outDirArg, userArgs: rawArgv } = parseArgs(process.argv);
   const noGenerateTests = rawArgv.includes("--no-generate-tests");
   const userArgs = rawArgv.filter((a) => a !== "--no-generate-tests");
   const userRequestedGen = userArgs.includes("--generate-tests");
@@ -48,7 +61,7 @@ function main() {
   mkdirSync(proofOutDir, { recursive: true });
   const generateTestsArgs =
     noGenerateTests || userRequestedGen ? [] : ["--generate-tests", proofOutDir];
-  const outDir = join(repoRoot, "benchmarks", "results", `${utcStamp()}_dvna_vibescan_cli`);
+  const outDir = outDirArg ?? join(repoRoot, "benchmarks", "results", `${utcStamp()}_dvna_vibescan_cli`);
   mkdirSync(outDir, { recursive: true });
   const manifestPath = join(outDir, "manifest.json");
   const jsonPath = join(outDir, "vibescan-project.json");

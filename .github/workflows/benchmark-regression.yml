@@ -1,0 +1,80 @@
+name: Benchmark Regression
+
+on:
+  push:
+    paths:
+      - "vibescan/**"
+      - "benchmarks/**"
+      - "results/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/benchmark-regression.yml"
+  pull_request:
+    paths:
+      - "vibescan/**"
+      - "benchmarks/**"
+      - "results/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/benchmark-regression.yml"
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  fast-benchmarks:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci
+      - run: npm run benchmark:validate
+      - run: node benchmarks/scripts/run-framework-vuln-scan.mjs --out-dir benchmarks/results/ci_framework_vulns_vibescan
+      - run: test -s benchmarks/results/ci_framework_vulns_vibescan/vibescan-project.json
+      - run: test -s benchmarks/results/ci_framework_vulns_vibescan/manifest.json
+      - run: git diff --exit-code -- results/charts
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: framework-benchmark-run
+          path: benchmarks/results/ci_framework_vulns_vibescan
+
+  dvna-heavy:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      DVNA_COMMIT: "9ba473add536f66ac9007966acb2a775dd31277a"
+      DVNA_RUN_DIR: "benchmarks/results/ci_dvna_vibescan_cli"
+      DVNA_PROOF_DIR: "benchmarks/results/ci_dvna_vibescan_proofs"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+      - run: mkdir -p benchmarks/dvna
+      - run: git clone https://github.com/appsecco/dvna.git benchmarks/dvna/dvna
+      - run: git -C benchmarks/dvna/dvna fetch --depth 1 origin "$DVNA_COMMIT"
+      - run: git -C benchmarks/dvna/dvna checkout "$DVNA_COMMIT"
+      - run: node benchmarks/scripts/run-dvna-vibescan-scan.mjs --out-dir "$DVNA_RUN_DIR" --generate-tests "$DVNA_PROOF_DIR"
+      - run: test -s "$DVNA_RUN_DIR/vibescan-project.json"
+      - run: node vibescan/scripts/run-generated-proofs.mjs "$DVNA_PROOF_DIR"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dvna-vibescan-run
+          path: |
+            benchmarks/results/ci_dvna_vibescan_cli
+            benchmarks/results/ci_dvna_vibescan_proofs

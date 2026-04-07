@@ -5,7 +5,7 @@ export type Severity = "critical" | "error" | "warning" | "info";
 export type SeverityLabel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 // Category of security issue.
-export type Category = "crypto" | "injection" | "api_inventory";
+export type Category = "crypto" | "injection" | "api_inventory" | "third_party";
 
 /** OWASP Top 10 style id, e.g. A03:2021 */
 export type OwaspId = string;
@@ -162,6 +162,16 @@ export interface ProofHarnessMeta {
 /** `static` = rule-based scan only. `ai` = same scan + writes an IDE paste-in prompt (Cursor / Claude Code); no remote API. */
 export type ScanMode = "static" | "ai";
 
+/** TypeScript analysis mode for project-aware semantic scanning. */
+export type TsAnalysisMode = "off" | "auto" | "semantic";
+
+/** Visible non-fatal scan/runtime warning surfaced in CLI and JSON output. */
+export interface ScanWarning {
+  code: string;
+  message: string;
+  filePath?: string;
+}
+
 // Options for the scanner.
 export interface ScannerOptions {
   filePath?: string;
@@ -187,6 +197,12 @@ export interface ScannerOptions {
   openApiDiscovery?: boolean;
   /** Optional build/deploy id for run metadata (JSON output / manifests). */
   buildId?: string;
+  /** `off` = current behavior, `auto` = semantic when tsconfig is available, `semantic` = require TS project setup. */
+  tsAnalysis?: TsAnalysisMode;
+  /** Optional explicit tsconfig path (project-relative or absolute in CLI/config). */
+  tsconfigPath?: string;
+  /** When true, continue with syntax-only TS parsing if semantic project creation fails. */
+  tsFailOpen?: boolean;
 }
 
 // Result of scanning a file.
@@ -195,6 +211,7 @@ export interface ScanResult {
   findings: Finding[];
   source?: string;
   routes?: RouteNode[];
+  warnings?: ScanWarning[];
 }
 
 /** Enriched route row for trust-boundary / inventory reporting. */
@@ -213,6 +230,93 @@ export interface RouteInventoryEntry {
   hasAuthMiddleware: boolean;
 }
 
+export type DependencyKind =
+  | "dependency"
+  | "devDependency"
+  | "peerDependency"
+  | "optionalDependency"
+  | "unknown";
+
+export type ThirdPartyImportKind =
+  | "default"
+  | "named"
+  | "namespace"
+  | "require"
+  | "destructured-require"
+  | "side-effect"
+  | "re-export"
+  | "dynamic-import";
+
+export interface ThirdPartyImportSpecifier {
+  kind: ThirdPartyImportKind;
+  localName?: string;
+  importedName?: string;
+}
+
+export interface ThirdPartyImportEdge {
+  filePath: string;
+  packageName: string;
+  moduleSpecifier: string;
+  line: number;
+  dependencyKind: DependencyKind;
+  specifiers: ThirdPartyImportSpecifier[];
+  importedBindings: string[];
+  usageCount: number;
+  callCount: number;
+}
+
+export interface ThirdPartyRouteTouchpoint {
+  packageName: string;
+  filePath: string;
+  method: RouteNode["method"];
+  path: string;
+  fullPath: string;
+  line: number;
+  tags: string[];
+  importedBindings: string[];
+}
+
+export interface ThirdPartyFindingTouchpoint {
+  packageName: string;
+  filePath: string;
+  ruleId: string;
+  severity: Severity;
+  line: number;
+  sourceLabel?: string;
+  sinkLabel?: string;
+  importedBindings: string[];
+}
+
+export interface ThirdPartyPackageSurface {
+  packageName: string;
+  dependencyKinds: DependencyKind[];
+  files: string[];
+  importedBindings: string[];
+  importEdges: ThirdPartyImportEdge[];
+  routeTouchpoints: ThirdPartyRouteTouchpoint[];
+  findingTouchpoints: ThirdPartyFindingTouchpoint[];
+  riskLabels: string[];
+  highestSeverity: Severity;
+}
+
+export interface ThirdPartySurfaceSummary {
+  packageCount: number;
+  importEdgeCount: number;
+  routeTouchpointCount: number;
+  sensitiveRouteTouchpointCount: number;
+  findingTouchpointCount: number;
+  taintedFlowTouchpointCount: number;
+  reviewFindingCount: number;
+}
+
+export interface ThirdPartySurfaceReport {
+  packageJsonPath?: string;
+  summary: ThirdPartySurfaceSummary;
+  imports: ThirdPartyImportEdge[];
+  packages: ThirdPartyPackageSurface[];
+  reviewFindings: Finding[];
+}
+
 /** Aggregated workspace scan (CLI / scanProject). */
 export interface ProjectScanResult {
   fileResults: ScanResult[];
@@ -223,6 +327,10 @@ export interface ProjectScanResult {
   openApiSpecsUsed?: string[];
   /** Labeled route inventory when project scan runs. */
   routeInventory?: RouteInventoryEntry[];
+  /** Deterministic third-party package inventory and touchpoints. */
+  thirdPartySurface?: ThirdPartySurfaceReport;
   /** Echo of optional ScannerOptions.buildId. */
   buildId?: string;
+  /** Visible scan warnings, including TypeScript semantic fallback notices. */
+  warnings?: ScanWarning[];
 }

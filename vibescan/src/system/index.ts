@@ -8,6 +8,9 @@ export {
   cryptoRules,
   injectionRules,
 } from "./scanner.js";
+export { analyzeThirdPartySurface } from "./depsurface/analyzer.js";
+export { parseFile } from "./parser/parseFile.js";
+export { createTsProjectContext, isTypeScriptFile } from "./parser/tsProject.js";
 export { plugin as eslintPluginSecureCodeScanner } from "./eslint-plugin.js";
 export {
   formatHuman,
@@ -58,15 +61,27 @@ export type {
   SeverityLabel,
   Category,
   ScanMode,
+  TsAnalysisMode,
+  ScanWarning,
   ProjectScanResult,
   RouteNode,
   RouteInventoryEntry,
+  DependencyKind,
+  ThirdPartyImportKind,
+  ThirdPartyImportSpecifier,
+  ThirdPartyImportEdge,
+  ThirdPartyRouteTouchpoint,
+  ThirdPartyFindingTouchpoint,
+  ThirdPartyPackageSurface,
+  ThirdPartySurfaceSummary,
+  ThirdPartySurfaceReport,
   ProofGeneration,
   ProofHints,
   ProofTierLabel,
   ProofFailureCode,
 } from "./types.js";
 export type { ProofHarnessMeta } from "./types.js";
+export type { ParseResult, ParserKind } from "./parser/parseFile.js";
 export { emitProofTests } from "./proof/pipeline.js";
 export type { EmitProofTestsOptions } from "./proof/pipeline.js";
 export { runProofHarness } from "./proof/runner.js";

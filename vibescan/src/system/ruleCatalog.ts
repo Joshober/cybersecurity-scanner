@@ -119,6 +119,35 @@ jwt.sign(payload, process.env.JWT_SECRET, { algorithm: "HS256" });
     defaultConfidence: 0.86,
     referenceUrls: ["https://cwe.mitre.org/data/definitions/1204.html", DOC_BASE],
   }),
+  "third_party.route.sensitive-touchpoint": doc({
+    title: "Sensitive route crosses an external package boundary",
+    pattern: "A route with auth/upload/webhook/admin characteristics calls into a third-party dependency.",
+    risk: "Important request handling now depends on code outside the repo, which increases review and incident-response scope.",
+    falsePositives:
+      "Thin wrappers around well-understood SDKs may be acceptable; keep the row as an inventory signal rather than a confirmed vulnerability.",
+    remediation:
+      "Validate inputs before the dependency boundary, isolate the package behind a local adapter, and review ownership/versioning separately.",
+    secureExample: `async function fetchUserProfile(client, userId) {
+  assertValidUserId(userId);
+  return client.getUser(userId);
+}`,
+    defaultConfidence: 0.64,
+    referenceUrls: ["https://cwe.mitre.org/data/definitions/829.html", DOC_BASE],
+  }),
+  "third_party.flow.tainted-package-touchpoint": doc({
+    title: "Security-relevant flow touches an external package",
+    pattern: "A finding with request-derived or sink-related context also references a third-party package API.",
+    risk: "The risky code path depends partly on external package behavior or contract details that are not visible in the repo.",
+    falsePositives:
+      "The package may be incidental on the same line or wrapper. Treat as a review assist row, not exploit proof.",
+    remediation:
+      "Constrain data before calling the package, keep a narrow wrapper around the dependency, and review upstream docs/changelog for that API.",
+    secureExample: `const safeId = validateId(req.query.id);
+await externalClient.lookupUser(safeId);
+`,
+    defaultConfidence: 0.6,
+    referenceUrls: ["https://cwe.mitre.org/data/definitions/829.html", DOC_BASE],
+  }),
   "crypto.random.insecure": doc({
     title: "Insecure randomness",
     pattern: "Math.random or other non-crypto RNG used for secrets, tokens, or session IDs.",
