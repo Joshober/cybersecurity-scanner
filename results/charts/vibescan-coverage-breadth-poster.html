@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan Coverage Breadth</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.45rem; margin: 0 0 10px; }
+    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
+    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
+    .grid { display: grid; gap: 18px; margin-top: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .muted { color: #64748b; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
+    .bar-label { font-size: 0.88rem; color: #0f172a; }
+    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
+    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+    .family-table th { background: #f1f5f9; }
+    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
+    .accent-green { color: #047857; }
+    .accent-blue { color: #1d4ed8; }
+    .accent-amber { color: #b45309; }
+    .accent-red { color: #b91c1c; }
+    
+  </style>
+</head>
+<body>
+<h1>Coverage breadth and rule-family mapping</h1>
+<p class="scope">This poster panel explains how supported rule families map to benchmarked evidence rows. It helps distinguish scanner breadth from the smaller legacy DVNA slice.</p>
+<div class="grid two">
+  <section class="card">
+    <h2>Coverage by family</h2>
+    <table class="family-table">
+      <thead>
+        <tr><th>Family</th><th>Rule IDs</th><th>Base cases</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+  <td>injection-core</td>
+  <td>10</td>
+  <td>9</td>
+  <td>covered</td>
+</tr>
+<tr>
+  <td>xss-client-and-framework</td>
+  <td>3</td>
+  <td>5</td>
+  <td>covered</td>
+</tr>
+<tr>
+  <td>ssrf-and-external-http</td>
+  <td>2</td>
+  <td>2</td>
+  <td>covered</td>
+</tr>
+<tr>
+  <td>crypto-and-secrets</td>
+  <td>9</td>
+  <td>9</td>
+  <td>covered</td>
+</tr>
+<tr>
+  <td>middleware-cookie</td>
+  <td>1</td>
+  <td>1</td>
+  <td>covered</td>
+</tr>
+<tr>
+  <td>research-new-classes</td>
+  <td>2</td>
+  <td>2</td>
+  <td>covered</td>
+</tr>
+      </tbody>
+    </table>
+    <p class="legend">High-volume rows add 80 supplemental stress cases on top of these base family mappings.</p>
+  </section>
+  <section class="card">
+    <h2>Corpus composition</h2>
+    <svg viewBox="0 0 920 260" width="100%" role="img" aria-label="Benchmark row composition">
+<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Benchmark row composition</text>
+<rect x="40" y="90" width="77.64705882352942" height="44" fill="#1d4ed8"></rect>
+<text x="78.82352941176471" y="120" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">DVNA (11)</text>
+<rect x="117.64705882352942" y="90" width="197.64705882352942" height="44" fill="#16a34a"></rect>
+<text x="216.47058823529414" y="120" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">Base expanded (28)</text>
+<rect x="315.29411764705884" y="90" width="564.7058823529412" height="44" fill="#b45309"></rect>
+<text x="597.6470588235295" y="120" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">High-volume (80)</text>
+<text x="460" y="244" font-size="12" text-anchor="middle" fill="#334155">Total benchmark rows: 119</text>
+</svg>
+    <p class="legend">Combined benchmark breadth is now 119 scored rows, which is substantially larger than DVNA alone and better reflects scanner scope.</p>
+  </section>
+</div>
+</body>
+</html>

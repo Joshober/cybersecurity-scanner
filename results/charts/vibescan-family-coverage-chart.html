@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan Family Coverage Chart</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.45rem; margin: 0 0 10px; }
+    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
+    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
+    .grid { display: grid; gap: 18px; margin-top: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .muted { color: #64748b; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
+    .bar-label { font-size: 0.88rem; color: #0f172a; }
+    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
+    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+    .family-table th { background: #f1f5f9; }
+    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
+    .accent-green { color: #047857; }
+    .accent-blue { color: #1d4ed8; }
+    .accent-amber { color: #b45309; }
+    .accent-red { color: #b91c1c; }
+    
+  </style>
+</head>
+<body>
+<h1>Rule-family coverage chart</h1>
+<p class="scope">This bar chart shows how benchmarked base cases are distributed across mapped VibeScan rule families.</p>
+<div class="card">
+  <svg viewBox="0 0 920 420" width="100%" role="img" aria-label="Base benchmark cases by family">
+<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Base benchmark cases by family</text>
+
+<line x1="170" y1="42" x2="170" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
+<text x="170" y="408" font-size="11" text-anchor="middle" fill="#475569">0%</text>
+
+
+<line x1="327.5" y1="42" x2="327.5" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
+<text x="327.5" y="408" font-size="11" text-anchor="middle" fill="#475569">25%</text>
+
+
+<line x1="485" y1="42" x2="485" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
+<text x="485" y="408" font-size="11" text-anchor="middle" fill="#475569">50%</text>
+
+
+<line x1="642.5" y1="42" x2="642.5" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
+<text x="642.5" y="408" font-size="11" text-anchor="middle" fill="#475569">75%</text>
+
+
+<line x1="800" y1="42" x2="800" y2="380" stroke="#cbd5e1" stroke-dasharray="3 3"></line>
+<text x="800" y="408" font-size="11" text-anchor="middle" fill="#475569">100%</text>
+
+
+<text x="158" y="70" font-size="13" text-anchor="end" fill="#0f172a">injection-core</text>
+<rect x="170" y="56" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="56" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="72" font-size="12" fill="#0f172a">9/9 (100.0%)</text>
+
+
+<text x="158" y="112" font-size="13" text-anchor="end" fill="#0f172a">xss-client-and-framework</text>
+<rect x="170" y="98" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="98" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="114" font-size="12" fill="#0f172a">5/5 (100.0%)</text>
+
+
+<text x="158" y="154" font-size="13" text-anchor="end" fill="#0f172a">ssrf-and-external-http</text>
+<rect x="170" y="140" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="140" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="156" font-size="12" fill="#0f172a">2/2 (100.0%)</text>
+
+
+<text x="158" y="196" font-size="13" text-anchor="end" fill="#0f172a">crypto-and-secrets</text>
+<rect x="170" y="182" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="182" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="198" font-size="12" fill="#0f172a">9/9 (100.0%)</text>
+
+
+<text x="158" y="238" font-size="13" text-anchor="end" fill="#0f172a">middleware-cookie</text>
+<rect x="170" y="224" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="224" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="240" font-size="12" fill="#0f172a">1/1 (100.0%)</text>
+
+
+<text x="158" y="280" font-size="13" text-anchor="end" fill="#0f172a">research-new-classes</text>
+<rect x="170" y="266" width="630" height="22" rx="11" fill="#e2e8f0"></rect>
+<rect x="170" y="266" width="630" height="22" rx="11" fill="#64748b"></rect>
+<text x="810" y="282" font-size="12" fill="#0f172a">2/2 (100.0%)</text>
+
+</svg>
+  <p class="legend">Each family shown here has base benchmark coverage. High-volume stress rows are additional rows layered on top of these mapped families.</p>
+</div>
+</body>
+</html>

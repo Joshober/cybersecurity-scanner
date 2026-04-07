@@ -143,6 +143,45 @@
       grid-column: 1 / -1;
     }
 
+    .subtle {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .figure-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f9fbff;
+      padding: 10px;
+    }
+
+    .figure-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--blue-dark);
+    }
+
+    .figure-caption {
+      margin-top: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .figure-card iframe {
+      width: 100%;
+      height: 280px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+    }
+
     .footer {
       border-top: 1px solid var(--border);
       padding: 12px 18px 18px;
@@ -170,8 +209,8 @@
 <body>
   <main class="poster">
     <header class="header">
-      <h1>VibeScan: Security Evaluation of AI-Generated Node.js Applications</h1>
-      <p>An Academic Poster on Experiment Design, Artifact Creation, and Motivation</p>
+      <h1>VibeScan: A Benchmark-Driven Static Security Scanner for AI-Generated JavaScript Applications</h1>
+      <p>A Data Science Poster on Experimental Design, Corpus Expansion, and Recall-Oriented Evaluation</p>
       <div class="meta">Cybersecurity Scanner Research Team · 2026</div>
     </header>
 
@@ -180,61 +219,78 @@
         <h2 class="section-title">Abstract</h2>
         <div class="section-body">
           <p>
-            AI-assisted development accelerates delivery but can introduce insecure defaults and exploitable logic.
-            We conducted a structured evaluation of VibeScan, a static-analysis security scanner for generated Node.js code.
+            AI-assisted software development accelerates delivery but often introduces insecure defaults, missing guardrails,
+            and hidden data-flow risks. We study <strong>VibeScan</strong>, a static-analysis security scanner for JavaScript and
+            TypeScript applications with a benchmark-driven evaluation workflow.
           </p>
           <p>
-            Our experiment measures detection behavior on intentionally vulnerable benchmark applications and compares
-            VibeScan's findings to baseline tools.
+            Our experiment combines a pinned DVNA benchmark with an expanded all-check corpus designed to exercise every
+            active VibeScan rule family plus new research classes. We report recall-oriented outcomes, corpus breadth,
+            and proof/actionability context rather than raw issue volume alone.
           </p>
         </div>
       </article>
 
       <article class="section">
-        <h2 class="section-title">Why We Created It</h2>
+        <h2 class="section-title">Research Questions</h2>
         <div class="section-body">
           <ul>
-            <li>Prompt-based coding often omits threat modeling and secure-by-default design.</li>
-            <li>Generated applications repeatedly show weak secrets, missing auth checks, and injection paths.</li>
-            <li>Existing checks are fragmented, requiring multiple tools and manual interpretation.</li>
-            <li>We needed a reproducible, developer-friendly scanner focused on LLM-generated backend code.</li>
+            <li>Can a lightweight static-analysis scanner achieve high recall on vulnerable JavaScript applications generated or modified with AI assistance?</li>
+            <li>How much benchmark coverage is missed when evaluation relies only on legacy corpora such as DVNA?</li>
+            <li>Can we pair high recall with reproducible artifacts, proof-aware output, and CI regression gates?</li>
+            <li>How should scanner results be communicated so benchmark recall is not confused with raw issue count?</li>
           </ul>
         </div>
       </article>
 
       <article class="section">
-        <h2 class="section-title">What We Created</h2>
+        <h2 class="section-title">Hypothesis</h2>
+        <div class="section-body">
+          <p>
+            We hypothesize that a benchmark-driven scanner tuned for JavaScript and TypeScript application structure can
+            outperform generic baseline tools on <strong>scored benchmark recall</strong>, while also surfacing broader coverage when the
+            benchmark corpus is expanded to match the scanner's actual rule surface.
+          </p>
+          <p class="subtle">
+            Secondary hypothesis: proof-aware outputs and CI recall gates make high-recall behavior easier to reproduce and defend in research reporting.
+          </p>
+        </div>
+      </article>
+
+      <article class="section">
+        <h2 class="section-title">System Contributions</h2>
         <div class="section-body">
           <p><strong>VibeScan</strong> is a modular static-analysis package that:</p>
           <ul>
-            <li>Builds AST-based route and flow awareness for Express/Node projects.</li>
-            <li>Detects injection, auth, secret, and unsafe dependency patterns.</li>
-            <li>Produces actionable findings and machine-readable output for CI pipelines.</li>
-            <li>Supports benchmark-driven validation and comparative reporting.</li>
+            <li>Parses JS, JSX, TS, and TSX with semantic TypeScript support when enabled.</li>
+            <li>Combines rule-based detection, taint tracking, route extraction, and third-party trust-boundary analysis.</li>
+            <li>Exports JSON, SARIF, HTML, proof-oriented metadata, and benchmark artifacts.</li>
+            <li>Includes research extensions such as SSTI detection, IDOR-style direct object reference detection, and recall-first benchmark automation.</li>
           </ul>
         </div>
       </article>
 
       <article class="section">
-        <h2 class="section-title">Experiment Design</h2>
+        <h2 class="section-title">Experimental Design</h2>
         <div class="section-body">
           <div class="flow">
-            <div class="step"><strong>Step 1 — Corpus Selection</strong>Use benchmark applications with known vulnerable patterns.</div>
-            <div class="step"><strong>Step 2 — Ground Truth Setup</strong>Map expected vulnerability classes and adjudicate findings.</div>
-            <div class="step"><strong>Step 3 — Tool Execution</strong>Run VibeScan and baseline scanners under consistent conditions.</div>
-            <div class="step"><strong>Step 4 — Analysis</strong>Compare true positives, coverage breadth, and evidence quality.</div>
+            <div class="step"><strong>Step 1 — Benchmark selection</strong>Pinned DVNA plus an expanded scanner-specific corpus with framework, crypto, SSRF, middleware, and research-class cases.</div>
+            <div class="step"><strong>Step 2 — Ground truth encoding</strong>Use line-anchored case catalogs with expected rule identifiers for deterministic scoring.</div>
+            <div class="step"><strong>Step 3 — Scanner execution</strong>Run VibeScan in reproducible CI-friendly modes with optional proof metadata generation.</div>
+            <div class="step"><strong>Step 4 — Comparative analysis</strong>Compare benchmark recall against peer tools on DVNA and measure VibeScan breadth on the expanded corpus.</div>
           </div>
         </div>
       </article>
 
       <article class="section">
-        <h2 class="section-title">Methods</h2>
+        <h2 class="section-title">Datasets and Methods</h2>
         <div class="section-body">
           <ul>
-            <li><strong>Static analysis pipeline:</strong> parser + rule engine + sink/source reasoning.</li>
-            <li><strong>Evaluation lens:</strong> class-level detection on first-party application code.</li>
-            <li><strong>Output:</strong> human-readable reports and structured artifacts for reproducibility.</li>
-            <li><strong>Quality control:</strong> manual adjudication to reduce false-positive inflation.</li>
+            <li><strong>Dataset A:</strong> DVNA benchmark with 11 adjudicated first-party vulnerability rows.</li>
+            <li><strong>Dataset B:</strong> Expanded VibeScan corpus with 108 all-check rows, including 80 high-volume stress cases.</li>
+            <li><strong>Combined scope:</strong> 119 scored rows across DVNA and expanded all-check coverage.</li>
+            <li><strong>Metric focus:</strong> benchmark recall on anchored rows; raw issue count tracked separately to avoid misleading comparisons.</li>
+            <li><strong>Quality control:</strong> deterministic case anchors, expected-rule matching, and CI regression gates.</li>
           </ul>
         </div>
       </article>
@@ -244,44 +300,152 @@
         <div class="section-body">
           <div class="results-grid">
             <div class="metric">
-              <div class="value">8</div>
-              <div class="label">First-party true positives identified by VibeScan (DVNA evaluation)</div>
+              <div class="value">11 / 11</div>
+              <div class="label">DVNA recall for VibeScan (100.0%)</div>
             </div>
             <div class="metric">
-              <div class="value">1</div>
-              <div class="label">First-party true positives identified by baseline eslint-plugin-security</div>
+              <div class="value">108 / 108</div>
+              <div class="label">Expanded all-check corpus recall (100.0%)</div>
             </div>
             <div class="metric">
-              <div class="value">4</div>
-              <div class="label">Primary capability areas: injection, auth, secret/crypto, monitoring signals</div>
+              <div class="value">119 / 119</div>
+              <div class="label">Combined scored benchmark rows hit by VibeScan</div>
             </div>
             <div class="metric">
-              <div class="value">CI</div>
-              <div class="label">Artifact output supports integration into continuous security workflows</div>
+              <div class="value">#1</div>
+              <div class="label">DVNA recall rank among compared tools in current matrix</div>
+            </div>
+          </div>
+          <p class="subtle" style="margin-top:10px;">DVNA peer comparison: Bearer 8/11, Snyk Code 7/11, CodeQL 6/11, Semgrep 4/11, eslint-plugin-security 1/11.</p>
+        </div>
+      </article>
+
+      <article class="section full-width">
+        <h2 class="section-title">Poster Figures and Captions</h2>
+        <div class="section-body">
+          <div class="figure-grid">
+            <div class="figure-card">
+              <h3>Figure A: DVNA recall bar chart</h3>
+              <iframe src="../../results/charts/vibescan-dvna-recall-bar-chart.html" title="VibeScan DVNA recall bar chart"></iframe>
+              <div class="figure-caption">
+                This bar chart shows benchmark recall across tools on the adjudicated DVNA cases. VibeScan currently
+                ranks first on the scored recall metric.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure B: Recall vs raw issue volume</h3>
+              <iframe src="../../results/charts/vibescan-recall-vs-volume-scatter.html" title="VibeScan recall versus volume scatter"></iframe>
+              <div class="figure-caption">
+                This scatter plot separates benchmark recall from raw issue count, making it clear that more total alerts
+                do not necessarily correspond to better benchmark performance.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure C: Benchmark scope growth</h3>
+              <iframe src="../../results/charts/vibescan-benchmark-growth-chart.html" title="VibeScan benchmark growth chart"></iframe>
+              <div class="figure-caption">
+                This line chart shows how the evaluation scope grew from legacy DVNA-only testing to a broader all-check
+                benchmark with high-volume stress coverage.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure D: Corpus composition</h3>
+              <iframe src="../../results/charts/vibescan-coverage-breadth-poster.html" title="VibeScan coverage breadth"></iframe>
+              <div class="figure-caption">
+                This chart panel shows how the combined benchmark is composed of DVNA legacy rows, base expanded family
+                rows, and high-volume stress rows.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure E: Rule-family coverage chart</h3>
+              <iframe src="../../results/charts/vibescan-family-coverage-chart.html" title="VibeScan family coverage chart"></iframe>
+              <div class="figure-caption">
+                This chart shows benchmarked base-case coverage across mapped VibeScan families, highlighting that the
+                experiment measures breadth as well as legacy benchmark recall.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure F: DVNA detection heatmap</h3>
+              <iframe src="../../results/charts/dvna-detection-rate-poster.html" title="DVNA detection heatmap"></iframe>
+              <div class="figure-caption">
+                The heatmap shows per-case detection outcomes across tools on the legacy DVNA benchmark. It is useful for
+                demonstrating case-level recall rather than raw issue-count volume.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure G: Experiment design panel</h3>
+              <iframe src="../../results/charts/vibescan-experiment-design-poster.html" title="VibeScan experiment design"></iframe>
+              <div class="figure-caption">
+                This panel explains the experimental protocol: benchmark selection, deterministic anchor scoring, scanner
+                execution, and CI regression gating.
+              </div>
+            </div>
+            <div class="figure-card">
+              <h3>Figure H: Proof tiers vs peers</h3>
+              <iframe src="../../results/charts/dvna-proof-vs-peers-poster.html" title="DVNA proof tiers versus peers"></iframe>
+              <div class="figure-caption">
+                This comparison separates benchmark recall from raw issue volume and proof/actionability tiers, helping
+                prevent the common misinterpretation that more raw alerts implies better benchmark performance.
+              </div>
             </div>
           </div>
         </div>
       </article>
 
-      <article class="section full-width">
-        <h2 class="section-title">Conclusions and Future Work</h2>
+      <article class="section">
+        <h2 class="section-title">Coverage Breadth</h2>
         <div class="section-body">
           <p>
-            The experiment indicates that targeted static analysis can substantially improve vulnerability visibility in
-            AI-generated backend applications. VibeScan demonstrates stronger benchmark detection than lightweight
-            baseline checks while preserving practical integration for developer workflows.
+            The expanded corpus was built to cover all active VibeScan rule families rather than only the narrower legacy
+            DVNA slice. This includes injection-core rules, XSS/client output, crypto/secrets, SSRF, cookie/middleware
+            checks, and new research extensions such as SSTI and IDOR.
           </p>
           <p>
-            <strong>Future work:</strong> expand benchmark diversity, include precision/recall reporting across more tools,
-            and evaluate remediation guidance quality in real development pipelines.
+            High-volume stress rows were added to make the evaluation more statistically meaningful for poster reporting
+            and to show that the scanner remains stable beyond one-case-per-family demonstrations.
+          </p>
+        </div>
+      </article>
+
+      <article class="section">
+        <h2 class="section-title">Key Findings</h2>
+        <div class="section-body">
+          <ul>
+            <li>VibeScan currently achieves top recall on the scored DVNA matrix (`11/11`).</li>
+            <li>The expanded VibeScan-specific corpus reaches `108/108`, demonstrating coverage beyond legacy benchmark scope.</li>
+            <li>The combined benchmark lane now evaluates `119` scored rows, making the experiment more representative than DVNA alone.</li>
+            <li>Presentation matters: recall, proof tiers, and raw issue counts must be shown as separate signals.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="section full-width">
+        <h2 class="section-title">Interpretation, Limitations, and Future Work</h2>
+        <div class="section-body">
+          <p>
+            The main empirical result is that <strong>VibeScan currently achieves the highest recall in the scored DVNA matrix while
+            also sustaining full recall on a broader scanner-specific corpus</strong>. This suggests that benchmark expansion is essential:
+            DVNA alone understates scanner breadth.
+          </p>
+          <p>
+            <strong>Important interpretation note:</strong> peer tools may show higher raw issue counts, but those counts are not equivalent to
+            benchmark recall. The poster therefore separates recall, proof/actionability tiers, and raw issue volume.
+          </p>
+          <p>
+            <strong>Limitations:</strong> peer tools are only compared on the DVNA subset in the current readout, and the expanded corpus
+            is intentionally VibeScan-focused rather than a universal cross-tool benchmark.
+          </p>
+          <p>
+            <strong>Future work:</strong> add a precision/noise lane, refresh peer tool reruns on the expanded corpus, incorporate more realistic
+            framework benchmarks, and study remediation quality and developer adoption in end-to-end workflows.
           </p>
         </div>
       </article>
     </section>
 
     <footer class="footer">
-      Poster template intentionally formatted for academic presentation style (section bars, multi-column layout,
-      and print-friendly typography) inspired by standard conference poster composition.
+      Poster template intentionally formatted for academic presentation style with print-friendly layout and embedded
+      benchmark figures. Supporting chart assets live under <code>results/charts/</code>.
     </footer>
   </main>
 </body>

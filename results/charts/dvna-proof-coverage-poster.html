@@ -35,16 +35,44 @@
   <p class="scope"><strong>Actionability</strong> (proof tiers below) is separate from the heatmap’s <strong>eleven benchmark rows</strong>. Tier counts come from <code>summary.proofCoverage</code> for <em>every</em> finding in the chosen JSON — e.g. 25 means 25 finding rows on the scanned DVNA tree, not “11”. The comparison table’s “11/11” column is only how many catalog anchors were hit.</p>
   <p class="scope">Use <code>--proof-coverage-json path/to/vibescan-project.json</code> to drive the bar chart and tier columns from a scan of <strong>any tree</strong> (e.g. whole monorepo with <code>--generate-tests</code>). If omitted, the chart uses the same JSON as <code>--vibescan-json</code> (often the DVNA app only). Counts always reflect <em>every</em> finding in that file, not a subset of the eleven heatmap rows.</p>
   
-  
+  <p class="scope"><strong>Proof tier source JSON:</strong> C:\Users\Josh\Downloads\CyberSecurity\benchmarks\results\ci_dvna_recall_baseline\vibescan-project.json</p>
   
   
   
   <div class="chart-wrap">
     <h2>VibeScan proof tier distribution</h2>
-    <p class="scope">No tier summary in this JSON. Run <code>cd vibescan &amp;&amp; npm run build</code> and regenerate, or ensure <code>summary.proofCoverage</code> / findings are present.</p>
+    <p class="tier-summary">Total findings counted: <strong>25</strong> (sum of tier buckets)</p>
+<div class="tier-bars" role="list" aria-label="VibeScan proof tier counts"><div class="tier-row">
+  <div class="tier-label">Provable locally (tier 1)</div>
+  <div class="tier-track" title="25 finding(s)">
+    <div class="tier-fill" style="width: 100%; background: #22c55e;"></div>
+  </div>
+  <div class="tier-num">25</div>
+</div>
+<div class="tier-row">
+  <div class="tier-label">Partial proof (tier 2)</div>
+  <div class="tier-track" title="0 finding(s)">
+    <div class="tier-fill" style="width: 0%; background: #84cc16;"></div>
+  </div>
+  <div class="tier-num">0</div>
+</div>
+<div class="tier-row">
+  <div class="tier-label">Structural (tier 3)</div>
+  <div class="tier-track" title="0 finding(s)">
+    <div class="tier-fill" style="width: 0%; background: #eab308;"></div>
+  </div>
+  <div class="tier-num">0</div>
+</div>
+<div class="tier-row">
+  <div class="tier-label">Detection only (tier 4)</div>
+  <div class="tier-track" title="0 finding(s)">
+    <div class="tier-fill" style="width: 0%; background: #94a3b8;"></div>
+  </div>
+  <div class="tier-num">0</div>
+</div></div>
   </div>
   <h2 class="section-title">DVNA benchmark grid vs proof tiers (full scan)</h2>
-  <p class="scope"><strong>Rows hit (11):</strong> Counts <strong>line-anchored benchmark scenarios</strong> in <code>results/dvna-case-catalog.json</code> — the same eleven heatmap rows. That number is <em>not</em> how many findings VibeScan reported: the scanner runs on the whole DVNA tree; use <strong>Findings</strong> and the tier columns for full output. <strong>VibeScan</strong> tiers come from <code>summary.proofCoverage</code> (every finding in the JSON). <strong>Peers</strong> have no equivalent schema; <code>dvnaRunIssueCount</code> is charted as 0/0/0/<em>N</em> for shape. Larger <em>N</em> is not “ahead” of VibeScan — different rules, deduping, and noise; see <code>results/dvna-benchmark-interpretation.md</code>.</p>
+  <p class="scope"><strong>Rows hit (11):</strong> Counts <strong>line-anchored benchmark scenarios</strong> in <code>results/dvna-case-catalog.json</code> — the same eleven heatmap rows. This is the recall metric used for ranking. That number is <em>not</em> how many findings VibeScan reported: the scanner runs on the whole DVNA tree; use <strong>Raw issues</strong> and tier columns for full output. <strong>VibeScan</strong> tiers come from <code>summary.proofCoverage</code> (every finding in the JSON). <strong>Peers</strong> have no equivalent schema; <code>dvnaRunIssueCount</code> is charted as 0/0/0/<em>N</em> for shape. Larger <em>N</em> is not “ahead” of VibeScan — different rules, deduping, and noise; see <code>results/dvna-benchmark-interpretation.md</code>.</p>
   <p class="scope"><strong>Detection matrix:</strong> VibeScan row aligned to benchmarks/results/2026-04-04_044003_dvna_vibescan_cli/vibescan-project.json (case-line match vs results/dvna-case-catalog.json); other tools unchanged from prior adjudication; Semgrep/CodeQL rows cross-checked against benchmarks/results artifacts where noted.</p>
   <div class="table-wrap">
     <table class="compare">
@@ -52,28 +80,31 @@
         <tr>
           <th scope="col">Product</th>
           <th scope="col">Role</th>
+          <th scope="col" title="Rank by benchmark recall (Rows hit over 11 DVNA rows).">Recall rank</th>
           <th scope="col" title="Benchmark anchors only: how many of the eleven catalog rows this tool hit (heatmap metric). Not total findings.">Rows hit<br/><span class="muted">DVNA grid (11)</span></th>
           <th scope="col" title="VibeScan tier 1">Tier 1<br/><span class="muted">provable</span></th>
           <th scope="col">Tier 2<br/><span class="muted">partial</span></th>
           <th scope="col">Tier 3<br/><span class="muted">structural</span></th>
           <th scope="col">Tier 4<br/><span class="muted">detect only</span></th>
-          <th scope="col" title="VibeScan: total_findings in proof JSON (full scan). Peers: frozen run issue count — table normalization places peers in tier 4.">Findings<br/><span class="muted">(full DVNA run)</span></th>
+          <th scope="col" title="VibeScan: total_findings in proof JSON (full scan). Peers: frozen run issue count — table normalization places peers in tier 4. This is volume, not benchmark recall.">Raw issues<br/><span class="muted">(full DVNA run)</span></th>
         </tr>
       </thead>
       <tbody>
         <tr class="row-vibescan">
   <th scope="row">VibeScan <span class="badge">heatmap focus</span></th>
   <td>sast</td>
+  <td class="num">1</td>
   <td class="num">11/11 <span class="muted">(100%)</span></td>
-  <td class="num">—</td>
-  <td class="num">—</td>
-  <td class="num">—</td>
-  <td class="num">—</td>
-  <td class="num">—</td>
+  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">25</td>
+  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
+  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
+  <td class="num" title="Full DVNA tree scan: 25 finding row(s) in this JSON; tiers sum to that total. “11/11” in the prior column is only benchmark anchor coverage (n=11 heatmap rows), not a cap on findings or proof tests.">0</td>
+  <td class="num" title="Matches summary.proofCoverage.total_findings (entire scan in this JSON).">25</td>
 </tr>
 <tr>
   <th scope="row">Bearer</th>
   <td>sast</td>
+  <td class="num">2</td>
   <td class="num">8/11 <span class="muted">(72.7%)</span></td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (31). Not VibeScan proofGenerator output. Frozen Bearer JSON on DVNA commit per results/dvna-evaluation.md.">0</td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (31). Not VibeScan proofGenerator output. Frozen Bearer JSON on DVNA commit per results/dvna-evaluation.md.">0</td>
@@ -84,6 +115,7 @@
 <tr>
   <th scope="row">Snyk Code</th>
   <td>sast</td>
+  <td class="num">3</td>
   <td class="num">7/11 <span class="muted">(63.6%)</span></td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (36). Not VibeScan proofGenerator output. Captured Snyk Code CLI JSON; severities mix error/warning/note.">0</td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (36). Not VibeScan proofGenerator output. Captured Snyk Code CLI JSON; severities mix error/warning/note.">0</td>
@@ -94,6 +126,7 @@
 <tr>
   <th scope="row">Semgrep</th>
   <td>sast</td>
+  <td class="num">5</td>
   <td class="num">4/11 <span class="muted">(36.4%)</span></td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (11). Not VibeScan proofGenerator output. Semgrep OSS JSON results array on DVNA (frozen run).">0</td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (11). Not VibeScan proofGenerator output. Semgrep OSS JSON results array on DVNA (frozen run).">0</td>
@@ -104,6 +137,7 @@
 <tr>
   <th scope="row">CodeQL</th>
   <td>sast</td>
+  <td class="num">4</td>
   <td class="num">6/11 <span class="muted">(54.5%)</span></td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (46). Not VibeScan proofGenerator output. codeql.sarif runs[0].results length (javascript-security-and-quality.qls, bundle 2.25.1).">0</td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (46). Not VibeScan proofGenerator output. codeql.sarif runs[0].results length (javascript-security-and-quality.qls, bundle 2.25.1).">0</td>
@@ -114,6 +148,7 @@
 <tr>
   <th scope="row">eslint-plugin-security</th>
   <td>sast</td>
+  <td class="num">6</td>
   <td class="num">1/11 <span class="muted">(9.1%)</span></td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (493). Not VibeScan proofGenerator output. Line count of diagnostics in results/eslint-dvna.txt — not first-party-only; heatmap uses stricter case anchors.">0</td>
   <td class="num" title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (493). Not VibeScan proofGenerator output. Line count of diagnostics in results/eslint-dvna.txt — not first-party-only; heatmap uses stricter case anchors.">0</td>
@@ -124,6 +159,6 @@
       </tbody>
     </table>
   </div>
-  <p class="footnote"><strong>Peer tier rows:</strong> Values are a <em>display normalization</em> for charting (all tool-reported issues stacked in tier 4), not an native product metric. VibeScan tiers 1–4 are structurally meaningful for local proof. See <code>results/dvna-benchmark-interpretation.md</code> and <code>dvnaRunIssueCount</code> in the matrix.</p>
+  <p class="footnote"><strong>How to compare fairly:</strong> Use <strong>Recall rank</strong> and <strong>Rows hit</strong> for benchmark performance. <strong>Raw issues</strong> is detection volume and can be inflated by broader/noisier rules. <strong>Peer tier rows</strong> are a display normalization (all peer issue rows shown in tier 4), not a native proof metric. See <code>results/dvna-benchmark-interpretation.md</code> and <code>dvnaRunIssueCount</code> in the matrix.</p>
 </body>
 </html>

@@ -17,6 +17,7 @@
     "benchmark:framework": "npm run build && node benchmarks/scripts/run-framework-vuln-scan.mjs",
     "benchmark:dvna": "npm run build && node benchmarks/scripts/run-dvna-vibescan-scan.mjs",
     "benchmark:dvna-all-checks": "npm run build && node benchmarks/scripts/run-dvna-all-vibescan-checks.mjs",
+    "benchmark:poster-charts": "node benchmarks/scripts/generate-research-poster-charts.mjs",
     "benchmark:assert-framework-recall": "node benchmarks/scripts/assert-framework-recall.mjs",
     "benchmark:outperform-readout": "node benchmarks/scripts/generate-outperform-readout.mjs",
     "secure-arch": "node vibescan/packages/secure-arch-cli/dist/cli.js",

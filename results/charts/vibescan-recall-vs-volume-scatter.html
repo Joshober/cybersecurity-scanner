@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan Recall vs Volume Scatter</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.45rem; margin: 0 0 10px; }
+    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
+    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
+    .grid { display: grid; gap: 18px; margin-top: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .muted { color: #64748b; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
+    .bar-label { font-size: 0.88rem; color: #0f172a; }
+    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
+    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+    .family-table th { background: #f1f5f9; }
+    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
+    .accent-green { color: #047857; }
+    .accent-blue { color: #1d4ed8; }
+    .accent-amber { color: #b45309; }
+    .accent-red { color: #b91c1c; }
+    
+  </style>
+</head>
+<body>
+<h1>Recall vs alert volume</h1>
+<p class="scope">This scatter plot separates benchmark recall from raw issue count in the full DVNA run.</p>
+<div class="card">
+  <svg viewBox="0 0 920 420" width="100%" role="img" aria-label="Recall versus raw issues">
+<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Recall versus raw issues</text>
+<line x1="65" y1="365" x2="880" y2="365" stroke="#64748b" stroke-width="1.5"></line>
+<line x1="65" y1="50" x2="65" y2="365" stroke="#64748b" stroke-width="1.5"></line>
+
+<line x1="65" y1="50" x2="65" y2="365" stroke="#e2e8f0"></line>
+<text x="65" y="406" font-size="11" text-anchor="middle" fill="#475569">0</text>
+
+
+<line x1="230.31440162271804" y1="50" x2="230.31440162271804" y2="365" stroke="#e2e8f0"></line>
+<text x="230.31440162271804" y="406" font-size="11" text-anchor="middle" fill="#475569">100</text>
+
+
+<line x1="395.6288032454361" y1="50" x2="395.6288032454361" y2="365" stroke="#e2e8f0"></line>
+<text x="395.6288032454361" y="406" font-size="11" text-anchor="middle" fill="#475569">200</text>
+
+
+<line x1="560.9432048681542" y1="50" x2="560.9432048681542" y2="365" stroke="#e2e8f0"></line>
+<text x="560.9432048681542" y="406" font-size="11" text-anchor="middle" fill="#475569">300</text>
+
+
+<line x1="726.2576064908721" y1="50" x2="726.2576064908721" y2="365" stroke="#e2e8f0"></line>
+<text x="726.2576064908721" y="406" font-size="11" text-anchor="middle" fill="#475569">400</text>
+
+
+<line x1="891.5720081135903" y1="50" x2="891.5720081135903" y2="365" stroke="#e2e8f0"></line>
+<text x="891.5720081135903" y="406" font-size="11" text-anchor="middle" fill="#475569">500</text>
+
+
+<line x1="65" y1="365" x2="880" y2="365" stroke="#e2e8f0"></line>
+<text x="55" y="369" font-size="11" text-anchor="end" fill="#475569">0</text>
+
+
+<line x1="65" y1="302" x2="880" y2="302" stroke="#e2e8f0"></line>
+<text x="55" y="306" font-size="11" text-anchor="end" fill="#475569">20</text>
+
+
+<line x1="65" y1="239" x2="880" y2="239" stroke="#e2e8f0"></line>
+<text x="55" y="243" font-size="11" text-anchor="end" fill="#475569">40</text>
+
+
+<line x1="65" y1="176" x2="880" y2="176" stroke="#e2e8f0"></line>
+<text x="55" y="180" font-size="11" text-anchor="end" fill="#475569">60</text>
+
+
+<line x1="65" y1="113" x2="880" y2="113" stroke="#e2e8f0"></line>
+<text x="55" y="117" font-size="11" text-anchor="end" fill="#475569">80</text>
+
+
+<line x1="65" y1="50" x2="880" y2="50" stroke="#e2e8f0"></line>
+<text x="55" y="54" font-size="11" text-anchor="end" fill="#475569">100</text>
+
+
+<circle cx="106.32860040567951" cy="50" r="7" fill="#16a34a" opacity="0.9"></circle>
+<text x="114.32860040567951" y="42" font-size="11" fill="#0f172a">VibeScan</text>
+
+
+<circle cx="116.2474645030426" cy="135.9090909090909" r="5" fill="#2563eb" opacity="0.9"></circle>
+<text x="124.2474645030426" y="127.9090909090909" font-size="11" fill="#0f172a">Bearer</text>
+
+
+<circle cx="124.5131845841785" cy="164.54545454545456" r="5" fill="#2563eb" opacity="0.9"></circle>
+<text x="132.5131845841785" y="156.54545454545456" font-size="11" fill="#0f172a">Snyk Code</text>
+
+
+<circle cx="141.04462474645032" cy="193.1818181818182" r="5" fill="#2563eb" opacity="0.9"></circle>
+<text x="149.04462474645032" y="185.1818181818182" font-size="11" fill="#0f172a">CodeQL</text>
+
+
+<circle cx="83.184584178499" cy="250.45454545454544" r="5" fill="#2563eb" opacity="0.9"></circle>
+<text x="91.184584178499" y="242.45454545454544" font-size="11" fill="#0f172a">Semgrep</text>
+
+
+<circle cx="880" cy="336.3636363636364" r="5" fill="#2563eb" opacity="0.9"></circle>
+<text x="888" y="328.3636363636364" font-size="11" fill="#0f172a">eslint-plugin-security</text>
+
+<text x="460" y="418" font-size="12" text-anchor="middle" fill="#334155">Raw issues in full DVNA run</text>
+<text x="16" y="207.5" font-size="12" text-anchor="middle" fill="#334155" transform="rotate(-90 16 207.5)">Recall (%)</text>
+</svg>
+  <p class="legend">Points farther upward have higher recall. Points farther right report more raw issues. VibeScan sits high on recall without requiring the highest issue volume.</p>
+</div>
+</body>
+</html>

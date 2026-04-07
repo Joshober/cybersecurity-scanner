@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan Project Overview</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.45rem; margin: 0 0 10px; }
+    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
+    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
+    .grid { display: grid; gap: 18px; margin-top: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .muted { color: #64748b; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
+    .bar-label { font-size: 0.88rem; color: #0f172a; }
+    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
+    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+    .family-table th { background: #f1f5f9; }
+    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
+    .accent-green { color: #047857; }
+    .accent-blue { color: #1d4ed8; }
+    .accent-amber { color: #b45309; }
+    .accent-red { color: #b91c1c; }
+    
+  </style>
+</head>
+<body>
+<h1>VibeScan: project overview</h1>
+<p class="scope">Poster-friendly overview of the scanner pipeline, major subsystems, and research additions. The focus is deterministic static analysis with semantic TypeScript support, taint flow, route/dependency context, and proof-oriented output.</p>
+<div class="grid two">
+  <section class="card">
+    <h2>System architecture</h2>
+    <div class="flow">
+      <div class="step"><strong>1. CLI</strong><br/>Scan, prove, export, benchmark orchestration.</div>
+      <div class="step"><strong>2. Parse</strong><br/>Acorn for JS and TS-ESLint parser for TS/TSX.</div>
+      <div class="step"><strong>3. Semantic context</strong><br/>TypeScript Program and TypeChecker when enabled.</div>
+      <div class="step"><strong>4. Detection engines</strong><br/>Rule engine + taint engine + route/dependency analysis.</div>
+      <div class="step"><strong>5. Outputs</strong><br/>JSON, SARIF, HTML, proof tests, benchmark artifacts.</div>
+    </div>
+    <p class="legend">Research-oriented additions in this phase include semantic alias resolution, explicit sink classification, SSTI detection, IDOR-style direct object reference detection, and recall-first benchmark lanes.</p>
+  </section>
+  <section class="card">
+    <h2>Core deliverables</h2>
+    <div class="grid three">
+      <div>
+        <div class="kpi">27</div>
+        <div class="muted">active mapped rule IDs</div>
+      </div>
+      <div>
+        <div class="kpi">6</div>
+        <div class="muted">coverage families</div>
+      </div>
+      <div>
+        <div class="kpi">3</div>
+        <div class="muted">major output modes</div>
+      </div>
+    </div>
+    <p class="legend">Outputs support research evidence, developer adoption, and CI regression gates: raw findings, proof/actionability summaries, third-party trust boundaries, and benchmark scoreboards.</p>
+  </section>
+</div>
+</body>
+</html>

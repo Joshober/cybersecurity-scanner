@@ -346,6 +346,22 @@ function buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary) {
   const tiers = tierProofSummary.tiers && typeof tierProofSummary.tiers === "object" ? tierProofSummary.tiers : null;
   const vsHasProof =
     tiers && typeof tiers.provable === "number" && typeof tiers.total_findings === "number";
+  const ranked = tools
+    .map((t) => {
+      const { hits } = caseHitsForTool(t, caseIds, codeqlHits);
+      return { id: t.id, hits };
+    })
+    .sort((a, b) => b.hits - a.hits);
+  const rankById = new Map();
+  let currentRank = 0;
+  let lastHits = null;
+  for (let i = 0; i < ranked.length; i++) {
+    if (ranked[i].hits !== lastHits) {
+      currentRank = i + 1;
+      lastHits = ranked[i].hits;
+    }
+    rankById.set(ranked[i].id, currentRank);
+  }
 
   return tools
     .map((t) => {
@@ -380,6 +396,7 @@ function buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary) {
         tierTitleAttr = ` title="Peer normalization: tiers 1–3 = 0; tier 4 = all issue rows in frozen DVNA run (${n}). Not VibeScan proofGenerator output.${note ? " " + note : ""}"`;
       }
       const rowClass = isVs ? ' class="row-vibescan"' : "";
+      const rank = rankById.get(t.id) || "—";
       const findTitle =
         isVs && vsHasProof
           ? ` title="${escapeHtml("Matches summary.proofCoverage.total_findings (entire scan in this JSON).")}"`
@@ -387,6 +404,7 @@ function buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary) {
       return `<tr${rowClass}>
   <th scope="row">${escapeHtml(t.label)}${t.highlight ? ' <span class="badge">heatmap focus</span>' : ""}</th>
   <td>${escapeHtml(t.role || "sast")}</td>
+  <td class="num">${rank}</td>
   <td class="num">${detCell}</td>
   <td class="num"${tierTitleAttr}>${t1}</td>
   <td class="num"${tierTitleAttr}>${t2}</td>
@@ -404,7 +422,7 @@ function buildCompareSectionHtml(matrix, tools, cases, tierProofSummary, codeqlH
   const rows = buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary);
 
   return `<h2 class="section-title">DVNA benchmark grid vs proof tiers (full scan)</h2>
-  <p class="scope"><strong>Rows hit (11):</strong> Counts <strong>line-anchored benchmark scenarios</strong> in <code>results/dvna-case-catalog.json</code> — the same eleven heatmap rows. That number is <em>not</em> how many findings VibeScan reported: the scanner runs on the whole DVNA tree; use <strong>Findings</strong> and the tier columns for full output. <strong>VibeScan</strong> tiers come from <code>summary.proofCoverage</code> (every finding in the JSON). <strong>Peers</strong> have no equivalent schema; <code>dvnaRunIssueCount</code> is charted as 0/0/0/<em>N</em> for shape. Larger <em>N</em> is not “ahead” of VibeScan — different rules, deduping, and noise; see <code>results/dvna-benchmark-interpretation.md</code>.</p>
+  <p class="scope"><strong>Rows hit (11):</strong> Counts <strong>line-anchored benchmark scenarios</strong> in <code>results/dvna-case-catalog.json</code> — the same eleven heatmap rows. This is the recall metric used for ranking. That number is <em>not</em> how many findings VibeScan reported: the scanner runs on the whole DVNA tree; use <strong>Raw issues</strong> and tier columns for full output. <strong>VibeScan</strong> tiers come from <code>summary.proofCoverage</code> (every finding in the JSON). <strong>Peers</strong> have no equivalent schema; <code>dvnaRunIssueCount</code> is charted as 0/0/0/<em>N</em> for shape. Larger <em>N</em> is not “ahead” of VibeScan — different rules, deduping, and noise; see <code>results/dvna-benchmark-interpretation.md</code>.</p>
   <p class="scope"><strong>Detection matrix:</strong> ${escapeHtml(matrix.source || matrix.metric || "results/dvna-detection-matrix.json")}</p>
   <div class="table-wrap">
     <table class="compare">
@@ -412,12 +430,13 @@ function buildCompareSectionHtml(matrix, tools, cases, tierProofSummary, codeqlH
         <tr>
           <th scope="col">Product</th>
           <th scope="col">Role</th>
+          <th scope="col" title="Rank by benchmark recall (Rows hit over 11 DVNA rows).">Recall rank</th>
           <th scope="col" title="Benchmark anchors only: how many of the eleven catalog rows this tool hit (heatmap metric). Not total findings.">Rows hit<br/><span class="muted">DVNA grid (11)</span></th>
           <th scope="col" title="VibeScan tier 1">Tier 1<br/><span class="muted">provable</span></th>
           <th scope="col">Tier 2<br/><span class="muted">partial</span></th>
           <th scope="col">Tier 3<br/><span class="muted">structural</span></th>
           <th scope="col">Tier 4<br/><span class="muted">detect only</span></th>
-          <th scope="col" title="VibeScan: total_findings in proof JSON (full scan). Peers: frozen run issue count — table normalization places peers in tier 4.">Findings<br/><span class="muted">(full DVNA run)</span></th>
+          <th scope="col" title="VibeScan: total_findings in proof JSON (full scan). Peers: frozen run issue count — table normalization places peers in tier 4. This is volume, not benchmark recall.">Raw issues<br/><span class="muted">(full DVNA run)</span></th>
         </tr>
       </thead>
       <tbody>
@@ -425,7 +444,7 @@ function buildCompareSectionHtml(matrix, tools, cases, tierProofSummary, codeqlH
       </tbody>
     </table>
   </div>
-  <p class="footnote"><strong>Peer tier rows:</strong> Values are a <em>display normalization</em> for charting (all tool-reported issues stacked in tier 4), not an native product metric. VibeScan tiers 1–4 are structurally meaningful for local proof. See <code>results/dvna-benchmark-interpretation.md</code> and <code>dvnaRunIssueCount</code> in the matrix.</p>`;
+  <p class="footnote"><strong>How to compare fairly:</strong> Use <strong>Recall rank</strong> and <strong>Rows hit</strong> for benchmark performance. <strong>Raw issues</strong> is detection volume and can be inflated by broader/noisier rules. <strong>Peer tier rows</strong> are a display normalization (all peer issue rows shown in tier 4), not a native proof metric. See <code>results/dvna-benchmark-interpretation.md</code> and <code>dvnaRunIssueCount</code> in the matrix.</p>`;
 }
 
 /**

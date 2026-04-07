@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VibeScan Benchmark Scope Growth</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.45rem; margin: 0 0 10px; }
+    h2 { font-size: 1rem; margin: 0 0 10px; color: #1e293b; }
+    p.scope { max-width: 1100px; line-height: 1.55; color: #475569; font-size: 0.92rem; }
+    .grid { display: grid; gap: 18px; margin-top: 18px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    .card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+    .kpi { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .muted { color: #64748b; }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 0.78rem; font-weight: 600; }
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-row { display: grid; grid-template-columns: minmax(170px, 1.2fr) 4fr auto; gap: 12px; align-items: center; }
+    .bar-label { font-size: 0.88rem; color: #0f172a; }
+    .track { height: 22px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 999px; }
+    .bar-num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .flow .step { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; font-size: 0.86rem; min-height: 88px; }
+    .family-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .family-table th, .family-table td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+    .family-table th { background: #f1f5f9; }
+    .legend { margin-top: 14px; font-size: 0.82rem; color: #475569; }
+    .accent-green { color: #047857; }
+    .accent-blue { color: #1d4ed8; }
+    .accent-amber { color: #b45309; }
+    .accent-red { color: #b91c1c; }
+    
+  </style>
+</head>
+<body>
+<h1>Benchmark scope growth</h1>
+<p class="scope">A line chart showing how evaluation scope changed from legacy DVNA-only benchmarking to a broader scanner-aligned benchmark suite.</p>
+<div class="card">
+  <svg viewBox="0 0 920 420" width="100%" role="img" aria-label="Growth in scored benchmark rows">
+<text x="460" y="24" font-size="18" font-weight="700" text-anchor="middle" fill="#0f172a">Growth in scored benchmark rows</text>
+<line x1="55" y1="365" x2="880" y2="365" stroke="#64748b" stroke-width="1.5"></line>
+<line x1="55" y1="50" x2="55" y2="365" stroke="#64748b" stroke-width="1.5"></line>
+
+<line x1="55" y1="365" x2="880" y2="365" stroke="#e2e8f0"></line>
+<text x="45" y="369" font-size="11" text-anchor="end" fill="#475569">0</text>
+
+
+<line x1="55" y1="285.5882352941177" x2="880" y2="285.5882352941177" stroke="#e2e8f0"></line>
+<text x="45" y="289.5882352941177" font-size="11" text-anchor="end" fill="#475569">30</text>
+
+
+<line x1="55" y1="206.1764705882353" x2="880" y2="206.1764705882353" stroke="#e2e8f0"></line>
+<text x="45" y="210.1764705882353" font-size="11" text-anchor="end" fill="#475569">60</text>
+
+
+<line x1="55" y1="129.41176470588235" x2="880" y2="129.41176470588235" stroke="#e2e8f0"></line>
+<text x="45" y="133.41176470588235" font-size="11" text-anchor="end" fill="#475569">89</text>
+
+
+<line x1="55" y1="50" x2="880" y2="50" stroke="#e2e8f0"></line>
+<text x="45" y="54" font-size="11" text-anchor="end" fill="#475569">119</text>
+
+<path d="M 55 335.88235294117646 L 467.5 261.7647058823529 L 880 50" fill="none" stroke="#1d4ed8" stroke-width="3"></path>
+
+<circle cx="55" cy="335.88235294117646" r="6" fill="#1d4ed8"></circle>
+<text x="55" y="406" font-size="11" text-anchor="middle" fill="#334155">DVNA only</text>
+<text x="55" y="325.88235294117646" font-size="11" text-anchor="middle" fill="#0f172a">11</text>
+
+
+<circle cx="467.5" cy="261.7647058823529" r="6" fill="#1d4ed8"></circle>
+<text x="467.5" y="406" font-size="11" text-anchor="middle" fill="#334155">DVNA + base</text>
+<text x="467.5" y="251.76470588235293" font-size="11" text-anchor="middle" fill="#0f172a">39</text>
+
+
+<circle cx="880" cy="50" r="6" fill="#1d4ed8"></circle>
+<text x="880" y="406" font-size="11" text-anchor="middle" fill="#334155">DVNA + all</text>
+<text x="880" y="40" font-size="11" text-anchor="middle" fill="#0f172a">119</text>
+
+</svg>
+  <p class="legend">The benchmark expanded from 11 legacy DVNA rows to 39 combined rows in the first expansion pass and then to 119 total rows after adding high-volume stress coverage.</p>
+</div>
+</body>
+</html>
