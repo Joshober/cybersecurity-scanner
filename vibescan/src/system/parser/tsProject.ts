@@ -1,6 +1,9 @@
 import { dirname, resolve } from "node:path";
 import ts from "typescript";
 import type { ScanWarning, ScannerOptions, TsAnalysisMode } from "../types.js";
+import { isTypeScriptFile, classifyFile, scriptKindFor } from "./fileKind.js";
+
+export { isTypeScriptFile };
 
 export interface SourceEntry {
   path: string;
@@ -20,24 +23,6 @@ export interface TsProjectContext {
 
 function normalizePath(filePath: string): string {
   return resolve(filePath);
-}
-
-export function isTypeScriptFile(filePath: string): boolean {
-  const lower = filePath.replace(/\\/g, "/").toLowerCase();
-  return (
-    lower.endsWith(".ts") ||
-    lower.endsWith(".tsx") ||
-    lower.endsWith(".mts") ||
-    lower.endsWith(".cts")
-  );
-}
-
-function scriptKindFor(filePath: string): ts.ScriptKind {
-  const lower = filePath.replace(/\\/g, "/").toLowerCase();
-  if (lower.endsWith(".tsx")) return ts.ScriptKind.TSX;
-  if (lower.endsWith(".jsx")) return ts.ScriptKind.JSX;
-  if (lower.endsWith(".ts")) return ts.ScriptKind.TS;
-  return ts.ScriptKind.JS;
 }
 
 function tsFallbackWarning(message: string): ScanWarning {
@@ -187,7 +172,7 @@ export function createTsProjectContext(
         override,
         languageVersion,
         true,
-        scriptKindFor(fileName)
+        scriptKindFor(classifyFile(fileName))
       );
     }
     return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);

@@ -45,6 +45,7 @@
     "yaml": "^2.7.0"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^10.9.1",
     "@secure-arch/cli": "file:vibescan/packages/secure-arch-cli",
     "@types/eslint": "^8.56.0",
     "@types/estree": "^1.0.0",

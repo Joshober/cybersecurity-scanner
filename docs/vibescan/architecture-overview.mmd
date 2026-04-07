@@ -1,0 +1,63 @@
+flowchart LR
+  subgraph INPUT ["Input"]
+    A["Source Code\n.js .ts .tsx .jsx .ejs"]
+    B["Config\n.vibescanrc + CLI args"]
+  end
+
+  subgraph PARSE ["Parse  (parser/)"]
+    FK["fileKind.ts\nclassifyFile → FileKind"]
+    C["Acorn + acorn-jsx\nJS / JSX"]
+    D["ts-eslint + TypeChecker\nTS / TSX"]
+    EJ["EJS handler\nscript block extraction"]
+    PR["ParseResult\nAST + FileKind + ejsBlocks"]
+  end
+
+  subgraph BRIDGE ["Parse → Analyze"]
+    AU["AnalysisUnit\nfullAst flag per unit"]
+    CACHE["Parse cache\nMap of path → ParseResult"]
+  end
+
+  subgraph ANALYZE ["Analyze  (analyzeFile)"]
+    E["Rule Engine\n40+ security rules"]
+    F["Taint Engine\nSource to Sink tracking"]
+    G["Route Analysis\nExpress + Next.js"]
+    H["Third-Party Surface\nTrust boundary mapping"]
+    I["Shared Severity\nCRITICAL / HIGH / MEDIUM / LOW"]
+  end
+
+  subgraph PIPELINE ["CLI Pipeline"]
+    J["Suppressions + Baseline"]
+    K["Severity Gate"]
+    L["Sidecars + Exports"]
+  end
+
+  subgraph REPORT ["Report"]
+    M["JSON"]
+    N["SARIF"]
+    O["HTML Dashboard"]
+    P["Proof Tests"]
+  end
+
+  A --> FK
+  B --> FK
+  FK --> C
+  FK --> D
+  FK --> EJ
+  C --> PR
+  D --> PR
+  EJ --> PR
+  PR --> CACHE
+  CACHE --> AU
+  AU --> E
+  AU --> F
+  AU --> G
+  E --> G
+  F --> G
+  G --> H
+  H --> J
+  J --> K
+  K --> L
+  L --> M
+  L --> N
+  L --> O
+  L --> P

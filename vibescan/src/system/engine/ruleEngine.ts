@@ -1,24 +1,12 @@
 // Pattern/rule-based detection: runs AST rules on the parsed tree and collects findings.
 
 import type { Program } from "estree";
-import type { Finding, ProofHints, ScannerOptions, Severity, SeverityLabel } from "../types.js";
+import type { Finding, ProofHints, ScannerOptions } from "../types.js";
 import type { ParseResult } from "../parser/parseFile.js";
 import type { Rule } from "../utils/rule-types.js";
 import { buildParentMap, walk } from "../walker.js";
 import { getResolvedCall, getTypeText } from "../typescript/semantic.js";
-
-const SEVERITY_ORDER: Record<Severity, number> = {
-  critical: 3,
-  error: 2,
-  warning: 1,
-  info: 0,
-};
-const SEVERITY_LABEL: Record<Severity, SeverityLabel> = {
-  critical: "CRITICAL",
-  error: "HIGH",
-  warning: "MEDIUM",
-  info: "LOW",
-};
+import { SEVERITY_ORDER, SEVERITY_LABEL } from "./severity.js";
 
 function interpolate(template: string, data: Record<string, unknown>): string {
   return template.replace(/\{\{(\w+)\}\}/g, (_, key) => String(data[key] ?? ""));
@@ -157,4 +145,3 @@ export function runRuleEngine(opts: RunRuleEngineOptions): Finding[] {
   return findings;
 }
 
-export { SEVERITY_ORDER, SEVERITY_LABEL };

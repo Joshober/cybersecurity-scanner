@@ -17,11 +17,8 @@ import {
 } from "../format.js";
 import type {
   ScannerOptions,
-  Severity,
-  ScanMode,
   Finding,
   ProjectScanResult,
-  TsAnalysisMode,
 } from "../types.js";
 import { collectScanFiles } from "./collectFiles.js";
 import {
@@ -42,58 +39,9 @@ import { buildRunManifest, writeRunManifest } from "./manifest.js";
 import { writeAdjudicationExports } from "./adjudication.js";
 import { writeIdeAssistPrompt } from "./ideAssistPrompt.js";
 import { projectJsonToHtmlReport, projectScanToHtmlReport } from "../htmlReport.js";
+import { parseCliArgs } from "./parseArgs.js";
 
-const args = process.argv.slice(2);
-let subcommand = "";
-let inputPaths: string[] = [];
-let configPathExplicit: string | undefined;
-let manifestPath: string | undefined;
-let adjudicationStem: string | undefined;
-let exportRoutesPath: string | undefined;
-let exportThirdPartySurfacePath: string | undefined;
-let aiAssistOutPath: string | undefined;
-
-const cliMerge = {
-  format: undefined as OutputFormat | undefined,
-  formatSet: false,
-  excludeVendor: false,
-  excludeVendorSet: false,
-  severityThreshold: undefined as Severity | undefined,
-  severitySet: false,
-  crypto: true,
-  injection: true,
-  rulesSet: false,
-  checkRegistry: false,
-  checkRegistrySet: false,
-  skipRegistry: false,
-  skipRegistrySet: false,
-  projectRoot: undefined as string | undefined,
-  ignoreGlobs: undefined as string[] | undefined,
-  ignoreGlobsSet: false,
-  openApiSpecPaths: [] as string[],
-  openApiSpecPathsSet: false,
-  openApiDiscovery: true,
-  openApiDiscoverySet: false,
-  buildId: undefined as string | undefined,
-  buildIdSet: false,
-  tsAnalysis: undefined as TsAnalysisMode | undefined,
-  tsAnalysisSet: false,
-  tsconfigPath: undefined as string | undefined,
-  tsconfigPathSet: false,
-  tsFailOpen: undefined as boolean | undefined,
-  tsFailOpenSet: false,
-};
-
-let fixSuggestions = false;
-let useColor = process.stdout.isTTY;
-let benchmarkMetadata = process.env.VIBESCAN_BENCHMARK === "1";
-let htmlReport = false;
-let htmlOutPath: string | undefined;
-let baselineCliPath: string | undefined;
-let writeBaselinePath: string | undefined;
-let baselineIncludeKnown = false;
-let baselineCliSet = false;
-let writeBaselineSet = false;
+// ─── Helpers ────────────────────────────────────────────────────────
 
 function tryGitCommit(cwd: string): string | null {
   try {
@@ -131,141 +79,7 @@ function scanOptionsEcho(
   };
 }
 
-for (let i = 0; i < args.length; i++) {
-  const a = args[i];
-  if (a === "scan") {
-    subcommand = "scan";
-    continue;
-  }
-  if (a === "report") {
-    subcommand = "report";
-    continue;
-  }
-  if (a === "--config" && args[i + 1]) {
-    configPathExplicit = resolve(args[++i]);
-  } else if (a === "--manifest" && args[i + 1]) {
-    manifestPath = resolve(args[++i]);
-  } else if (a === "--export-routes" && args[i + 1]) {
-    exportRoutesPath = resolve(args[++i]);
-  } else if (a === "--export-third-party-surface" && args[i + 1]) {
-    exportThirdPartySurfacePath = resolve(args[++i]);
-  } else if (a === "--export-adjudication" && args[i + 1]) {
-    adjudicationStem = args[++i];
-  } else if (a === "--mode" && args[i + 1]) {
-    const m = args[++i].toLowerCase();
-    if (m === "static" || m === "ai") {
-      // applied after merge
-      (cliMerge as unknown as { mode?: ScanMode }).mode = m as ScanMode;
-    }
-  } else if (a === "--ai-assist-out" && args[i + 1]) {
-    aiAssistOutPath = resolve(args[++i]);
-  } else if (a === "--no-crypto") {
-    cliMerge.crypto = false;
-    cliMerge.rulesSet = true;
-  } else if (a === "--no-injection") {
-    cliMerge.injection = false;
-    cliMerge.rulesSet = true;
-  } else if (a === "--rules" && args[i + 1]) {
-    const val = args[++i].toLowerCase();
-    cliMerge.crypto = val.includes("crypto");
-    cliMerge.injection = val.includes("injection");
-    cliMerge.rulesSet = true;
-  } else if (a === "--severity" && args[i + 1]) {
-    const s = args[++i].toLowerCase();
-    if (["critical", "error", "warning", "info"].includes(s)) {
-      cliMerge.severityThreshold = s as Severity;
-      cliMerge.severitySet = true;
-    }
-  } else if (a === "--format" && args[i + 1]) {
-    const f = args[++i].toLowerCase();
-    if (f === "json") cliMerge.format = "json";
-    else if (f === "sarif") cliMerge.format = "sarif";
-    else if (f === "human") cliMerge.format = "human";
-    else cliMerge.format = "compact";
-    cliMerge.formatSet = true;
-  } else if (a === "--fix-suggestions") fixSuggestions = true;
-  else if (a === "--check-registry") {
-    cliMerge.checkRegistry = true;
-    cliMerge.checkRegistrySet = true;
-  } else if (a === "--skip-registry") {
-    cliMerge.skipRegistry = true;
-    cliMerge.skipRegistrySet = true;
-  } else if (a === "--exclude-vendor") {
-    cliMerge.excludeVendor = true;
-    cliMerge.excludeVendorSet = true;
-  } else if (a === "--ignore-glob" && args[i + 1]) {
-    cliMerge.ignoreGlobs = cliMerge.ignoreGlobs ?? [];
-    cliMerge.ignoreGlobs.push(args[++i]);
-    cliMerge.ignoreGlobsSet = true;
-  } else if (a === "--benchmark-metadata") {
-    benchmarkMetadata = true;
-  } else if (a === "--generate-tests") {
-    (cliMerge as unknown as { generateTests?: boolean }).generateTests = true;
-    if (args[i + 1] && !args[i + 1].startsWith("-")) {
-      (cliMerge as unknown as { generateTestsDir?: string }).generateTestsDir = resolve(args[++i]);
-    } else {
-      (cliMerge as unknown as { generateTestsDir?: string }).generateTestsDir = join(
-        process.cwd(),
-        "vibescan-generated-tests"
-      );
-    }
-  } else if (a === "--project-root" && args[i + 1]) {
-    cliMerge.projectRoot = resolve(args[++i]);
-  } else if (a === "--openapi-spec" && args[i + 1]) {
-    cliMerge.openApiSpecPaths.push(resolve(args[++i]));
-    cliMerge.openApiSpecPathsSet = true;
-  } else if (a === "--no-openapi-discovery") {
-    cliMerge.openApiDiscovery = false;
-    cliMerge.openApiDiscoverySet = true;
-  } else if (a === "--build-id" && args[i + 1]) {
-    cliMerge.buildId = args[++i];
-    cliMerge.buildIdSet = true;
-  } else if (a === "--ts-analysis" && args[i + 1]) {
-    const mode = args[++i].toLowerCase();
-    if (mode === "off" || mode === "auto" || mode === "semantic") {
-      cliMerge.tsAnalysis = mode as TsAnalysisMode;
-      cliMerge.tsAnalysisSet = true;
-    }
-  } else if (a === "--tsconfig" && args[i + 1]) {
-    cliMerge.tsconfigPath = args[++i];
-    cliMerge.tsconfigPathSet = true;
-  } else if (a === "--ts-fail-open") {
-    cliMerge.tsFailOpen = true;
-    cliMerge.tsFailOpenSet = true;
-  } else if (a === "--no-ts-fail-open") {
-    cliMerge.tsFailOpen = false;
-    cliMerge.tsFailOpenSet = true;
-  } else if (a === "--baseline" && args[i + 1]) {
-    baselineCliPath = resolve(args[++i]);
-    baselineCliSet = true;
-  } else if (a === "--write-baseline" && args[i + 1]) {
-    writeBaselinePath = resolve(args[++i]);
-    writeBaselineSet = true;
-  } else if (a === "--baseline-include-known") {
-    baselineIncludeKnown = true;
-  } else if (a === "--color" && args[i + 1]) {
-    const v = args[++i].toLowerCase();
-    useColor = v === "always" ? true : v === "never" ? false : process.stdout.isTTY;
-  } else if (a === "--html") {
-    htmlReport = true;
-  } else if (a === "--html-out" && args[i + 1]) {
-    htmlOutPath = resolve(args[++i]);
-  } else if (!a.startsWith("-")) {
-    if (subcommand === "scan") inputPaths.push(a);
-    else if (subcommand === "report") inputPaths.push(a);
-    else if (!subcommand) {
-      subcommand = "scan";
-      inputPaths.push(a);
-    }
-  }
-}
-
-if (!subcommand || (subcommand === "scan" && inputPaths.length === 0)) {
-  if (subcommand === "scan") inputPaths.push(".");
-}
-
-const showHelp = (): void => {
-  console.log(`
+const HELP_TEXT = `
 VibeScan (secure) — Static analysis for crypto failures and injection risks
 
 Usage:
@@ -308,18 +122,24 @@ Options:
 
   vibescan report <results.json> [--html-out <path>]
     Build a static HTML report from a prior --format json output (no rescan).
-`);
-};
+`;
 
-if (inputPaths.length === 0) {
-  showHelp();
+// ─── Parse CLI args ─────────────────────────────────────────────────
+
+const parsed = parseCliArgs(process.argv.slice(2));
+const rawArgs = process.argv.slice(2);
+
+// ─── Early exits: help / report ─────────────────────────────────────
+
+if (parsed.inputPaths.length === 0) {
+  console.log(HELP_TEXT);
   process.exit(0);
 }
 
-if (subcommand === "report") {
+if (parsed.subcommand === "report") {
   try {
-    const jsonPath = resolve(inputPaths[0]);
-    const outPath = htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
+    const jsonPath = resolve(parsed.inputPaths[0]);
+    const outPath = parsed.htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
     const text = readFileSync(jsonPath, "utf-8");
     const html = projectJsonToHtmlReport(text, {
       generatedAt: new Date().toISOString(),
@@ -334,59 +154,57 @@ if (subcommand === "report") {
   process.exit(0);
 }
 
-const searchRoot = inputPaths.length > 0 ? resolve(inputPaths[0]) : process.cwd();
-const configFilePath = configPathExplicit ?? findVibeScanConfigFile(searchRoot);
+// ─── Config resolution ──────────────────────────────────────────────
+
+const searchRoot = parsed.inputPaths.length > 0 ? resolve(parsed.inputPaths[0]) : process.cwd();
+const configFilePath = parsed.configPathExplicit ?? findVibeScanConfigFile(searchRoot);
 const fileCfg = configFilePath ? loadVibeScanConfigFile(configFilePath) : null;
+const cm = parsed.cliMerge;
 
 const merged = mergeVibeScanConfig(
   fileCfg,
   {
-    format: cliMerge.format,
-    formatSet: cliMerge.formatSet,
-    excludeVendor: cliMerge.excludeVendor,
-    excludeVendorSet: cliMerge.excludeVendorSet,
-    severityThreshold: cliMerge.severityThreshold,
-    severitySet: cliMerge.severitySet,
-    crypto: cliMerge.crypto,
-    injection: cliMerge.injection,
-    rulesSet: cliMerge.rulesSet,
-    checkRegistry: cliMerge.checkRegistry,
-    checkRegistrySet: cliMerge.checkRegistrySet,
-    skipRegistry: cliMerge.skipRegistry,
-    skipRegistrySet: cliMerge.skipRegistrySet,
-    projectRoot: cliMerge.projectRoot,
-    ignoreGlobs: cliMerge.ignoreGlobs,
-    ignoreGlobsSet: cliMerge.ignoreGlobsSet,
-    openApiSpecPaths: cliMerge.openApiSpecPathsSet ? cliMerge.openApiSpecPaths : undefined,
-    openApiSpecPathsSet: cliMerge.openApiSpecPathsSet,
-    openApiDiscovery: cliMerge.openApiDiscovery,
-    openApiDiscoverySet: cliMerge.openApiDiscoverySet,
-    buildId: cliMerge.buildId,
-    buildIdSet: cliMerge.buildIdSet,
-    tsAnalysis: cliMerge.tsAnalysis,
-    tsAnalysisSet: cliMerge.tsAnalysisSet,
-    tsconfigPath: cliMerge.tsconfigPath,
-    tsconfigPathSet: cliMerge.tsconfigPathSet,
-    tsFailOpen: cliMerge.tsFailOpen,
-    tsFailOpenSet: cliMerge.tsFailOpenSet,
-    baseline: baselineCliPath,
-    baselineSet: baselineCliSet,
+    format: cm.format,
+    formatSet: cm.formatSet,
+    excludeVendor: cm.excludeVendor,
+    excludeVendorSet: cm.excludeVendorSet,
+    severityThreshold: cm.severityThreshold,
+    severitySet: cm.severitySet,
+    crypto: cm.crypto,
+    injection: cm.injection,
+    rulesSet: cm.rulesSet,
+    checkRegistry: cm.checkRegistry,
+    checkRegistrySet: cm.checkRegistrySet,
+    skipRegistry: cm.skipRegistry,
+    skipRegistrySet: cm.skipRegistrySet,
+    projectRoot: cm.projectRoot,
+    ignoreGlobs: cm.ignoreGlobs,
+    ignoreGlobsSet: cm.ignoreGlobsSet,
+    openApiSpecPaths: cm.openApiSpecPathsSet ? cm.openApiSpecPaths : undefined,
+    openApiSpecPathsSet: cm.openApiSpecPathsSet,
+    openApiDiscovery: cm.openApiDiscovery,
+    openApiDiscoverySet: cm.openApiDiscoverySet,
+    buildId: cm.buildId,
+    buildIdSet: cm.buildIdSet,
+    tsAnalysis: cm.tsAnalysis,
+    tsAnalysisSet: cm.tsAnalysisSet,
+    tsconfigPath: cm.tsconfigPath,
+    tsconfigPathSet: cm.tsconfigPathSet,
+    tsFailOpen: cm.tsFailOpen,
+    tsFailOpenSet: cm.tsFailOpenSet,
+    baseline: parsed.baselineCliPath,
+    baselineSet: parsed.baselineCliSet,
   },
   { crypto: true, injection: true }
 );
 
 const baselineFromConfig = merged.baseline ? resolve(searchRoot, merged.baseline) : undefined;
-const effectiveBaselinePath = baselineCliSet ? baselineCliPath : baselineFromConfig;
+const effectiveBaselinePath = parsed.baselineCliSet ? parsed.baselineCliPath : baselineFromConfig;
 
 let options: ScannerOptions = merged.scanner;
 const format = merged.format;
 const suppressions = merged.suppressions;
 
-const cm = cliMerge as unknown as {
-  mode?: ScanMode;
-  generateTests?: boolean;
-  generateTestsDir?: string;
-};
 if (cm.mode) options = { ...options, mode: cm.mode };
 if (cm.generateTests) {
   options = {
@@ -399,18 +217,13 @@ if (cm.generateTests) {
   );
 }
 
-const files = collectScanFiles(inputPaths, options);
+const files = collectScanFiles(parsed.inputPaths, options);
 
-if (files.length === 0 && inputPaths.length > 0) {
-  console.error("No files found for:", inputPaths.join(", "));
+if (files.length === 0 && parsed.inputPaths.length > 0) {
+  console.error("No files found for:", parsed.inputPaths.join(", "));
   process.exit(1);
 }
 
-function findingsFail(fs: Finding[]): boolean {
-  return fs.some((f) => f.severity === "critical" || f.severity === "error");
-}
-
-const useIdeAssist = options.mode === "ai";
 const structuredStdout = format === "json" || format === "sarif";
 
 function logScan(msg: string): void {
@@ -418,72 +231,17 @@ function logScan(msg: string): void {
   else console.log(msg);
 }
 
-function withFilteredFindings(project: ProjectScanResult): ProjectScanResult {
-  const findings = applySuppressions(project.findings, suppressions);
-  return { ...project, findings };
-}
+// ─── Pipeline steps ─────────────────────────────────────────────────
 
-function emitWarnings(project: ProjectScanResult): void {
-  for (const warning of project.warnings ?? []) {
-    const line = `Warning [${warning.code}]: ${warning.message}`;
-    if (structuredStdout) console.error(line);
-    else console.log(line);
-  }
-}
-
-function emitHtmlReport(projectOut: ProjectScanResult): void {
-  if (!htmlReport) return;
-  const htmlPath = htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
-  const html = projectScanToHtmlReport(projectOut, {
-    generatedAt: new Date().toISOString(),
-    toolVersion: readScannerPackageVersion(),
-    buildId: projectOut.buildId ?? options.buildId,
-  });
-  writeFileSync(htmlPath, html, "utf-8");
-  const msg = `Wrote HTML report: ${htmlPath}`;
-  if (structuredStdout) console.error(msg);
-  else console.log(msg);
-}
-
-function maybeWriteSidecars(
-  findings: Finding[],
-  projectRoot: string,
-  extras?: { buildId?: string; openApiSpecsUsed?: string[] }
-): void {
-  let adjJson: string | undefined;
-  let adjCsv: string | undefined;
-  if (adjudicationStem) {
-    const w = writeAdjudicationExports(adjudicationStem, findings);
-    adjJson = w.jsonPath;
-    adjCsv = w.csvPath;
-    if (structuredStdout) console.error(`Wrote adjudication: ${adjJson}, ${adjCsv}`);
-  }
-  if (manifestPath) {
-    const man = buildRunManifest({
-      argv: args,
-      projectRoot,
-      includedFiles: files,
-      adjudicationJson: adjJson,
-      adjudicationCsv: adjCsv,
-      buildId: extras?.buildId,
-      openApiSpecsUsed: extras?.openApiSpecsUsed,
-    });
-    writeRunManifest(manifestPath, man);
-    if (structuredStdout) console.error(`Wrote manifest: ${manifestPath}`);
-  }
-}
-
-async function main(): Promise<void> {
-  let exitCode = 0;
-
+async function runScan(): Promise<{ project: ProjectScanResult; projectRoot: string; entries: { path: string; source: string }[] }> {
   logScan(`Scanning ${files.length} file${files.length === 1 ? "" : "s"}...`);
-  const entries = files.map((path) => ({
-    path: resolve(path),
-    source: readFileSync(resolve(path), "utf-8"),
-  }));
+  const entries = files.map((p) => {
+    const resolved = resolve(p);
+    return { path: resolved, source: readFileSync(resolved, "utf-8") };
+  });
   const inferredRoot = (() => {
-    if (inputPaths.length === 0) return process.cwd();
-    const firstPath = resolve(inputPaths[0]);
+    if (parsed.inputPaths.length === 0) return process.cwd();
+    const firstPath = resolve(parsed.inputPaths[0]);
     try {
       return statSync(firstPath).isDirectory() ? firstPath : dirname(firstPath);
     } catch {
@@ -493,23 +251,39 @@ async function main(): Promise<void> {
   const projectRoot = options.projectRoot ?? inferredRoot;
   options = { ...options, projectRoot };
   const rawProject = await scanProjectAsync(entries, options, projectRoot);
-  const project = withFilteredFindings(rawProject);
-  emitWarnings(project);
+  const findings = applySuppressions(rawProject.findings, suppressions);
+  const project = { ...rawProject, findings };
+  return { project, projectRoot, entries };
+}
 
-  if (writeBaselineSet && writeBaselinePath) {
-    const entriesOut = findingsToBaselineEntries(projectRoot, project.findings);
-    const bf: BaselineFile = {
-      version: BASELINE_FILE_VERSION,
-      generatedAt: new Date().toISOString(),
-      tool: "vibescan",
-      note: "Findings after suppressions; CI with --baseline defers these until remediated.",
-      entries: entriesOut,
-    };
-    writeFileSync(writeBaselinePath, JSON.stringify(bf, null, 2), "utf-8");
-    console.error(`Wrote baseline (${entriesOut.length} entries): ${writeBaselinePath}`);
-    process.exit(0);
+function emitWarnings(project: ProjectScanResult): void {
+  for (const warning of project.warnings ?? []) {
+    logScan(`Warning [${warning.code}]: ${warning.message}`);
   }
+}
 
+function handleWriteBaseline(project: ProjectScanResult, projectRoot: string): void {
+  if (!(parsed.writeBaselineSet && parsed.writeBaselinePath)) return;
+  const entriesOut = findingsToBaselineEntries(projectRoot, project.findings);
+  const bf: BaselineFile = {
+    version: BASELINE_FILE_VERSION,
+    generatedAt: new Date().toISOString(),
+    tool: "vibescan",
+    note: "Findings after suppressions; CI with --baseline defers these until remediated.",
+    entries: entriesOut,
+  };
+  writeFileSync(parsed.writeBaselinePath, JSON.stringify(bf, null, 2), "utf-8");
+  console.error(`Wrote baseline (${entriesOut.length} entries): ${parsed.writeBaselinePath}`);
+  process.exit(0);
+}
+
+function applyBaselinePartition(project: ProjectScanResult): {
+  findingsForGate: Finding[];
+  displayFindings: Finding[];
+  baselineFindings: Finding[];
+  freshFindings: Finding[];
+  baselineData: BaselineFile | null;
+} {
   let baselineData: BaselineFile | null = null;
   if (effectiveBaselinePath) {
     try {
@@ -520,30 +294,57 @@ async function main(): Promise<void> {
       process.exit(1);
     }
   }
-
   const { baseline: baselineFindings, fresh: freshFindings } = baselineData
     ? partitionByBaseline(project.findings, baselineData.entries)
-    : { baseline: [], fresh: project.findings };
-
+    : { baseline: [] as Finding[], fresh: project.findings };
   const findingsForGate = baselineData ? freshFindings : project.findings;
   const displayFindings = baselineData
-    ? baselineIncludeKnown
+    ? parsed.baselineIncludeKnown
       ? project.findings
       : freshFindings
     : project.findings;
+  return { findingsForGate, displayFindings, baselineFindings, freshFindings, baselineData };
+}
 
-  if (findingsFail(findingsForGate)) exitCode = 1;
+function findingsFail(fs: Finding[]): boolean {
+  return fs.some((f) => f.severity === "critical" || f.severity === "error");
+}
 
-  const totalFindings = displayFindings.length;
-  const totalRaw = project.findings.length;
+function writeSidecars(
+  project: ProjectScanResult,
+  projectRoot: string
+): void {
+  let adjJson: string | undefined;
+  let adjCsv: string | undefined;
+  if (parsed.adjudicationStem) {
+    const w = writeAdjudicationExports(parsed.adjudicationStem, project.findings);
+    adjJson = w.jsonPath;
+    adjCsv = w.csvPath;
+    if (structuredStdout) console.error(`Wrote adjudication: ${adjJson}, ${adjCsv}`);
+  }
+  if (parsed.manifestPath) {
+    const man = buildRunManifest({
+      argv: rawArgs,
+      projectRoot,
+      includedFiles: files,
+      adjudicationJson: adjJson,
+      adjudicationCsv: adjCsv,
+      buildId: project.buildId ?? options.buildId,
+      openApiSpecsUsed: project.openApiSpecsUsed,
+    });
+    writeRunManifest(parsed.manifestPath, man);
+    if (structuredStdout) console.error(`Wrote manifest: ${parsed.manifestPath}`);
+  }
+}
 
-  maybeWriteSidecars(project.findings, projectRoot, {
-    buildId: project.buildId ?? options.buildId,
-    openApiSpecsUsed: project.openApiSpecsUsed,
-  });
-
-  if (useIdeAssist) {
-    const assistPath = aiAssistOutPath ?? join(projectRoot, "vibescan-ai-assist.md");
+function writeExports(
+  project: ProjectScanResult,
+  projectRoot: string,
+  entries: { path: string; source: string }[],
+  displayFindings: Finding[]
+): void {
+  if (options.mode === "ai") {
+    const assistPath = parsed.aiAssistOutPath ?? join(projectRoot, "vibescan-ai-assist.md");
     const scannedRelativePaths = entries.map((e) =>
       relative(projectRoot, e.path).split("\\").join("/")
     );
@@ -552,47 +353,70 @@ async function main(): Promise<void> {
       findings: displayFindings,
       scannedRelativePaths,
     });
-    const msg = `Wrote IDE assist prompt (Cursor / Claude Code): ${assistPath}`;
-    if (structuredStdout) console.error(msg);
-    else console.log(msg);
+    logScan(`Wrote IDE assist prompt (Cursor / Claude Code): ${assistPath}`);
   }
-
-  if (exportRoutesPath) {
+  if (parsed.exportRoutesPath) {
     writeFileSync(
-      exportRoutesPath,
-      JSON.stringify(
-        {
-          routeInventory: project.routeInventory ?? [],
-          routes: project.routes,
-        },
-        null,
-        2
-      ),
+      parsed.exportRoutesPath,
+      JSON.stringify({ routeInventory: project.routeInventory ?? [], routes: project.routes }, null, 2),
       "utf-8"
     );
-    if (structuredStdout) console.error(`Wrote route export: ${exportRoutesPath}`);
+    if (structuredStdout) console.error(`Wrote route export: ${parsed.exportRoutesPath}`);
   }
-
-  if (exportThirdPartySurfacePath) {
+  if (parsed.exportThirdPartySurfacePath) {
     writeFileSync(
-      exportThirdPartySurfacePath,
+      parsed.exportThirdPartySurfacePath,
       JSON.stringify(project.thirdPartySurface ?? null, null, 2),
       "utf-8"
     );
-    if (structuredStdout) console.error(`Wrote third-party surface export: ${exportThirdPartySurfacePath}`);
+    if (structuredStdout) console.error(`Wrote third-party surface export: ${parsed.exportThirdPartySurfacePath}`);
   }
+}
 
+function emitHtmlReport(projectOut: ProjectScanResult): void {
+  if (!parsed.htmlReport) return;
+  const htmlPath = parsed.htmlOutPath ?? join(process.cwd(), "vibescan-report.html");
+  const html = projectScanToHtmlReport(projectOut, {
+    generatedAt: new Date().toISOString(),
+    toolVersion: readScannerPackageVersion(),
+    buildId: projectOut.buildId ?? options.buildId,
+  });
+  writeFileSync(htmlPath, html, "utf-8");
+  logScan(`Wrote HTML report: ${htmlPath}`);
+}
+
+function emitFixSuggestions(displayFindings: Finding[]): void {
+  if (!parsed.fixSuggestions || displayFindings.length === 0) return;
+  const stream = structuredStdout ? console.error : console.log;
+  stream("\n--- Fix suggestions ---");
+  for (const f of displayFindings) {
+    const remed = f.remediation ?? f.fix;
+    if (remed) stream(`[${f.ruleId}] ${remed}`);
+  }
+}
+
+async function formatOutput(
+  project: ProjectScanResult,
+  projectRoot: string,
+  displayFindings: Finding[],
+  baselineFindings: Finding[],
+  freshFindings: Finding[],
+  baselineData: BaselineFile | null,
+  exitCode: number
+): Promise<number> {
   const projectOut = { ...project, findings: displayFindings };
+  const totalFindings = displayFindings.length;
+  const totalRaw = project.findings.length;
 
   if (format === "json") {
     const payload = JSON.parse(
       formatProjectJson(project, {
-        benchmarkMetadata,
-        includeRuleFamily: benchmarkMetadata,
+        benchmarkMetadata: parsed.benchmarkMetadata,
+        includeRuleFamily: parsed.benchmarkMetadata,
         toolVersion: readScannerPackageVersion(),
         gitCommit: tryGitCommit(projectRoot),
         scanOptions: {
-          ...scanOptionsEcho(options, format, benchmarkMetadata),
+          ...scanOptionsEcho(options, format, parsed.benchmarkMetadata),
           ...(baselineData && effectiveBaselinePath
             ? {
                 baseline: effectiveBaselinePath,
@@ -621,51 +445,62 @@ async function main(): Promise<void> {
     if (totalRaw === 0) {
       console.log("No vulnerabilities found.");
       emitHtmlReport(projectOut);
-      process.exit(0);
+      return exitCode;
     }
-    if (baselineData && freshFindings.length === 0 && baselineFindings.length > 0 && !baselineIncludeKnown) {
+    if (baselineData && freshFindings.length === 0 && baselineFindings.length > 0 && !parsed.baselineIncludeKnown) {
       console.log(
         `No new issues beyond baseline (${baselineFindings.length} known finding(s) deferred — use --baseline-include-known to list them).`
       );
       emitHtmlReport(projectOut);
-      process.exit(exitCode);
+      return exitCode;
     }
-    if (totalFindings === 0 && (!baselineData || baselineIncludeKnown)) {
+    if (totalFindings === 0 && (!baselineData || parsed.baselineIncludeKnown)) {
       console.log("No vulnerabilities found.");
       emitHtmlReport(projectOut);
-      process.exit(exitCode);
+      return exitCode;
     }
     const bl = baselineData
       ? ` (${freshFindings.length} affecting CI exit, ${baselineFindings.length} in baseline)`
       : "";
     console.log(`\n${totalFindings} finding${totalFindings === 1 ? "" : "s"} shown${bl}\n`);
-    if (baselineData && !baselineIncludeKnown) {
-      const msg = `(Baseline active: ${baselineFindings.length} deferred; exit reflects new issues only.)`;
-      if (structuredStdout) console.error(msg);
-      else console.log(msg);
+    if (baselineData && !parsed.baselineIncludeKnown) {
+      logScan(`(Baseline active: ${baselineFindings.length} deferred; exit reflects new issues only.)`);
     }
     const display = projectFindingsToScanResults(projectOut);
-    if (format === "human") console.log(formatHuman(display, useColor));
-    else console.log(formatCompact(display, useColor));
+    if (format === "human") console.log(formatHuman(display, parsed.useColor));
+    else console.log(formatCompact(display, parsed.useColor));
   }
 
-  if (fixSuggestions && format !== "human" && format !== "json" && format !== "sarif" && totalFindings > 0) {
-    console.log("\n--- Fix suggestions ---");
-    for (const f of displayFindings) {
-      const remed = f.remediation ?? f.fix;
-      if (remed) console.log(`[${f.ruleId}] ${remed}`);
-    }
-  }
-  if ((format === "json" || format === "sarif") && fixSuggestions && totalFindings > 0) {
-    console.error("\n--- Fix suggestions ---");
-    for (const f of displayFindings) {
-      const remed = f.remediation ?? f.fix;
-      if (remed) console.error(`[${f.ruleId}] ${remed}`);
-    }
-  }
-
+  emitFixSuggestions(displayFindings);
   emitHtmlReport(projectOut);
-  process.exit(exitCode);
+  return exitCode;
+}
+
+// ─── Main orchestrator ──────────────────────────────────────────────
+
+async function main(): Promise<void> {
+  const { project, projectRoot, entries } = await runScan();
+  emitWarnings(project);
+  handleWriteBaseline(project, projectRoot);
+
+  const { findingsForGate, displayFindings, baselineFindings, freshFindings, baselineData } =
+    applyBaselinePartition(project);
+  const exitCode = findingsFail(findingsForGate) ? 1 : 0;
+
+  writeSidecars(project, projectRoot);
+  writeExports(project, projectRoot, entries, displayFindings);
+
+  const finalCode = await formatOutput(
+    project,
+    projectRoot,
+    displayFindings,
+    baselineFindings,
+    freshFindings,
+    baselineData,
+    exitCode
+  );
+
+  process.exit(finalCode);
 }
 
 main().catch((err) => {

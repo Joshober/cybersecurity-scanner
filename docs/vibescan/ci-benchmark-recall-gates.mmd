@@ -1,0 +1,32 @@
+flowchart TD
+  subgraph CI ["GitHub Actions CI"]
+    START[Push / PR / Schedule trigger] --> DEPS[Checkout + npm install]
+    DEPS --> UNIT[npm test: unit + smoke tests]
+  end
+
+  subgraph VALIDATE ["Benchmark Validation"]
+    UNIT --> VB[validate-committed-benchmarks: schema checks]
+    VB --> VF[validate-rule-family-coverage: manifest vs rules]
+  end
+
+  subgraph FRAMEWORK ["Framework Corpus Scan"]
+    VF --> FS[run-framework-vuln-scan: VibeScan scans seed corpus]
+    FS --> FA[assert-framework-recall: every expected rule row present?]
+    FA --> PASS{All rows found?}
+    PASS -- No --> FAIL[CI build fails]
+    PASS -- Yes --> READ[generate-outperform-readout: write markdown summary]
+  end
+
+  subgraph ARTIFACTS ["Result Artifacts"]
+    READ --> A1[results/outperform-readout.md]
+    READ --> A2[framework scan report JSON]
+  end
+
+  subgraph HEAVY ["Scheduled Heavy Lane"]
+    A1 & A2 --> HQ{Scheduled or manual dispatch?}
+    HQ -- No --> DONE[CI completes]
+    HQ -- Yes --> DVNA[run-dvna-vibescan-scan: scan pinned DVNA commit]
+    DVNA --> PROOFS[--generate-tests: emit proof artifacts]
+    PROOFS --> BASELINE[Store ci_dvna_recall_baseline + proofs]
+    BASELINE --> DONE
+  end

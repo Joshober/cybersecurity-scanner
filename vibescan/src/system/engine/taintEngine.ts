@@ -12,7 +12,7 @@ import type {
 } from "estree";
 import ts from "typescript";
 import { walk } from "../walker.js";
-import type { Finding, ScannerOptions, Severity, SeverityLabel } from "../types.js";
+import type { Finding, ScannerOptions, Severity } from "../types.js";
 import type { ParseResult } from "../parser/parseFile.js";
 import { describeCalleeName } from "../utils/helpers.js";
 import { getRequestSourceLabel } from "../sources/express.js";
@@ -23,19 +23,7 @@ import {
 } from "../sinks/index.js";
 import { looksParameterized } from "../sanitizers/sql.js";
 import { getCallResolution, getSymbolDeclarationForCall } from "../typescript/semantic.js";
-
-const SEVERITY_ORDER: Record<Severity, number> = {
-  critical: 3,
-  error: 2,
-  warning: 1,
-  info: 0,
-};
-const SEVERITY_LABEL: Record<Severity, SeverityLabel> = {
-  critical: "CRITICAL",
-  error: "HIGH",
-  warning: "MEDIUM",
-  info: "LOW",
-};
+import { SEVERITY_ORDER, SEVERITY_LABEL } from "./severity.js";
 
 function getSourceLabelFromMember(node: MemberExpression): string | null {
   if (node.object.type === "Identifier" && node.property.type === "Identifier") {

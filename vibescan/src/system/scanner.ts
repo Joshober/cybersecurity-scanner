@@ -1,10 +1,17 @@
 // Main scan pipeline: parse, pattern rules, taint, route graph, audits, optional registry/tests.
 
 import type { Program } from "estree";
-import type { Finding, ScannerOptions, ScanResult, ProjectScanResult, ScanWarning } from "./types.js";
+import type {
+  Finding,
+  Severity,
+  ScannerOptions,
+  ScanResult,
+  ProjectScanResult,
+  ScanWarning,
+  RouteNode,
+} from "./types.js";
 import type { Rule } from "./utils/rule-types.js";
-import { parseFile } from "./parser/parseFile.js";
-import { extractEjsScriptBlocks } from "./parser/ejsScripts.js";
+import { parseFile, type ParseResult } from "./parser/parseFile.js";
 import { extractRouteGraph } from "./parser/routeGraph.js";
 import { extractNextAppRouteHandlers } from "./parser/nextRouteGraph.js";
 import { createTsProjectContext, type TsProjectContext } from "./parser/tsProject.js";
@@ -23,6 +30,8 @@ import { analyzeThirdPartySurface } from "./depsurface/analyzer.js";
 import { cryptoRules, injectionRules } from "../attacks/index.js";
 import { checkDependencies, findPackageJsonNear } from "./ai/slopsquat.js";
 
+// ─── Helpers ────────────────────────────────────────────────────────
+
 function getRules(options: ScannerOptions): Rule[] {
   const rules: Rule[] = [];
   if (options.crypto !== false) rules.push(...cryptoRules);
@@ -30,13 +39,21 @@ function getRules(options: ScannerOptions): Rule[] {
   return rules;
 }
 
-function filterByThreshold(findings: Finding[], threshold?: import("./types.js").Severity): Finding[] {
+function filterByThreshold(findings: Finding[], threshold?: Severity): Finding[] {
   if (!threshold) return findings;
   const min = SEVERITY_ORDER[threshold];
   return findings.filter((f) => SEVERITY_ORDER[f.severity] >= min);
 }
 
-function shiftRuleFindings(findings: Finding[], lineDelta: number, fullSource: string): Finding[] {
+function collectAndFilterFindings(
+  target: Finding[],
+  newFindings: Finding[],
+  threshold?: Severity
+): void {
+  target.push(...filterByThreshold(newFindings, threshold));
+}
+
+function shiftFindings(findings: Finding[], lineDelta: number, fullSource: string): Finding[] {
   const lines = fullSource.split("\n");
   return findings.map((f) => {
     const line = f.line + lineDelta;
@@ -49,107 +66,170 @@ function shiftRuleFindings(findings: Finding[], lineDelta: number, fullSource: s
   });
 }
 
-// Scan one file: parse to AST, run pattern rules, taint, route extraction, app-level audit.
+function extractRoutesFromParsed(
+  ast: Program,
+  source: string,
+  filePath: string,
+  projectRoot?: string
+): RouteNode[] {
+  return [
+    ...extractRouteGraph(ast, source, filePath),
+    ...extractNextAppRouteHandlers(ast, source, filePath, projectRoot),
+  ];
+}
+
+// ─── Analysis Unit ──────────────────────────────────────────────────
+// Normalizes the parse → analyze boundary.
+// A normal file produces one unit with fullAst=true.
+// An EJS file produces N units (one per <script> block) with fullAst=false.
+
+interface AnalysisUnit {
+  ast: Program;
+  source: string;
+  parseResult: ParseResult;
+  fullAst: boolean;
+  lineDelta: number;
+}
+
+function buildAnalysisUnits(parseResult: ParseResult): AnalysisUnit[] {
+  if (parseResult.ejsBlocks) {
+    return parseResult.ejsBlocks.map((block) => ({
+      ast: block.parseResult.ast,
+      source: block.parseResult.source,
+      parseResult: block.parseResult,
+      fullAst: false,
+      lineDelta: block.lineDelta,
+    }));
+  }
+  return [
+    {
+      ast: parseResult.ast,
+      source: parseResult.source,
+      parseResult,
+      fullAst: true,
+      lineDelta: 0,
+    },
+  ];
+}
+
+// ─── Per-file analysis ──────────────────────────────────────────────
+// Accepts a pre-parsed result so the caller can cache/reuse parses.
+
+function analyzeFile(
+  parseResult: ParseResult,
+  filePath: string,
+  options: ScannerOptions
+): { findings: Finding[]; routes: RouteNode[] } {
+  const rules = getRules(options);
+  const units = buildAnalysisUnits(parseResult);
+  const findings: Finding[] = [];
+  const routes: RouteNode[] = [];
+
+  for (const unit of units) {
+    // Pattern rules run on every unit (EJS blocks and normal files alike).
+    const patternFindings = runRuleEngine({
+      filePath,
+      source: unit.source,
+      ast: unit.ast,
+      rules,
+      options,
+      parseResult: unit.parseResult,
+    });
+    if (unit.lineDelta > 0) {
+      findings.push(...shiftFindings(patternFindings, unit.lineDelta, parseResult.source));
+    } else {
+      findings.push(...patternFindings);
+    }
+
+    // Taint, route extraction, and app-level audit only run on full ASTs.
+    if (!unit.fullAst) continue;
+
+    if (options.injection !== false) {
+      findings.push(
+        ...runTaintEngine({
+          filePath,
+          source: unit.source,
+          ast: unit.ast,
+          options,
+          parseResult: unit.parseResult,
+        })
+      );
+    }
+
+    const fileRoutes = extractRoutesFromParsed(unit.ast, unit.source, filePath, options.projectRoot);
+    routes.push(...fileRoutes);
+
+    findings.push(
+      ...runAppLevelAudit(unit.ast, unit.source, {
+        hasRoutes: fileRoutes.length > 0,
+        filePath,
+      })
+    );
+  }
+
+  return {
+    findings: filterByThreshold(findings, options.severityThreshold),
+    routes,
+  };
+}
+
+// ─── Public API ─────────────────────────────────────────────────────
+
 export function scan(
   source: string,
   filePath: string,
   options: ScannerOptions = {},
   scanContext?: { tsProject?: TsProjectContext | null }
 ): ScanResult {
-  const warnings: ScanWarning[] = [];
   const parseResult = parseFile(source, filePath, { tsProject: scanContext?.tsProject });
-  const lowerPath = filePath.replace(/\\/g, "/").toLowerCase();
-  const isEjs = lowerPath.endsWith(".ejs");
 
-  if (!parseResult && !isEjs) {
-    return { filePath, findings: [], source, warnings };
+  if (!parseResult) {
+    return { filePath, findings: [], source, warnings: [] };
   }
 
-  const rules = getRules(options);
-  let patternFindings: Finding[] = [];
-  let ast: Program;
-  let src: string;
-
-  if (parseResult) {
-    ast = parseResult.ast;
-    src = parseResult.source;
-    patternFindings = runRuleEngine({
-      filePath,
-      source: src,
-      ast,
-      rules,
-      options,
-      parseResult,
-    });
-  } else {
-    src = source;
-    ast = { type: "Program", body: [], sourceType: "script" } as Program;
-    for (const block of extractEjsScriptBlocks(source)) {
-      if (!block.content.trim()) continue;
-      const pr = parseFile(block.content, filePath, { tsProject: scanContext?.tsProject });
-      if (!pr) continue;
-      const chunk = runRuleEngine({
-        filePath,
-        source: pr.source,
-        ast: pr.ast,
-        rules,
-        options,
-        parseResult: pr,
-      });
-      patternFindings.push(...shiftRuleFindings(chunk, block.baseLine - 1, source));
-    }
-  }
-
-  const taintFindings: Finding[] =
-    options.injection !== false && parseResult
-      ? runTaintEngine({
-          filePath,
-          source: src,
-          ast,
-          options,
-          parseResult,
-        })
-      : [];
-
-  const expressRoutes = parseResult ? extractRouteGraph(ast, src, filePath) : [];
-  const nextRoutes = parseResult
-    ? extractNextAppRouteHandlers(ast, src, filePath, options.projectRoot)
-    : [];
-  const routes = [...expressRoutes, ...nextRoutes];
-  const appAudit = parseResult
-    ? runAppLevelAudit(ast, src, { hasRoutes: routes.length > 0, filePath })
-    : [];
-  const appAuditFiltered = filterByThreshold(appAudit, options.severityThreshold);
-
-  const findings = filterByThreshold(
-    [...patternFindings, ...taintFindings, ...appAuditFiltered],
-    options.severityThreshold
-  );
-
-  return { filePath, findings, source: src, routes, warnings };
+  const { findings, routes } = analyzeFile(parseResult, filePath, options);
+  return { filePath, findings, source: parseResult.source, routes, warnings: [] };
 }
 
-/** Multi-file scan: per-file findings + merged route graph + middleware audit + optional registry/tests. */
 export function scanProject(
   files: { path: string; source: string }[],
   options: ScannerOptions = {}
 ): ProjectScanResult {
-  const fileResults: ScanResult[] = [];
   const packageJsonPath = findPackageJsonNear(options.projectRoot ?? process.cwd());
   const tsProject = createTsProjectContext(files, options);
-  const allRoutes = extractRouteGraphFromFiles(files, options.projectRoot, tsProject);
-  const allFindings: Finding[] = [];
   const warnings: ScanWarning[] = [...(tsProject?.warnings ?? [])];
+  const threshold = options.severityThreshold;
 
+  // Parse every file once; reuse for both route pre-scan and per-file analysis.
+  const parsed = new Map<string, ParseResult | null>();
   for (const f of files) {
-    const one = scan(f.source, f.path, options, { tsProject });
-    fileResults.push(one);
-    allFindings.push(...one.findings);
-    if (one.warnings?.length) warnings.push(...one.warnings);
+    parsed.set(f.path, parseFile(f.source, f.path, { tsProject }));
   }
 
-  const mw = filterByThreshold(runMiddlewareAudit(allRoutes), options.severityThreshold);
-  allFindings.push(...mw);
+  // Pre-scan: extract routes from all parseable non-EJS files.
+  const allRoutes: RouteNode[] = [];
+  for (const f of files) {
+    const pr = parsed.get(f.path);
+    if (!pr || pr.ejsBlocks) continue;
+    allRoutes.push(...extractRoutesFromParsed(pr.ast, pr.source, f.path, options.projectRoot));
+  }
+
+  // Per-file analysis using cached parse results.
+  const fileResults: ScanResult[] = [];
+  const allFindings: Finding[] = [];
+  for (const f of files) {
+    const pr = parsed.get(f.path);
+    if (!pr) {
+      fileResults.push({ filePath: f.path, findings: [], source: f.source, warnings: [] });
+      continue;
+    }
+    const { findings, routes } = analyzeFile(pr, f.path, options);
+    fileResults.push({ filePath: f.path, findings, source: pr.source, routes, warnings: [] });
+    allFindings.push(...findings);
+  }
+
+  // Cross-file audits.
+  collectAndFilterFindings(allFindings, runMiddlewareAudit(allRoutes), threshold);
 
   const specPaths = resolveOpenApiSpecPaths(
     options.projectRoot,
@@ -157,18 +237,11 @@ export function scanProject(
     options.openApiDiscovery
   );
   if (specPaths.length > 0) {
-    const drift = filterByThreshold(
-      runOpenApiDriftAudit(allRoutes, specPaths),
-      options.severityThreshold
-    );
-    allFindings.push(...drift);
+    collectAndFilterFindings(allFindings, runOpenApiDriftAudit(allRoutes, specPaths), threshold);
   }
 
-  const posture = filterByThreshold(runRoutePostureFinding(allRoutes), options.severityThreshold);
-  allFindings.push(...posture);
-
-  const wh = filterByThreshold(runWebhookAudit(allRoutes), options.severityThreshold);
-  allFindings.push(...wh);
+  collectAndFilterFindings(allFindings, runRoutePostureFinding(allRoutes), threshold);
+  collectAndFilterFindings(allFindings, runWebhookAudit(allRoutes), threshold);
 
   const routeInventory = buildRouteInventory(allRoutes);
   const thirdPartySurface = analyzeThirdPartySurface(
@@ -190,21 +263,6 @@ export function scanProject(
   };
 }
 
-function extractRouteGraphFromFiles(
-  files: { path: string; source: string }[],
-  projectRoot?: string,
-  tsProject?: TsProjectContext | null
-): import("./types.js").RouteNode[] {
-  const routes: import("./types.js").RouteNode[] = [];
-  for (const f of files) {
-    const pr = parseFile(f.source, f.path, { tsProject });
-    if (!pr) continue;
-    routes.push(...extractRouteGraph(pr.ast, pr.source, f.path));
-    routes.push(...extractNextAppRouteHandlers(pr.ast, pr.source, f.path, projectRoot));
-  }
-  return routes;
-}
-
 export async function scanProjectAsync(
   files: { path: string; source: string }[],
   options: ScannerOptions = {},
@@ -215,13 +273,14 @@ export async function scanProjectAsync(
   const base = scanProject(files, opts);
   const packageJsonPath = base.packageJsonPath ?? findPackageJsonNear(opts.projectRoot ?? root);
 
-  if (opts.checkRegistry && !opts.skipRegistry && packageJsonPath) {
-    const slop = await checkDependencies(packageJsonPath, { skipRegistry: opts.skipRegistry });
-    base.findings.push(...filterByThreshold(slop, opts.severityThreshold));
-  }
+  const registryFindings: Finding[] =
+    opts.checkRegistry && !opts.skipRegistry && packageJsonPath
+      ? filterByThreshold(await checkDependencies(packageJsonPath, { skipRegistry: opts.skipRegistry }), opts.severityThreshold)
+      : [];
 
   if (opts.generateTests && opts.generateTestsOutputDir) {
-    const written = generateTests(base.findings, opts.generateTestsOutputDir, { projectRoot: root });
+    const allFindings = [...base.findings, ...registryFindings];
+    const written = generateTests(allFindings, opts.generateTestsOutputDir, { projectRoot: root });
     if (written.length > 0) {
       console.error(
         `VibeScan: wrote ${written.length} local proof-oriented test file(s) under ${opts.generateTestsOutputDir}`
@@ -231,6 +290,7 @@ export async function scanProjectAsync(
 
   return {
     ...base,
+    findings: [...base.findings, ...registryFindings],
     packageJsonPath,
     thirdPartySurface: base.thirdPartySurface
       ? {
@@ -241,13 +301,13 @@ export async function scanProjectAsync(
   };
 }
 
-// Async wrapper around sync scan (API compatibility for callers; mode does not change per-file results).
 export async function scanAsync(
   source: string,
   filePath: string,
-  options: ScannerOptions = {}
+  options: ScannerOptions = {},
+  scanContext?: { tsProject?: TsProjectContext | null }
 ): Promise<ScanResult> {
-  return Promise.resolve(scan(source, filePath, options));
+  return Promise.resolve(scan(source, filePath, options, scanContext));
 }
 
 export { cryptoRules, injectionRules } from "../attacks/index.js";

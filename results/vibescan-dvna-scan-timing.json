@@ -1,0 +1,8 @@
+{
+  "tool": "VibeScan",
+  "corpus": "DVNA",
+  "durationMs": 862.79,
+  "measuredAt": "2026-04-07",
+  "command": "node vibescan/dist/system/cli/index.js scan benchmarks/dvna/dvna --format json --exclude-vendor",
+  "notes": "Wall-clock duration measured with PowerShell Measure-Command on local machine."
+}
