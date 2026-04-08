@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: vibescan-demo
+    runtime: node
+    plan: free
+    rootDir: demo
+    buildCommand: |
+      npm install
+      npm install @jobersteadt/vibescan@latest
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20
+

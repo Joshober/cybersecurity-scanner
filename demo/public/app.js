@@ -7,42 +7,58 @@ const resultsEl = $("#results");
 const blockedBigEl = $("#blockedBig");
 const totalFindingsEl = $("#totalFindings");
 const critErrCountEl = $("#critErrCount");
-const findingsEl = $("#findings");
+const openReportEl = $("#openReport");
+const openPromptEl = $("#openPrompt");
+const reportFrameEl = $("#reportFrame");
+const promptBoxEl = $("#promptBox");
+const copyPromptEl = $("#copyPrompt");
+const promptStatusEl = $("#promptStatus");
+const leaderRepoEl = $("#leaderRepo");
+const leaderCountEl = $("#leaderCount");
 
 function setStatus(msg) {
   statusEl.textContent = msg;
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function severityToBadge(sev) {
-  return `<span class="badge">${escapeHtml(sev || "")}</span>`;
-}
-
-function renderFinding(f) {
-  const badge = severityToBadge(f.severityLabel);
-  const ruleId = escapeHtml(f.ruleId || "");
-  const fileLine = escapeHtml(f.file || "(unknown)");
-  const message = escapeHtml(f.message || "");
-  return `
-    <div class="finding">
-      <div>${badge} <span style="color:#9898a8;font-size:12px;font-weight:800;">${ruleId}</span></div>
-      <div class="fileLine">${fileLine}</div>
-      <div class="findingMsg">${message}</div>
-    </div>
-  `;
-}
-
 function getSelectedScenario() {
   const checked = document.querySelector("input[name='scenario']:checked");
   return checked ? checked.value : "original";
+}
+
+async function fetchText(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${await r.text().catch(() => "")}`.trim());
+  return await r.text();
+}
+
+async function fetchJson(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${await r.text().catch(() => "")}`.trim());
+  return await r.json();
+}
+
+function setPromptStatus(msg) {
+  promptStatusEl.textContent = msg;
+}
+
+function setLeaderboard(top) {
+  if (!leaderRepoEl || !leaderCountEl) return;
+  if (!top) {
+    leaderRepoEl.textContent = "—";
+    leaderCountEl.textContent = "—";
+    return;
+  }
+  leaderRepoEl.textContent = top.repoLabel || top.repoGitUrl || "—";
+  leaderCountEl.textContent = String(top.totalFindings ?? "—");
+}
+
+async function refreshLeaderboard() {
+  try {
+    const data = await fetchJson("/api/leaderboard");
+    setLeaderboard(data.top);
+  } catch {
+    // Non-fatal; keep placeholders.
+  }
 }
 
 async function startScan() {
@@ -51,7 +67,12 @@ async function startScan() {
 
   scanBtn.disabled = true;
   resultsEl.style.display = "none";
-  findingsEl.innerHTML = "";
+  reportFrameEl.removeAttribute("src");
+  promptBoxEl.value = "";
+  copyPromptEl.disabled = true;
+  setPromptStatus("—");
+  openReportEl.style.display = "none";
+  openPromptEl.style.display = "none";
   setStatus("Queued scan…");
 
   const res = await fetch("/api/scan", {
@@ -106,6 +127,7 @@ async function pollScan(scanId) {
       scanBtn.disabled = false;
       setStatus("Scan complete.");
       showResults(data.result);
+      refreshLeaderboard();
       return;
     }
 
@@ -129,13 +151,48 @@ function showResults(result) {
   totalFindingsEl.textContent = String(result.totalFindings ?? "—");
   critErrCountEl.textContent = String(result.criticalOrErrorCount ?? "—");
 
-  const top = result.topFindings || [];
-  findingsEl.innerHTML = top.length
-    ? top.map(renderFinding).join("")
-    : `<div style="color:#9898a8;font-size:13px;">No findings to display.</div>`;
+  if (result.reportPath) {
+    openReportEl.href = result.reportPath;
+    openReportEl.style.display = "inline-flex";
+    reportFrameEl.src = result.reportPath;
+  }
+
+  if (result.promptPath) {
+    openPromptEl.href = result.promptPath;
+    openPromptEl.style.display = "inline-flex";
+    setPromptStatus("Loading…");
+    fetchText(result.promptPath)
+      .then((md) => {
+        promptBoxEl.value = md;
+        copyPromptEl.disabled = md.trim().length === 0;
+        setPromptStatus(md.trim().length ? "Ready" : "Empty prompt");
+      })
+      .catch((e) => {
+        promptBoxEl.value = "";
+        copyPromptEl.disabled = true;
+        setPromptStatus(`Failed to load prompt: ${String(e?.message || e)}`);
+      });
+  }
 }
 
 scanBtn.addEventListener("click", () => {
   startScan();
+});
+
+refreshLeaderboard();
+
+copyPromptEl.addEventListener("click", async () => {
+  const text = promptBoxEl.value || "";
+  if (!text.trim()) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    setPromptStatus("Copied to clipboard");
+  } catch {
+    // Fallback for older browsers / clipboard permissions.
+    promptBoxEl.focus();
+    promptBoxEl.select();
+    document.execCommand("copy");
+    setPromptStatus("Copied (fallback)");
+  }
 });
 

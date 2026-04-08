@@ -4,16 +4,47 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import fg from "fast-glob";
 
-const PUBLIC_DIR = path.resolve(process.cwd(), "demo/public");
-const TMP_DIR = path.resolve(process.cwd(), "demo/.tmp");
+const DEMO_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = path.resolve(DEMO_DIR, "public");
+const TMP_DIR = path.resolve(DEMO_DIR, ".tmp");
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 // In-memory job store (demo server is intended to be short-lived).
 const jobs = new Map();
+const leaderboard = {
+  repoLabel: null,
+  repoGitUrl: null,
+  totalFindings: 0,
+};
+
+function repoLabelFromGitUrl(repoGitUrl) {
+  try {
+    const u = new URL(repoGitUrl);
+    const parts = u.pathname.split("/").filter(Boolean);
+    if (parts.length >= 2) {
+      const owner = parts[0];
+      const repo = parts[1].replace(/\.git$/, "");
+      return `${owner}/${repo}`;
+    }
+  } catch {
+    // ignore
+  }
+  return repoGitUrl;
+}
+
+function sendText(res, status, body, contentType) {
+  const buf = Buffer.from(body ?? "", "utf8");
+  res.writeHead(status, {
+    "Content-Type": contentType,
+    "Content-Length": buf.length,
+    "Cache-Control": "no-store",
+  });
+  res.end(buf);
+}
 
 function contentTypeFor(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -121,6 +152,67 @@ function severityWeight(sev) {
   return 0;
 }
 
+function escCell(s) {
+  return String(s ?? "").replaceAll("|", "\\|").replace(/\r?\n/g, " ");
+}
+
+function buildAiPromptMarkdown({ projectRoot, findings, scannedRelativePaths }) {
+  const rows = (findings || []).map((f) => {
+    const loc = f.filePath != null ? `${f.filePath}:${f.line}` : `:${f.line}`;
+    return `| ${escCell(f.ruleId)} | ${escCell(f.severity)} | ${escCell(loc)} | ${escCell(f.message)} |`;
+  });
+
+  const table =
+    rows.length > 0
+      ? ["| ruleId | severity | location | message |", "| --- | --- | --- | --- |", ...rows].join("\n")
+      : "_No findings at the current severity threshold._";
+
+  const files = [...new Set(scannedRelativePaths || [])].sort();
+  const filesBlock = files.length ? files.map((p) => `- \`${p}\``).join("\n") : "_No files listed._";
+
+  const json = JSON.stringify(
+    (findings || []).map((f) => ({
+      ruleId: f.ruleId,
+      severity: f.severity,
+      message: f.message,
+      filePath: f.filePath,
+      line: f.line,
+      column: f.column,
+      remediation: f.remediation ?? f.fix,
+    })),
+    null,
+    2
+  );
+
+  return `# VibeScan — IDE-assisted security review
+
+VibeScan does not call a remote LLM API or ask for API keys. This file is a paste-in prompt for tools that already run in your repo (Cursor, Claude Code, etc).
+
+## Paste into your assistant
+
+Use the static findings below. For each row: open the location, confirm the issue, rate false-positive risk, and propose a concrete fix (code-level). Prefer minimal, testable changes.
+
+### Summary table
+
+${table}
+
+### Files included in this scan
+
+${filesBlock}
+
+---
+
+## Machine-readable findings (JSON)
+
+\`\`\`json
+${json}
+\`\`\`
+
+---
+Project root (scanner): \`${projectRoot}\`
+`;
+}
+
 async function runScanJob(scanId, repoGitUrl, scenario) {
   const job = jobs.get(scanId);
   if (!job) return;
@@ -146,13 +238,10 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       await maybePatchSimulatedHack(repoDir);
     }
 
-    const distIndex = path.resolve(process.cwd(), "vibescan/dist/system/index.js");
-    if (!existsSync(distIndex)) {
-      throw new Error(`Scanner build not found at ${distIndex}. Run 'npm run build' or 'npm run build -w @jobersteadt/vibescan' from the repo root first.`);
-    }
-
-    const scanner = await import(pathToFileURL(distIndex).href);
+    // Use the published npm package (Render deploys can install @latest).
+    const scanner = await import("@jobersteadt/vibescan");
     const scanProjectAsync = scanner.scanProjectAsync;
+    const projectScanToHtmlReport = scanner.projectScanToHtmlReport;
 
     const files = await listScanFiles(repoDir);
     const entries = [];
@@ -194,6 +283,25 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
         };
       });
 
+    const scannedRelativePaths = files
+      .map((abs) => (abs && abs.startsWith(repoDir) ? path.relative(repoDir, abs) : abs))
+      .filter(Boolean);
+
+    // Pre-render the report HTML so the UI can match VibeScan's real report.
+    // NOTE: we only embed metadata safe for display in a local demo.
+    const reportHtml = typeof projectScanToHtmlReport === "function"
+      ? projectScanToHtmlReport(project, {
+          generatedAt: new Date().toISOString(),
+          projectLabel: repoGitUrl,
+        })
+      : null;
+
+    const promptMarkdown = buildAiPromptMarkdown({
+      projectRoot,
+      findings,
+      scannedRelativePaths,
+    });
+
     job.result = {
       repoGitUrl,
       scenario,
@@ -202,6 +310,21 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       criticalOrErrorCount: criticalOrError.length,
       countsBySeverity,
       topFindings,
+      // For UI deep-links.
+      reportPath: `/api/scan/${scanId}/report.html`,
+      promptPath: `/api/scan/${scanId}/prompt.md`,
+    };
+
+    // Update leaderboard (max total findings in this server session).
+    if (Number.isFinite(findings.length) && findings.length > (leaderboard.totalFindings ?? 0)) {
+      leaderboard.totalFindings = findings.length;
+      leaderboard.repoGitUrl = repoGitUrl;
+      leaderboard.repoLabel = repoLabelFromGitUrl(repoGitUrl);
+    }
+    job.artifacts = {
+      repoDir,
+      reportHtml,
+      promptMarkdown,
     };
     job.state = "done";
   } catch (err) {
@@ -254,6 +377,18 @@ const server = http.createServer((req, res) => {
     }
 
     if (pathname.startsWith("/api/")) {
+      if (req.method === "GET" && pathname === "/api/leaderboard") {
+        sendJson(res, 200, {
+          top: leaderboard.repoGitUrl
+            ? {
+                repoLabel: leaderboard.repoLabel,
+                repoGitUrl: leaderboard.repoGitUrl,
+                totalFindings: leaderboard.totalFindings,
+              }
+            : null,
+        });
+        return;
+      }
       if (req.method === "POST" && pathname === "/api/scan") {
         const body = await readJsonBody(req);
         const repoInput = String(body.repoUrl || "");
@@ -278,10 +413,40 @@ const server = http.createServer((req, res) => {
       }
 
       if (req.method === "GET" && pathname.startsWith("/api/scan/")) {
-        const scanId = pathname.split("/").pop();
+        const parts = pathname.split("/").filter(Boolean);
+        const scanId = parts[2];
+        const tail = parts[3];
         const job = jobs.get(scanId);
         if (!job) {
           sendJson(res, 404, { error: "Unknown scanId" });
+          return;
+        }
+
+        if (req.method === "GET" && tail === "report.html") {
+          if (job.state !== "done") {
+            sendJson(res, 409, { error: `Scan not ready (state: ${job.state})` });
+            return;
+          }
+          const html = job.artifacts?.reportHtml;
+          if (!html) {
+            sendJson(res, 500, { error: "Report renderer not available (missing build output)" });
+            return;
+          }
+          sendText(res, 200, html, "text/html; charset=utf-8");
+          return;
+        }
+
+        if (req.method === "GET" && tail === "prompt.md") {
+          if (job.state !== "done") {
+            sendJson(res, 409, { error: `Scan not ready (state: ${job.state})` });
+            return;
+          }
+          const md = job.artifacts?.promptMarkdown;
+          if (!md) {
+            sendJson(res, 500, { error: "Prompt generator not available (missing build output)" });
+            return;
+          }
+          sendText(res, 200, md, "text/markdown; charset=utf-8");
           return;
         }
 

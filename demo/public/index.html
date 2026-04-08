@@ -13,6 +13,19 @@
         <div class="tag">Downstream security scanning for LLM-generated Node.js apps</div>
       </header>
 
+      <section class="panel leaderboard" id="leaderboard">
+        <div class="leaderRow">
+          <div>
+            <div class="leaderTitle">Leaderboard</div>
+            <div class="leaderSub">Most total findings across scans in this session</div>
+          </div>
+          <div class="leaderStat">
+            <div id="leaderRepo" class="leaderRepo">—</div>
+            <div class="leaderCount"><span id="leaderCount">—</span> findings</div>
+          </div>
+        </div>
+      </section>
+
       <section class="panel">
         <h2 class="h2">1) Choose a GitHub repo</h2>
         <label class="label" for="repoUrl">Repo URL (github.com only)</label>
@@ -36,8 +49,16 @@
       </section>
 
       <section class="panel" id="results" style="display: none;">
-        <h2 class="h2">Decision</h2>
-        <div id="blockedBig" class="big">—</div>
+        <div class="resultsHeader">
+          <div>
+            <h2 class="h2">Decision</h2>
+            <div id="blockedBig" class="big">—</div>
+          </div>
+          <div class="resultsLinks">
+            <a id="openReport" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open full report</a>
+            <a id="openPrompt" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open AI prompt</a>
+          </div>
+        </div>
 
         <div class="row">
           <div class="metric">
@@ -50,11 +71,20 @@
           </div>
         </div>
 
-        <h2 class="h2">Top findings</h2>
-        <div id="findings" class="findings"></div>
+        <div class="panelSub">
+          <h2 class="h2">VibeScan report (real HTML renderer)</h2>
+          <div class="iframeWrap">
+            <iframe id="reportFrame" title="VibeScan HTML report"></iframe>
+          </div>
+        </div>
 
-        <div class="hint">
-          What this means: VibeScan blocks changes when it sees high-confidence security patterns in generated code paths.
+        <div class="panelSub" style="margin-top:12px;">
+          <h2 class="h2">AI fix prompt (paste into Cursor / Claude Code / etc)</h2>
+          <div class="promptRow">
+            <button id="copyPrompt" class="btnSmall" disabled>Copy</button>
+            <span id="promptStatus" class="statusSmall">—</span>
+          </div>
+          <textarea id="promptBox" class="textarea" spellcheck="false" placeholder="Prompt will appear after scan completes…" readonly></textarea>
         </div>
       </section>
 
