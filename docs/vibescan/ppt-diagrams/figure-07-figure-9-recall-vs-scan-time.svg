@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Recall vs Scan Time</title>
-  <style>body{font-family:system-ui,sans-serif;margin:24px;background:#f8fafc;color:#0f172a}.card{max-width:760px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgb(0 0 0 / 0.08)}h1{font-size:1.1rem;margin:0 0 12px}</style>
-  </head><body><h1>Recall vs Scan Time</h1><div class="card"><svg viewBox="0 0 480 280" width="100%" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 480 280" width="100%" xmlns="http://www.w3.org/2000/svg">
 <text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs Scan Time</text>
 <line x1="52" y1="238" x2="456" y2="238" stroke="#64748b"/>
 <line x1="52" y1="34" x2="52" y2="238" stroke="#64748b"/>
@@ -17,11 +15,11 @@
 <line x1="52" y1="115.60000000000001" x2="456" y2="115.60000000000001" stroke="#e2e8f0"/><text x="44" y="118.60000000000001" font-size="8" text-anchor="end" fill="#64748b">60%</text>
 <line x1="52" y1="74.79999999999998" x2="456" y2="74.79999999999998" stroke="#e2e8f0"/><text x="44" y="77.79999999999998" font-size="8" text-anchor="end" fill="#64748b">80%</text>
 <line x1="52" y1="34" x2="456" y2="34" stroke="#e2e8f0"/><text x="44" y="37" font-size="8" text-anchor="end" fill="#64748b">100%</text>
-<circle cx="175.54160414332378" cy="34" r="5" fill="#009E73"/><text x="181.54160414332378" y="29" font-size="8" fill="#334155">VibeScan</text>
-<circle cx="329.5277313820126" cy="89.63636363636363" r="4" fill="#0072B2"/><text x="335.5277313820126" y="84.63636363636363" font-size="8" fill="#334155">Bearer</text>
-<circle cx="322.27582670756465" cy="108.18181818181819" r="4" fill="#E69F00"/><text x="328.27582670756465" y="103.18181818181819" font-size="8" fill="#334155">Snyk Code</text>
-<circle cx="456" cy="126.72727272727273" r="4" fill="#CC79A7"/><text x="462" y="121.72727272727273" font-size="8" fill="#334155">CodeQL</text>
-<circle cx="349.6548150313918" cy="163.8181818181818" r="4" fill="#D55E00"/><text x="355.6548150313918" y="158.8181818181818" font-size="8" fill="#334155">Semgrep</text>
-<circle cx="219.93309306304334" cy="219.45454545454544" r="4" fill="#56B4E9"/><text x="225.93309306304334" y="214.45454545454544" font-size="8" fill="#334155">eslint-plugin-security</text>
+<circle cx="175.54160414332378" cy="34" r="5" fill="#16a34a"/><text x="181.54160414332378" y="29" font-size="8" fill="#334155">VibeScan</text>
+<circle cx="329.5277313820126" cy="89.63636363636363" r="4" fill="#2563eb"/><text x="335.5277313820126" y="84.63636363636363" font-size="8" fill="#334155">Bearer</text>
+<circle cx="322.27582670756465" cy="108.18181818181819" r="4" fill="#2563eb"/><text x="328.27582670756465" y="103.18181818181819" font-size="8" fill="#334155">Snyk Code</text>
+<circle cx="456" cy="126.72727272727273" r="4" fill="#2563eb"/><text x="462" y="121.72727272727273" font-size="8" fill="#334155">CodeQL</text>
+<circle cx="349.6548150313918" cy="163.8181818181818" r="4" fill="#2563eb"/><text x="355.6548150313918" y="158.8181818181818" font-size="8" fill="#334155">Semgrep</text>
+<circle cx="219.93309306304334" cy="219.45454545454544" r="4" fill="#2563eb"/><text x="225.93309306304334" y="214.45454545454544" font-size="8" fill="#334155">eslint-plugin-security</text>
 <text x="240" y="274" font-size="8" text-anchor="middle" fill="#334155">X-axis: runtime (seconds, log scale) · Y-axis: DVNA recall</text>
-</svg></div></body></html>
+</svg>

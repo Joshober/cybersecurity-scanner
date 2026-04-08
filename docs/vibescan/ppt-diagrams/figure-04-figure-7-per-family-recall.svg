@@ -1,0 +1,48 @@
+<svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Per-Family Recall by Tool</text>
+<line x1="38" y1="225" x2="465" y2="225" stroke="#64748b"/>
+<line x1="38" y1="38" x2="38" y2="225" stroke="#64748b"/>
+<rect x="42" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="52.52777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="63.05555555555556" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
+<rect x="73.58333333333334" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
+<rect x="84.11111111111111" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
+<rect x="94.63888888888889" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
+<text x="73.58333333333334" y="237" font-size="7" text-anchor="middle" fill="#334155">Injection</text>
+<rect x="113.16666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="123.69444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="134.22222222222223" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="144.75" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="155.27777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="165.80555555555557" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<text x="144.75" y="237" font-size="7" text-anchor="middle" fill="#334155">Redirect &amp; Navigation</text>
+<rect x="184.33333333333334" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="194.86111111111111" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="205.3888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="215.91666666666669" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="226.44444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="236.97222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<text x="215.91666666666669" y="237" font-size="7" text-anchor="middle" fill="#334155">Integrity</text>
+<rect x="255.5" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="266.02777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="276.55555555555554" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="287.0833333333333" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
+<rect x="297.6111111111111" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
+<rect x="308.1388888888889" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<text x="287.0833333333333" y="237" font-size="7" text-anchor="middle" fill="#334155">Secrets &amp; Crypto</text>
+<rect x="326.6666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="337.19444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="347.72222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="358.25" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="368.7777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="379.3055555555556" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<text x="358.25" y="237" font-size="7" text-anchor="middle" fill="#334155">Auth &amp; Access Control</text>
+<rect x="397.83333333333337" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
+<rect x="408.36111111111114" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="418.8888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
+<rect x="429.4166666666667" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="439.94444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<rect x="450.4722222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
+<text x="429.4166666666667" y="237" font-size="7" text-anchor="middle" fill="#334155">XSS &amp; Client-Side Output</text>
+<text x="240" y="294" font-size="8" text-anchor="middle" fill="#334155">Green=VibeScan, gray=peers</text>
+</svg>

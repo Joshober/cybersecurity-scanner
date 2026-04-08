@@ -1,6 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Figure 8 - Recall vs precision proxy</title>
-  <style>body{font-family:system-ui,sans-serif;margin:24px;background:#f8fafc;color:#0f172a}.card{max-width:760px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgb(0 0 0 / 0.08)}h1{font-size:1.1rem;margin:0 0 12px}</style>
-  </head><body><h1>Figure 8 - Recall vs precision proxy</h1><div class="card"><svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
 <text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Figure 8 - Recall vs precision proxy</text>
 <line x1="42" y1="260" x2="455" y2="260" stroke="#64748b"/>
 <line x1="42" y1="38" x2="42" y2="260" stroke="#64748b"/>
@@ -15,18 +13,18 @@
 <line x1="42" y1="126.80000000000001" x2="455" y2="126.80000000000001" stroke="#e2e8f0"/><text x="34" y="129.8" font-size="8" text-anchor="end" fill="#64748b">60%</text>
 <line x1="42" y1="82.39999999999998" x2="455" y2="82.39999999999998" stroke="#e2e8f0"/><text x="34" y="85.39999999999998" font-size="8" text-anchor="end" fill="#64748b">80%</text>
 <line x1="42" y1="38" x2="455" y2="38" stroke="#e2e8f0"/><text x="34" y="41" font-size="8" text-anchor="end" fill="#64748b">100%</text>
-<circle cx="445.8222222222222" cy="38" r="5" fill="#009E73"/>
+<circle cx="445.8222222222222" cy="38" r="5" fill="#16a34a"/>
 <text x="451.8222222222222" y="33" font-size="8" fill="#334155">VibeScan</text>
-<circle cx="278.84587813620067" cy="98.54545454545453" r="4" fill="#0072B2"/>
+<circle cx="278.84587813620067" cy="98.54545454545453" r="4" fill="#2563eb"/>
 <text x="284.84587813620067" y="93.54545454545453" font-size="8" fill="#334155">Bearer</text>
-<circle cx="220.45679012345678" cy="118.72727272727272" r="4" fill="#E69F00"/>
+<circle cx="220.45679012345678" cy="118.72727272727272" r="4" fill="#2563eb"/>
 <text x="226.45679012345678" y="113.72727272727272" font-size="8" fill="#334155">Snyk Code</text>
-<circle cx="161.71014492753625" cy="138.90909090909093" r="4" fill="#CC79A7"/>
+<circle cx="161.71014492753625" cy="138.90909090909093" r="4" fill="#2563eb"/>
 <text x="167.71014492753625" y="133.90909090909093" font-size="8" fill="#334155">CodeQL</text>
-<circle cx="375.73737373737373" cy="179.27272727272725" r="4" fill="#D55E00"/>
+<circle cx="375.73737373737373" cy="179.27272727272725" r="4" fill="#2563eb"/>
 <text x="381.73737373737373" y="174.27272727272725" font-size="8" fill="#334155">Semgrep</text>
-<circle cx="43.86161821050259" cy="239.8181818181818" r="4" fill="#56B4E9"/>
+<circle cx="43.86161821050259" cy="239.8181818181818" r="4" fill="#2563eb"/>
 <text x="49.86161821050259" y="234.8181818181818" font-size="8" fill="#334155">eslint-plugin-security</text>
 <text x="240" y="296" font-size="8" text-anchor="middle" fill="#334155">X-axis: Precision proxy (cases detected / raw alerts)</text>
 <text x="12" y="149" font-size="8" text-anchor="middle" fill="#334155" transform="rotate(-90 12 149)">Y-axis: Recall (%)</text>
-</svg></div></body></html>
+</svg>

@@ -13,7 +13,7 @@
     "url": "https://github.com/Joshober/cybersecurity-scanner/issues"
   },
   "homepage": "https://github.com/Joshober/cybersecurity-scanner/tree/main/vibescan#readme",
-  "description": "VibeScan (@jobersteadt/vibescan) - static JS/TS security scan, secure-arch, and IDE rule export. Official CLI: vibescan.",
+  "description": "Developer-first JavaScript/TypeScript security scanner with static analysis, proof-oriented tests, secure-arch checks, and AI rule export.",
   "main": "dist/system/index.js",
   "types": "dist/system/index.d.ts",
   "bin": {
@@ -22,12 +22,13 @@
   },
   "files": [
     "dist",
+    "LICENSE",
     "README.md",
     "vibescan.config.sample.json",
     "templates"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "node ./node_modules/typescript/lib/tsc.js",
     "prepack": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
     "test": "npm run build && npm run test:all",
     "test:all": "node --test tests/unit tests/smoke",
@@ -41,12 +42,15 @@
   "keywords": [
     "security",
     "static-analysis",
+    "devsecops",
+    "owasp",
+    "sarif",
+    "javascript",
+    "typescript",
     "cryptography",
-    "injection",
-    "eslint-plugin",
-    "lint"
+    "injection"
   ],
-  "author": "",
+  "author": "Josh Obersteadt",
   "license": "MIT",
   "engines": {
     "node": ">=18"
