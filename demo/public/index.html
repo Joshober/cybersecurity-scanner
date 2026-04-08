@@ -9,9 +9,34 @@
   <body>
     <div class="wrap">
       <header class="hero">
-        <div class="brand">VibeScan</div>
+        <div class="heroTop">
+          <div class="brand">VibeScan</div>
+          <a
+            class="githubBtn"
+            href="https://github.com/Joshober/cybersecurity-scanner"
+            target="_blank"
+            rel="noopener"
+            aria-label="View this repo on GitHub"
+          >
+            View repo
+          </a>
+        </div>
         <div class="tag">Downstream security scanning for LLM-generated Node.js apps</div>
       </header>
+
+      <section class="panel leaderboard" id="leaderboard">
+        <div class="leaderRow">
+          <div>
+            <div class="leaderTitle">Leaderboard</div>
+            <div class="leaderSub">Most total findings across scans in this session</div>
+          </div>
+          <div class="leaderStat">
+            <div id="leaderRepo" class="leaderRepo">—</div>
+            <div class="leaderCount"><span id="leaderCount">—</span> findings</div>
+          </div>
+        </div>
+        <div id="leaderTop5" class="leaderTop5" style="display:none;"></div>
+      </section>
 
       <section class="panel">
         <h2 class="h2">1) Choose a GitHub repo</h2>
@@ -28,6 +53,10 @@
             <input type="radio" name="scenario" value="simulated_hacked" />
             <span>Simulated hacked commit</span>
           </label>
+          <label class="radio">
+            <input type="radio" name="scenario" value="compare" />
+            <span>Compare (original vs hacked)</span>
+          </label>
         </div>
 
         <button id="scanBtn" class="btn">Scan &amp; decide</button>
@@ -36,8 +65,19 @@
       </section>
 
       <section class="panel" id="results" style="display: none;">
-        <h2 class="h2">Decision</h2>
-        <div id="blockedBig" class="big">—</div>
+        <div class="resultsHeader">
+          <div>
+            <h2 class="h2">Decision</h2>
+            <div id="blockedBig" class="big">—</div>
+          </div>
+          <div class="resultsLinks">
+            <a id="openReport" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open full report</a>
+            <a id="openPrompt" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open AI prompt</a>
+            <a id="openProjectJson" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download JSON</a>
+            <a id="openSarif" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download SARIF</a>
+            <button id="copyShareLink" class="linkBtnBtn" type="button" style="display:none;">Copy share link</button>
+          </div>
+        </div>
 
         <div class="row">
           <div class="metric">
@@ -50,11 +90,26 @@
           </div>
         </div>
 
-        <h2 class="h2">Top findings</h2>
-        <div id="findings" class="findings"></div>
+        <div class="panelSub">
+          <h2 class="h2">VibeScan report (real HTML renderer)</h2>
+          <div id="compareBar" class="compareBar" style="display:none;">
+            <span class="compareLabel">View:</span>
+            <button id="viewOriginal" type="button" class="segBtn segBtnActive">Original</button>
+            <button id="viewHacked" type="button" class="segBtn">Hacked</button>
+            <span id="compareSummary" class="compareSummary"></span>
+          </div>
+          <div class="iframeWrap">
+            <iframe id="reportFrame" title="VibeScan HTML report"></iframe>
+          </div>
+        </div>
 
-        <div class="hint">
-          What this means: VibeScan blocks changes when it sees high-confidence security patterns in generated code paths.
+        <div class="panelSub" style="margin-top:12px;">
+          <h2 class="h2">AI fix prompt (paste into Cursor / Claude Code / etc)</h2>
+          <div class="promptRow">
+            <button id="copyPrompt" class="btnSmall" disabled>Copy</button>
+            <span id="promptStatus" class="statusSmall">—</span>
+          </div>
+          <textarea id="promptBox" class="textarea" spellcheck="false" placeholder="Prompt will appear after scan completes…" readonly></textarea>
         </div>
       </section>
 

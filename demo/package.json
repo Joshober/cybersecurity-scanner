@@ -1,0 +1,17 @@
+{
+  "name": "vibescan-demo",
+  "private": true,
+  "type": "module",
+  "description": "Render-hosted interactive demo for VibeScan",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@jobersteadt/vibescan": "^1.1.0",
+    "fast-glob": "^3.3.0"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}
+
