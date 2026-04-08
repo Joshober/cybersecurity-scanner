@@ -9,12 +9,20 @@ const totalFindingsEl = $("#totalFindings");
 const critErrCountEl = $("#critErrCount");
 const openReportEl = $("#openReport");
 const openPromptEl = $("#openPrompt");
+const openProjectJsonEl = $("#openProjectJson");
+const openSarifEl = $("#openSarif");
+const copyShareLinkEl = $("#copyShareLink");
 const reportFrameEl = $("#reportFrame");
 const promptBoxEl = $("#promptBox");
 const copyPromptEl = $("#copyPrompt");
 const promptStatusEl = $("#promptStatus");
 const leaderRepoEl = $("#leaderRepo");
 const leaderCountEl = $("#leaderCount");
+const leaderTop5El = $("#leaderTop5");
+const compareBarEl = $("#compareBar");
+const viewOriginalEl = $("#viewOriginal");
+const viewHackedEl = $("#viewHacked");
+const compareSummaryEl = $("#compareSummary");
 
 function setStatus(msg) {
   statusEl.textContent = msg;
@@ -41,6 +49,22 @@ function setPromptStatus(msg) {
   promptStatusEl.textContent = msg;
 }
 
+function setShareLinkVisible(isVisible) {
+  if (!copyShareLinkEl) return;
+  copyShareLinkEl.style.display = isVisible ? "inline-flex" : "none";
+}
+
+function setCompareUiVisible(isVisible) {
+  if (!compareBarEl) return;
+  compareBarEl.style.display = isVisible ? "flex" : "none";
+}
+
+function setActiveSeg(active) {
+  if (!viewOriginalEl || !viewHackedEl) return;
+  viewOriginalEl.classList.toggle("segBtnActive", active === "original");
+  viewHackedEl.classList.toggle("segBtnActive", active === "hacked");
+}
+
 function setLeaderboard(top) {
   if (!leaderRepoEl || !leaderCountEl) return;
   if (!top) {
@@ -52,10 +76,43 @@ function setLeaderboard(top) {
   leaderCountEl.textContent = String(top.totalFindings ?? "—");
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function setTop5(list) {
+  if (!leaderTop5El) return;
+  const rows = Array.isArray(list) ? list : [];
+  if (!rows.length) {
+    leaderTop5El.style.display = "none";
+    leaderTop5El.innerHTML = "";
+    return;
+  }
+  leaderTop5El.style.display = "grid";
+  leaderTop5El.innerHTML = rows
+    .map((r, i) => {
+      const label = escapeHtml(r.repoLabel || r.repoGitUrl || "—");
+      const n = escapeHtml(String(r.totalFindings ?? "—"));
+      return `<div class="leaderRowItem"><div>${i + 1}. <code>${label}</code></div><div>${n}</div></div>`;
+    })
+    .join("");
+}
+
 async function refreshLeaderboard() {
   try {
     const data = await fetchJson("/api/leaderboard");
     setLeaderboard(data.top);
+    setTop5(data.top5);
+    try {
+      localStorage.setItem("vibescan-demo-leaderboard", JSON.stringify({ top: data.top, top5: data.top5 }));
+    } catch {
+      // ignore
+    }
   } catch {
     // Non-fatal; keep placeholders.
   }
@@ -73,6 +130,9 @@ async function startScan() {
   setPromptStatus("—");
   openReportEl.style.display = "none";
   openPromptEl.style.display = "none";
+  openProjectJsonEl.style.display = "none";
+  openSarifEl.style.display = "none";
+  setShareLinkVisible(false);
   setStatus("Queued scan…");
 
   const res = await fetch("/api/scan", {
@@ -143,6 +203,50 @@ async function pollScan(scanId) {
 function showResults(result) {
   resultsEl.style.display = "block";
 
+  // Compare support (defaults to hacked if present).
+  if (result.compare && result.compare.original && result.compare.hacked) {
+    setCompareUiVisible(true);
+    setActiveSeg("hacked");
+    if (compareSummaryEl) {
+      const o = result.compare.original;
+      const h = result.compare.hacked;
+      compareSummaryEl.textContent = `Original: ${o.totalFindings} · Hacked: ${h.totalFindings} (Δ ${h.totalFindings - o.totalFindings})`;
+    }
+
+    const setView = (which) => {
+      const block = which === "original" ? result.compare.original : result.compare.hacked;
+      setActiveSeg(which);
+      if (block.reportPath) {
+        openReportEl.href = block.reportPath;
+        openReportEl.style.display = "inline-flex";
+        reportFrameEl.src = block.reportPath;
+      }
+      if (block.promptPath) {
+        openPromptEl.href = block.promptPath;
+        openPromptEl.style.display = "inline-flex";
+        setPromptStatus("Loading…");
+        fetchText(block.promptPath)
+          .then((md) => {
+            promptBoxEl.value = md;
+            copyPromptEl.disabled = md.trim().length === 0;
+            setPromptStatus(md.trim().length ? "Ready" : "Empty prompt");
+          })
+          .catch((e) => {
+            promptBoxEl.value = "";
+            copyPromptEl.disabled = true;
+            setPromptStatus(`Failed to load prompt: ${String(e?.message || e)}`);
+          });
+      }
+    };
+
+    viewOriginalEl?.addEventListener("click", () => setView("original"), { once: true });
+    viewHackedEl?.addEventListener("click", () => setView("hacked"), { once: true });
+
+    // Keep metrics showing "hacked" by default.
+  } else {
+    setCompareUiVisible(false);
+  }
+
   const blocked = !!result.blocked;
   blockedBigEl.textContent = blocked ? "BLOCKED" : "NOT BLOCKED";
   blockedBigEl.classList.toggle("blocked", blocked);
@@ -173,6 +277,29 @@ function showResults(result) {
         setPromptStatus(`Failed to load prompt: ${String(e?.message || e)}`);
       });
   }
+
+  if (result.projectJsonPath) {
+    openProjectJsonEl.href = result.projectJsonPath;
+    openProjectJsonEl.style.display = "inline-flex";
+  }
+
+  if (result.sarifPath) {
+    openSarifEl.href = result.sarifPath;
+    openSarifEl.style.display = "inline-flex";
+  }
+
+  // Share link points to /scan/<scanId>.
+  if (result.reportPath && typeof result.reportPath === "string") {
+    const m = result.reportPath.match(/\/api\/scan\/([^/]+)\/report\.html/);
+    if (m && m[1] && copyShareLinkEl) {
+      const scanId = m[1];
+      const url = new URL(window.location.href);
+      url.pathname = `/scan/${encodeURIComponent(scanId)}`;
+      url.search = "";
+      copyShareLinkEl.dataset.shareUrl = url.toString();
+      setShareLinkVisible(true);
+    }
+  }
 }
 
 scanBtn.addEventListener("click", () => {
@@ -180,6 +307,45 @@ scanBtn.addEventListener("click", () => {
 });
 
 refreshLeaderboard();
+
+// Fast initial paint: load cached leaderboard while network request runs.
+try {
+  const cached = JSON.parse(localStorage.getItem("vibescan-demo-leaderboard") || "null");
+  if (cached) {
+    setLeaderboard(cached.top);
+    setTop5(cached.top5);
+  }
+} catch {
+  // ignore
+}
+
+copyShareLinkEl?.addEventListener("click", async () => {
+  const url = copyShareLinkEl.dataset.shareUrl || "";
+  if (!url) return;
+  try {
+    await navigator.clipboard.writeText(url);
+    setStatus("Share link copied.");
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    setStatus("Share link copied (fallback).");
+  }
+});
+
+async function loadScanFromPath() {
+  const m = window.location.pathname.match(/^\/scan\/([^/]+)$/);
+  if (!m) return;
+  const scanId = decodeURIComponent(m[1]);
+  setStatus(`Loading scan ${scanId}…`);
+  resultsEl.style.display = "none";
+  pollScan(scanId);
+}
+
+loadScanFromPath();
 
 copyPromptEl.addEventListener("click", async () => {
   const text = promptBoxEl.value || "";

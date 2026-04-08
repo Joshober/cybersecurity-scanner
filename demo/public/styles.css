@@ -34,6 +34,31 @@ body {
   padding: 18px 0 22px;
 }
 
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.githubBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #0f0f16;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 850;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.githubBtn:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
 .brand {
   font-size: 34px;
   font-weight: 850;
@@ -105,6 +130,31 @@ body {
 .leaderCount {
   font-size: 12px;
   color: var(--muted);
+}
+
+.leaderTop5 {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.leaderRowItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.leaderRowItem code {
+  color: var(--text);
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 999px;
 }
 
 .panel {
@@ -256,11 +306,65 @@ body {
   font-size: 13px;
 }
 
+.linkBtnBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #0f0f16;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.linkBtnBtn:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
 .panelSub {
   border: 1px solid var(--line);
   background: #0f0f16;
   border-radius: 14px;
   padding: 12px;
+}
+
+.compareBar {
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compareLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.segBtn {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0a0a10;
+  color: var(--text);
+  font-weight: 850;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.segBtnActive {
+  border-color: rgba(34, 211, 238, 0.55);
+  background: rgba(34, 211, 238, 0.12);
+}
+
+.compareSummary {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .promptRow {

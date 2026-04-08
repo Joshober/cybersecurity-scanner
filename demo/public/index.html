@@ -9,7 +9,18 @@
   <body>
     <div class="wrap">
       <header class="hero">
-        <div class="brand">VibeScan</div>
+        <div class="heroTop">
+          <div class="brand">VibeScan</div>
+          <a
+            class="githubBtn"
+            href="https://github.com/Joshober/cybersecurity-scanner"
+            target="_blank"
+            rel="noopener"
+            aria-label="View this repo on GitHub"
+          >
+            View repo
+          </a>
+        </div>
         <div class="tag">Downstream security scanning for LLM-generated Node.js apps</div>
       </header>
 
@@ -24,6 +35,7 @@
             <div class="leaderCount"><span id="leaderCount">—</span> findings</div>
           </div>
         </div>
+        <div id="leaderTop5" class="leaderTop5" style="display:none;"></div>
       </section>
 
       <section class="panel">
@@ -41,6 +53,10 @@
             <input type="radio" name="scenario" value="simulated_hacked" />
             <span>Simulated hacked commit</span>
           </label>
+          <label class="radio">
+            <input type="radio" name="scenario" value="compare" />
+            <span>Compare (original vs hacked)</span>
+          </label>
         </div>
 
         <button id="scanBtn" class="btn">Scan &amp; decide</button>
@@ -57,6 +73,9 @@
           <div class="resultsLinks">
             <a id="openReport" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open full report</a>
             <a id="openPrompt" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open AI prompt</a>
+            <a id="openProjectJson" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download JSON</a>
+            <a id="openSarif" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download SARIF</a>
+            <button id="copyShareLink" class="linkBtnBtn" type="button" style="display:none;">Copy share link</button>
           </div>
         </div>
 
@@ -73,6 +92,12 @@
 
         <div class="panelSub">
           <h2 class="h2">VibeScan report (real HTML renderer)</h2>
+          <div id="compareBar" class="compareBar" style="display:none;">
+            <span class="compareLabel">View:</span>
+            <button id="viewOriginal" type="button" class="segBtn segBtnActive">Original</button>
+            <button id="viewHacked" type="button" class="segBtn">Hacked</button>
+            <span id="compareSummary" class="compareSummary"></span>
+          </div>
           <div class="iframeWrap">
             <iframe id="reportFrame" title="VibeScan HTML report"></iframe>
           </div>
