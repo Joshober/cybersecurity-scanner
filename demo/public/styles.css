@@ -138,6 +138,8 @@ body {
   padding-top: 10px;
   display: grid;
   gap: 6px;
+  max-height: 260px;
+  overflow: auto;
 }
 
 .leaderRowItem {

@@ -107,9 +107,9 @@ async function refreshLeaderboard() {
   try {
     const data = await fetchJson("/api/leaderboard");
     setLeaderboard(data.top);
-    setTop5(data.top5);
+    setTop5(data.all);
     try {
-      localStorage.setItem("vibescan-demo-leaderboard", JSON.stringify({ top: data.top, top5: data.top5 }));
+      localStorage.setItem("vibescan-demo-leaderboard", JSON.stringify({ top: data.top, all: data.all }));
     } catch {
       // ignore
     }
@@ -313,7 +313,7 @@ try {
   const cached = JSON.parse(localStorage.getItem("vibescan-demo-leaderboard") || "null");
   if (cached) {
     setLeaderboard(cached.top);
-    setTop5(cached.top5);
+    setTop5(cached.all);
   }
 } catch {
   // ignore

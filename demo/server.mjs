@@ -17,7 +17,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 // In-memory job store (demo server is intended to be short-lived).
 const jobs = new Map();
 const leaderboard = {
-  top: [], // [{ repoLabel, repoGitUrl, totalFindings }]
+  rowsByRepo: new Map(), // repoGitUrl -> { repoLabel, repoGitUrl, totalFindings }
 };
 
 const MAX_CONCURRENT = Number(process.env.MAX_CONCURRENT ?? 2);
@@ -499,16 +499,17 @@ async function runScanJob(scanId, repoGitUrl, scenario) {
       };
     }
 
-    // Update leaderboard (top 5 by total findings).
+    // Update leaderboard (keep ALL repos; show sorted client-side).
     const nForLeader = scenario === "compare" ? scanOut.hacked.totalFindings : scanOut.single.totalFindings;
     if (Number.isFinite(nForLeader)) {
       const repoLabel = repoLabelFromGitUrl(repoGitUrl);
-      const existingIdx = leaderboard.top.findIndex((r) => r.repoGitUrl === repoGitUrl);
-      const row = { repoLabel, repoGitUrl, totalFindings: nForLeader };
-      if (existingIdx >= 0) leaderboard.top[existingIdx] = row;
-      else leaderboard.top.push(row);
-      leaderboard.top.sort((a, b) => (b.totalFindings ?? 0) - (a.totalFindings ?? 0));
-      leaderboard.top = leaderboard.top.slice(0, 5);
+      const prev = leaderboard.rowsByRepo.get(repoGitUrl);
+      const next = {
+        repoLabel,
+        repoGitUrl,
+        totalFindings: Math.max(prev?.totalFindings ?? 0, nForLeader),
+      };
+      leaderboard.rowsByRepo.set(repoGitUrl, next);
     }
     // Persist artifacts (single or compare).
     if (scenario === "compare") {
@@ -578,9 +579,12 @@ const server = http.createServer((req, res) => {
 
     if (pathname.startsWith("/api/")) {
       if (req.method === "GET" && pathname === "/api/leaderboard") {
+        const all = [...leaderboard.rowsByRepo.values()].sort(
+          (a, b) => (b.totalFindings ?? 0) - (a.totalFindings ?? 0)
+        );
         sendJson(res, 200, {
-          top: leaderboard.top?.[0] ?? null,
-          top5: leaderboard.top ?? [],
+          top: all[0] ?? null,
+          all,
         });
         return;
       }
