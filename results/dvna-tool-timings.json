@@ -1,0 +1,49 @@
+{
+  "measuredAt": "2026-04-07",
+  "units": "milliseconds",
+  "notes": [
+    "Wall-clock timings measured with PowerShell Measure-Command on the local machine.",
+    "These are rerun values from the latest measurement pass.",
+    "Runtimes are environment-dependent and should be treated as rough comparison values.",
+    "Docker-based tools were measured with cached images."
+  ],
+  "tools": [
+    {
+      "id": "vibescan",
+      "label": "VibeScan",
+      "durationMs": 805.47,
+      "command": "node vibescan/dist/system/cli/index.js scan benchmarks/dvna/dvna --format json --exclude-vendor"
+    },
+    {
+      "id": "bearer",
+      "label": "Bearer",
+      "durationMs": 10848.7,
+      "command": "docker run --rm -v <dvna>:/scan bearer/bearer:latest-amd64 scan /scan --format json"
+    },
+    {
+      "id": "snyk-code",
+      "label": "Snyk Code",
+      "durationMs": 9598.26,
+      "command": "snyk code test benchmarks/dvna/dvna --json"
+    },
+    {
+      "id": "semgrep",
+      "label": "Semgrep",
+      "durationMs": 15240.14,
+      "command": "docker run --rm -v <dvna>:/src returntocorp/semgrep semgrep --config p/javascript --config p/security-audit /src --json"
+    },
+    {
+      "id": "eslint-security",
+      "label": "eslint-plugin-security",
+      "durationMs": 1704.57,
+      "command": "npx eslint -c results/eslint-dvna.eslintrc.cjs benchmarks/dvna/dvna/**/*.js"
+    },
+    {
+      "id": "codeql",
+      "label": "CodeQL",
+      "durationMs": 91816.44,
+      "command": "powershell -File benchmarks/scripts/run-codeql-dvna.ps1",
+      "note": "Measured via full CodeQL database create + analyze using benchmarks/.cache/codeql/codeql.cmd (javascript-security-and-quality suite)."
+    }
+  ]
+}

@@ -401,6 +401,16 @@ function buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary) {
         isVs && vsHasProof
           ? ` title="${escapeHtml("Matches summary.proofCoverage.total_findings (entire scan in this JSON).")}"`
           : "";
+      const runtimeMs = typeof t.dvnaRunDurationMs === "number" ? t.dvnaRunDurationMs : null;
+      const runtimeCell =
+        runtimeMs == null
+          ? "N/A"
+          : runtimeMs >= 1000
+            ? `${(runtimeMs / 1000).toFixed(2)}s`
+            : `${runtimeMs.toFixed(0)}ms`;
+      const runtimeTitle = t.dvnaRunDurationNote
+        ? ` title="${escapeHtml(t.dvnaRunDurationNote)}"`
+        : "";
       return `<tr${rowClass}>
   <th scope="row">${escapeHtml(t.label)}${t.highlight ? ' <span class="badge">heatmap focus</span>' : ""}</th>
   <td>${escapeHtml(t.role || "sast")}</td>
@@ -410,6 +420,7 @@ function buildCompareTableRows(tools, caseIds, codeqlHits, tierProofSummary) {
   <td class="num"${tierTitleAttr}>${t2}</td>
   <td class="num"${tierTitleAttr}>${t3}</td>
   <td class="num"${tierTitleAttr}>${t4}</td>
+  <td class="num"${runtimeTitle}>${runtimeCell}</td>
   <td class="num"${findTitle}>${nFind}</td>
 </tr>`;
     })
@@ -436,6 +447,7 @@ function buildCompareSectionHtml(matrix, tools, cases, tierProofSummary, codeqlH
           <th scope="col">Tier 2<br/><span class="muted">partial</span></th>
           <th scope="col">Tier 3<br/><span class="muted">structural</span></th>
           <th scope="col">Tier 4<br/><span class="muted">detect only</span></th>
+          <th scope="col" title="Wall-clock runtime for the DVNA scan in this environment/configuration. Use for rough speed comparison only.">Runtime<br/><span class="muted">DVNA scan</span></th>
           <th scope="col" title="VibeScan: total_findings in proof JSON (full scan). Peers: frozen run issue count — table normalization places peers in tier 4. This is volume, not benchmark recall.">Raw issues<br/><span class="muted">(full DVNA run)</span></th>
         </tr>
       </thead>

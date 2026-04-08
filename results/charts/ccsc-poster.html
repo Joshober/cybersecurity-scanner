@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CCSC Poster — VibeScan: End-to-End Static Analysis</title>
+<style>
+  @page { size: 48in 36in; margin: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0d1b2a;
+    --slate:   #1b2838;
+    --blue:    #1e3a5f;
+    --accent:  #38bdf8;
+    --teal:    #2dd4bf;
+    --green:   #22c55e;
+    --amber:   #f59e0b;
+    --red:     #ef4444;
+    --bg:      #f0f4f8;
+    --card:    #ffffff;
+    --text:    #1e293b;
+    --muted:   #64748b;
+    --border:  #cbd5e1;
+    --radius:  10px;
+    --shadow:  0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    width: 48in;
+    min-height: 36in;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Title Banner ── */
+  .banner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: #fff;
+    padding: 38px 56px 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .banner-left { flex: 1; }
+  .banner h1 {
+    font-size: 2.7rem;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.5px;
+  }
+  .banner .hook {
+    margin-top: 10px;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: #94a3b8;
+    line-height: 1.45;
+  }
+  .banner-right {
+    text-align: right;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    flex-shrink: 0;
+  }
+  .banner-right .conf {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .hero-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 8px 20px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 8px;
+  }
+  .hero-stat .big { font-size: 2.2rem; font-weight: 800; color: var(--accent); }
+  .hero-stat .sub { font-size: 0.95rem; color: #94a3b8; }
+
+  /* ── Grid ── */
+  .poster-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1.3fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+    padding: 24px 40px 20px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 28px;
+    border: 1px solid var(--border);
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--blue);
+    margin: 16px 0 8px;
+  }
+  .card p, .card li {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .card ul { padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  .card .fig-caption {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .fig-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  /* ── Column spans ── */
+  .col-abstract    { grid-column: 1; grid-row: 1 / 3; }
+  .col-fig1        { grid-column: 2 / 4; grid-row: 1; }
+  .col-fig3        { grid-column: 2; grid-row: 2; }
+  .col-fig2        { grid-column: 3; grid-row: 2; }
+  .col-fig4        { grid-column: 1 / 3; grid-row: 3; }
+  .col-fig5        { grid-column: 3; grid-row: 3; }
+
+  /* ── Footer ── */
+  .footer {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 0.7fr;
+    gap: 20px;
+    padding: 0 40px 30px;
+  }
+
+  /* ── Architecture pipeline ── */
+  .pipeline { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; padding: 8px 0; }
+  .pipe-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.35;
+    min-width: 120px;
+    min-height: 64px;
+    position: relative;
+  }
+  .pipe-stage .label { font-size: 0.7rem; font-weight: 400; color: inherit; opacity: 0.8; margin-top: 2px; }
+  .pipe-arrow {
+    font-size: 1.3rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+  .stage-input  { background: #e0f2fe; color: #0c4a6e; border: 1px solid #7dd3fc; }
+  .stage-parse  { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .stage-rule   { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
+  .stage-taint  { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .stage-cross  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .stage-route  { background: #ffedd5; color: #9a3412; border: 1px solid #fdba74; }
+  .stage-report { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .stage-ci     { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+  .stage-result { background: var(--accent); color: #fff; border: 2px solid #0284c7; font-weight: 800; }
+  .pipe-bracket {
+    border: 2px dashed #f59e0b;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+  .pipe-bracket::before {
+    content: attr(data-label);
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Bar chart ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 55px; gap: 10px; align-items: center; }
+  .bar-label { font-size: 0.82rem; font-weight: 600; text-align: right; color: var(--text); }
+  .bar-track { height: 28px; background: #e2e8f0; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .bar-fill span { font-size: 0.72rem; font-weight: 700; color: #fff; }
+  .bar-value { font-size: 0.88rem; font-weight: 700; color: var(--text); text-align: left; font-variant-numeric: tabular-nums; }
+  .bar-fill.vibescan { background: linear-gradient(90deg, #059669, var(--green)); }
+  .bar-fill.peer { background: linear-gradient(90deg, #6366f1, #818cf8); }
+  .bar-fill.low { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
+
+  /* ── Depth ladder ── */
+  .depth-ladder { display: flex; flex-direction: column; gap: 0; }
+  .depth-step {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+  }
+  .depth-level {
+    width: 46%;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .depth-level strong { display: block; font-size: 0.88rem; margin-bottom: 2px; }
+  .depth-annotation {
+    width: 54%;
+    padding: 8px 16px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+  .depth-annotation .stop-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+  }
+  .depth-connector {
+    width: 46%;
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+  }
+  .depth-connector svg { display: block; }
+
+  /* ── Heatmap ── */
+  .heatmap-wrap { overflow-x: auto; }
+  table.heatmap { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
+  .heatmap th, .heatmap td { border: 1px solid #e2e8f0; padding: 7px 9px; text-align: center; vertical-align: middle; }
+  .heatmap thead th { background: #f1f5f9; font-weight: 700; color: var(--navy); font-size: 0.8rem; }
+  .heatmap .case-cell { text-align: left; background: #fafafa; min-width: 170px; }
+  .heatmap .case-title { font-weight: 600; color: var(--text); }
+  .heatmap .case-sub { font-size: 0.7rem; color: var(--muted); }
+  .heatmap .family-row th { background: #e8edf2; font-weight: 700; text-align: left; color: var(--navy); font-size: 0.82rem; }
+  .heatmap td.hit { background: #22c55e; color: #fff; font-weight: 700; font-size: 0.75rem; }
+  .heatmap td.miss { background: #ef4444; color: #fff; font-weight: 600; font-size: 0.75rem; }
+  .heatmap .difficulty { font-size: 0.7rem; color: var(--muted); font-weight: 400; }
+  .heatmap .tool-hl { background: #ecfdf5 !important; color: var(--navy); }
+
+  /* ── Scatter ── */
+  .scatter-wrap { position: relative; width: 100%; }
+  .scatter-wrap svg { display: block; width: 100%; }
+
+  /* ── Key points ── */
+  .key-points li {
+    position: relative;
+    padding-left: 6px;
+    list-style: none;
+    margin-bottom: 10px;
+  }
+  .key-points li::before {
+    content: "▸";
+    position: absolute;
+    left: -16px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .key-points li strong { color: var(--navy); }
+
+  .limitation-list li { color: var(--muted); font-size: 0.84rem; }
+  .conclusion-text { font-size: 0.9rem; line-height: 1.6; }
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 8px 16px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .github-link:hover { background: var(--blue); }
+
+  @media screen and (max-width: 1400px) {
+    body { width: 100%; min-height: auto; }
+    .poster-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .col-abstract, .col-fig1, .col-fig2, .col-fig3, .col-fig4, .col-fig5 { grid-column: 1; grid-row: auto; }
+    .footer { grid-template-columns: 1fr; }
+    .pipeline { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ TITLE BANNER ════════════════════ -->
+<header class="banner">
+  <div class="banner-left">
+    <h1>VibeScan: End-to-End Static Analysis with<br/>Cross-File Reasoning and Proof Validation</h1>
+    <p class="hook">Deeper JavaScript security analysis that goes beyond pattern matching — combining taint tracking,
+      cross-file reasoning, route/API analysis, and executable proof generation to achieve
+      measurable vulnerability coverage on the DVNA benchmark.</p>
+  </div>
+  <div class="banner-right">
+    <div class="conf">CCSC 2026</div>
+    <div style="margin-top: 6px;">Josh Morman</div>
+    <div class="hero-stat">
+      <span class="big">11/11</span>
+      <span class="sub">DVNA recall<br/>only tool at full depth</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════ MAIN GRID ════════════════════ -->
+<main class="poster-grid">
+
+  <!-- ── ABSTRACT + KEY POINTS (left column) ── -->
+  <section class="card col-abstract">
+    <h2>Abstract</h2>
+    <p>VibeScan is a JavaScript security scanner designed to go beyond shallow pattern matching by combining
+      rule-based detection, taint analysis, cross-file reasoning, route and API analysis, and executable
+      proof validation. In this work, we evaluate VibeScan against several existing tools using the DVNA
+      benchmark and an expanded rule-family corpus. VibeScan achieved 11/11 recall on DVNA, outperforming
+      all evaluated tools, and was the only system in the comparison to reach full analysis depth. These
+      results suggest that deeper static analysis paired with proof-oriented validation can improve both
+      vulnerability coverage and confidence in reported findings.</p>
+
+    <h3>Key Points</h3>
+    <ul class="key-points">
+      <li><strong>11/11 recall</strong> on the DVNA benchmark — no other evaluated tool matched this.</li>
+      <li><strong>Only tool to reach full analysis depth</strong>, extending through route/API reasoning and proof generation.</li>
+      <li><strong>Cross-file reasoning</strong> and route/API analysis improved coverage on harder, low-consensus cases.</li>
+      <li><strong>Proof generation and CI recall gates</strong> turned findings into measurable validation artifacts.</li>
+      <li><strong>Stronger recall without excessive noise</strong> — 25 alerts vs. up to 493 from pattern-only tools.</li>
+    </ul>
+
+    <h3>Benchmark</h3>
+    <p>The <strong>Damn Vulnerable NodeJS Application (DVNA)</strong> provides 11 ground-truth vulnerability
+      cases spanning injection, redirect, deserialization, cryptography, access control, and XSS families.
+      Six tools were evaluated on first-party DVNA source using line-anchored case matching.</p>
+
+    <h3 style="margin-top:24px;">Runtime Comparison</h3>
+    <div style="margin-top:10px;">
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">VibeScan</div>
+          <div class="bar-track"><div class="bar-fill vibescan" style="width: 6%;"><span></span></div></div>
+          <div class="bar-value" style="color:#059669;">0.8s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">eslint-security</div>
+          <div class="bar-track"><div class="bar-fill low" style="width: 11%;"><span></span></div></div>
+          <div class="bar-value">1.7s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Snyk Code</div>
+          <div class="bar-track"><div class="bar-fill peer" style="width: 52%;"><span></span></div></div>
+          <div class="bar-value">9.6s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Bearer</div>
+          <div class="bar-track"><div class="bar-fill peer" style="width: 59%;"><span></span></div></div>
+          <div class="bar-value">10.9s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Semgrep</div>
+          <div class="bar-track"><div class="bar-fill peer" style="width: 66%;"><span></span></div></div>
+          <div class="bar-value">15.2s</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">CodeQL</div>
+          <div class="bar-track"><div class="bar-fill peer" style="width: 100%;"><span></span></div></div>
+          <div class="bar-value">91.8s</div>
+        </div>
+      </div>
+      <p class="fig-caption">Wall-clock DVNA scan time (PowerShell Measure-Command, 2026-04-07). Docker-based tools measured with cached images.</p>
+    </div>
+  </section>
+
+  <!-- ── FIGURE 1: Architecture Pipeline (spans center+right) ── -->
+  <section class="card col-fig1">
+    <div class="fig-label">Figure 1 — VibeScan Architecture and Validation Flow</div>
+    <div class="pipeline">
+      <div class="pipe-stage stage-input">Source Code<div class="label">.js .ts .tsx .ejs</div></div>
+      <div class="pipe-arrow">&#9654;</div>
+      <div class="pipe-stage stage-parse">Parse &amp; Context<div class="label">AST + Semantic</div></div>
+      <div class="pipe-arrow">&#9654;</div>
+      <div class="pipe-stage stage-rule">Rule Engine<div class="label">40+ rules</div></div>
+      <div class="pipe-arrow">&#9654;</div>
+      <div class="pipe-stage stage-taint">Taint Analysis<div class="label">Source → Sink</div></div>
+      <div class="pipe-arrow">&#9654;</div>
+      <div class="pipe-bracket" data-label="Novel Contributions">
+        <div class="pipe-stage stage-cross">Cross-File<div class="label">Inter-procedural</div></div>
+        <div class="pipe-arrow">&#9654;</div>
+        <div class="pipe-stage stage-route">Route &amp; API<div class="label">Trust boundaries</div></div>
+        <div class="pipe-arrow">&#9654;</div>
+        <div class="pipe-stage stage-report">Findings + Proofs<div class="label">Proof artifacts</div></div>
+        <div class="pipe-arrow">&#9654;</div>
+        <div class="pipe-stage stage-ci">CI Validation<div class="label">Recall gates</div></div>
+      </div>
+      <div class="pipe-arrow">&#9654;</div>
+      <div class="pipe-stage stage-result">11/11 Recall<div class="label">DVNA Benchmark</div></div>
+    </div>
+    <p class="fig-caption">
+      The VibeScan pipeline flows from source code input through semantic parsing, rule-based detection, taint analysis,
+      cross-file reasoning, reporting, and CI validation. The highlighted stages (dashed border) show the project's main
+      contribution: extending traditional static analysis with route/API reasoning, executable proof artifacts, and recall
+      regression checks.
+    </p>
+  </section>
+
+  <!-- ── FIGURE 3: Analysis Depth (center column) ── -->
+  <section class="card col-fig3">
+    <div class="fig-label">Figure 3 — Analysis Depth Comparison</div>
+    <div class="depth-ladder">
+      <!-- Level 1 -->
+      <div class="depth-step">
+        <div class="depth-level" style="background:#f3f4f6; border:1px solid #d1d5db;">
+          <strong>1. Pattern Matching</strong>
+          AST node-level checks
+        </div>
+        <div class="depth-annotation">
+          <span class="stop-badge">eslint-plugin-security stops here &middot; 1/11 &middot; 493 alerts</span>
+        </div>
+      </div>
+      <div class="depth-step"><div class="depth-connector"><svg width="20" height="24"><path d="M10 0 L10 24" stroke="#94a3af" stroke-width="2" fill="none"/><path d="M5 18 L10 24 L15 18" fill="#94a3af"/></svg></div></div>
+
+      <!-- Level 2 -->
+      <div class="depth-step">
+        <div class="depth-level" style="background:#dbeafe; border:1px solid #93c5fd;">
+          <strong>2. Taint / Data Flow</strong>
+          Source-to-sink within files
+        </div>
+        <div class="depth-annotation">
+          <span class="stop-badge">Semgrep stops here &middot; 4/11 &middot; 11 alerts</span>
+        </div>
+      </div>
+      <div class="depth-step"><div class="depth-connector"><svg width="20" height="24"><path d="M10 0 L10 24" stroke="#94a3af" stroke-width="2" fill="none"/><path d="M5 18 L10 24 L15 18" fill="#94a3af"/></svg></div></div>
+
+      <!-- Level 3 -->
+      <div class="depth-step">
+        <div class="depth-level" style="background:#e0e7ff; border:1px solid #a5b4fc;">
+          <strong>3. Cross-File Analysis</strong>
+          Inter-procedural + type resolution
+        </div>
+        <div class="depth-annotation">
+          <span class="stop-badge">CodeQL 6/11 &middot; Snyk Code 7/11 &middot; Bearer 8/11</span>
+        </div>
+      </div>
+      <div class="depth-step"><div class="depth-connector"><svg width="20" height="24"><path d="M10 0 L10 24" stroke="#94a3af" stroke-width="2" fill="none"/><path d="M5 18 L10 24 L15 18" fill="#94a3af"/></svg></div></div>
+
+      <!-- Level 4 -->
+      <div class="depth-step">
+        <div class="depth-level" style="background:#ffedd5; border:1px solid #fdba74;">
+          <strong>4. Route + API Reasoning</strong>
+          Framework routes, API drift, trust boundaries
+        </div>
+        <div class="depth-annotation">
+          <span style="font-size:0.78rem; color:#92400e; font-style:italic;">No other evaluated tool reaches this depth</span>
+        </div>
+      </div>
+      <div class="depth-step"><div class="depth-connector"><svg width="20" height="24"><path d="M10 0 L10 24" stroke="#94a3af" stroke-width="2" fill="none"/><path d="M5 18 L10 24 L15 18" fill="#94a3af"/></svg></div></div>
+
+      <!-- Level 5 -->
+      <div class="depth-step">
+        <div class="depth-level" style="background:#dcfce7; border:2px solid #22c55e;">
+          <strong>5. Proof Generation + CI Gates</strong>
+          Auto-generated tests, recall enforcement
+        </div>
+        <div class="depth-annotation">
+          <span style="font-weight:700; color:#059669; font-size:0.82rem;">VibeScan only &middot; 11/11 &middot; 25 alerts</span>
+        </div>
+      </div>
+    </div>
+    <p class="fig-caption">
+      Evaluated tools stop at different levels of analysis depth. VibeScan was the only tool to extend
+      through route/API reasoning and proof generation with CI recall gates, which helps explain its
+      stronger benchmark performance.
+    </p>
+  </section>
+
+  <!-- ── FIGURE 2: Recall by Tool (right column) ── -->
+  <section class="card col-fig2">
+    <div class="fig-label">Figure 2 — DVNA Recall by Tool</div>
+    <div class="bar-chart" style="margin-top: 8px;">
+      <div class="bar-row">
+        <div class="bar-label" style="color:#059669; font-weight:700;">VibeScan</div>
+        <div class="bar-track"><div class="bar-fill vibescan" style="width: 100%;"></div></div>
+        <div class="bar-value" style="color:#059669;">11/11</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Bearer</div>
+        <div class="bar-track"><div class="bar-fill peer" style="width: 72.7%;"></div></div>
+        <div class="bar-value">8/11</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Snyk Code</div>
+        <div class="bar-track"><div class="bar-fill peer" style="width: 63.6%;"></div></div>
+        <div class="bar-value">7/11</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">CodeQL</div>
+        <div class="bar-track"><div class="bar-fill peer" style="width: 54.5%;"></div></div>
+        <div class="bar-value">6/11</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Semgrep</div>
+        <div class="bar-track"><div class="bar-fill peer" style="width: 36.4%;"></div></div>
+        <div class="bar-value">4/11</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">eslint-security</div>
+        <div class="bar-track"><div class="bar-fill low" style="width: 9.1%;"></div></div>
+        <div class="bar-value">1/11</div>
+      </div>
+    </div>
+    <p class="fig-caption" style="margin-top:14px;">
+      VibeScan achieved perfect recall on the DVNA benchmark, detecting all 11 ground-truth cases.
+      The next-best tool (Bearer) reached 8/11, showing that deeper JavaScript-specific analysis
+      can recover vulnerabilities that other evaluated tools missed.
+    </p>
+
+    <h3 style="margin-top: 24px;">Alert Volume Context</h3>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+      <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:800; color:#059669;">25</div>
+        <div style="font-size:0.76rem; color:#065f46; font-weight:600;">VibeScan alerts</div>
+      </div>
+      <div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:12px; text-align:center;">
+        <div style="font-size:1.8rem; font-weight:800; color:#475569;">493</div>
+        <div style="font-size:0.76rem; color:#64748b; font-weight:600;">eslint-security alerts</div>
+      </div>
+    </div>
+    <p class="fig-caption">High recall was not achieved by producing excessive alert volume. VibeScan reported the fewest alerts among tools reaching &ge;6/11 recall.</p>
+  </section>
+
+  <!-- ── FIGURE 4: Detection Heatmap (bottom left, spans 2 cols) ── -->
+  <section class="card col-fig4">
+    <div class="fig-label">Figure 4 — Detection Heatmap with Difficulty Rating</div>
+    <div class="heatmap-wrap">
+      <table class="heatmap">
+        <thead>
+          <tr>
+            <th class="case-cell">Vulnerability Case</th>
+            <th style="min-width:60px;">Difficulty</th>
+            <th class="tool-hl" style="min-width:72px;">VibeScan</th>
+            <th>Bearer</th>
+            <th>Snyk Code</th>
+            <th>Semgrep</th>
+            <th>CodeQL</th>
+            <th>eslint-sec.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="family-row"><th colspan="8">Injection</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">SQL Injection</span></th>
+            <td class="difficulty">Easy (6/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td>
+          </tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Command Injection</span></th>
+            <td class="difficulty">Medium (4/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">NoSQL Injection</span> <span class="case-sub">(route)</span></th>
+            <td class="difficulty">Hard (2/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">NoSQL Injection</span> <span class="case-sub">(auth)</span></th>
+            <td class="difficulty">Hard (2/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">NoSQL Injection</span> <span class="case-sub">(session)</span></th>
+            <td class="difficulty">Hard (2/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr class="family-row"><th colspan="8">Redirect &amp; Navigation</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Open Redirect</span></th>
+            <td class="difficulty">Medium (5/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr class="family-row"><th colspan="8">Integrity</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Unsafe Deserialization</span></th>
+            <td class="difficulty">Medium (4/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="miss">&#10007;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr class="family-row"><th colspan="8">Secrets &amp; Crypto</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Hardcoded Secret</span></th>
+            <td class="difficulty">Easy (5/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Weak Crypto Hash</span></th>
+            <td class="difficulty">Medium (3/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="hit">&#10003;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr class="family-row"><th colspan="8">Auth &amp; Access Control</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">Insecure Env Secret Fallback</span></th>
+            <td class="difficulty">Hard (2/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td>
+          </tr>
+          <tr class="family-row"><th colspan="8">XSS &amp; Client-Side Output</th></tr>
+          <tr>
+            <th class="case-cell"><span class="case-title">DOM-Based XSS</span></th>
+            <td class="difficulty">Hard (2/6)</td>
+            <td class="hit tool-hl">&#10003;</td><td class="miss">&#10007;</td><td class="hit">&#10003;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td><td class="miss">&#10007;</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:#f8fafc; font-weight:700;">
+            <th class="case-cell" style="text-align:right;">Total Recall</th>
+            <td></td>
+            <td class="tool-hl" style="color:#059669; font-size:0.9rem;">11/11</td>
+            <td>8/11</td>
+            <td>7/11</td>
+            <td>4/11</td>
+            <td>6/11</td>
+            <td>1/11</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="fig-caption">
+      The heatmap shows which tools detected each benchmark case and how difficult each case was across the comparison
+      set. Difficulty is measured by consensus: n/6 = how many tools detected it. VibeScan maintained coverage even on
+      low-consensus cases (2/6) that most peers missed, supporting the claim that its gains extend beyond easier detections.
+    </p>
+  </section>
+
+  <!-- ── FIGURE 5: Recall vs Precision Proxy (bottom right) ── -->
+  <section class="card col-fig5">
+    <div class="fig-label">Figure 5 — Recall vs. Precision Proxy</div>
+    <div class="scatter-wrap">
+      <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, sans-serif;">
+        <!-- Axes -->
+        <line x1="60" y1="280" x2="400" y2="280" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="60" y1="280" x2="60" y2="30" stroke="#94a3b8" stroke-width="1.5"/>
+
+        <!-- Grid lines -->
+        <line x1="60" y1="230" x2="400" y2="230" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="60" y1="180" x2="400" y2="180" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="60" y1="130" x2="400" y2="130" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="60" y1="80"  x2="400" y2="80"  stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="128" y1="280" x2="128" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="196" y1="280" x2="196" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="264" y1="280" x2="264" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="332" y1="280" x2="332" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+        <line x1="400" y1="280" x2="400" y2="30" stroke="#e2e8f0" stroke-width="0.5"/>
+
+        <!-- X-axis labels (Recall 0-100%) -->
+        <text x="60" y="298" font-size="10" fill="#64748b" text-anchor="middle">0%</text>
+        <text x="128" y="298" font-size="10" fill="#64748b" text-anchor="middle">20%</text>
+        <text x="196" y="298" font-size="10" fill="#64748b" text-anchor="middle">40%</text>
+        <text x="264" y="298" font-size="10" fill="#64748b" text-anchor="middle">60%</text>
+        <text x="332" y="298" font-size="10" fill="#64748b" text-anchor="middle">80%</text>
+        <text x="400" y="298" font-size="10" fill="#64748b" text-anchor="middle">100%</text>
+        <text x="230" y="325" font-size="11.5" fill="#475569" text-anchor="middle" font-weight="600">Recall (cases detected / 11)</text>
+
+        <!-- Y-axis labels (Cases per Alert, 0-0.5) -->
+        <text x="54" y="284" font-size="10" fill="#64748b" text-anchor="end">0</text>
+        <text x="54" y="234" font-size="10" fill="#64748b" text-anchor="end">0.1</text>
+        <text x="54" y="184" font-size="10" fill="#64748b" text-anchor="end">0.2</text>
+        <text x="54" y="134" font-size="10" fill="#64748b" text-anchor="end">0.3</text>
+        <text x="54" y="84"  font-size="10" fill="#64748b" text-anchor="end">0.4</text>
+        <text x="54" y="34"  font-size="10" fill="#64748b" text-anchor="end">0.5</text>
+        <text x="18" y="160" font-size="11.5" fill="#475569" text-anchor="middle" font-weight="600" transform="rotate(-90 18 160)">Cases per Alert (precision proxy)</text>
+
+        <!-- Ideal corner highlight -->
+        <rect x="330" y="30" width="72" height="105" rx="6" fill="#dcfce7" opacity="0.35"/>
+        <text x="366" y="25" font-size="8.5" fill="#16a34a" text-anchor="middle" font-weight="600">IDEAL</text>
+
+        <!-- Data points -->
+        <!-- eslint-security: recall=1/11=9.1%, cases_per_alert=1/493=0.002 -->
+        <!-- x=60+(9.1%*340)=91, y=280-(0.002/0.5*250)=279 -->
+        <circle cx="91" cy="279" r="8" fill="#94a3b8" opacity="0.8"/>
+        <text x="91" y="271" font-size="8.5" fill="#475569" text-anchor="middle" font-weight="600">eslint</text>
+
+        <!-- Semgrep: recall=4/11=36.4%, cases_per_alert=4/11=0.364 -->
+        <!-- x=60+(36.4%*340)=184, y=280-(0.364/0.5*250)=98 -->
+        <circle cx="184" cy="98" r="8" fill="#818cf8" opacity="0.8"/>
+        <text x="184" y="90" font-size="8.5" fill="#4f46e5" text-anchor="middle" font-weight="600">Semgrep</text>
+
+        <!-- CodeQL: recall=6/11=54.5%, cases_per_alert=6/46=0.130 -->
+        <!-- x=60+(54.5%*340)=245, y=280-(0.130/0.5*250)=215 -->
+        <circle cx="245" cy="215" r="8" fill="#818cf8" opacity="0.8"/>
+        <text x="245" y="207" font-size="8.5" fill="#4f46e5" text-anchor="middle" font-weight="600">CodeQL</text>
+
+        <!-- Snyk Code: recall=7/11=63.6%, cases_per_alert=7/36=0.194 -->
+        <!-- x=60+(63.6%*340)=276, y=280-(0.194/0.5*250)=183 -->
+        <circle cx="276" cy="183" r="8" fill="#818cf8" opacity="0.8"/>
+        <text x="294" y="180" font-size="8.5" fill="#4f46e5" text-anchor="start" font-weight="600">Snyk Code</text>
+
+        <!-- Bearer: recall=8/11=72.7%, cases_per_alert=8/31=0.258 -->
+        <!-- x=60+(72.7%*340)=307, y=280-(0.258/0.5*250)=151 -->
+        <circle cx="307" cy="151" r="8" fill="#818cf8" opacity="0.8"/>
+        <text x="288" y="145" font-size="8.5" fill="#4f46e5" text-anchor="end" font-weight="600">Bearer</text>
+
+        <!-- VibeScan: recall=11/11=100%, cases_per_alert=11/25=0.44 -->
+        <!-- x=60+(100%*340)=400, y=280-(0.44/0.5*250)=60 -->
+        <circle cx="396" cy="60" r="10" fill="#22c55e" stroke="#059669" stroke-width="2"/>
+        <text x="378" y="52" font-size="9.5" fill="#059669" text-anchor="end" font-weight="800">VibeScan</text>
+      </svg>
+    </div>
+    <p class="fig-caption">
+      This plot compares recall against a cases-per-alert precision proxy to show practical tradeoffs
+      between coverage and noise. The upper-right corner represents the ideal: high recall with low
+      noise. VibeScan performed well on both axes, suggesting that its recall advantage was not achieved
+      by producing excessive alert volume.
+    </p>
+  </section>
+
+</main>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer class="footer">
+  <div class="card">
+    <h2>Conclusion</h2>
+    <p class="conclusion-text">
+      VibeScan showed that deeper JavaScript security analysis can improve benchmark recall while still
+      supporting practical validation workflows. Cross-file reasoning, route/API analysis, and executable
+      proof generation helped move the tool beyond simple detection toward measurable security assurance.
+      These results suggest that combining semantic depth with proof-oriented validation is a viable path
+      toward higher-confidence static analysis.
+    </p>
+  </div>
+  <div class="card">
+    <h2>Limitations</h2>
+    <ul class="limitation-list" style="padding-left:18px;">
+      <li>Benchmark results are based primarily on DVNA and an expanded corpus; broader benchmarks may yield different rankings.</li>
+      <li style="margin-top:6px;">The precision proxy (cases per alert) is not the same as a fully adjudicated precision study with human-labeled FP/TP.</li>
+      <li style="margin-top:6px;">Historical peer runtime data was limited in the available committed artifacts; timings are environment-dependent.</li>
+    </ul>
+  </div>
+  <div class="card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+    <h2 style="border:none; margin-bottom:8px;">Source &amp; Data</h2>
+    <div style="width:120px; height:120px; background:#f1f5f9; border:2px dashed #94a3b8; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:0.78rem; color:#64748b;">
+      QR Code<br/>placeholder
+    </div>
+    <a class="github-link" href="#" style="margin-top:12px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.694.825.577C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+      github.com/vibescan
+    </a>
+  </div>
+</footer>
+
+</body>
+</html>

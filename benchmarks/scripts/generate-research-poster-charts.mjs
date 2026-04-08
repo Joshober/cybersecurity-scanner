@@ -36,6 +36,7 @@ function loadCompareRows(matrix) {
           total,
           percent: total > 0 ? (hits / total) * 100 : 0,
           rawIssues: Number(tool.dvnaRunIssueCount || 0),
+          runtimeMs: typeof tool.dvnaRunDurationMs === "number" ? Number(tool.dvnaRunDurationMs) : null,
           precisionProxy,
         };
       })
@@ -310,11 +311,25 @@ ${bars}
 ${txt(width / 2, height - 6, "Green=VibeScan, gray=peers", 'font-size="8" text-anchor="middle" fill="#334155"')}
 </svg>`;
 }
-function buildRecallPrecisionSvg(rows, { width = 480, height = 300, title = "Recall vs Precision Proxy" } = {}) {
+function buildRecallPrecisionSvg(rows, { width = 480, height = 300, title = "Figure 8 - Recall vs precision proxy" } = {}) {
   const margin = { top: 38, right: 25, bottom: 40, left: 42 };
   const chartW = width - margin.left - margin.right;
   const chartH = height - margin.top - margin.bottom;
   const maxX = Math.max(...rows.map((r) => r.precisionProxy), 0.45);
+  const xTicks = [0, 0.1, 0.2, 0.3, 0.4];
+  const yTicks = [0, 20, 40, 60, 80, 100];
+  const xGrid = xTicks
+    .map((t) => {
+      const x = margin.left + (Math.min(t, maxX) / maxX) * chartW;
+      return `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + chartH}" stroke="#e2e8f0"/>${txt(x, margin.top + chartH + 14, t.toFixed(1), 'font-size="8" text-anchor="middle" fill="#64748b"')}`;
+    })
+    .join("\n");
+  const yGrid = yTicks
+    .map((t) => {
+      const y = margin.top + chartH - (t / 100) * chartH;
+      return `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"/>${txt(margin.left - 8, y + 3, `${t}%`, 'font-size="8" text-anchor="end" fill="#64748b"')}`;
+    })
+    .join("\n");
   const points = rows
     .map((r) => {
       const x = margin.left + (r.precisionProxy / maxX) * chartW;
@@ -327,22 +342,63 @@ ${txt(x + 6, y - 5, r.label, 'font-size="8" fill="#334155"')}`;
 ${txt(width / 2, 18, title, 'font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a"')}
 <line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b"/>
 <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b"/>
+${xGrid}
+${yGrid}
 ${points}
-${txt(width / 2, height - 4, "Precision proxy (cases detected / raw alerts)", 'font-size="8" text-anchor="middle" fill="#334155"')}
+${txt(width / 2, height - 4, "X-axis: Precision proxy (cases detected / raw alerts)", 'font-size="8" text-anchor="middle" fill="#334155"')}
+${txt(12, margin.top + chartH / 2, "Y-axis: Recall (%)", 'font-size="8" text-anchor="middle" fill="#334155" transform="rotate(-90 12 ' + (margin.top + chartH / 2) + ')"')}
 </svg>`;
 }
-function buildRecallTimeSvg(rows, timing, { width = 480, height = 220, title = "Recall vs Scan Time" } = {}) {
-  const vibescan = rows.find((r) => r.id === "vibescan");
-  const secs = timing.durationMs / 1000;
+function buildRecallTimeSvg(rows, timing, { width = 480, height = 280, title = "Recall vs Scan Time" } = {}) {
+  const margin = { top: 34, right: 24, bottom: 42, left: 52 };
+  const chartW = width - margin.left - margin.right;
+  const chartH = height - margin.top - margin.bottom;
+  const withTime = rows.filter((r) => typeof r.runtimeMs === "number");
+  const xs = withTime.map((r) => Number(r.runtimeMs) / 1000);
+  const xMax = Math.max(...xs, Number(timing.durationMs || 0) / 1000, 1);
+  const xMin = Math.max(Math.min(...xs, 0.1), 0.1);
+  const logMin = Math.log10(xMin);
+  const logMax = Math.log10(xMax);
+  const xTicks = [0.5, 1, 2, 5, 10, 20, 50, 100].filter((t) => t >= xMin && t <= xMax);
+  const yTicks = [0, 20, 40, 60, 80, 100];
+  const fmtSec = (s) => `${s.toFixed(1)}s`;
+  const xToPx = (s) => {
+    const clamped = Math.max(xMin, Math.min(xMax, s));
+    const t = (Math.log10(clamped) - logMin) / Math.max(logMax - logMin, 1e-9);
+    return margin.left + t * chartW;
+  };
+
+  const gridX = xTicks
+    .map((t) => {
+      const x = xToPx(t);
+      return `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + chartH}" stroke="#e2e8f0"/>${txt(x, margin.top + chartH + 14, fmtSec(t), 'font-size="8" text-anchor="middle" fill="#64748b"')}`;
+    })
+    .join("\n");
+  const gridY = yTicks
+    .map((t) => {
+      const y = margin.top + chartH - (t / 100) * chartH;
+      return `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="#e2e8f0"/>${txt(margin.left - 8, y + 3, `${t}%`, 'font-size="8" text-anchor="end" fill="#64748b"')}`;
+    })
+    .join("\n");
+
+  const points = withTime
+    .map((r) => {
+      const x = xToPx(Number(r.runtimeMs) / 1000);
+      const y = margin.top + chartH - (r.percent / 100) * chartH;
+      const c = r.id === "vibescan" ? "#16a34a" : "#2563eb";
+      const rad = r.id === "vibescan" ? 5 : 4;
+      return `<circle cx="${x}" cy="${y}" r="${rad}" fill="${c}"/>${txt(x + 6, y - 5, r.label, 'font-size="8" fill="#334155"')}`;
+    })
+    .join("\n");
+
   return `<svg viewBox="0 0 ${width} ${height}" width="100%" xmlns="http://www.w3.org/2000/svg">
 ${txt(width / 2, 18, title, 'font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a"')}
-<rect x="40" y="45" width="${Math.min(360, secs * 180)}" height="22" rx="8" fill="#16a34a"/>
-${txt(42, 61, `VibeScan runtime: ${secs.toFixed(2)}s`, 'font-size="9" fill="#fff" font-weight="700"')}
-${txt(40, 95, `VibeScan recall: ${vibescan.hits}/${vibescan.total} (${vibescan.percent.toFixed(1)}%)`, 'font-size="10" fill="#0f172a"')}
-${txt(40, 117, "Peer runtime data not captured in committed artifacts (shown as N/A).", 'font-size="8" fill="#475569"')}
-${rows
-  .map((r, i) => txt(40, 140 + i * 12, `${r.label}: recall ${r.percent.toFixed(1)}%, time N/A`, 'font-size="8" fill="#334155"'))
-  .join("\n")}
+<line x1="${margin.left}" y1="${margin.top + chartH}" x2="${margin.left + chartW}" y2="${margin.top + chartH}" stroke="#64748b"/>
+<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + chartH}" stroke="#64748b"/>
+${gridX}
+${gridY}
+${points}
+${txt(width / 2, height - 6, "X-axis: runtime (seconds, log scale) · Y-axis: DVNA recall", 'font-size="8" text-anchor="middle" fill="#334155"')}
 </svg>`;
 }
 
@@ -365,36 +421,47 @@ function buildPosterHtml(figs, data) {
 .col{padding:14px 16px;border-right:1px solid var(--border)}.col:last-child{border-right:none}.sec{margin-bottom:14px}.sec h2{font-size:1rem;color:#1e3a5f;border-bottom:2px solid #2563eb;padding-bottom:4px;margin:0 0 6px}
 .sec p,.sec li{font-size:.83rem;line-height:1.45}.fig{margin-bottom:12px}.fig-title{font-size:.73rem;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px}
 .fig-card{border:1px solid var(--border);border-radius:8px;background:#fafbfd;padding:8px}.caption{font-size:.74rem;color:var(--muted);margin-top:5px;line-height:1.35}
+.fig-card img{width:100%;height:auto;display:block;border-radius:6px}
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kbox{border:1px solid var(--border);border-radius:8px;padding:7px;text-align:center;background:#f0f9ff}
 .kval{font-size:1.3rem;font-weight:700}.klbl{font-size:.68rem;color:var(--muted)}.discussion{border-top:1px solid var(--border);padding:10px 16px}
-.discussion h3{margin:0 0 5px;color:#1e3a5f}.discussion p{margin:0;font-size:.8rem;line-height:1.4}.footer{border-top:1px solid var(--border);padding:9px 16px;font-size:.74rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.discussion h3{margin:0 0 5px;color:#1e3a5f}.discussion p{margin:0;font-size:.8rem;line-height:1.4}
+.references{border-top:1px solid var(--border);padding:10px 16px 12px;font-size:.72rem;color:var(--muted);line-height:1.38}
+.references h3{margin:0 0 6px;color:#1e3a5f;font-size:.85rem}.ref-list{margin:0;padding-left:18px}.ref-list li{margin-bottom:5px}.ref-list a{color:#1e40af;word-break:break-all}
+.footer{border-top:1px solid var(--border);padding:9px 16px;font-size:.74rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 @media print{@page{size:A1 landscape;margin:8mm}body{padding:0;background:#fff}.poster{border:none}}@media (max-width:1100px){.content{grid-template-columns:1fr}.col{border-right:none;border-bottom:1px solid var(--border)}}
 </style></head><body><main class="poster">
 <header class="header"><h1>VibeScan: Multi-Dimensional Benchmark Analysis for JavaScript Security Scanning</h1><p>Josh Obersteadt - CCSC 2026</p></header>
 <section class="content">
 <div class="col">
-<div class="sec"><h2>Abstract</h2><p>We evaluate VibeScan on DVNA (11 adjudicated rows) plus expanded rule-family coverage. This revision deepens analysis by separating recall, signal efficiency, case difficulty, family-level behavior, and runtime characteristics. VibeScan remains top-ranked in recall (${top.percent.toFixed(1)}%) with a ${(top.percent - second.percent).toFixed(1)}-point lead over ${second.label}.</p></div>
+<div class="sec"><h2>Abstract</h2><p>Comparing JavaScript security scanners by raw alert counts confounds detection with noise. We present a reproducible multi-dimensional study on an adjudicated DVNA benchmark [1] with aligned peer tool runs, expanded rule-family coverage, and metrics that separate what is found (recall) from triage burden (cases-per-alert precision proxy) and operational cost (wall-clock scan time). Findings are interpreted alongside standard web-application risk framing [2]. VibeScan attains the highest DVNA recall (${top.percent.toFixed(1)}%), ${(top.percent - second.percent).toFixed(1)} percentage points above the next-ranked scanner (${second.label}), with supporting analyses for signal-to-noise, per-family recall, difficulty-weighted coverage, and recall–time tradeoffs. Limitations: precision remains a proxy (not full per-alert false-positive adjudication for every tool), and the expanded corpus is partially VibeScan-aligned for family stress testing.</p></div>
 <div class="sec"><h2>Research Questions</h2><ul><li>RQ1: Can VibeScan sustain top recall on hard cases?</li><li>RQ2: Where do peers diverge by family and case difficulty?</li><li>RQ3: How do precision-proxy and runtime affect practical scanner value?</li></ul></div>
 <div class="sec"><h2>Method</h2><p>Datasets: DVNA (${dvnaCases}), expanded unique (${expandedUnique}), stress repeats (${stressRows}). Metrics: recall, cases-per-alert precision proxy, family recall, difficulty score (detected-by count), and VibeScan wall-clock runtime (${(timing.durationMs / 1000).toFixed(2)}s).</p></div>
-<div class="fig"><div class="fig-title">Figure 1 - DVNA recall by tool</div><div class="fig-card">${figs.recall}</div><div class="caption">Ranks and recall gap annotation make leadership explicit.</div></div>
+<div class="fig"><div class="fig-title">Figure 1 - Analysis depth comparison</div><div class="fig-card"><img src="./comparison-overview.png" alt="VibeScan analysis depth comparison diagram"/></div><div class="caption">Clean stage-by-stage comparison of where peer tools stop vs where VibeScan continues.</div></div>
 <div class="fig"><div class="fig-title">Figure 2 - Recall vs raw volume</div><div class="fig-card">${figs.scatter}</div><div class="caption">Trend line + Pearson r quantifies that alert volume is weakly related to recall.</div></div>
-<div class="fig"><div class="fig-title">Figure 5 - Case difficulty spectrum</div><div class="fig-card">${figs.difficulty}</div><div class="caption">Hardest cases are where specialized JS/TS semantics matter.</div></div>
 </div>
 <div class="col">
 <div class="sec"><h2>Results KPIs</h2><div class="kpi"><div class="kbox"><div class="kval">100%</div><div class="klbl">VibeScan DVNA recall</div></div><div class="kbox"><div class="kval">${second.percent.toFixed(1)}%</div><div class="klbl">Next-best recall</div></div><div class="kbox"><div class="kval">${dvnaCases + expandedUnique}</div><div class="klbl">Unique scored rows</div></div><div class="kbox"><div class="kval">${familyCount}</div><div class="klbl">Rule families</div></div></div></div>
-<div class="fig"><div class="fig-title">Figure 3 - Coverage gap</div><div class="fig-card">${figs.coverage}</div><div class="caption">DVNA misses SSRF/cookie/SSTI/IDOR classes covered in expanded corpus.</div></div>
 <div class="fig"><div class="fig-title">Figure 6 - Signal to noise</div><div class="fig-card">${figs.signalNoise}</div><div class="caption">Higher means more benchmark value per reported alert.</div></div>
 <div class="fig"><div class="fig-title">Figure 7 - Per-family recall</div><div class="fig-card">${figs.familyRecall}</div><div class="caption">Family-level decomposition shows where peers drop coverage.</div></div>
 </div>
 <div class="col">
 <div class="fig"><div class="fig-title">Figure 4 - Heatmap with totals</div><div class="fig-card">${figs.heatmap}</div><div class="caption">Adds column totals and per-row difficulty score.</div></div>
 <div class="fig"><div class="fig-title">Figure 8 - Recall vs precision proxy</div><div class="fig-card">${figs.recallPrecision}</div><div class="caption">Precision proxy = cases detected / raw alerts (not full FP-adjudicated precision).</div></div>
-<div class="fig"><div class="fig-title">Figure 9 - Recall vs scan time</div><div class="fig-card">${figs.recallTime}</div><div class="caption">Runtime measured on local DVNA run; peer timing unavailable in committed artifacts.</div></div>
+<div class="fig"><div class="fig-title">Figure 9 - Recall vs scan time</div><div class="fig-card">${figs.recallTime}</div><div class="caption">Runtime from rerun measurements; log-scale x-axis improves visibility with CodeQL as an outlier.</div></div>
 <div class="sec"><h2>Limitations</h2><ul><li>Peer runtime fields are not in historical artifacts.</li><li>Precision proxy is not formal precision.</li><li>Expanded corpus remains VibeScan-focused.</li></ul></div>
 </div>
 </section>
 <section class="discussion"><h3>Discussion</h3><p>VibeScan leads overall recall and stays strong on hard cases (<=2/6 peer coverage). Signal-to-noise and recall-vs-precision-proxy charts show practical advantage beyond raw alert counts. Family-level and heatmap totals explain where this lead comes from: crypto/auth/xss and multi-context injection cases. Runtime evidence shows CI-friendly execution speed for local benchmark workflows.</p></section>
-<footer class="footer"><span>DVNA commit 9ba473a | VibeScan v1.1.0 | npm @jobersteadt/vibescan</span><span>Data: results/dvna-detection-matrix.json, results/dvna-case-catalog.json, results/vibescan-dvna-scan-timing.json</span></footer>
+<section class="references"><h3>References</h3><ol class="ref-list">
+<li>AppSecCo. <em>Damn Vulnerable Node Application (DVNA)</em>. GitHub repository. <a href="https://github.com/appsecco/dvna">https://github.com/appsecco/dvna</a>.</li>
+<li>OWASP Foundation. <em>OWASP Top 10:2021</em>. <a href="https://owasp.org/Top10/">https://owasp.org/Top10/</a>.</li>
+<li>Semgrep, Inc. <em>Semgrep documentation</em>. <a href="https://semgrep.dev/docs/">https://semgrep.dev/docs/</a>.</li>
+<li>GitHub. <em>CodeQL documentation</em>. <a href="https://codeql.github.com/docs/">https://codeql.github.com/docs/</a>.</li>
+<li>ESLint Community. <em>eslint-plugin-security</em>. <a href="https://github.com/eslint-community/eslint-plugin-security">https://github.com/eslint-community/eslint-plugin-security</a>.</li>
+<li>Snyk Ltd. <em>Snyk CLI</em>. <a href="https://docs.snyk.io/snyk-cli">https://docs.snyk.io/snyk-cli</a>.</li>
+<li>Bearer. <em>Bearer (open-source static analysis)</em>. <a href="https://github.com/Bearer/bearer">https://github.com/Bearer/bearer</a>.</li>
+</ol></section>
+<footer class="footer"><span>DVNA commit 9ba473a | VibeScan v1.1.0 | npm @jobersteadt/vibescan</span><span>Data: results/dvna-detection-matrix.json, results/dvna-case-catalog.json, results/vibescan-dvna-scan-timing.json, results/dvna-tool-timings.json</span></footer>
 </main></body></html>`;
 }
 
@@ -444,7 +511,7 @@ function main() {
     ["vibescan-case-difficulty-chart.html", "Case Difficulty Spectrum", figs.difficulty],
     ["vibescan-signal-noise-chart.html", "Signal-to-Noise", figs.signalNoise],
     ["vibescan-family-recall-chart.html", "Per-Family Recall", figs.familyRecall],
-    ["vibescan-recall-precision-chart.html", "Recall vs Precision Proxy", figs.recallPrecision],
+    ["vibescan-recall-precision-chart.html", "Figure 8 - Recall vs precision proxy", figs.recallPrecision],
     ["vibescan-recall-time-chart.html", "Recall vs Scan Time", figs.recallTime],
   ];
   for (const [name, title, svg] of standalone) {
