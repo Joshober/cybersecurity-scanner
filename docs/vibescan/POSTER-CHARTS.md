@@ -64,6 +64,13 @@ node benchmarks/scripts/run-framework-vuln-scan.mjs
 
 The heatmap lists **eleven grounded DVNA case rows** (some share a title with different **scenario** subtitles). **npm audit** is omitted from tool columns when the matrix marks it as **gap** scope (dependency advisories ≠ first-party line SAST). See `results/dvna-benchmark-interpretation.md` for judge-facing framing.
 
+## Difficulty metric in Figure 4
+
+- Difficulty now uses **ETS delta scaling** from consensus detection probability: compute `p = detectedBy / 6` (charted SAST tools), then `delta = 13 - 4z` where `z` is the standard normal deviate for `p`.
+- The heatmap’s right column shows **delta** (higher = harder), while the companion difficulty chart also shows the raw consensus as `(n/6)`.
+- Rationale: the legacy `n/6` count is still visible, but delta provides a standard psychometric difficulty scale that is less tied to a single raw count format.
+- Source: ETS Research Memorandum RM-19-09, *Final Study Statistical Analysis for the Redesigned TOEIC Bridge Tests* (item-difficulty definitions for p and delta): https://www.ets.org/Media/Research/pdf/RM-19-09.pdf
+
 ## Companion figure
 
 `dvna-proof-coverage-poster.html` is a **self-contained HTML/CSS** horizontal bar view of `summary.proofCoverage` (or recomputed tiers from findings)—no Chart.js CDN, so it works offline and in locked-down browsers.

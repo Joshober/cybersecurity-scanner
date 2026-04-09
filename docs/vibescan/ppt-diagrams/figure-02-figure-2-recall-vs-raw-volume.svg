@@ -1,0 +1,44 @@
+<svg viewBox="0 0 480 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs. Raw Alert Volume</text>
+<text x="470" y="30" font-size="9" text-anchor="end" fill="#334155">Pearson r=-0.73</text>
+<line x1="46" y1="272" x2="450" y2="272" stroke="#64748b"/>
+<line x1="46" y1="36" x2="46" y2="272" stroke="#64748b"/>
+<line x1="46" y1="36" x2="46" y2="272" stroke="#eef2f7"/>
+<text x="46" y="306" font-size="9" text-anchor="middle" fill="#64748b">0</text>
+<line x1="127.947261663286" y1="36" x2="127.947261663286" y2="272" stroke="#eef2f7"/>
+<text x="127.947261663286" y="306" font-size="9" text-anchor="middle" fill="#64748b">100</text>
+<line x1="209.894523326572" y1="36" x2="209.894523326572" y2="272" stroke="#eef2f7"/>
+<text x="209.894523326572" y="306" font-size="9" text-anchor="middle" fill="#64748b">200</text>
+<line x1="291.84178498985807" y1="36" x2="291.84178498985807" y2="272" stroke="#eef2f7"/>
+<text x="291.84178498985807" y="306" font-size="9" text-anchor="middle" fill="#64748b">300</text>
+<line x1="373.789046653144" y1="36" x2="373.789046653144" y2="272" stroke="#eef2f7"/>
+<text x="373.789046653144" y="306" font-size="9" text-anchor="middle" fill="#64748b">400</text>
+<line x1="450" y1="36" x2="450" y2="272" stroke="#eef2f7"/>
+<text x="450" y="306" font-size="9" text-anchor="middle" fill="#64748b">500</text>
+<line x1="46" y1="272" x2="450" y2="272" stroke="#eef2f7"/>
+<text x="41" y="275" font-size="8" text-anchor="end" fill="#64748b">0</text>
+<line x1="46" y1="224.8" x2="450" y2="224.8" stroke="#eef2f7"/>
+<text x="41" y="227.8" font-size="8" text-anchor="end" fill="#64748b">20</text>
+<line x1="46" y1="177.6" x2="450" y2="177.6" stroke="#eef2f7"/>
+<text x="41" y="180.6" font-size="8" text-anchor="end" fill="#64748b">40</text>
+<line x1="46" y1="130.4" x2="450" y2="130.4" stroke="#eef2f7"/>
+<text x="41" y="133.4" font-size="8" text-anchor="end" fill="#64748b">60</text>
+<line x1="46" y1="83.19999999999999" x2="450" y2="83.19999999999999" stroke="#eef2f7"/>
+<text x="41" y="86.19999999999999" font-size="8" text-anchor="end" fill="#64748b">80</text>
+<line x1="46" y1="36" x2="450" y2="36" stroke="#eef2f7"/>
+<text x="41" y="39" font-size="8" text-anchor="end" fill="#64748b">100</text>
+<line x1="46" y1="109.36971439435305" x2="450" y2="249.1018346204278" stroke="#ef4444" stroke-width="1.5"/>
+<circle cx="66.4868154158215" cy="36" r="5" fill="#16a34a" opacity="0.85"/>
+<text x="73.4868154158215" y="31" font-size="8" fill="#334155">VibeScan</text>
+<circle cx="71.40365111561866" cy="100.36363636363635" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="78.40365111561866" y="95.36363636363635" font-size="8" fill="#334155">Bearer</text>
+<circle cx="75.50101419878297" cy="121.81818181818181" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="82.50101419878297" y="116.81818181818181" font-size="8" fill="#334155">Snyk Code</text>
+<circle cx="83.69574036511156" cy="143.27272727272728" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="90.69574036511156" y="138.27272727272728" font-size="8" fill="#334155">CodeQL</text>
+<circle cx="55.01419878296146" cy="186.1818181818182" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="62.01419878296146" y="181.1818181818182" font-size="8" fill="#334155">Semgrep</text>
+<circle cx="450" cy="250.54545454545453" r="4" fill="#2563eb" opacity="0.85"/>
+<text x="457" y="245.54545454545453" font-size="8" fill="#334155">eslint-plugin-security</text>
+<text x="240" y="318" font-size="9" text-anchor="middle" fill="#475569">Raw issues reported on DVNA</text>
+</svg>

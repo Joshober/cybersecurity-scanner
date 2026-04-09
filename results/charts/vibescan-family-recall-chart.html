@@ -1,50 +1,91 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Per-Family Recall</title>
   <style>body{font-family:system-ui,sans-serif;margin:24px;background:#f8fafc;color:#0f172a}.card{max-width:760px;background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgb(0 0 0 / 0.08)}h1{font-size:1.1rem;margin:0 0 12px}</style>
-  </head><body><h1>Per-Family Recall</h1><div class="card"><svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Per-Family Recall by Tool</text>
-<line x1="38" y1="225" x2="465" y2="225" stroke="#64748b"/>
-<line x1="38" y1="38" x2="38" y2="225" stroke="#64748b"/>
-<rect x="42" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="52.52777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="63.05555555555556" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
-<rect x="73.58333333333334" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
-<rect x="84.11111111111111" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
-<rect x="94.63888888888889" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
-<text x="73.58333333333334" y="237" font-size="7" text-anchor="middle" fill="#334155">Injection</text>
-<rect x="113.16666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="123.69444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="134.22222222222223" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="144.75" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="155.27777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="165.80555555555557" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="144.75" y="237" font-size="7" text-anchor="middle" fill="#334155">Redirect &amp; Navigation</text>
-<rect x="184.33333333333334" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="194.86111111111111" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="205.3888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="215.91666666666669" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="226.44444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="236.97222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="215.91666666666669" y="237" font-size="7" text-anchor="middle" fill="#334155">Integrity</text>
-<rect x="255.5" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="266.02777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="276.55555555555554" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="287.0833333333333" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
-<rect x="297.6111111111111" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
-<rect x="308.1388888888889" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="287.0833333333333" y="237" font-size="7" text-anchor="middle" fill="#334155">Secrets &amp; Crypto</text>
-<rect x="326.6666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="337.19444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="347.72222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="358.25" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="368.7777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="379.3055555555556" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="358.25" y="237" font-size="7" text-anchor="middle" fill="#334155">Auth &amp; Access Control</text>
-<rect x="397.83333333333337" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="408.36111111111114" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="418.8888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="429.4166666666667" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="439.94444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="450.4722222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="429.4166666666667" y="237" font-size="7" text-anchor="middle" fill="#334155">XSS &amp; Client-Side Output</text>
-<text x="240" y="294" font-size="8" text-anchor="middle" fill="#334155">Green=VibeScan, gray=peers</text>
+  </head><body><h1>Per-Family Recall</h1><div class="card"><svg viewBox="0 0 428 248" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="214" y="16" font-size="11" font-weight="700" text-anchor="middle" fill="#0f172a">Recall by family (% of cases hit)</text>
+<text x="214" y="30" font-size="7" text-anchor="middle" fill="#64748b">Matrix: rows = DVNA family, columns = tools (same order &amp; colors as poster key).</text>
+<rect x="119" y="40" width="47" height="6" rx="2" fill="#009E73"/>
+<text x="142" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">1</text>
+<rect x="169" y="40" width="47" height="6" rx="2" fill="#0072B2"/>
+<text x="192" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">2</text>
+<rect x="219" y="40" width="47" height="6" rx="2" fill="#E69F00"/>
+<text x="242" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">3</text>
+<rect x="269" y="40" width="47" height="6" rx="2" fill="#D55E00"/>
+<text x="292" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">4</text>
+<rect x="319" y="40" width="47" height="6" rx="2" fill="#CC79A7"/>
+<text x="342" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">5</text>
+<rect x="369" y="40" width="47" height="6" rx="2" fill="#56B4E9"/>
+<text x="392" y="60" font-size="9" font-weight="800" text-anchor="middle" fill="#475569">6</text>
+<text x="112" y="80" font-size="8" text-anchor="end" fill="#0f172a">Injection</text><rect x="119" y="65" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="65" width="47" height="23" rx="4" fill="#0072B228" stroke="#0072B2" stroke-width="1.25" opacity="1"/>
+<text x="192" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#0072B2">100%</text>
+<rect x="219" y="65" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="242" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#E69F00">40%</text>
+<rect x="269" y="65" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="292" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#D55E00">20%</text>
+<rect x="319" y="65" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="342" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#CC79A7">40%</text>
+<rect x="369" y="65" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="81" font-size="10" font-weight="700" text-anchor="middle" fill="#56B4E9">20%</text>
+<text x="112" y="106" font-size="8" text-anchor="end" fill="#0f172a">Redirect &amp; Navigati…</text><rect x="119" y="91" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="91" width="47" height="23" rx="4" fill="#0072B228" stroke="#0072B2" stroke-width="1.25" opacity="1"/>
+<text x="192" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#0072B2">100%</text>
+<rect x="219" y="91" width="47" height="23" rx="4" fill="#E69F0028" stroke="#E69F00" stroke-width="1.25" opacity="1"/>
+<text x="242" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#E69F00">100%</text>
+<rect x="269" y="91" width="47" height="23" rx="4" fill="#D55E0028" stroke="#D55E00" stroke-width="1.25" opacity="1"/>
+<text x="292" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#D55E00">100%</text>
+<rect x="319" y="91" width="47" height="23" rx="4" fill="#CC79A728" stroke="#CC79A7" stroke-width="1.25" opacity="1"/>
+<text x="342" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#CC79A7">100%</text>
+<rect x="369" y="91" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="107" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<text x="112" y="132" font-size="8" text-anchor="end" fill="#0f172a">Integrity</text><rect x="119" y="117" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="117" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="192" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="219" y="117" width="47" height="23" rx="4" fill="#E69F0028" stroke="#E69F00" stroke-width="1.25" opacity="1"/>
+<text x="242" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#E69F00">100%</text>
+<rect x="269" y="117" width="47" height="23" rx="4" fill="#D55E0028" stroke="#D55E00" stroke-width="1.25" opacity="1"/>
+<text x="292" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#D55E00">100%</text>
+<rect x="319" y="117" width="47" height="23" rx="4" fill="#CC79A728" stroke="#CC79A7" stroke-width="1.25" opacity="1"/>
+<text x="342" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#CC79A7">100%</text>
+<rect x="369" y="117" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="133" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<text x="112" y="158" font-size="8" text-anchor="end" fill="#0f172a">Secrets &amp; Crypto</text><rect x="119" y="143" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="143" width="47" height="23" rx="4" fill="#0072B228" stroke="#0072B2" stroke-width="1.25" opacity="1"/>
+<text x="192" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#0072B2">100%</text>
+<rect x="219" y="143" width="47" height="23" rx="4" fill="#E69F0028" stroke="#E69F00" stroke-width="1.25" opacity="1"/>
+<text x="242" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#E69F00">100%</text>
+<rect x="269" y="143" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="292" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#D55E00">50%</text>
+<rect x="319" y="143" width="47" height="23" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="342" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#CC79A7">50%</text>
+<rect x="369" y="143" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="159" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<text x="112" y="184" font-size="8" text-anchor="end" fill="#0f172a">Auth &amp; Access Contr…</text><rect x="119" y="169" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="169" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="192" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="219" y="169" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="242" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="269" y="169" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="292" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="319" y="169" width="47" height="23" rx="4" fill="#CC79A728" stroke="#CC79A7" stroke-width="1.25" opacity="1"/>
+<text x="342" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#CC79A7">100%</text>
+<rect x="369" y="169" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="185" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<text x="112" y="210" font-size="8" text-anchor="end" fill="#0f172a">XSS &amp; Client-Side O…</text><rect x="119" y="195" width="47" height="23" rx="4" fill="#009E7328" stroke="#009E73" stroke-width="1.25" opacity="1"/>
+<text x="142" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#009E73">100%</text>
+<rect x="169" y="195" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="192" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="219" y="195" width="47" height="23" rx="4" fill="#E69F0028" stroke="#E69F00" stroke-width="1.25" opacity="1"/>
+<text x="242" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#E69F00">100%</text>
+<rect x="269" y="195" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="292" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="319" y="195" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="342" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<rect x="369" y="195" width="47" height="23" rx="4" fill="#fef2f2" stroke="#e2e8f0" stroke-width="0.75" opacity="1"/>
+<text x="392" y="211" font-size="10" font-weight="700" text-anchor="middle" fill="#94a3b8">0%</text>
+<text x="214" y="230" font-size="7" text-anchor="middle" fill="#64748b">100% = all cases in that family detected; 0% = none.</text>
 </svg></div></body></html>

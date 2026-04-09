@@ -94,9 +94,11 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   };
 
   const cm = result.cliMerge;
+  let sawFlag = false;
 
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
+    if (a.startsWith("-")) sawFlag = true;
 
     if (a === "scan" || a === "report") {
       result.subcommand = a;
@@ -278,8 +280,12 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     }
   }
 
-  if (!result.subcommand || (result.subcommand === "scan" && result.inputPaths.length === 0)) {
-    if (result.subcommand === "scan") result.inputPaths.push(".");
+  if (!result.subcommand && sawFlag) {
+    result.subcommand = "scan";
+  }
+
+  if (result.subcommand === "scan" && result.inputPaths.length === 0) {
+    result.inputPaths.push(".");
   }
 
   return result;

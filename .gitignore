@@ -42,6 +42,9 @@ coverage/
 # Optional
 .cache/
 
+# Generated poster screenshot (benchmarks/scripts/poster-html-to-pptx.mjs)
+.tmp/
+
 # CodeQL CLI bundle and zip (see benchmarks/scripts/run-codeql-dvna.ps1)
 benchmarks/.cache/
 

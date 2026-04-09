@@ -1,266 +1,208 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>VibeScan Poster</title>
+<title>VibeScan — CCSC 2026 Research Poster</title>
 <style>
-:root{--blue:#1e3a5f;--border:#e2e8f0;--muted:#475569}*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f8fafc;padding:12px}
-.poster{max-width:1550px;margin:0 auto;background:#fff;border:1px solid var(--border)}.header{background:linear-gradient(135deg,#1e3a5f,#0f172a);color:#fff;padding:22px 30px;text-align:center}
-.header h1{margin:0;font-size:2rem}.header p{margin:6px 0 0;font-size:1rem;opacity:.9}.content{display:grid;grid-template-columns:1fr 1.2fr 1.2fr}
-.col{padding:14px 16px;border-right:1px solid var(--border)}.col:last-child{border-right:none}.sec{margin-bottom:14px}.sec h2{font-size:1rem;color:#1e3a5f;border-bottom:2px solid #2563eb;padding-bottom:4px;margin:0 0 6px}
-.sec p,.sec li{font-size:.83rem;line-height:1.45}.fig{margin-bottom:12px}.fig-title{font-size:.73rem;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px}
-.fig-card{border:1px solid var(--border);border-radius:8px;background:#fafbfd;padding:8px}.caption{font-size:.74rem;color:var(--muted);margin-top:5px;line-height:1.35}
+:root{--blue:#1e3a5f;--border:#e2e8f0;--muted:#475569;--banner-purple:#322379;--accent:#2563eb;--accent-light:#dbeafe}*{box-sizing:border-box}body{font-family:system-ui,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin:0;background:#cbd5e1;padding:16px}
+.poster{width:1536px;height:1152px;margin:0 auto;background:#fff;border:1px solid #94a3b8;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06)}
+.header{background:linear-gradient(135deg,#1e1664 0%,var(--banner-purple) 40%,#4a2faa 100%);color:#fff;padding:16px 22px 18px 18px;display:flex;flex-direction:row;align-items:center;gap:16px;flex-shrink:0;text-align:left;border-bottom:3px solid var(--accent)}
+.header-logo{flex:0 0 auto;height:4.75rem;width:auto;object-fit:contain;display:block}
+.header-body{flex:1;min-width:0}
+.header h1{margin:0;font-size:1.38rem;font-weight:800;line-height:1.2;letter-spacing:-.01em}
+.header-subtitle{margin:6px 0 0;font-size:.72rem;font-weight:400;line-height:1.35;opacity:.96;max-width:62rem}
+.header-authors{margin:8px 0 0;font-size:.62rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.92}
+.header-mentors{margin:4px 0 0;font-size:.62rem;opacity:.92}
+.header-qr{flex:0 0 auto;align-self:center}
+.header-qr img{display:block;width:5.25rem;height:5.25rem;object-fit:contain;background:#fff;padding:5px;border-radius:6px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.content{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);grid-template-rows:minmax(0,1fr);flex:1;min-height:0}
+.results-comparison{grid-column:2;grid-row:1;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;padding-top:8px}
+.sec--findings{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:5px;padding:4px 6px;margin-bottom:5px}.sec--findings h2{color:#1e40af;border-left-color:#1e40af;font-size:.62rem;margin:0 0 2px;padding:1px 0 1px 6px;border-left-width:2px}.sec--findings ul{margin:0;padding-left:12px}.sec--findings li{font-size:.58rem;line-height:1.22;margin:0 0 1px}
+.col--right-sm .references{border-top:none;padding-top:4px}
+.results-comparison-title{font-size:.76rem;color:var(--blue);margin:0 0 8px;padding:3px 12px 5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-left:3px solid var(--accent);border-bottom:1px solid var(--border);line-height:1.35;flex-shrink:0}
+.results-comparison-body{display:grid;grid-template-columns:1fr 1.2fr;flex:1;min-height:0;align-content:start;min-width:0}
+.tool-legend-wrap{flex-shrink:0;border-bottom:1px solid var(--border);background:#f8fafc;padding:4px 12px;min-width:0;display:flex;align-items:center;gap:8px}
+.results-comparison-matrix{flex-shrink:0;padding:4px 10px 8px;border-bottom:1px solid var(--border);min-width:0}
+.results-comparison-matrix .fig{margin-bottom:4px}
+.fig--detection-matrix .fig-card{padding:0;background:#fff;overflow:hidden}
+.detection-matrix-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.detection-matrix{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-size:.56rem;line-height:1.18;color:#0f172a}
+.detection-matrix th,.detection-matrix td{border:none;padding:0;vertical-align:middle;word-break:break-word}
+.detection-matrix thead th.dm-corner{text-align:left;font-weight:700;background:#1e293b;color:#e2e8f0;font-size:.54rem;line-height:1.2;padding:6px 8px}
+.detection-matrix thead th.dm-tool{text-align:center;font-weight:700;padding:5px 2px;background:#f1f5f9}
+.detection-matrix .dm-tn{display:block;font-size:.48rem;font-weight:800;color:#94a3b8;line-height:1}
+.detection-matrix .dm-tab{display:block;font-size:.56rem;font-weight:700;color:#0f172a;line-height:1.2;margin-top:2px}
+.detection-matrix tbody .dm-cat{text-align:left;font-weight:700;color:#f1f5f9;width:14%;font-size:.56rem;padding:0 8px;background:#334155}
+.detection-matrix tbody .dm-scen{text-align:left;font-size:.52rem;padding:0 6px;color:#475569;background:#f1f5f9;font-weight:500}
+.detection-matrix .dm-cell{text-align:center;font-weight:800;font-size:.58rem;padding:0;width:7.2%}
+.detection-matrix .dm-block{display:flex;align-items:center;justify-content:center;width:100%;height:22px;font-weight:800;letter-spacing:.02em}
+.detection-matrix .dm-full .dm-block{background:#059669;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+.detection-matrix .dm-part .dm-block{background:#d97706;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.1)}
+.detection-matrix .dm-none .dm-block{background:#dc2626;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+.detection-matrix tbody tr.dm-row-alt{background:transparent}
+.detection-matrix tfoot .dm-foot-label{text-align:left;font-size:.54rem;font-weight:700;background:#1e293b;color:#e2e8f0;padding:5px 8px}
+.detection-matrix tfoot .dm-foot-cell{padding:0}
+.detection-matrix tfoot .dm-foot-val{display:flex;align-items:center;justify-content:center;width:100%;height:22px;background:#0f172a;color:#e2e8f0;font-weight:800;font-size:.54rem;letter-spacing:.02em}
+.dm-micro{margin:5px 6px 2px;font-size:.54rem;color:#64748b;text-align:center;line-height:1.3}
+.dm-micro-k{font-weight:700;color:#475569}
+.col--left-poster{grid-column:1;grid-row:1;align-self:stretch;min-height:0;min-width:0;border-right:2px solid var(--border);background:linear-gradient(180deg,#f8faff 0%,#fff 35%)}
+.col--mid-sm,.col--right-sm{min-height:0;min-width:0}
+.tool-legend-label{font-size:.54rem;font-weight:700;color:#64748b;white-space:nowrap;flex-shrink:0;letter-spacing:.02em}
+.tool-legend{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.tool-legend-item{display:flex;align-items:center;gap:2px;font-size:.56rem;color:#334155;white-space:nowrap;min-width:0}
+.tool-num{font-size:.5rem;font-weight:800;color:#94a3b8;flex-shrink:0}
+.tool-swatch{display:inline-block;width:9px;height:9px;border-radius:2px;flex-shrink:0;border:1px solid rgb(0 0 0 / 0.12)}
+.tool-name{overflow:hidden;text-overflow:ellipsis;line-height:1.15;font-weight:600}
+.col{padding:10px 12px;border-right:1px solid var(--border);overflow:hidden}.col:last-child{border-right:none}.sec{margin-bottom:9px}.sec h2{font-size:.82rem;color:var(--blue);border-bottom:none;border-left:3px solid var(--accent);padding:2px 0 2px 9px;margin:0 0 5px;font-weight:700;letter-spacing:.01em;line-height:1.3}
+.sec p,.sec li{font-size:.72rem;line-height:1.35}.fig{margin-bottom:8px}.fig-title{font-size:.62rem;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px;letter-spacing:.04em}
+.fig-card{border:1px solid var(--border);border-radius:8px;background:#fafbfd;padding:5px;box-shadow:0 1px 3px rgba(0,0,0,.04)}.caption{font-size:.62rem;color:var(--muted);margin-top:4px;line-height:1.25}
+.fig-narrative{margin:5px 0 0;font-size:.67rem;line-height:1.35;color:#334155}
+.fig-card svg{width:100%;height:auto;display:block;border-radius:6px}
+.col--mid-sm .fig .fig-card svg{width:72%;max-width:100%;margin-left:auto;margin-right:auto;display:block;height:auto}
+.col--right-sm .fig .fig-card svg{width:62%;max-width:100%;margin-left:auto;margin-right:auto;display:block;height:auto}
+.col--right-sm .fig{margin-bottom:4px}
+.col--right-sm .fig-narrative{font-size:.62rem;line-height:1.28;margin-top:3px}
+.col--right-sm .caption{font-size:.58rem;margin-top:2px}
+.fig--heatmap .fig-card svg{width:78%;max-width:100%;margin-left:auto;margin-right:auto;display:block;height:auto}
 .fig-card img{width:100%;height:auto;display:block;border-radius:6px}
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.kbox{border:1px solid var(--border);border-radius:8px;padding:7px;text-align:center;background:#f0f9ff}
-.kval{font-size:1.3rem;font-weight:700}.klbl{font-size:.68rem;color:var(--muted)}.discussion{border-top:1px solid var(--border);padding:10px 16px}
+.fig-img-depth{display:block;width:100%;max-width:100%;height:auto;max-height:320px;margin-left:auto;margin-right:auto;object-fit:contain}
+.discussion{border-top:1px solid var(--border);padding:10px 16px}
 .discussion h3{margin:0 0 5px;color:#1e3a5f}.discussion p{margin:0;font-size:.8rem;line-height:1.4}
-.references{border-top:1px solid var(--border);padding:10px 16px 12px;font-size:.72rem;color:var(--muted);line-height:1.38}
-.references h3{margin:0 0 6px;color:#1e3a5f;font-size:.85rem}.ref-list{margin:0;padding-left:18px}.ref-list li{margin-bottom:5px}.ref-list a{color:#1e40af;word-break:break-all}
-.footer{border-top:1px solid var(--border);padding:9px 16px;font-size:.74rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-@media print{@page{size:A1 landscape;margin:8mm}body{padding:0;background:#fff}.poster{border:none}}@media (max-width:1100px){.content{grid-template-columns:1fr}.col{border-right:none;border-bottom:1px solid var(--border)}}
+.references{border-top:1px solid var(--border);padding:6px 8px 6px;font-size:.62rem;color:var(--muted);line-height:1.18;flex-shrink:0}
+.references h3{margin:0 0 4px;color:#1e3a5f;font-size:.72rem}.ref-list{margin:0;padding-left:14px}.ref-list li{margin-bottom:2px}.ref-list a{color:#1e40af;word-break:break-all}
+.footer{border-top:3px solid var(--accent);background:#f8fafc;padding:8px 16px;font-size:.72rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;flex-shrink:0}.footer a{color:#1e40af}
+@media print{@page{size:48in 36in;margin:0}html,body{width:48in;height:36in}body{padding:0;background:#fff}.poster{width:48in;height:36in;border:none;border-radius:0}}
+@media (max-width:1600px){.poster{width:100%;min-height:auto}.header{flex-wrap:wrap}.header-qr img{width:4.5rem;height:4.5rem}.content{grid-template-columns:1fr}.results-comparison{grid-column:1}.results-comparison-body{grid-template-columns:1fr}.col--left-poster{grid-column:1}.col{border-right:none;border-bottom:1px solid var(--border)}.tool-legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head><body><main class="poster">
-<header class="header"><h1>VibeScan: Multi-Dimensional Benchmark Analysis for JavaScript Security Scanning</h1><p>Josh Obersteadt - CCSC 2026</p></header>
+<header class="header">
+<img class="header-logo" src="./gannon-university-shield.png" width="94" height="109" alt="Gannon University"/>
+<div class="header-body">
+<h1>VibeScan: Multi-Dimensional Benchmark Analysis for JavaScript Security Scanning</h1>
+<p class="header-subtitle">A reproducible multi-dimensional study on adjudicated DVNA with aligned peer tool runs: recall, cases-per-alert precision proxy, per-family coverage, and wall-clock scan time. CCSC 2026.</p>
+<p class="header-authors">AUTHORS: JOSH OBERSTEADT, ANDREW YOUSSEF</p>
+<p class="header-mentors">Mentors: Kevin Brunner | Aquilla Galusha</p>
+</div>
+<div class="header-qr"><a href="https://vibescan-demo.onrender.com" target="_blank" rel="noreferrer"><img src="./poster-banner-qr.png" width="110" height="110" alt="QR code (VibeScan demo)"/></a></div>
+</header>
 <section class="content">
-<div class="col">
-<div class="sec"><h2>Abstract</h2><p>Comparing JavaScript security scanners by raw alert counts confounds detection with noise. We present a reproducible multi-dimensional study on an adjudicated DVNA benchmark [1] with aligned peer tool runs, expanded rule-family coverage, and metrics that separate what is found (recall) from triage burden (cases-per-alert precision proxy) and operational cost (wall-clock scan time). Findings are interpreted alongside standard web-application risk framing [2]. VibeScan attains the highest DVNA recall (100.0%), 27.3 percentage points above the next-ranked scanner (Bearer), with supporting analyses for signal-to-noise, per-family recall, difficulty-weighted coverage, and recall–time tradeoffs. Limitations: precision remains a proxy (not full per-alert false-positive adjudication for every tool), and the expanded corpus is partially VibeScan-aligned for family stress testing.</p></div>
+<div class="col col--left-poster">
+<div class="sec"><h2>Abstract</h2><p>Comparing JavaScript security scanners by raw alert counts confounds detection with noise. We present a reproducible multi-dimensional study on an adjudicated DVNA benchmark [1] with aligned peer tool runs, expanded rule-family coverage, and metrics that separate what is found (recall) from triage burden (cases-per-alert precision proxy) and operational cost (wall-clock scan time). Findings are interpreted alongside standard web-application risk framing [2]. VibeScan attains the highest DVNA recall (100.0%), 27.3 percentage points above the next-ranked scanner (Bearer), with supporting analyses for difficulty-weighted coverage, recall–precision tradeoffs, and recall–time tradeoffs. Limitations: precision remains a proxy (not full per-alert false-positive adjudication for every tool), and the expanded corpus is partially VibeScan-aligned for family stress testing.</p></div>
 <div class="sec"><h2>Research Questions</h2><ul><li>RQ1: Can VibeScan sustain top recall on hard cases?</li><li>RQ2: Where do peers diverge by family and case difficulty?</li><li>RQ3: How do precision-proxy and runtime affect practical scanner value?</li></ul></div>
-<div class="sec"><h2>Method</h2><p>Datasets: DVNA (11), expanded unique (28), stress repeats (80). Metrics: recall, cases-per-alert precision proxy, family recall, difficulty score (detected-by count), and VibeScan wall-clock runtime (0.86s).</p></div>
-<div class="fig"><div class="fig-title">Figure 1 - Analysis depth comparison</div><div class="fig-card"><img src="./comparison-overview.png" alt="VibeScan analysis depth comparison diagram"/></div><div class="caption">Clean stage-by-stage comparison of where peer tools stop vs where VibeScan continues.</div></div>
-<div class="fig"><div class="fig-title">Figure 2 - Recall vs raw volume</div><div class="fig-card"><svg viewBox="0 0 480 320" width="100%" xmlns="http://www.w3.org/2000/svg">
+<div class="sec"><h2>Method</h2><p>Six SAST tools were benchmarked against 11 adjudicated DVNA vulnerability cases spanning 6 rule families (Injection, Redirect, Integrity, Secrets &amp; Crypto, Auth &amp; Access, XSS). Each tool ran in its default or recommended configuration on identical source. Metrics: <strong>recall</strong> (cases detected / 11), <strong>precision proxy</strong> (cases / raw alerts), <strong>case difficulty</strong> (ETS delta from consensus p&nbsp;=&nbsp;detected-by/6), and <strong>wall-clock scan time</strong>. The expanded corpus (28 unique, 80 stress repeats) stress-tests family coverage; only the 11-case DVNA core is used for cross-tool comparison.</p></div>
+<div class="fig"><div class="fig-title">Figure 1 — Analysis Depth Comparison</div><div class="fig-card"><img class="fig-img-depth" src="./comparison-overview.png" alt="VibeScan analysis depth comparison diagram"/></div><div class="caption">Stage-by-stage comparison of where peer tools stop vs. where VibeScan continues.</div><p class="fig-narrative">Most static analysis tools stop after pattern matching — flagging code that resembles a known vulnerability but providing no further evidence. VibeScan extends the pipeline through semantic context extraction and taint-flow validation, giving developers actionable proof rather than undifferentiated alerts.</p></div>
+</div>
+<section class="results-comparison" aria-labelledby="results-comparison-heading">
+<h2 class="results-comparison-title" id="results-comparison-heading">Cross-tool DVNA results</h2>
+<aside class="tool-legend-wrap" aria-label="Tool color key (1–6)">
+<span class="tool-legend-label">Tools:</span>
+<div class="tool-legend"><div class="tool-legend-item" title="VibeScan"><span class="tool-num">1</span><span class="tool-swatch" style="background:#009E73"></span><span class="tool-name">VibeScan</span></div><div class="tool-legend-item" title="Bearer"><span class="tool-num">2</span><span class="tool-swatch" style="background:#0072B2"></span><span class="tool-name">Bearer</span></div><div class="tool-legend-item" title="Snyk Code"><span class="tool-num">3</span><span class="tool-swatch" style="background:#E69F00"></span><span class="tool-name">Snyk Code</span></div><div class="tool-legend-item" title="Semgrep"><span class="tool-num">4</span><span class="tool-swatch" style="background:#D55E00"></span><span class="tool-name">Semgrep</span></div><div class="tool-legend-item" title="CodeQL"><span class="tool-num">5</span><span class="tool-swatch" style="background:#CC79A7"></span><span class="tool-name">CodeQL</span></div><div class="tool-legend-item" title="eslint-plugin-security"><span class="tool-num">6</span><span class="tool-swatch" style="background:#56B4E9"></span><span class="tool-name">ESLint</span></div></div>
+</aside>
+<div class="results-comparison-matrix">
+<div class="fig fig--detection-matrix"><div class="fig-title">Figure 3 — Coverage by vulnerability category (DVNA core)</div><p class="fig-narrative"><strong>VibeScan is the only tool with full coverage across all vulnerability categories, especially outperforming in complex injection and client-side cases.</strong></p><div class="fig-card"><div class="detection-matrix-wrap">
+<table class="detection-matrix">
+<thead>
+<tr>
+<th scope="colgroup" colspan="2" class="dm-corner">Category · Scenarios covered</th>
+<th class="dm-tool" scope="col" style="border-top:3px solid #009E73" title="VibeScan"><span class="dm-tn">1</span><span class="dm-tab">VibeScan</span></th><th class="dm-tool" scope="col" style="border-top:3px solid #0072B2" title="Bearer"><span class="dm-tn">2</span><span class="dm-tab">Bearer</span></th><th class="dm-tool" scope="col" style="border-top:3px solid #E69F00" title="Snyk Code"><span class="dm-tn">3</span><span class="dm-tab">Snyk</span></th><th class="dm-tool" scope="col" style="border-top:3px solid #D55E00" title="Semgrep"><span class="dm-tn">4</span><span class="dm-tab">Semgrep</span></th><th class="dm-tool" scope="col" style="border-top:3px solid #CC79A7" title="CodeQL"><span class="dm-tn">5</span><span class="dm-tab">CodeQL</span></th><th class="dm-tool" scope="col" style="border-top:3px solid #56B4E9" title="eslint-plugin-security"><span class="dm-tn">6</span><span class="dm-tab">ESLint</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="dm-row-alt">
+<td class="dm-cat">Injection</td>
+<td class="dm-scen">SQL, Command, NoSQL (3)</td>
+<td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (3/3)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (3/3)">100%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="66% (2/3)">66%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="33% (1/3)">33%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="66% (2/3)">66%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="33% (1/3)">33%</span></td>
+</tr>
+<tr>
+<td class="dm-cat">Redirect &amp; Nav</td>
+<td class="dm-scen">Open Redirect (1)</td>
+<td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/1)">0%</span></td>
+</tr>
+<tr class="dm-row-alt">
+<td class="dm-cat">Integrity</td>
+<td class="dm-scen">Unsafe Deserialization (1)</td>
+<td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/1)">0%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (1/1)">100%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/1)">0%</span></td>
+</tr>
+<tr>
+<td class="dm-cat">Secrets &amp; Crypto</td>
+<td class="dm-scen">Secrets + Weak Hash (2)</td>
+<td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (2/2)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (2/2)">100%</span></td><td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (2/2)">100%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="50% (1/2)">50%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="50% (1/2)">50%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/2)">0%</span></td>
+</tr>
+<tr class="dm-row-alt">
+<td class="dm-cat">Auth &amp; Client</td>
+<td class="dm-scen">Env + XSS (2)</td>
+<td class="dm-cell dm-full"><span class="dm-block" aria-label="100% (2/2)">100%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/2)">0%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="50% (1/2)">50%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/2)">0%</span></td><td class="dm-cell dm-part"><span class="dm-block" aria-label="50% (1/2)">50%</span></td><td class="dm-cell dm-none"><span class="dm-block" aria-label="0% (0/2)">0%</span></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="2" class="dm-foot-label">Overall recall (11 cases)</td>
+<td class="dm-cell dm-foot-cell"><span class="dm-foot-val">100%</span></td><td class="dm-cell dm-foot-cell"><span class="dm-foot-val">72.7%</span></td><td class="dm-cell dm-foot-cell"><span class="dm-foot-val">63.6%</span></td><td class="dm-cell dm-foot-cell"><span class="dm-foot-val">36.4%</span></td><td class="dm-cell dm-foot-cell"><span class="dm-foot-val">54.5%</span></td><td class="dm-cell dm-foot-cell"><span class="dm-foot-val">9.1%</span></td>
+</tr>
+</tfoot>
+</table>
+</div></div><p class="fig-narrative">The matrix groups DVNA's 11 benchmark cases into five vulnerability categories. VibeScan is the only scanner to achieve 100% coverage across all five. Peer tools perform well on Injection and Redirect but drop sharply in Auth &amp; Client-side, where only VibeScan detects both cases — highlighting the coverage gap that raw alert counts obscure.</p></div>
+</div>
+<div class="results-comparison-body">
+<div class="col col--mid-sm">
+<div class="fig"><div class="fig-title">Figure 2 — Recall vs. Raw Alert Volume</div><div class="fig-card"><svg viewBox="0 0 480 320" width="100%" xmlns="http://www.w3.org/2000/svg">
 <text x="240" y="18" font-size="13" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs. Raw Alert Volume</text>
-<text x="470" y="30" font-size="9" text-anchor="end" fill="#334155">Pearson r=-0.73</text>
-<line x1="46" y1="272" x2="450" y2="272" stroke="#64748b"/>
-<line x1="46" y1="36" x2="46" y2="272" stroke="#64748b"/>
-<line x1="46" y1="36" x2="46" y2="272" stroke="#eef2f7"/>
-<text x="46" y="306" font-size="9" text-anchor="middle" fill="#64748b">0</text>
-<line x1="127.947261663286" y1="36" x2="127.947261663286" y2="272" stroke="#eef2f7"/>
-<text x="127.947261663286" y="306" font-size="9" text-anchor="middle" fill="#64748b">100</text>
-<line x1="209.894523326572" y1="36" x2="209.894523326572" y2="272" stroke="#eef2f7"/>
-<text x="209.894523326572" y="306" font-size="9" text-anchor="middle" fill="#64748b">200</text>
-<line x1="291.84178498985807" y1="36" x2="291.84178498985807" y2="272" stroke="#eef2f7"/>
-<text x="291.84178498985807" y="306" font-size="9" text-anchor="middle" fill="#64748b">300</text>
-<line x1="373.789046653144" y1="36" x2="373.789046653144" y2="272" stroke="#eef2f7"/>
-<text x="373.789046653144" y="306" font-size="9" text-anchor="middle" fill="#64748b">400</text>
-<line x1="450" y1="36" x2="450" y2="272" stroke="#eef2f7"/>
-<text x="450" y="306" font-size="9" text-anchor="middle" fill="#64748b">500</text>
-<line x1="46" y1="272" x2="450" y2="272" stroke="#eef2f7"/>
-<text x="41" y="275" font-size="8" text-anchor="end" fill="#64748b">0</text>
-<line x1="46" y1="224.8" x2="450" y2="224.8" stroke="#eef2f7"/>
-<text x="41" y="227.8" font-size="8" text-anchor="end" fill="#64748b">20</text>
-<line x1="46" y1="177.6" x2="450" y2="177.6" stroke="#eef2f7"/>
-<text x="41" y="180.6" font-size="8" text-anchor="end" fill="#64748b">40</text>
-<line x1="46" y1="130.4" x2="450" y2="130.4" stroke="#eef2f7"/>
-<text x="41" y="133.4" font-size="8" text-anchor="end" fill="#64748b">60</text>
-<line x1="46" y1="83.19999999999999" x2="450" y2="83.19999999999999" stroke="#eef2f7"/>
-<text x="41" y="86.19999999999999" font-size="8" text-anchor="end" fill="#64748b">80</text>
+<text x="470" y="30" font-size="9" text-anchor="end" fill="#334155">Pearson r=-0.73 (linear)</text>
+<line x1="46" y1="268" x2="450" y2="268" stroke="#64748b"/>
+<line x1="46" y1="36" x2="46" y2="268" stroke="#64748b"/>
+<line x1="65.71064680592293" y1="36" x2="65.71064680592293" y2="268" stroke="#eef2f7"/>
+<text x="65.71064680592293" y="292" font-size="8" text-anchor="middle" fill="#64748b">10</text>
+<line x1="100.81277474024523" y1="36" x2="100.81277474024523" y2="268" stroke="#eef2f7"/>
+<text x="100.81277474024523" y="292" font-size="8" text-anchor="middle" fill="#64748b">15</text>
+<line x1="126.28813889404255" y1="36" x2="126.28813889404255" y2="268" stroke="#eef2f7"/>
+<text x="126.28813889404255" y="292" font-size="8" text-anchor="middle" fill="#64748b">20</text>
+<line x1="146.2962425940046" y1="36" x2="146.2962425940046" y2="268" stroke="#eef2f7"/>
+<text x="146.2962425940046" y="292" font-size="8" text-anchor="middle" fill="#64748b">25</text>
+<line x1="162.7740771701497" y1="36" x2="162.7740771701497" y2="268" stroke="#eef2f7"/>
+<text x="162.7740771701497" y="292" font-size="8" text-anchor="middle" fill="#64748b">30</text>
+<line x1="188.9662180168806" y1="36" x2="188.9662180168806" y2="268" stroke="#eef2f7"/>
+<text x="188.9662180168806" y="292" font-size="8" text-anchor="middle" fill="#64748b">40</text>
+<line x1="209.41270462607514" y1="36" x2="209.41270462607514" y2="268" stroke="#eef2f7"/>
+<text x="209.41270462607514" y="292" font-size="8" text-anchor="middle" fill="#64748b">50</text>
+<line x1="246.78327890673984" y1="36" x2="246.78327890673984" y2="268" stroke="#eef2f7"/>
+<text x="246.78327890673984" y="292" font-size="8" text-anchor="middle" fill="#64748b">75</text>
+<line x1="273.42531139808375" y1="36" x2="273.42531139808375" y2="268" stroke="#eef2f7"/>
+<text x="273.42531139808375" y="292" font-size="8" text-anchor="middle" fill="#64748b">100</text>
+<line x1="311.1005040675595" y1="36" x2="311.1005040675595" y2="268" stroke="#eef2f7"/>
+<text x="311.1005040675595" y="292" font-size="8" text-anchor="middle" fill="#64748b">150</text>
+<line x1="337.895978229714" y1="36" x2="337.895978229714" y2="268" stroke="#eef2f7"/>
+<text x="337.895978229714" y="292" font-size="8" text-anchor="middle" fill="#64748b">200</text>
+<line x1="375.7253753334559" y1="36" x2="375.7253753334559" y2="268" stroke="#eef2f7"/>
+<text x="375.7253753334559" y="292" font-size="8" text-anchor="middle" fill="#64748b">300</text>
+<line x1="402.59823959414723" y1="36" x2="402.59823959414723" y2="268" stroke="#eef2f7"/>
+<text x="402.59823959414723" y="292" font-size="8" text-anchor="middle" fill="#64748b">400</text>
+<line x1="423.45609508778386" y1="36" x2="423.45609508778386" y2="268" stroke="#eef2f7"/>
+<text x="423.45609508778386" y="292" font-size="8" text-anchor="middle" fill="#64748b">500</text>
+<line x1="46" y1="268" x2="450" y2="268" stroke="#eef2f7"/>
+<text x="41" y="271" font-size="8" text-anchor="end" fill="#64748b">0</text>
+<line x1="46" y1="221.6" x2="450" y2="221.6" stroke="#eef2f7"/>
+<text x="41" y="224.6" font-size="8" text-anchor="end" fill="#64748b">20</text>
+<line x1="46" y1="175.2" x2="450" y2="175.2" stroke="#eef2f7"/>
+<text x="41" y="178.2" font-size="8" text-anchor="end" fill="#64748b">40</text>
+<line x1="46" y1="128.8" x2="450" y2="128.8" stroke="#eef2f7"/>
+<text x="41" y="131.8" font-size="8" text-anchor="end" fill="#64748b">60</text>
+<line x1="46" y1="82.39999999999998" x2="450" y2="82.39999999999998" stroke="#eef2f7"/>
+<text x="41" y="85.39999999999998" font-size="8" text-anchor="end" fill="#64748b">80</text>
 <line x1="46" y1="36" x2="450" y2="36" stroke="#eef2f7"/>
 <text x="41" y="39" font-size="8" text-anchor="end" fill="#64748b">100</text>
-<line x1="46" y1="109.36971439435305" x2="450" y2="249.1018346204278" stroke="#ef4444" stroke-width="1.5"/>
-<circle cx="66.4868154158215" cy="36" r="5" fill="#16a34a" opacity="0.85"/>
-<text x="73.4868154158215" y="31" font-size="8" fill="#334155">VibeScan</text>
-<circle cx="71.40365111561866" cy="100.36363636363635" r="4" fill="#2563eb" opacity="0.85"/>
-<text x="78.40365111561866" y="95.36363636363635" font-size="8" fill="#334155">Bearer</text>
-<circle cx="75.50101419878297" cy="121.81818181818181" r="4" fill="#2563eb" opacity="0.85"/>
-<text x="82.50101419878297" y="116.81818181818181" font-size="8" fill="#334155">Snyk Code</text>
-<circle cx="83.69574036511156" cy="143.27272727272728" r="4" fill="#2563eb" opacity="0.85"/>
-<text x="90.69574036511156" y="138.27272727272728" font-size="8" fill="#334155">CodeQL</text>
-<circle cx="55.01419878296146" cy="186.1818181818182" r="4" fill="#2563eb" opacity="0.85"/>
-<text x="62.01419878296146" y="181.1818181818182" font-size="8" fill="#334155">Semgrep</text>
-<circle cx="450" cy="250.54545454545453" r="4" fill="#2563eb" opacity="0.85"/>
-<text x="457" y="245.54545454545453" font-size="8" fill="#334155">eslint-plugin-security</text>
-<text x="240" y="318" font-size="9" text-anchor="middle" fill="#475569">Raw issues reported on DVNA</text>
-</svg></div><div class="caption">Trend line + Pearson r quantifies that alert volume is weakly related to recall.</div></div>
-</div>
-<div class="col">
-<div class="sec"><h2>Results KPIs</h2><div class="kpi"><div class="kbox"><div class="kval">100%</div><div class="klbl">VibeScan DVNA recall</div></div><div class="kbox"><div class="kval">72.7%</div><div class="klbl">Next-best recall</div></div><div class="kbox"><div class="kval">39</div><div class="klbl">Unique scored rows</div></div><div class="kbox"><div class="kval">6</div><div class="klbl">Rule families</div></div></div></div>
-<div class="fig"><div class="fig-title">Figure 6 - Signal to noise</div><div class="fig-card"><svg viewBox="0 0 480 218" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Signal-to-Noise (Cases/Alert)</text>
-<text x="152" y="53" font-size="8" text-anchor="end" fill="#1e293b">VibeScan</text>
-<rect x="160" y="41" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="41" width="302" height="15" rx="7" fill="#16a34a"/>
-<text x="466" y="53" font-size="8" fill="#334155">0.440</text>
-<text x="152" y="79" font-size="8" text-anchor="end" fill="#1e293b">Semgrep</text>
-<rect x="160" y="67" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="67" width="249.58677685950414" height="15" rx="7" fill="#6366f1"/>
-<text x="466" y="79" font-size="8" fill="#334155">0.364</text>
-<text x="152" y="105" font-size="8" text-anchor="end" fill="#1e293b">Bearer</text>
-<rect x="160" y="93" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="93" width="177.12609970674487" height="15" rx="7" fill="#6366f1"/>
-<text x="466" y="105" font-size="8" fill="#334155">0.258</text>
-<text x="152" y="131" font-size="8" text-anchor="end" fill="#1e293b">Snyk Code</text>
-<rect x="160" y="119" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="119" width="133.45959595959596" height="15" rx="7" fill="#6366f1"/>
-<text x="466" y="131" font-size="8" fill="#334155">0.194</text>
-<text x="152" y="157" font-size="8" text-anchor="end" fill="#1e293b">CodeQL</text>
-<rect x="160" y="145" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="145" width="89.52569169960475" height="15" rx="7" fill="#6366f1"/>
-<text x="466" y="157" font-size="8" fill="#334155">0.130</text>
-<text x="152" y="183" font-size="8" text-anchor="end" fill="#1e293b">eslint-plugin-security</text>
-<rect x="160" y="171" width="302" height="15" rx="7" fill="#e2e8f0"/>
-<rect x="160" y="171" width="1.3922183293380048" height="15" rx="7" fill="#6366f1"/>
-<text x="466" y="183" font-size="8" fill="#334155">0.002</text>
-</svg></div><div class="caption">Higher means more benchmark value per reported alert.</div></div>
-<div class="fig"><div class="fig-title">Figure 7 - Per-family recall</div><div class="fig-card"><svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Per-Family Recall by Tool</text>
-<line x1="38" y1="225" x2="465" y2="225" stroke="#64748b"/>
-<line x1="38" y1="38" x2="38" y2="225" stroke="#64748b"/>
-<rect x="42" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="52.52777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="63.05555555555556" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
-<rect x="73.58333333333334" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
-<rect x="84.11111111111111" y="150.2" width="9.527777777777779" height="74.8" fill="#94a3b8"/>
-<rect x="94.63888888888889" y="187.6" width="9.527777777777779" height="37.4" fill="#94a3b8"/>
-<text x="73.58333333333334" y="237" font-size="7" text-anchor="middle" fill="#334155">Injection</text>
-<rect x="113.16666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="123.69444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="134.22222222222223" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="144.75" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="155.27777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="165.80555555555557" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="144.75" y="237" font-size="7" text-anchor="middle" fill="#334155">Redirect &amp; Navigation</text>
-<rect x="184.33333333333334" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="194.86111111111111" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="205.3888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="215.91666666666669" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="226.44444444444446" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="236.97222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="215.91666666666669" y="237" font-size="7" text-anchor="middle" fill="#334155">Integrity</text>
-<rect x="255.5" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="266.02777777777777" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="276.55555555555554" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="287.0833333333333" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
-<rect x="297.6111111111111" y="131.5" width="9.527777777777779" height="93.5" fill="#94a3b8"/>
-<rect x="308.1388888888889" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="287.0833333333333" y="237" font-size="7" text-anchor="middle" fill="#334155">Secrets &amp; Crypto</text>
-<rect x="326.6666666666667" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="337.19444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="347.72222222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="358.25" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="368.7777777777778" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="379.3055555555556" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="358.25" y="237" font-size="7" text-anchor="middle" fill="#334155">Auth &amp; Access Control</text>
-<rect x="397.83333333333337" y="38" width="9.527777777777779" height="187" fill="#16a34a"/>
-<rect x="408.36111111111114" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="418.8888888888889" y="38" width="9.527777777777779" height="187" fill="#94a3b8"/>
-<rect x="429.4166666666667" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="439.94444444444446" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<rect x="450.4722222222223" y="225" width="9.527777777777779" height="0" fill="#94a3b8"/>
-<text x="429.4166666666667" y="237" font-size="7" text-anchor="middle" fill="#334155">XSS &amp; Client-Side Output</text>
-<text x="240" y="294" font-size="8" text-anchor="middle" fill="#334155">Green=VibeScan, gray=peers</text>
-</svg></div><div class="caption">Family-level decomposition shows where peers drop coverage.</div></div>
-</div>
-<div class="col">
-<div class="fig"><div class="fig-title">Figure 4 - Heatmap with totals</div><div class="fig-card"><svg viewBox="0 0 498 298" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="249" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">DVNA Detection Heatmap with Difficulty</text>
-<text x="164" y="46" font-size="8" text-anchor="end" transform="rotate(-35 164 46)" fill="#334155">VibeScan</text>
-<text x="212" y="46" font-size="8" text-anchor="end" transform="rotate(-35 212 46)" fill="#334155">Bearer</text>
-<text x="260" y="46" font-size="8" text-anchor="end" transform="rotate(-35 260 46)" fill="#334155">Snyk Code</text>
-<text x="308" y="46" font-size="8" text-anchor="end" transform="rotate(-35 308 46)" fill="#334155">Semgrep</text>
-<text x="356" y="46" font-size="8" text-anchor="end" transform="rotate(-35 356 46)" fill="#334155">CodeQL</text>
-<text x="404" y="46" font-size="8" text-anchor="end" transform="rotate(-35 404 46)" fill="#334155">eslint-plugin-security</text>
-<text x="450" y="46" font-size="8" text-anchor="middle" fill="#334155">difficulty</text>
-<text x="136" y="68" font-size="8" text-anchor="end" fill="#1e293b">SQL Injection</text>
-<rect x="140" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="332" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="56" width="46" height="16" rx="2" fill="#22c55e"/>
-<text x="450" y="68" font-size="8" text-anchor="middle" fill="#334155">6/6</text>
-<text x="136" y="86" font-size="8" text-anchor="end" fill="#1e293b">Command Injection</text>
-<rect x="140" y="74" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="74" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="74" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="74" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="74" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="74" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="86" font-size="8" text-anchor="middle" fill="#334155">4/6</text>
-<text x="136" y="104" font-size="8" text-anchor="end" fill="#1e293b">NoSQL Injection (route-path case)</text>
-<rect x="140" y="92" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="92" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="92" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="284" y="92" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="92" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="380" y="92" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="104" font-size="8" text-anchor="middle" fill="#334155">2/6</text>
-<text x="136" y="122" font-size="8" text-anchor="end" fill="#1e293b">NoSQL Injection (auth-context case)</text>
-<rect x="140" y="110" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="110" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="110" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="284" y="110" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="110" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="380" y="110" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="122" font-size="8" text-anchor="middle" fill="#334155">2/6</text>
-<text x="136" y="140" font-size="8" text-anchor="end" fill="#1e293b">NoSQL Injection (session-context case)</text>
-<rect x="140" y="128" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="128" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="128" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="284" y="128" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="128" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="380" y="128" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="140" font-size="8" text-anchor="middle" fill="#334155">2/6</text>
-<text x="136" y="158" font-size="8" text-anchor="end" fill="#1e293b">Open Redirect</text>
-<rect x="140" y="146" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="146" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="146" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="146" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="332" y="146" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="146" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="158" font-size="8" text-anchor="middle" fill="#334155">5/6</text>
-<text x="136" y="176" font-size="8" text-anchor="end" fill="#1e293b">Unsafe Deserialization</text>
-<rect x="140" y="164" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="164" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="236" y="164" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="164" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="332" y="164" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="164" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="176" font-size="8" text-anchor="middle" fill="#334155">4/6</text>
-<text x="136" y="194" font-size="8" text-anchor="end" fill="#1e293b">Hardcoded Secret</text>
-<rect x="140" y="182" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="182" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="182" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="182" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="332" y="182" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="182" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="194" font-size="8" text-anchor="middle" fill="#334155">5/6</text>
-<text x="136" y="212" font-size="8" text-anchor="end" fill="#1e293b">Weak Cryptographic Hash</text>
-<rect x="140" y="200" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="200" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="236" y="200" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="200" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="200" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="380" y="200" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="212" font-size="8" text-anchor="middle" fill="#334155">3/6</text>
-<text x="136" y="230" font-size="8" text-anchor="end" fill="#1e293b">Insecure Env Secret Fallback</text>
-<rect x="140" y="218" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="218" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="236" y="218" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="284" y="218" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="218" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="380" y="218" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="230" font-size="8" text-anchor="middle" fill="#334155">2/6</text>
-<text x="136" y="248" font-size="8" text-anchor="end" fill="#1e293b">DOM-Based XSS</text>
-<rect x="140" y="236" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="188" y="236" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="236" y="236" width="46" height="16" rx="2" fill="#22c55e"/>
-<rect x="284" y="236" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="332" y="236" width="46" height="16" rx="2" fill="#ef4444"/>
-<rect x="380" y="236" width="46" height="16" rx="2" fill="#ef4444"/>
-<text x="450" y="248" font-size="8" text-anchor="middle" fill="#334155">2/6</text>
-<text x="136" y="266" font-size="8" text-anchor="end" font-weight="700" fill="#1e293b">Total Hits</text>
-<rect x="140" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="163" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">11/11</text>
-<rect x="188" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="211" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">8/11</text>
-<rect x="236" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="259" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">7/11</text>
-<rect x="284" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="307" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">4/11</text>
-<rect x="332" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="355" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">6/11</text>
-<rect x="380" y="254" width="46" height="16" rx="2" fill="#dbeafe"/>
-<text x="403" y="266" font-size="8" text-anchor="middle" fill="#1e3a8a" font-weight="700">1/11</text>
-<text x="450" y="266" font-size="8" text-anchor="middle" fill="#334155">diff</text>
-</svg></div><div class="caption">Adds column totals and per-row difficulty score.</div></div>
-<div class="fig"><div class="fig-title">Figure 8 - Recall vs precision proxy</div><div class="fig-card"><svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Figure 8 - Recall vs precision proxy</text>
+<circle cx="146.2962425940046" cy="36" r="5" fill="#009E73" opacity="0.85"/>
+<text x="153.2962425940046" y="31" font-size="8" fill="#334155">VibeScan</text>
+<circle cx="165.74836687723695" cy="99.27272727272728" r="4" fill="#0072B2" opacity="0.85"/>
+<text x="172.74836687723695" y="94.27272727272728" font-size="8" fill="#334155">Bearer</text>
+<circle cx="179.34934519943863" cy="120.36363636363637" r="4" fill="#E69F00" opacity="0.85"/>
+<text x="186.34934519943863" y="115.36363636363637" font-size="8" fill="#334155">Snyk Code</text>
+<circle cx="201.76092235349861" cy="141.45454545454547" r="4" fill="#CC79A7" opacity="0.85"/>
+<text x="208.76092235349861" y="136.45454545454547" font-size="8" fill="#334155">CodeQL</text>
+<circle cx="73.86206896551724" cy="183.63636363636363" r="4" fill="#D55E00" opacity="0.85"/>
+<text x="80.86206896551724" y="178.63636363636363" font-size="8" fill="#334155">Semgrep</text>
+<circle cx="422.1379310344827" cy="246.9090909090909" r="4" fill="#56B4E9" opacity="0.85"/>
+<text x="429.1379310344827" y="241.9090909090909" font-size="8" fill="#334155">eslint-plugin-security</text>
+<text x="12" y="152" font-size="9" text-anchor="middle" fill="#334155" transform="rotate(-90 12 152)">Y: Recall (%)</text>
+<text x="240" y="312" font-size="9" text-anchor="middle" fill="#334155">X: Raw issue count on DVNA (log₁₀(x+1) scale)</text>
+</svg></div><div class="caption">Dots use tool colors from the key. X-axis log-scaled; Pearson r on linear counts.</div><p class="fig-narrative">A tool's raw alert count is a poor proxy for scanner quality. eslint-plugin-security emits over 500 alerts yet detects only 1 of 11 benchmark cases, while VibeScan reports 25 alerts and detects all 11. The negative correlation (Pearson r = -0.73) confirms that alert volume and actual detection are largely independent &mdash; evaluating scanners by volume alone is misleading.</p></div>
+<div class="fig"><div class="fig-title">Figure 4 — Recall vs. Precision Proxy</div><div class="fig-card"><svg viewBox="0 0 480 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs. Precision Proxy</text>
 <line x1="42" y1="260" x2="455" y2="260" stroke="#64748b"/>
 <line x1="42" y1="38" x2="42" y2="260" stroke="#64748b"/>
 <line x1="42" y1="38" x2="42" y2="260" stroke="#e2e8f0"/><text x="42" y="274" font-size="8" text-anchor="middle" fill="#64748b">0.0</text>
@@ -274,23 +216,25 @@
 <line x1="42" y1="126.80000000000001" x2="455" y2="126.80000000000001" stroke="#e2e8f0"/><text x="34" y="129.8" font-size="8" text-anchor="end" fill="#64748b">60%</text>
 <line x1="42" y1="82.39999999999998" x2="455" y2="82.39999999999998" stroke="#e2e8f0"/><text x="34" y="85.39999999999998" font-size="8" text-anchor="end" fill="#64748b">80%</text>
 <line x1="42" y1="38" x2="455" y2="38" stroke="#e2e8f0"/><text x="34" y="41" font-size="8" text-anchor="end" fill="#64748b">100%</text>
-<circle cx="445.8222222222222" cy="38" r="5" fill="#16a34a"/>
+<circle cx="445.8222222222222" cy="38" r="5" fill="#009E73"/>
 <text x="451.8222222222222" y="33" font-size="8" fill="#334155">VibeScan</text>
-<circle cx="278.84587813620067" cy="98.54545454545453" r="4" fill="#2563eb"/>
+<circle cx="278.84587813620067" cy="98.54545454545453" r="4" fill="#0072B2"/>
 <text x="284.84587813620067" y="93.54545454545453" font-size="8" fill="#334155">Bearer</text>
-<circle cx="220.45679012345678" cy="118.72727272727272" r="4" fill="#2563eb"/>
+<circle cx="220.45679012345678" cy="118.72727272727272" r="4" fill="#E69F00"/>
 <text x="226.45679012345678" y="113.72727272727272" font-size="8" fill="#334155">Snyk Code</text>
-<circle cx="161.71014492753625" cy="138.90909090909093" r="4" fill="#2563eb"/>
+<circle cx="161.71014492753625" cy="138.90909090909093" r="4" fill="#CC79A7"/>
 <text x="167.71014492753625" y="133.90909090909093" font-size="8" fill="#334155">CodeQL</text>
-<circle cx="375.73737373737373" cy="179.27272727272725" r="4" fill="#2563eb"/>
+<circle cx="375.73737373737373" cy="179.27272727272725" r="4" fill="#D55E00"/>
 <text x="381.73737373737373" y="174.27272727272725" font-size="8" fill="#334155">Semgrep</text>
-<circle cx="43.86161821050259" cy="239.8181818181818" r="4" fill="#2563eb"/>
+<circle cx="43.86161821050259" cy="239.8181818181818" r="4" fill="#56B4E9"/>
 <text x="49.86161821050259" y="234.8181818181818" font-size="8" fill="#334155">eslint-plugin-security</text>
 <text x="240" y="296" font-size="8" text-anchor="middle" fill="#334155">X-axis: Precision proxy (cases detected / raw alerts)</text>
 <text x="12" y="149" font-size="8" text-anchor="middle" fill="#334155" transform="rotate(-90 12 149)">Y-axis: Recall (%)</text>
-</svg></div><div class="caption">Precision proxy = cases detected / raw alerts (not full FP-adjudicated precision).</div></div>
-<div class="fig"><div class="fig-title">Figure 9 - Recall vs scan time</div><div class="fig-card"><svg viewBox="0 0 480 280" width="100%" xmlns="http://www.w3.org/2000/svg">
-<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs Scan Time</text>
+</svg></div><div class="caption">Points use tool colors from the key. Precision proxy = cases detected / raw alerts.</div><p class="fig-narrative">The precision proxy (cases detected / raw alerts) measures how efficiently a tool converts its output into real findings. VibeScan reaches the upper-right quadrant &mdash; highest recall with the best signal-to-noise ratio. Semgrep achieves a competitive ratio but at only 36% recall, while eslint-plugin-security falls to the lower-left with both low recall and low precision.</p></div>
+</div>
+<div class="col col--right-sm">
+<div class="fig"><div class="fig-title">Figure 5 — Recall vs. Scan Time</div><div class="fig-card"><svg viewBox="0 0 480 280" width="100%" xmlns="http://www.w3.org/2000/svg">
+<text x="240" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#0f172a">Recall vs. Scan Time</text>
 <line x1="52" y1="238" x2="456" y2="238" stroke="#64748b"/>
 <line x1="52" y1="34" x2="52" y2="238" stroke="#64748b"/>
 <line x1="147.30592755737226" y1="34" x2="147.30592755737226" y2="238" stroke="#e2e8f0"/><text x="147.30592755737226" y="252" font-size="8" text-anchor="middle" fill="#64748b">0.5s</text>
@@ -306,26 +250,29 @@
 <line x1="52" y1="115.60000000000001" x2="456" y2="115.60000000000001" stroke="#e2e8f0"/><text x="44" y="118.60000000000001" font-size="8" text-anchor="end" fill="#64748b">60%</text>
 <line x1="52" y1="74.79999999999998" x2="456" y2="74.79999999999998" stroke="#e2e8f0"/><text x="44" y="77.79999999999998" font-size="8" text-anchor="end" fill="#64748b">80%</text>
 <line x1="52" y1="34" x2="456" y2="34" stroke="#e2e8f0"/><text x="44" y="37" font-size="8" text-anchor="end" fill="#64748b">100%</text>
-<circle cx="175.54160414332378" cy="34" r="5" fill="#16a34a"/><text x="181.54160414332378" y="29" font-size="8" fill="#334155">VibeScan</text>
-<circle cx="329.5277313820126" cy="89.63636363636363" r="4" fill="#2563eb"/><text x="335.5277313820126" y="84.63636363636363" font-size="8" fill="#334155">Bearer</text>
-<circle cx="322.27582670756465" cy="108.18181818181819" r="4" fill="#2563eb"/><text x="328.27582670756465" y="103.18181818181819" font-size="8" fill="#334155">Snyk Code</text>
-<circle cx="456" cy="126.72727272727273" r="4" fill="#2563eb"/><text x="462" y="121.72727272727273" font-size="8" fill="#334155">CodeQL</text>
-<circle cx="349.6548150313918" cy="163.8181818181818" r="4" fill="#2563eb"/><text x="355.6548150313918" y="158.8181818181818" font-size="8" fill="#334155">Semgrep</text>
-<circle cx="219.93309306304334" cy="219.45454545454544" r="4" fill="#2563eb"/><text x="225.93309306304334" y="214.45454545454544" font-size="8" fill="#334155">eslint-plugin-security</text>
+<circle cx="175.54160414332378" cy="34" r="5" fill="#009E73"/><text x="181.54160414332378" y="29" font-size="8" fill="#334155">VibeScan</text>
+<circle cx="329.5277313820126" cy="89.63636363636363" r="4" fill="#0072B2"/><text x="335.5277313820126" y="84.63636363636363" font-size="8" fill="#334155">Bearer</text>
+<circle cx="322.27582670756465" cy="108.18181818181819" r="4" fill="#E69F00"/><text x="328.27582670756465" y="103.18181818181819" font-size="8" fill="#334155">Snyk Code</text>
+<circle cx="456" cy="126.72727272727273" r="4" fill="#CC79A7"/><text x="462" y="121.72727272727273" font-size="8" fill="#334155">CodeQL</text>
+<circle cx="349.6548150313918" cy="163.8181818181818" r="4" fill="#D55E00"/><text x="355.6548150313918" y="158.8181818181818" font-size="8" fill="#334155">Semgrep</text>
+<circle cx="219.93309306304334" cy="219.45454545454544" r="4" fill="#56B4E9"/><text x="225.93309306304334" y="214.45454545454544" font-size="8" fill="#334155">eslint-plugin-security</text>
 <text x="240" y="274" font-size="8" text-anchor="middle" fill="#334155">X-axis: runtime (seconds, log scale) · Y-axis: DVNA recall</text>
-</svg></div><div class="caption">Runtime from rerun measurements; log-scale x-axis improves visibility with CodeQL as an outlier.</div></div>
+</svg></div><div class="caption">Points use tool colors from the key. X-axis log-scaled (CodeQL runtime as outlier).</div><p class="fig-narrative">VibeScan completes a full DVNA scan in 0.86 seconds with 100% recall &mdash; fast enough for pre-commit hooks or CI gates. CodeQL requires over 60 seconds for 54.5% recall. Bearer and Snyk Code cluster at 10&ndash;15 seconds with moderate recall, making them better suited to pipeline stages that tolerate longer waits.</p></div>
 <div class="sec"><h2>Limitations</h2><ul><li>Peer runtime fields are not in historical artifacts.</li><li>Precision proxy is not formal precision.</li><li>Expanded corpus remains VibeScan-focused.</li></ul></div>
+<div class="sec sec--findings"><h2>Key Findings</h2><ul><li><strong>RQ1:</strong> 100% DVNA recall (11/11); all hard cases (Δ&nbsp;≥&nbsp;14) missed by 4+ peers.</li><li><strong>RQ2:</strong> Peers strong on Injection/Secrets; Auth/XSS ≤&nbsp;2 tools.</li><li><strong>RQ3:</strong> Upper-right on recall vs. precision; fastest scan (0.86&nbsp;s).</li></ul></div>
+<section class="references"><h3>References</h3><ol class="ref-list">
+<li>[1] AppSecCo. <em>Damn Vulnerable Node Application (DVNA)</em>. <a href="https://github.com/appsecco/dvna">github.com/appsecco/dvna</a>.</li>
+<li>[2] OWASP Foundation. <em>OWASP Top 10:2021</em>. <a href="https://owasp.org/Top10/">owasp.org/Top10/</a>.</li>
+<li>[3] Semgrep, Inc. <em>Semgrep documentation</em>. <a href="https://semgrep.dev/docs/">semgrep.dev/docs</a>.</li>
+<li>[4] GitHub. <em>CodeQL documentation</em>. <a href="https://codeql.github.com/docs/">codeql.github.com/docs</a>.</li>
+<li>[5] ESLint Community. <em>eslint-plugin-security</em>. <a href="https://github.com/eslint-community/eslint-plugin-security">github.com/eslint-community/eslint-plugin-security</a>.</li>
+<li>[6] Snyk Ltd. <em>Snyk CLI</em>. <a href="https://docs.snyk.io/snyk-cli">docs.snyk.io/snyk-cli</a>.</li>
+<li>[7] Bearer. <em>Bearer (open-source SAST)</em>. <a href="https://github.com/Bearer/bearer">github.com/Bearer/bearer</a>.</li>
+<li>[8] ETS. <em>Final Study Statistical Analysis for the Redesigned TOEIC Bridge Tests</em> (RM-19-09), item difficulty definitions for p and delta.</li>
+</ol></section>
+</div>
 </div>
 </section>
-<section class="discussion"><h3>Discussion</h3><p>VibeScan leads overall recall and stays strong on hard cases (<=2/6 peer coverage). Signal-to-noise and recall-vs-precision-proxy charts show practical advantage beyond raw alert counts. Family-level and heatmap totals explain where this lead comes from: crypto/auth/xss and multi-context injection cases. Runtime evidence shows CI-friendly execution speed for local benchmark workflows.</p></section>
-<section class="references"><h3>References</h3><ol class="ref-list">
-<li>AppSecCo. <em>Damn Vulnerable Node Application (DVNA)</em>. GitHub repository. <a href="https://github.com/appsecco/dvna">https://github.com/appsecco/dvna</a>.</li>
-<li>OWASP Foundation. <em>OWASP Top 10:2021</em>. <a href="https://owasp.org/Top10/">https://owasp.org/Top10/</a>.</li>
-<li>Semgrep, Inc. <em>Semgrep documentation</em>. <a href="https://semgrep.dev/docs/">https://semgrep.dev/docs/</a>.</li>
-<li>GitHub. <em>CodeQL documentation</em>. <a href="https://codeql.github.com/docs/">https://codeql.github.com/docs/</a>.</li>
-<li>ESLint Community. <em>eslint-plugin-security</em>. <a href="https://github.com/eslint-community/eslint-plugin-security">https://github.com/eslint-community/eslint-plugin-security</a>.</li>
-<li>Snyk Ltd. <em>Snyk CLI</em>. <a href="https://docs.snyk.io/snyk-cli">https://docs.snyk.io/snyk-cli</a>.</li>
-<li>Bearer. <em>Bearer (open-source static analysis)</em>. <a href="https://github.com/Bearer/bearer">https://github.com/Bearer/bearer</a>.</li>
-</ol></section>
-<footer class="footer"><span>DVNA commit 9ba473a | VibeScan v1.1.0 | npm @jobersteadt/vibescan</span><span>Data: results/dvna-detection-matrix.json, results/dvna-case-catalog.json, results/vibescan-dvna-scan-timing.json, results/dvna-tool-timings.json</span></footer>
+</section>
+
 </main></body></html>

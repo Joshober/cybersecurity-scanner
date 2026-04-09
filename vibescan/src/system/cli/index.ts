@@ -128,10 +128,11 @@ Options:
 
 const parsed = parseCliArgs(process.argv.slice(2));
 const rawArgs = process.argv.slice(2);
+const wantsHelp = rawArgs.includes("--help") || rawArgs.includes("-h");
 
 // ─── Early exits: help / report ─────────────────────────────────────
 
-if (parsed.inputPaths.length === 0) {
+if (wantsHelp || parsed.inputPaths.length === 0) {
   console.log(HELP_TEXT);
   process.exit(0);
 }

@@ -1,0 +1,7 @@
+1. Figure 1 - Analysis depth comparison -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-01-figure-1-analysis-depth-comparison.png (ok)
+2. Figure 2 - Recall vs raw volume -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-02-figure-2-recall-vs-raw-volume.png (ok)
+3. Figure 6 - Signal to noise -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-03-figure-6-signal-to-noise.png (ok)
+4. Figure 7 - Per-family recall -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-04-figure-7-per-family-recall.png (ok)
+5. Figure 4 - Heatmap with totals -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-05-figure-4-heatmap-with-totals.png (ok)
+6. Figure 8 - Recall vs precision proxy -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-06-figure-8-recall-vs-precision-proxy.png (ok)
+7. Figure 9 - Recall vs scan time -> C:/Users/Josh/Downloads/CyberSecurity/docs/vibescan/ppt-diagrams/figure-07-figure-9-recall-vs-scan-time.png (ok)

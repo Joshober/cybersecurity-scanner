@@ -18,6 +18,7 @@
     "benchmark:dvna": "npm run build && node benchmarks/scripts/run-dvna-vibescan-scan.mjs",
     "benchmark:dvna-all-checks": "npm run build && node benchmarks/scripts/run-dvna-all-vibescan-checks.mjs",
     "benchmark:poster-charts": "node benchmarks/scripts/generate-research-poster-charts.mjs",
+    "benchmark:poster-pptx": "node benchmarks/scripts/poster-html-to-pptx.mjs",
     "benchmark:assert-framework-recall": "node benchmarks/scripts/assert-framework-recall.mjs",
     "benchmark:outperform-readout": "node benchmarks/scripts/generate-outperform-readout.mjs",
     "secure-arch": "node vibescan/packages/secure-arch-cli/dist/cli.js",
@@ -52,6 +53,9 @@
     "@types/node": "^20.0.0",
     "@types/picomatch": "^4.0.2",
     "eslint-plugin-security": "^2.1.1",
+    "image-size": "^2.0.2",
+    "pptxgenjs": "^4.0.1",
+    "puppeteer": "^24.40.0",
     "typescript": "^5.3.0"
   },
   "peerDependencies": {
