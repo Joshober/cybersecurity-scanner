@@ -1,7 +1,8 @@
 (function () {
   function initReveal() {
     var els = document.querySelectorAll(".reveal");
-    if (!els.length || !("IntersectionObserver" in window)) {
+    if (!els.length) return;
+    if (!("IntersectionObserver" in window)) {
       els.forEach(function (el) {
         el.classList.add("visible");
       });
@@ -16,34 +17,26 @@
           }
         });
       },
-      { rootMargin: "0px 0px -40px 0px", threshold: 0.08 }
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.06 }
     );
     els.forEach(function (el) {
       io.observe(el);
     });
   }
 
-  function initMermaid() {
-    if (typeof mermaid === "undefined") return;
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: "dark",
-      securityLevel: "loose",
-      themeVariables: {
-        primaryColor: "#1a2332",
-        primaryTextColor: "#e7ecf3",
-        primaryBorderColor: "#2d3a4d",
-        lineColor: "#22d3ee",
-        secondaryColor: "#12121a",
-        tertiaryColor: "#0a0a0f",
-      },
-    });
-    var p = mermaid.run({ querySelector: ".mermaid" });
-    if (p && typeof p.catch === "function") p.catch(function () {});
+  function initHeaderScroll() {
+    var header = document.querySelector(".siteHeader");
+    if (!header) return;
+    var onScroll = function () {
+      if (window.scrollY > 12) header.classList.add("isScrolled");
+      else header.classList.remove("isScrolled");
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
     initReveal();
-    initMermaid();
+    initHeaderScroll();
   });
 })();
