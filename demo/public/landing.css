@@ -441,13 +441,15 @@ body {
   }
 }
 
-.heroVisualImg {
+.heroVisualFrame .diagramShell--hero {
   position: relative;
   z-index: 1;
-  display: block;
-  width: 100%;
+}
+
+.heroVisualFrame .diagramShell--hero .mermaid svg {
+  max-width: 100%;
   height: auto;
-  vertical-align: middle;
+  display: block;
 }
 
 .heroScrollHint {
@@ -613,8 +615,9 @@ body {
   vertical-align: middle;
 }
 
-.docFigureFrameLight {
-  background: #f1f5f9;
+.docFigureFrameDiagram {
+  background: var(--panel);
+  padding: 0;
 }
 
 .docFigureScroll {
@@ -622,9 +625,8 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-.docFigureScroll img {
-  min-width: min(1200px, 180%);
-  max-width: none;
+.docFigureScroll .diagramShell {
+  min-width: min(100%, 720px);
 }
 
 .impactRow {
@@ -635,11 +637,184 @@ body {
   margin-top: 28px;
 }
 
-.impactLoopImg {
-  max-width: min(100%, 400px);
+.impactRow .diagramShell--impact {
+  max-width: min(100%, 440px);
+  width: 100%;
+}
+
+.impactRow .diagramShell--impact .mermaid svg {
+  max-width: 100%;
   height: auto;
-  opacity: 0.92;
-  transition: opacity 0.3s ease;
+}
+
+/* ——— Mermaid diagram shells + pan/zoom ——— */
+.diagramShell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.diagramToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(10, 10, 18, 0.95);
+}
+
+.diagramToolBtn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(18, 18, 26, 0.9);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.diagramToolBtn:hover {
+  border-color: rgba(34, 211, 238, 0.45);
+  background: rgba(25, 25, 36, 0.95);
+}
+
+.diagramToolBtn:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 2px;
+}
+
+.diagramToolBtnText {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.diagramZoomPct {
+  min-width: 3.25rem;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.diagramViewport {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  flex: 1;
+  min-width: 0;
+}
+
+.diagramViewport--runtime {
+  min-height: min(420px, 70vh);
+}
+
+.diagramPanzoomRoot {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.diagramPanzoomRoot .mermaid {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.diagramPanzoomRoot .mermaid svg {
+  max-width: none;
+  height: auto;
+  display: block;
+}
+
+.diagramLoading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  background: rgba(7, 7, 12, 0.65);
+  pointer-events: none;
+}
+
+.diagramLoading--error {
+  color: #f87171;
+  pointer-events: auto;
+}
+
+.diagramShell--ready .diagramLoading:not(.diagramLoading--error) {
+  display: none;
+}
+
+.diagramShell--fullscreen {
+  position: fixed !important;
+  inset: 0;
+  z-index: 300;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 12px;
+  padding-top: 52px;
+  background: rgba(7, 7, 12, 0.96);
+  backdrop-filter: blur(8px);
+  flex-direction: column;
+}
+
+.diagramShell--fullscreen .diagramViewport {
+  flex: 1;
+  min-height: min(75vh, 900px);
+  max-height: calc(100vh - 64px);
+}
+
+.diagramShell--fullscreen .diagramToolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 48px;
+  z-index: 2;
+}
+
+.diagramFullscreenClose {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 301;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.diagramFullscreenClose:hover {
+  border-color: rgba(34, 211, 238, 0.45);
+}
+
+.diagramFullscreenClose:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagramPanzoomRoot {
+    will-change: auto;
+  }
 }
 
 .cardGrid {

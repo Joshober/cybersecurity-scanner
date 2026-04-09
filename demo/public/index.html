@@ -53,13 +53,20 @@
         <div class="heroVisual heroEnter" style="--enter-delay: 0.28s">
           <div class="heroVisualFrame">
             <div class="heroVisualGlow"></div>
-            <img
-              class="heroVisualImg"
-              src="/assets/hero-illustration.svg"
-              width="560"
-              height="234"
-              alt="Diagram: source files flow through VibeScan to security findings"
-            />
+            <div
+              class="diagramShell diagramShell--compact diagramShell--hero"
+              data-inline-mermaid="hero"
+              data-zoom="false"
+              aria-busy="true"
+              aria-label="Diagram: source files flow through VibeScan to security findings"
+            >
+              <div class="diagramViewport diagramViewport--hero" style="min-height: 200px">
+                <p class="diagramLoading" aria-live="polite">Loading diagram…</p>
+                <div class="diagramPanzoomRoot">
+                  <div class="mermaid"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -85,18 +92,45 @@
         </ul>
         <figure class="docFigure reveal">
           <figcaption class="docCaption">Analysis depth vs. common tooling (project benchmark overview)</figcaption>
-          <div class="docFigureFrame">
-            <img
-              src="/assets/comparison-overview.png"
-              width="1200"
-              height="675"
-              alt="Flowchart comparing analysis depth: pattern matching through proof generation and CI gates, with VibeScan at full depth"
-              loading="lazy"
-            />
+          <div class="docFigureFrame docFigureFrameDiagram">
+            <div
+              class="diagramShell"
+              id="diagram-comparison"
+              data-diagram-src="/assets/diagrams/comparison-overview.mmd"
+              aria-busy="true"
+              aria-label="Flowchart comparing analysis depth: pattern matching through proof generation and CI gates, with VibeScan at full depth"
+            >
+              <div class="diagramToolbar" role="toolbar" aria-label="Diagram zoom controls">
+                <button type="button" class="diagramToolBtn" data-action="zoom-out" aria-label="Zoom out">−</button>
+                <span class="diagramZoomPct" aria-live="polite">100%</span>
+                <button type="button" class="diagramToolBtn" data-action="zoom-in" aria-label="Zoom in">+</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="reset">Reset</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="expand">Expand</button>
+              </div>
+              <div class="diagramViewport" style="min-height: 380px">
+                <p class="diagramLoading" aria-live="polite">Loading diagram…</p>
+                <div class="diagramPanzoomRoot">
+                  <div class="mermaid"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </figure>
         <div class="impactRow">
-          <img src="/assets/impact-loop.svg" width="400" height="120" alt="" class="impactLoopImg" loading="lazy" />
+          <div
+            class="diagramShell diagramShell--compact diagramShell--impact"
+            data-inline-mermaid="impact"
+            data-zoom="false"
+            aria-busy="true"
+            aria-label="Ship, scan in CI, fix with prompts, iterate"
+          >
+            <div class="diagramViewport diagramViewport--impact" style="min-height: 120px">
+              <p class="diagramLoading" aria-live="polite">Loading diagram…</p>
+              <div class="diagramPanzoomRoot">
+                <div class="mermaid"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -109,14 +143,28 @@
         </p>
         <figure class="docFigure reveal">
           <figcaption class="docCaption">High-level architecture (from project documentation)</figcaption>
-          <div class="docFigureFrame docFigureFrameLight">
-            <img
-              src="/assets/architecture-overview.png"
-              width="1600"
-              height="900"
-              alt="Architecture diagram: input through analysis core, novel contributions, to reporting and CI validation"
-              loading="lazy"
-            />
+          <div class="docFigureFrame docFigureFrameDiagram">
+            <div
+              class="diagramShell"
+              id="diagram-architecture"
+              data-diagram-src="/assets/diagrams/architecture-overview.mmd"
+              aria-busy="true"
+              aria-label="Architecture diagram: input through analysis core, novel contributions, to reporting and CI validation"
+            >
+              <div class="diagramToolbar" role="toolbar" aria-label="Diagram zoom controls">
+                <button type="button" class="diagramToolBtn" data-action="zoom-out" aria-label="Zoom out">−</button>
+                <span class="diagramZoomPct" aria-live="polite">100%</span>
+                <button type="button" class="diagramToolBtn" data-action="zoom-in" aria-label="Zoom in">+</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="reset">Reset</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="expand">Expand</button>
+              </div>
+              <div class="diagramViewport" style="min-height: 400px">
+                <p class="diagramLoading" aria-live="polite">Loading diagram…</p>
+                <div class="diagramPanzoomRoot">
+                  <div class="mermaid"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </figure>
       </section>
@@ -131,14 +179,28 @@
         </p>
         <figure class="docFigure reveal">
           <figcaption class="docCaption">Detailed scan pipeline (from project documentation)</figcaption>
-          <div class="docFigureFrame docFigureScroll">
-            <img
-              src="/assets/runtime-scan-flow.png"
-              width="2000"
-              height="1200"
-              alt="Flowchart: CLI through initialization, per-file analysis, cross-file post analysis, output formatting, and optional proof generation"
-              loading="lazy"
-            />
+          <div class="docFigureFrame docFigureFrameDiagram docFigureScroll">
+            <div
+              class="diagramShell"
+              id="diagram-runtime"
+              data-diagram-src="/assets/diagrams/runtime-scan-flow.mmd"
+              aria-busy="true"
+              aria-label="Flowchart: CLI through initialization, per-file analysis, cross-file post analysis, output formatting, and optional proof generation"
+            >
+              <div class="diagramToolbar" role="toolbar" aria-label="Diagram zoom controls">
+                <button type="button" class="diagramToolBtn" data-action="zoom-out" aria-label="Zoom out">−</button>
+                <span class="diagramZoomPct" aria-live="polite">100%</span>
+                <button type="button" class="diagramToolBtn" data-action="zoom-in" aria-label="Zoom in">+</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="reset">Reset</button>
+                <button type="button" class="diagramToolBtn diagramToolBtnText" data-action="expand">Expand</button>
+              </div>
+              <div class="diagramViewport diagramViewport--runtime" style="min-height: 420px">
+                <p class="diagramLoading" aria-live="polite">Loading diagram…</p>
+                <div class="diagramPanzoomRoot">
+                  <div class="mermaid"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </figure>
       </section>
@@ -211,5 +273,6 @@
     </div>
 
     <script src="/landing.js" defer></script>
+    <script type="module" src="/landing-diagrams.js"></script>
   </body>
 </html>
