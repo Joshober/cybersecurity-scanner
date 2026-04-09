@@ -567,13 +567,19 @@ const server = http.createServer((req, res) => {
     const pathname = u.pathname;
 
     if (req.method === "GET" && (pathname === "/" || pathname === "")) {
+      // Marketing landing (story + diagrams).
       await serveStatic(res, "/index.html");
       return;
     }
 
+    if (req.method === "GET" && pathname === "/try") {
+      await serveStatic(res, "/try.html");
+      return;
+    }
+
     if (req.method === "GET" && pathname.startsWith("/scan/")) {
-      // Permalink view (client reads scanId from URL).
-      await serveStatic(res, "/index.html");
+      // Interactive demo + permalink view (client reads scanId from URL).
+      await serveStatic(res, "/try.html");
       return;
     }
 

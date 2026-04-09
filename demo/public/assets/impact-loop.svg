@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" role="img" aria-labelledby="t2 d2">
+  <title id="t2">Build faster, catch issues earlier</title>
+  <desc id="d2">Loop from ship to learn with VibeScan in CI</desc>
+  <rect width="400" height="120" fill="transparent" />
+  <path d="M40 60 A80 40 0 1 1 200 60" fill="none" stroke="#2a2a38" stroke-width="2" stroke-dasharray="6 4" />
+  <circle cx="80" cy="45" r="8" fill="#7c3aed" />
+  <text x="95" y="48" fill="#e8e8ef" font-family="system-ui,sans-serif" font-size="11">Ship</text>
+  <circle cx="200" cy="35" r="8" fill="#22d3ee" />
+  <text x="215" y="38" fill="#e8e8ef" font-family="system-ui,sans-serif" font-size="11">Scan</text>
+  <circle cx="320" cy="60" r="8" fill="#37d67a" />
+  <text x="285" y="64" fill="#e8e8ef" font-family="system-ui,sans-serif" font-size="11" text-anchor="end">Fix</text>
+  <text x="200" y="105" text-anchor="middle" fill="#9898a8" font-family="system-ui,sans-serif" font-size="10">CI + local  no API keys</text>
+</svg>

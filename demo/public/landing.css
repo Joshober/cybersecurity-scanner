@@ -1,0 +1,355 @@
+:root {
+  --bg: #0a0a0f;
+  --panel: #12121a;
+  --line: #2a2a38;
+  --text: #e8e8ef;
+  --muted: #9898a8;
+  --accent: #7c3aed;
+  --accent2: #22d3ee;
+  --good: #37d67a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(124, 58, 237, 0.18), transparent), var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.55;
+}
+
+.landingWrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 24px 18px 64px;
+}
+
+.landingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 0 28px;
+}
+
+.landingLogo {
+  font-size: 26px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landingNav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.landingNav a {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0f0f16;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 650;
+  font-size: 13px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.landingNav a:hover {
+  border-color: rgba(34, 211, 238, 0.5);
+}
+
+.landingNav a.primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: #091018;
+  border: 0;
+  font-weight: 800;
+}
+
+.landingNav a.primary:hover {
+  transform: translateY(-1px);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 760px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.heroH1 {
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 12px;
+}
+
+.heroLead {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin: 0 0 20px;
+  max-width: 42ch;
+}
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.heroMeta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.heroMeta code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.heroArt {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--panel);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  animation: heroFloat 8s ease-in-out infinite;
+}
+
+.heroArt img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes drift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.heroGlow {
+  background: linear-gradient(120deg, rgba(124, 58, 237, 0.25), rgba(34, 211, 238, 0.15), rgba(124, 58, 237, 0.2));
+  background-size: 200% 200%;
+  animation: drift 12s ease infinite;
+  border-radius: 14px;
+  padding: 1px;
+}
+
+.section {
+  margin-bottom: 44px;
+}
+
+.section.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.section.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sectionTitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent2);
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.section h2 {
+  font-size: 1.45rem;
+  font-weight: 850;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.section p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  max-width: 65ch;
+}
+
+.bulletList {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+}
+
+.bulletList li {
+  margin-bottom: 8px;
+}
+
+.diagramBox {
+  margin-top: 18px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.diagramBox .mermaid {
+  display: flex;
+  justify-content: center;
+  min-width: min(100%, 640px);
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 16px 18px;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.audienceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.audience {
+  border-left: 3px solid var(--accent);
+  padding-left: 14px;
+}
+
+.audience h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.audience p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.ctaBand {
+  margin-top: 36px;
+  padding: 28px 22px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(34, 211, 238, 0.08));
+  text-align: center;
+}
+
+.ctaBand h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+}
+
+.ctaBand p {
+  margin: 0 auto 18px;
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.landingFooter {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.landingFooter a {
+  color: var(--accent2);
+}
+
+.impactRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.impactRow img {
+  max-width: 280px;
+  height: auto;
+  opacity: 0.95;
+}

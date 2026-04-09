@@ -3,122 +3,180 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VibeScan Demo</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <meta
+      name="description"
+      content="VibeScan — developer-first static security for JavaScript and TypeScript. CLI, SARIF, HTML reports, AI rule export, and secure-arch checks. MIT. No API keys."
+    />
+    <title>VibeScan — Static security for JS &amp; TS</title>
+    <link rel="stylesheet" href="/landing.css" />
   </head>
   <body>
-    <div class="wrap">
-      <header class="hero">
-        <div class="heroTop">
-          <div class="brand">VibeScan</div>
-          <a
-            class="githubBtn"
-            href="https://github.com/Joshober/cybersecurity-scanner"
-            target="_blank"
-            rel="noopener"
-            aria-label="View this repo on GitHub"
-          >
-            View repo
-          </a>
-        </div>
-        <div class="tag">Downstream security scanning for LLM-generated Node.js apps</div>
+    <div class="landingWrap">
+      <header class="landingHeader">
+        <div class="landingLogo">VibeScan</div>
+        <nav class="landingNav" aria-label="Primary">
+          <a href="https://www.npmjs.com/package/@jobersteadt/vibescan" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/Joshober/cybersecurity-scanner" target="_blank" rel="noopener">GitHub</a>
+          <a href="/try" class="primary">Try live demo</a>
+        </nav>
       </header>
 
-      <section class="panel leaderboard" id="leaderboard">
-        <div class="leaderRow">
-          <div>
-            <div class="leaderTitle">Leaderboard</div>
-            <div class="leaderSub">Most total findings across scans in this session</div>
+      <section class="heroGrid" aria-labelledby="hero-heading">
+        <div>
+          <h1 id="hero-heading" class="heroH1">Catch risky patterns before they ship.</h1>
+          <p class="heroLead">
+            <strong style="color: var(--text)">VibeScan</strong> is a developer-first security CLI: static JS/TS scanning,
+            optional semantic TypeScript analysis, HTML and SARIF/JSON output, IDE-friendly AI rule export, and
+            architecture checks — <strong style="color: var(--text)">no VibeScan API keys</strong>. Free (MIT).
+          </p>
+          <div class="heroCtas">
+            <a class="landingNav primary" href="/try" style="text-decoration: none">Try the interactive demo</a>
+            <a class="landingNav" href="https://github.com/Joshober/cybersecurity-scanner" target="_blank" rel="noopener" style="text-decoration: none">View source</a>
           </div>
-          <div class="leaderStat">
-            <div id="leaderRepo" class="leaderRepo">—</div>
-            <div class="leaderCount"><span id="leaderCount">—</span> findings</div>
-          </div>
+          <p class="heroMeta">
+            Install: <code>npx @jobersteadt/vibescan@latest scan . --exclude-vendor</code>
+          </p>
         </div>
-        <div id="leaderTop5" class="leaderTop5" style="display:none;"></div>
-      </section>
-
-      <section class="panel">
-        <h2 class="h2">1) Choose a GitHub repo</h2>
-        <label class="label" for="repoUrl">Repo URL (github.com only)</label>
-        <input id="repoUrl" class="input" type="url" value="https://github.com/appsecco/dvna" spellcheck="false" />
-
-        <h2 class="h2">2) Choose a scenario</h2>
-        <div class="radioRow">
-          <label class="radio">
-            <input type="radio" name="scenario" value="original" checked />
-            <span>Original repo</span>
-          </label>
-          <label class="radio">
-            <input type="radio" name="scenario" value="simulated_hacked" />
-            <span>Simulated hacked commit</span>
-          </label>
-          <label class="radio">
-            <input type="radio" name="scenario" value="compare" />
-            <span>Compare (original vs hacked)</span>
-          </label>
-        </div>
-
-        <button id="scanBtn" class="btn">Scan &amp; decide</button>
-
-        <div id="status" class="status" aria-live="polite">Idle</div>
-      </section>
-
-      <section class="panel" id="results" style="display: none;">
-        <div class="resultsHeader">
-          <div>
-            <h2 class="h2">Decision</h2>
-            <div id="blockedBig" class="big">—</div>
+        <div class="heroGlow">
+          <div class="heroArt">
+            <img src="/assets/hero-illustration.svg" width="480" height="200" alt="" />
           </div>
-          <div class="resultsLinks">
-            <a id="openReport" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open full report</a>
-            <a id="openPrompt" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Open AI prompt</a>
-            <a id="openProjectJson" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download JSON</a>
-            <a id="openSarif" class="linkBtn" href="#" target="_blank" rel="noopener" style="display:none;">Download SARIF</a>
-            <button id="copyShareLink" class="linkBtnBtn" type="button" style="display:none;">Copy share link</button>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="metric">
-            <div class="metricLabel">Findings total</div>
-            <div id="totalFindings" class="metricValue">—</div>
-          </div>
-          <div class="metric">
-            <div class="metricLabel">Critical / Error</div>
-            <div id="critErrCount" class="metricValue">—</div>
-          </div>
-        </div>
-
-        <div class="panelSub">
-          <h2 class="h2">VibeScan report (real HTML renderer)</h2>
-          <div id="compareBar" class="compareBar" style="display:none;">
-            <span class="compareLabel">View:</span>
-            <button id="viewOriginal" type="button" class="segBtn segBtnActive">Original</button>
-            <button id="viewHacked" type="button" class="segBtn">Hacked</button>
-            <span id="compareSummary" class="compareSummary"></span>
-          </div>
-          <div class="iframeWrap">
-            <iframe id="reportFrame" title="VibeScan HTML report"></iframe>
-          </div>
-        </div>
-
-        <div class="panelSub" style="margin-top:12px;">
-          <h2 class="h2">AI fix prompt (paste into Cursor / Claude Code / etc)</h2>
-          <div class="promptRow">
-            <button id="copyPrompt" class="btnSmall" disabled>Copy</button>
-            <span id="promptStatus" class="statusSmall">—</span>
-          </div>
-          <textarea id="promptBox" class="textarea" spellcheck="false" placeholder="Prompt will appear after scan completes…" readonly></textarea>
         </div>
       </section>
 
-      <footer class="footer">
-        <div class="footerText">Backend runs VibeScan on a cloned repo.</div>
+      <section class="section reveal" aria-labelledby="impact-title">
+        <p class="sectionTitle">Impact</p>
+        <h2 id="impact-title">Why it matters</h2>
+        <p>
+          Teams ship faster with AI-assisted coding — but velocity can outpace review. Crypto mistakes, injection sinks,
+          and fragile auth patterns still reach production if nothing catches them in the repo. VibeScan focuses on
+          <strong style="color: var(--text)">classes of issues in your source</strong>: clear severities, file/line
+          locations, remediation hints, safe examples, and references — so fixes are actionable, not noisy guesswork.
+        </p>
+        <ul class="bulletList">
+          <li>Run locally or in CI; pin versions for reproducible builds.</li>
+          <li>Export governance artifacts for Cursor / Amazon Q / markdown policy digests.</li>
+          <li>Optional proof-oriented test generation for supported finding classes (deterministic, no live API).</li>
+        </ul>
+        <div class="impactRow">
+          <img src="/assets/impact-loop.svg" width="400" height="120" alt="" />
+        </div>
+      </section>
+
+      <section class="section reveal" aria-labelledby="journey-title">
+        <p class="sectionTitle">How it works</p>
+        <h2 id="journey-title">From your repo to a report</h2>
+        <p>
+          Point VibeScan at your project. It parses JavaScript and TypeScript (with optional <code>tsconfig</code>-backed
+          semantics), runs rule and taint analyses, understands routes and app structure, and emits human and machine
+          readable output — plus optional secure-arch validation against YAML policy.
+        </p>
+        <div class="diagramBox">
+          <div class="mermaid">
+flowchart LR
+R[Repo] --> P[Parse JS/TS]
+P --> Q[Rules + taint]
+Q --> A[Route + app audits]
+A --> F[Findings]
+F --> O[HTML / SARIF / JSON]
+O -.-> X[Proof tests]
+O -.-> Y[export-ai-rules]
+O -.-> Z[secure-arch]
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" aria-labelledby="pipeline-title">
+        <p class="sectionTitle">Under the hood</p>
+        <h2 id="pipeline-title">Scan pipeline (simplified)</h2>
+        <p>
+          The engine walks parsed ASTs, runs pattern rules and taint tracking, builds route intelligence (including
+          Next.js-style handlers when applicable), runs middleware and app-level audits, checks OpenAPI drift when
+          specs are present, analyzes third-party touchpoints, and can attach proof-harness metadata for supported rules.
+        </p>
+        <div class="diagramBox">
+          <div class="mermaid">
+flowchart TD
+PF[parseFile] --> RE[runRuleEngine]
+PF --> TE[runTaintEngine]
+RE --> RG[Route graph + Next]
+TE --> RG
+RG --> MA[Middleware + app audits]
+MA --> OD[OpenAPI drift]
+OD --> TP[Third-party surface]
+TP --> GT[generateTests]
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" aria-labelledby="what-title">
+        <p class="sectionTitle">What you get</p>
+        <h2 id="what-title">One install, many surfaces</h2>
+        <div class="cardGrid">
+          <div class="card">
+            <h3>CLI &amp; CI</h3>
+            <p><code>vibescan scan</code> with JSON or SARIF for gates and dashboards. GitHub Actions template included in the package.</p>
+          </div>
+          <div class="card">
+            <h3>Reports</h3>
+            <p>Static HTML report, SARIF for SARIF-aware tools, rich project JSON with evidence fields when enabled.</p>
+          </div>
+          <div class="card">
+            <h3>IDE assist</h3>
+            <p>Generated prompts and rules for assistants — paste-in markdown, no remote LLM required from VibeScan.</p>
+          </div>
+          <div class="card">
+            <h3>secure-arch</h3>
+            <p>YAML policy + optional code evidence: validate architecture facts alongside code signals.</p>
+          </div>
+          <div class="card">
+            <h3>Proof tests</h3>
+            <p>Where supported, deterministic <code>node:test</code> files to exercise findings — no base URL, no secrets.</p>
+          </div>
+          <div class="card">
+            <h3>ESLint plugin</h3>
+            <p>Same rule catalog in-editor; use CLI first for full TypeScript semantic parity on complex projects.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section reveal" aria-labelledby="who-title">
+        <p class="sectionTitle">Audience</p>
+        <h2 id="who-title">Who it’s for</h2>
+        <div class="audienceGrid">
+          <div class="audience">
+            <h3>Teams using AI coding tools</h3>
+            <p>Turn governance into Cursor rules and policy JSON derived from your repo — not generic prompts.</p>
+          </div>
+          <div class="audience">
+            <h3>Platform &amp; CI owners</h3>
+            <p>Block merges on SARIF or JSON thresholds; keep scans fast and version-pinned.</p>
+          </div>
+          <div class="audience">
+            <h3>AppSec &amp; auditors</h3>
+            <p>Consistent rule IDs, locations, and export formats for triage and toolchain integration.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="ctaBand reveal" aria-labelledby="cta-title">
+        <h2 id="cta-title">See it on a real repo</h2>
+        <p>Open the hosted demo: clone a public GitHub repo, run VibeScan, and explore the HTML report and AI fix prompt.</p>
+        <div class="ctaRow">
+          <a href="/try" class="landingNav primary" style="text-decoration: none">Open live demo</a>
+          <a href="https://www.npmjs.com/package/@jobersteadt/vibescan" target="_blank" rel="noopener" class="landingNav" style="text-decoration: none">Package on npm</a>
+        </div>
+      </section>
+
+      <footer class="landingFooter">
+        <p>
+          VibeScan (<code>@jobersteadt/vibescan</code>) · MIT ·
+          <a href="https://github.com/Joshober/cybersecurity-scanner">cybersecurity-scanner</a>
+        </p>
       </footer>
     </div>
 
-    <script src="/app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" crossorigin="anonymous"></script>
+    <script src="/landing.js" defer></script>
   </body>
 </html>
-

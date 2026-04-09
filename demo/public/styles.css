@@ -59,6 +59,18 @@ body {
   border-color: rgba(34, 211, 238, 0.55);
 }
 
+.heroNav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.githubBtnGhost {
+  background: transparent;
+}
+
 .brand {
   font-size: 34px;
   font-weight: 850;

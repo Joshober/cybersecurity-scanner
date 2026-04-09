@@ -9,12 +9,14 @@ This interactive website clones a selected GitHub repository, optionally applies
 
 ## Setup
 
-1. Build the scanner (required so the demo can import from `vibescan/dist/`):
-   - From repo root: `npm run build` (or `npm run build -w @jobersteadt/vibescan`)
+1. From the `demo/` folder, install dependencies (uses published `@jobersteadt/vibescan`):
+   - `npm install`
 2. Start the demo server:
-   - `node demo/server.mjs`
+   - `node server.mjs`
 3. Open:
-   - `http://localhost:3000/`
+   - `http://localhost:3000/` — marketing landing (how VibeScan works)
+   - `http://localhost:3000/try` — interactive clone + scan demo
+   - `http://localhost:3000/scan/<scanId>` — permalink to a completed scan (same UI as `/try`)
 
 ## Safety notes
 
