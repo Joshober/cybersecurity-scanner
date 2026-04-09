@@ -850,6 +850,9 @@ function buildPosterHtml(figs, data) {
 .fig--heatmap .fig-card svg{width:78%;max-width:100%;margin-left:auto;margin-right:auto;display:block;height:auto}
 .fig-card img{width:100%;height:auto;display:block;border-radius:6px}
 .fig-img-depth{display:block;width:100%;max-width:100%;height:auto;max-height:320px;margin-left:auto;margin-right:auto;object-fit:contain}
+.fig-card--analysis-depth{padding:6px 8px;background:#fff}
+.analysis-depth-root{width:100%;max-height:320px;display:flex;justify-content:center;align-items:flex-start}
+.analysis-depth-root svg{max-height:320px;width:100%;height:auto;display:block;border-radius:6px}
 .discussion{border-top:1px solid var(--border);padding:10px 16px}
 .discussion h3{margin:0 0 5px;color:#1e3a5f}.discussion p{margin:0;font-size:.8rem;line-height:1.4}
 .references{border-top:1px solid var(--border);padding:6px 8px 6px;font-size:.62rem;color:var(--muted);line-height:1.18}
@@ -873,7 +876,7 @@ function buildPosterHtml(figs, data) {
 <div class="sec"><h2>Abstract</h2><p>Comparing JavaScript security scanners by raw alert counts confounds detection with noise. We present a reproducible multi-dimensional study on an adjudicated DVNA benchmark [1] with aligned peer tool runs, expanded rule-family coverage, and metrics that separate what is found (recall) from triage burden (cases-per-alert precision proxy) and operational cost (wall-clock scan time). Findings are interpreted alongside standard web-application risk framing [2]. VibeScan attains the highest DVNA recall (${top.percent.toFixed(1)}%), ${(top.percent - second.percent).toFixed(1)} percentage points above the next-ranked scanner (${second.label}), with supporting analyses for difficulty-weighted coverage, recall–precision tradeoffs, and recall–time tradeoffs. Limitations: precision remains a proxy (not full per-alert false-positive adjudication for every tool), and the expanded corpus is partially VibeScan-aligned for family stress testing.</p></div>
 <div class="sec"><h2>Research Questions</h2><ul><li>RQ1: Can VibeScan sustain top recall on hard cases?</li><li>RQ2: Where do peers diverge by family and case difficulty?</li><li>RQ3: How do precision-proxy and runtime affect practical scanner value?</li></ul></div>
 <div class="sec"><h2>Method</h2><p>Datasets: DVNA (${dvnaCases}), expanded unique (${expandedUnique}), stress repeats (${stressRows}). Metrics: recall, cases-per-alert precision proxy, and case difficulty (ETS delta from consensus p where p=detected-by/6). Runtime: VibeScan wall-clock (${(timing.durationMs / 1000).toFixed(2)}s).</p></div>
-<div class="fig"><div class="fig-title">Figure 1 - Analysis depth comparison</div><div class="fig-card"><img class="fig-img-depth" src="./comparison-overview.png" alt="VibeScan analysis depth comparison diagram"/></div><div class="caption">Clean stage-by-stage comparison of where peer tools stop vs where VibeScan continues.</div></div>
+<div class="fig"><div class="fig-title">Figure 1 - Analysis depth comparison</div><div class="fig-card fig-card--analysis-depth"><div id="analysis-depth-diagram" class="analysis-depth-root" role="img" aria-label="Analysis depth pipeline from pattern matching through proof and CI gates. Peer tools stop at successive stages. VibeScan reaches full depth."></div></div><div class="caption">Clean stage-by-stage comparison of where peer tools stop vs where VibeScan continues.</div></div>
 </div>
 <section class="results-comparison" aria-labelledby="results-comparison-heading">
 <h2 class="results-comparison-title" id="results-comparison-heading">Cross-tool DVNA results</h2>
@@ -903,7 +906,7 @@ ${buildGlobalToolLegendHtml(toolLegendTools)}
 </div>
 </section>
 </section>
-</main></body></html>`;
+</main><script src="./comparison-overview-diagram.js"></script></body></html>`;
 }
 
 function main() {
