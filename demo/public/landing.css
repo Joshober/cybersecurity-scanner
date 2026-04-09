@@ -946,17 +946,6 @@ body {
   margin-right: auto;
 }
 
-.scanFlowAbridgedArrow {
-  align-self: center;
-  color: var(--accent2);
-  font-size: 17px;
-  font-weight: 900;
-  line-height: 1;
-  opacity: 0.92;
-  user-select: none;
-  padding: 2px 0;
-}
-
 .scanFlowAbridgedCard {
   flex: none;
   width: 100%;

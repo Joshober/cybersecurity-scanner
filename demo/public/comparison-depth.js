@@ -15,7 +15,7 @@
     {
       type: "bridge",
       text:
-        "eslint-plugin-security stops here · benchmark recall 1/11 · 493 alerts on evaluated set",
+        "eslint-plugin-security stops here; benchmark recall 1/11; 493 alerts on evaluated set",
       filterId: "eslint",
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       type: "bridge",
-      text: "Semgrep stops here · 4/11 recall · 11 alerts",
+      text: "Semgrep stops here; 4/11 recall; 11 alerts",
       filterId: "semgrep",
     },
     {
@@ -39,11 +39,11 @@
       desc: "Inter-procedural and type-aware resolution",
       theme: "cross",
       filterId: "sast-mid",
-      filterLabel: "CodeQL · Snyk Code · Bearer",
+      filterLabel: "CodeQL, Snyk Code, Bearer",
     },
     {
       type: "bridge",
-      text: "CodeQL 6/11 · Snyk Code 7/11 · Bearer 8/11 stop before the next stage",
+      text: "CodeQL 6/11, Snyk Code 7/11, Bearer 8/11 stop before the next stage",
       filterId: "sast-mid",
     },
     {
@@ -73,7 +73,7 @@
       type: "step",
       key: "vs",
       title: "VibeScan",
-      desc: "11/11 recall · 25 alerts — only tool at full depth in this evaluation",
+      desc: "11/11 recall, 25 alerts; only tool at full depth in this evaluation",
       theme: "vibescan",
       filterId: "vibescan",
       filterLabel: "VibeScan",
@@ -85,7 +85,7 @@
     { id: "all", label: "Full depth stack", help: "Show every stage equally" },
     { id: "eslint", label: "eslint-plugin-security", help: "Typical ceiling: pattern matching" },
     { id: "semgrep", label: "Semgrep", help: "Typical ceiling: taint within files" },
-    { id: "sast-mid", label: "CodeQL · Snyk · Bearer", help: "Typical ceiling: cross-file stage" },
+    { id: "sast-mid", label: "CodeQL, Snyk, Bearer", help: "Typical ceiling: cross-file stage" },
     { id: "preproof", label: "Other tools max", help: "Highlight route/API depth before proofs" },
     { id: "vibescan", label: "VibeScan", help: "Emphasize proof + CI and full pipeline" },
   ];

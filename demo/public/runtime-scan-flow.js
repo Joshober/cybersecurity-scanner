@@ -11,7 +11,7 @@
     },
     {
       title: "scanProjectAsync",
-      detail: "Scanner entry — unified project scan",
+      detail: "Scanner entry, unified project scan",
     },
     {
       title: "Init & pre-scan",
@@ -27,7 +27,7 @@
     },
     {
       title: "Output",
-      detail: "Suppressions, baseline, gates, sidecars, exports — JSON, SARIF, HTML, human",
+      detail: "Suppressions, baseline, gates, sidecars, exports: JSON, SARIF, HTML, human",
     },
     {
       title: "Optional proof",
@@ -50,8 +50,7 @@
 
   function mount(root) {
     var abWrap = el("div", "scanFlowAbridged", { role: "group", "aria-label": "Scan pipeline summary" });
-    ABRIDGED_STAGES.forEach(function (stage, i) {
-      if (i > 0) abWrap.appendChild(el("span", "scanFlowAbridgedArrow", { "aria-hidden": "true", text: "↓" }));
+    ABRIDGED_STAGES.forEach(function (stage) {
       var card = el("article", "scanFlowAbridgedCard");
       card.appendChild(el("h3", "scanFlowAbridgedTitle", { text: stage.title }));
       card.appendChild(el("p", "scanFlowAbridgedDetail", { text: stage.detail }));

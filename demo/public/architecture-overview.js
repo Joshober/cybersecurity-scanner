@@ -38,8 +38,7 @@
 
   function mount(root) {
     var abWrap = el("div", "scanFlowAbridged", { role: "group", "aria-label": "Architecture summary" });
-    ABRIDGED_STAGES.forEach(function (stage, i) {
-      if (i > 0) abWrap.appendChild(el("span", "scanFlowAbridgedArrow", { "aria-hidden": "true", text: "↓" }));
+    ABRIDGED_STAGES.forEach(function (stage) {
       var card = el("article", "scanFlowAbridgedCard");
       card.appendChild(el("h3", "scanFlowAbridgedTitle", { text: stage.title }));
       card.appendChild(el("p", "scanFlowAbridgedDetail", { text: stage.detail }));
