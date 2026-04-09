@@ -98,7 +98,7 @@ function setTop5(list) {
     .map((r, i) => {
       const label = escapeHtml(r.repoLabel || r.repoGitUrl || "—");
       const n = escapeHtml(String(r.totalFindings ?? "—"));
-      return `<div class="leaderRowItem"><div>${i + 1}. <code>${label}</code></div><div>${n}</div></div>`;
+      return `<div class="leaderRowItem"><div><span class="leaderRowRank">${i + 1}.</span> <code>${label}</code></div><div class="leaderRowFindings">${n}</div></div>`;
     })
     .join("");
 }
