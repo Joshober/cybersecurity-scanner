@@ -441,15 +441,13 @@ body {
   }
 }
 
-.heroVisualFrame .diagramShell--hero {
+.heroVisualImg {
   position: relative;
   z-index: 1;
-}
-
-.heroVisualFrame .diagramShell--hero .mermaid svg {
-  max-width: 100%;
-  height: auto;
   display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
 }
 
 .heroScrollHint {
@@ -615,9 +613,311 @@ body {
   vertical-align: middle;
 }
 
-.docFigureFrameDiagram {
-  background: var(--panel);
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ——— Interactive comparison depth (replaces static comparison-overview.png) ——— */
+.docFigureFrameComparison {
+  overflow: visible;
+}
+
+.comparisonDepthMount {
+  padding: 20px 20px 24px;
+}
+
+.comparisonDepthFallbackImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.comparisonDepthToolbar {
+  margin: 0 0 20px;
+  padding: 0;
+  border: none;
+}
+
+.comparisonDepthToolbarLegend {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 0;
+  margin: 0 0 10px;
+}
+
+.comparisonDepthToolbarHint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 52rem;
+}
+
+.comparisonDepthChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.comparisonDepthChip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(18, 18, 26, 0.9);
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comparisonDepthChip:hover {
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.comparisonDepthChip:has(.comparisonDepthChipInput:focus-visible) {
+  outline: 2px solid var(--accent2);
+  outline-offset: 2px;
+}
+
+.comparisonDepthChipInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.comparisonDepthChipInput:checked + .comparisonDepthChipText {
+  color: var(--accent2);
+}
+
+.comparisonDepthChip:has(.comparisonDepthChipInput:checked) {
+  border-color: rgba(124, 58, 237, 0.55);
+  background: rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.2);
+}
+
+.comparisonDepthTimeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.comparisonDepthTimeline::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 28px;
+  bottom: 28px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.45), rgba(34, 211, 238, 0.35));
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.comparisonDepthStepWrap,
+.comparisonDepthBridgeWrap {
+  position: relative;
+  padding-left: 48px;
+  transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+
+.comparisonDepthStepWrap.isDimmed,
+.comparisonDepthBridgeWrap.isDimmed {
+  opacity: 0.32;
+}
+
+.comparisonDepthStepWrap.isFocused,
+.comparisonDepthBridgeWrap.isFocused {
+  opacity: 1;
+}
+
+.comparisonDepthStepWrap.isFocused .comparisonDepthCard,
+.comparisonDepthBridgeWrap.isFocused .comparisonDepthBridge {
+  transform: translateX(2px);
+}
+
+.comparisonDepthBridgeWrap {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.comparisonDepthBridge {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px dashed rgba(42, 42, 56, 0.95);
+  background: rgba(10, 10, 15, 0.5);
+}
+
+.comparisonDepthCard {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 14px 16px 16px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.3s var(--ease-out);
+}
+
+.comparisonDepthStepNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.comparisonDepthCardHead {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.comparisonDepthCardTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.comparisonDepthCardDesc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.comparisonDepthCardMeta {
+  margin: 10px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(152, 152, 168, 0.85);
+}
+
+.comparisonDepthCard--basic {
+  background: rgba(243, 244, 246, 0.06);
+  border-color: rgba(156, 163, 175, 0.35);
+}
+.comparisonDepthCard--basic .comparisonDepthStepNum {
+  background: rgba(156, 163, 175, 0.2);
+  color: #e5e7eb;
+}
+
+.comparisonDepthCard--flow {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.comparisonDepthCard--flow .comparisonDepthStepNum {
+  background: rgba(59, 130, 246, 0.22);
+  color: #93c5fd;
+}
+
+.comparisonDepthCard--cross {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.38);
+}
+.comparisonDepthCard--cross .comparisonDepthStepNum {
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+
+.comparisonDepthCard--advanced {
+  background: rgba(234, 88, 12, 0.09);
+  border-color: rgba(234, 88, 12, 0.35);
+}
+.comparisonDepthCard--advanced .comparisonDepthStepNum {
+  background: rgba(234, 88, 12, 0.2);
+  color: #fdba74;
+}
+
+.comparisonDepthCard--unique {
+  background: rgba(22, 163, 74, 0.1);
+  border-color: rgba(22, 163, 74, 0.4);
+}
+.comparisonDepthCard--unique .comparisonDepthStepNum {
+  background: rgba(22, 163, 74, 0.22);
+  color: var(--good);
+}
+
+.comparisonDepthCard--vibescan {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.14), rgba(34, 211, 238, 0.08));
+  border-color: rgba(55, 214, 122, 0.45);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+.comparisonDepthCard--vibescan .comparisonDepthStepNum {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0a0a0f;
+}
+
+.comparisonDepthStepWrap--final {
+  padding-top: 8px;
+}
+
+@media (max-width: 520px) {
+  .comparisonDepthMount {
+    padding: 16px 14px 20px;
+  }
+
+  .comparisonDepthTimeline::before {
+    left: 15px;
+  }
+
+  .comparisonDepthStepWrap,
+  .comparisonDepthBridgeWrap {
+    padding-left: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comparisonDepthStepWrap,
+  .comparisonDepthBridgeWrap,
+  .comparisonDepthCard,
+  .comparisonDepthBridge {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+.docFigureFrameLight {
+  background: #f1f5f9;
+}
+
+/* Shares padding with .docFigureFlowFrame; keeps hover clip sane for JS mounts */
+.docFigureArchFrame {
+  overflow: visible;
+}
+
+.architectureOverviewMount {
+  min-width: 0;
 }
 
 .docFigureScroll {
@@ -625,196 +925,67 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-.docFigureScroll .diagramShell {
-  min-width: min(100%, 720px);
-}
-
-.impactRow {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 28px;
-}
-
-.impactRow .diagramShell--impact {
-  max-width: min(100%, 440px);
-  width: 100%;
-}
-
-.impactRow .diagramShell--impact .mermaid svg {
-  max-width: 100%;
-  height: auto;
-}
-
-/* ——— Mermaid diagram shells + pan/zoom ——— */
-.diagramShell {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-}
-
-.diagramToolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(10, 10, 18, 0.95);
-}
-
-.diagramToolBtn {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 10px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: rgba(18, 18, 26, 0.9);
-  color: var(--text);
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.diagramToolBtn:hover {
-  border-color: rgba(34, 211, 238, 0.45);
-  background: rgba(25, 25, 36, 0.95);
-}
-
-.diagramToolBtn:focus-visible {
-  outline: 2px solid var(--accent2);
-  outline-offset: 2px;
-}
-
-.diagramToolBtnText {
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.diagramZoomPct {
-  min-width: 3.25rem;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.diagramViewport {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-elevated);
-  flex: 1;
-  min-width: 0;
-}
-
-.diagramViewport--runtime {
-  min-height: min(420px, 70vh);
-}
-
-.diagramPanzoomRoot {
-  transform-origin: 0 0;
-  will-change: transform;
-}
-
-.diagramPanzoomRoot .mermaid {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-.diagramPanzoomRoot .mermaid svg {
+.docFigureScroll img {
+  min-width: min(1200px, 180%);
   max-width: none;
-  height: auto;
-  display: block;
 }
 
-.diagramLoading {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+.docFigureFlowFrame {
+  padding: 20px 18px 22px;
+  overflow: visible;
+}
+
+.scanFlowAbridged {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 16px;
-  font-size: 13px;
-  color: var(--muted);
-  background: rgba(7, 7, 12, 0.65);
-  pointer-events: none;
-}
-
-.diagramLoading--error {
-  color: #f87171;
-  pointer-events: auto;
-}
-
-.diagramShell--ready .diagramLoading:not(.diagramLoading--error) {
-  display: none;
-}
-
-.diagramShell--fullscreen {
-  position: fixed !important;
-  inset: 0;
-  z-index: 300;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 12px;
-  padding-top: 52px;
-  background: rgba(7, 7, 12, 0.96);
-  backdrop-filter: blur(8px);
   flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin-bottom: 0;
+  max-width: min(100%, 520px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.diagramShell--fullscreen .diagramViewport {
-  flex: 1;
-  min-height: min(75vh, 900px);
-  max-height: calc(100vh - 64px);
-}
-
-.diagramShell--fullscreen .diagramToolbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 48px;
-  z-index: 2;
-}
-
-.diagramFullscreenClose {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 301;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--text);
-  font-size: 28px;
+.scanFlowAbridgedArrow {
+  align-self: center;
+  color: var(--accent2);
+  font-size: 17px;
+  font-weight: 900;
   line-height: 1;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  opacity: 0.92;
+  user-select: none;
+  padding: 2px 0;
 }
 
-.diagramFullscreenClose:hover {
-  border-color: rgba(34, 211, 238, 0.45);
+.scanFlowAbridgedCard {
+  flex: none;
+  width: 100%;
+  padding: 14px 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(18, 18, 26, 0.65);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.diagramFullscreenClose:focus-visible {
-  outline: 2px solid var(--accent2);
-  outline-offset: 2px;
+.scanFlowAbridgedCard:hover {
+  border-color: rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.12);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .diagramPanzoomRoot {
-    will-change: auto;
-  }
+.scanFlowAbridgedTitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.scanFlowAbridgedDetail {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .cardGrid {
