@@ -19,6 +19,7 @@
     "benchmark:dvna-all-checks": "npm run build && node benchmarks/scripts/run-dvna-all-vibescan-checks.mjs",
     "benchmark:poster-charts": "node benchmarks/scripts/generate-research-poster-charts.mjs",
     "benchmark:poster-pptx": "node benchmarks/scripts/poster-html-to-pptx.mjs",
+    "benchmark:poster-pdf": "node benchmarks/scripts/poster-html-to-pdf.mjs",
     "benchmark:assert-framework-recall": "node benchmarks/scripts/assert-framework-recall.mjs",
     "benchmark:outperform-readout": "node benchmarks/scripts/generate-outperform-readout.mjs",
     "secure-arch": "node vibescan/packages/secure-arch-cli/dist/cli.js",

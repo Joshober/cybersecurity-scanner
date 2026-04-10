@@ -1,6 +1,7 @@
 /**
  * Renders Figure 1 — Analysis depth pipeline (peer tools vs VibeScan) as SVG.
  * Semantics match docs/vibescan/comparison-overview.mmd
+ * Stop callouts sit to the right of the stack with colored branches and ✕ marks.
  */
 (function () {
   "use strict";
@@ -38,35 +39,178 @@
     { key: "unique", lines: ["VibeScan", "11/11 recall · 25 alerts", "Only tool at full depth"] },
   ];
 
-  /** Per edge: string or [line1, line2]; empty string / empty array = no label */
-  const edgeLabels = [
-    "eslint-plugin-security stops · 1/11 · 493 alerts",
-    "Semgrep stops · 4/11 · 11 alerts",
-    ["CodeQL 6/11 · Snyk 7/11 · Bearer 8/11", "stop before route / API depth"],
-    "No other evaluated tool reaches this depth",
-    "",
+  /**
+   * Per edge after node i (connector i → i+1).
+   * branchColor: horizontal spur + ✕; lines: main copy; extraLines: muted sublines.
+   * tspans: optional [{ fill, text }] for first line (peer tools).
+   */
+  const edgeCallouts = [
+    {
+      branchColor: "#56B4E9",
+      lines: ["eslint-plugin-security stops · 1/11 · 493 alerts"],
+    },
+    {
+      branchColor: "#D55E00",
+      lines: ["Semgrep stops · 4/11 · 11 alerts"],
+    },
+    {
+      branchColor: "#94a3b8",
+      tspans: [
+        { fill: "#CC79A7", text: "✕ CodeQL 6/11" },
+        { fill: "#64748b", text: "  ·  " },
+        { fill: "#E69F00", text: "✕ Snyk 7/11" },
+        { fill: "#64748b", text: "  ·  " },
+        { fill: "#0072B2", text: "✕ Bearer 8/11" },
+      ],
+      extraLines: ["stop before route / API depth"],
+    },
+    {
+      branchColor: "#64748b",
+      lines: ["No other evaluated tool reaches this depth"],
+    },
+    null,
   ];
 
   function nodeHeight(lineCount) {
-    const padT = 10;
-    const padB = 10;
-    const titleLine = 12;
-    const subLine = 11;
-    return padT + titleLine + (lineCount > 1 ? 2 + (lineCount - 1) * subLine : 0) + padB;
+    const padT = 12;
+    const padB = 14;
+    const titleLine = 16;
+    const subLine = 14;
+    return padT + titleLine + (lineCount > 1 ? 3 + (lineCount - 1) * subLine : 0) + padB;
+  }
+
+  function appendTspanLine(svg, x, y, tspans, fontSize, weight) {
+    const t = el(
+      "text",
+      {
+        x: String(x),
+        y: String(y),
+        "text-anchor": "start",
+        "font-family": "system-ui,Segoe UI,Roboto,sans-serif",
+        "font-size": String(fontSize),
+        "font-weight": weight,
+      },
+      []
+    );
+    for (const p of tspans) {
+      t.appendChild(
+        el(
+          "tspan",
+          {
+            fill: p.fill,
+            "font-weight": p.bold ? "700" : weight,
+          },
+          [p.text]
+        )
+      );
+    }
+    svg.appendChild(t);
+  }
+
+  function drawStopCallout(svg, opts) {
+    const {
+      midY,
+      spineX,
+      lineEndX,
+      xGlyphX,
+      textX,
+      branchColor,
+      lines,
+      tspans,
+      extraLines,
+      edgeFs,
+      subFs,
+    } = opts;
+
+    svg.appendChild(
+      el("line", {
+        x1: String(spineX),
+        y1: String(midY),
+        x2: String(lineEndX),
+        y2: String(midY),
+        stroke: branchColor,
+        "stroke-width": "2",
+        "stroke-linecap": "round",
+      })
+    );
+
+    const xr = 6;
+    svg.appendChild(
+      el("path", {
+        d: `M${xGlyphX - xr},${midY - xr} L${xGlyphX + xr},${midY + xr} M${xGlyphX + xr},${midY - xr} L${xGlyphX - xr},${midY + xr}`,
+        stroke: branchColor,
+        "stroke-width": "2.25",
+        fill: "none",
+        "stroke-linecap": "round",
+      })
+    );
+
+    let ty = midY + 5 - (tspans || lines ? 0 : 0);
+    const linePitch = 15;
+
+    if (tspans && tspans.length) {
+      appendTspanLine(svg, textX, ty, tspans, edgeFs, "600");
+      ty += linePitch + 2;
+    } else if (lines && lines.length) {
+      for (const line of lines) {
+        svg.appendChild(
+          el(
+            "text",
+            {
+              x: String(textX),
+              y: String(ty),
+              "text-anchor": "start",
+              "font-family": "system-ui,Segoe UI,Roboto,sans-serif",
+              "font-size": edgeFs,
+              "font-weight": "600",
+              fill: "#334155",
+            },
+            [line]
+          )
+        );
+        ty += linePitch;
+      }
+    }
+
+    if (extraLines) {
+      for (const line of extraLines) {
+        svg.appendChild(
+          el(
+            "text",
+            {
+              x: String(textX),
+              y: String(ty),
+              "text-anchor": "start",
+              "font-family": "system-ui,Segoe UI,Roboto,sans-serif",
+              "font-size": subFs,
+              "font-weight": "500",
+              fill: "#64748b",
+            },
+            [line]
+          )
+        );
+        ty += linePitch - 1;
+      }
+    }
   }
 
   function renderAnalysisDepthDiagram(container) {
     if (!container || container.getAttribute("data-rendered") === "1") return;
     container.setAttribute("data-rendered", "1");
 
-    const W = 300;
     const nodeW = 262;
-    const nodeX = (W - nodeW) / 2;
-    const cx = W / 2;
+    const nodeX = 14;
+    const cx = nodeX + nodeW / 2;
+    const lineEndX = nodeX + nodeW + 18;
+    const xGlyphX = lineEndX + 10;
+    const textX = xGlyphX + 14;
+    const W = 628;
     const edgeGap = 34;
-    const titleFs = "10";
-    const subFs = "7.5";
-    const edgeFs = "7";
+    const titleFs = "12.5";
+    const subFs = "9.5";
+    /** Right-side stop callouts (branch + ✕ + copy) */
+    const edgeCalloutFs = "14";
+    const edgeCalloutSubFs = "12";
 
     const layout = [];
     let y = 8;
@@ -90,14 +234,18 @@
     const mid = "analysis-depth-arrowhead";
     svg.appendChild(
       el("defs", {}, [
-        el("marker", {
-          id: mid,
-          markerWidth: "7",
-          markerHeight: "7",
-          refX: "6",
-          refY: "3.5",
-          orient: "auto",
-        }, [el("path", { d: "M0,0 L7,3.5 L0,7 Z", fill: "#64748b" })]),
+        el(
+          "marker",
+          {
+            id: mid,
+            markerWidth: "7",
+            markerHeight: "7",
+            refX: "6",
+            refY: "3.5",
+            orient: "auto",
+          },
+          [el("path", { d: "M0,0 L7,3.5 L0,7 Z", fill: "#64748b" })]
+        ),
       ])
     );
 
@@ -117,7 +265,7 @@
         })
       );
 
-      let baseline = ny + 20;
+      let baseline = ny + 23;
       n.lines.forEach((line, li) => {
         const fs = li === 0 ? titleFs : subFs;
         const weight = li === 0 ? "700" : "500";
@@ -137,7 +285,7 @@
             [line]
           )
         );
-        baseline += li === 0 ? 14 : 11;
+        baseline += li === 0 ? 17 : 14;
       });
 
       if (i < layout.length - 1) {
@@ -155,33 +303,22 @@
           })
         );
 
-        const label = edgeLabels[i];
-        const lines = !label
-          ? []
-          : Array.isArray(label)
-            ? label
-            : [label];
-        if (lines.length) {
+        const callout = edgeCallouts[i];
+        if (callout) {
           const midY = (y1 + y2) / 2;
-          const linePitch = 8;
-          let ty = midY + 3 - ((lines.length - 1) * linePitch) / 2;
-          for (const line of lines) {
-            svg.appendChild(
-              el(
-                "text",
-                {
-                  x: String(cx),
-                  y: String(ty),
-                  "text-anchor": "middle",
-                  "font-family": "system-ui,Segoe UI,Roboto,sans-serif",
-                  "font-size": edgeFs,
-                  fill: "#475569",
-                },
-                [line]
-              )
-            );
-            ty += linePitch;
-          }
+          drawStopCallout(svg, {
+            midY,
+            spineX: cx,
+            lineEndX,
+            xGlyphX,
+            textX,
+            branchColor: callout.branchColor,
+            lines: callout.lines,
+            tspans: callout.tspans,
+            extraLines: callout.extraLines,
+            edgeFs: edgeCalloutFs,
+            subFs: edgeCalloutSubFs,
+          });
         }
       }
     }

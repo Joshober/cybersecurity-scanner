@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Figure 3 - Recall vs. Raw Alert Volume (DVNA).
  * Inline SVG with print-friendly sizing and high-contrast labeling.
  */
@@ -178,7 +178,7 @@
           "font-weight": "600",
           fill: "#0f172a",
         },
-        ["Raw issue count on DVNA (log10(x+1))"]
+        ["Raw alert volume on DVNA (issue count; logarithmic scale)"]
       )
     );
 

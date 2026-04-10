@@ -49,12 +49,24 @@ async function main() {
 
   try {
     const page = await browser.newPage();
+    // Viewport must be *wider than 1600px* or the poster’s @media (max-width:1600px)
+    // switches to a stacked mobile layout — the export would not show the full poster grid.
     await page.setViewport({
-      width: 1600,
-      height: 900,
+      width: 1920,
+      height: 1280,
       deviceScaleFactor: 2,
     });
     await page.goto(fileUrl, { waitUntil: "networkidle0", timeout: 120000 });
+
+    // Full desktop layout: no body padding clipping, no CSS scale shrink on .poster.
+    await page.addStyleTag({
+      content: `
+        html, body { margin: 0 !important; padding: 0 !important; background: #cbd5e1 !important; }
+        :root { --poster-scale: 1 !important; }
+        .poster { transform: none !important; }
+      `,
+    });
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
     const poster = await page.$(".poster");
     if (!poster) {
