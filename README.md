@@ -4,6 +4,8 @@
 
 **Repository:** [github.com/Joshober/cybersecurity-scanner](https://github.com/Joshober/cybersecurity-scanner)
 
+**Open source:** Released under the [MIT License](LICENSE).
+
 **VibeScan / conference poster materials:** see [`docs/vibescan/`](docs/vibescan/) (HTML poster, abstract, pitch script, A5 handout, QR SVG, submission checklist).
 
 **Verification matrix, pipeline roadmap, AI comparison plan:** [`docs/vibescan/rule-verification-matrix.md`](docs/vibescan/rule-verification-matrix.md) · [`docs/vibescan/pipeline-protection-roadmap.md`](docs/vibescan/pipeline-protection-roadmap.md) · [`docs/vibescan/ai-comparison-study-plan.md`](docs/vibescan/ai-comparison-study-plan.md) · gold-path demo [`benchmarks/gold-path-demo/`](benchmarks/gold-path-demo/).
@@ -271,6 +273,5 @@ Full mapping of these themes to rule IDs, CI, and external controls: [`docs/vibe
 ## License
 
 MIT.
-
 
 
