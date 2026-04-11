@@ -254,6 +254,23 @@ body {
   color: var(--text);
 }
 
+.presetHint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.presetRepoBtn {
+  font-size: 13px;
+}
+
 .radioRow {
   display: flex;
   gap: 16px;

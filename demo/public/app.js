@@ -24,6 +24,37 @@ const viewOriginalEl = $("#viewOriginal");
 const viewHackedEl = $("#viewHacked");
 const compareSummaryEl = $("#compareSummary");
 
+function normalizeRepoUrl(s) {
+  return String(s || "")
+    .trim()
+    .replace(/\/+$/, "");
+}
+
+function syncPresetButtons() {
+  const presetBtns = document.querySelectorAll(".presetRepoBtn");
+  if (!presetBtns.length || !repoUrlEl) return;
+  const v = normalizeRepoUrl(repoUrlEl.value);
+  for (const btn of presetBtns) {
+    const u = normalizeRepoUrl(btn.getAttribute("data-repo-url"));
+    btn.classList.toggle("segBtnActive", u !== "" && v === u);
+  }
+}
+
+function initPresetRepoButtons() {
+  const presetBtns = document.querySelectorAll(".presetRepoBtn");
+  if (!presetBtns.length || !repoUrlEl) return;
+  for (const btn of presetBtns) {
+    btn.addEventListener("click", () => {
+      const url = btn.getAttribute("data-repo-url");
+      if (url) repoUrlEl.value = url;
+      syncPresetButtons();
+      repoUrlEl.focus();
+    });
+  }
+  repoUrlEl.addEventListener("input", () => syncPresetButtons());
+  syncPresetButtons();
+}
+
 function setStatus(msg) {
   statusEl.textContent = msg;
 }
@@ -306,6 +337,7 @@ scanBtn.addEventListener("click", () => {
   startScan();
 });
 
+initPresetRepoButtons();
 refreshLeaderboard();
 
 // Fast initial paint: load cached leaderboard while network request runs.
