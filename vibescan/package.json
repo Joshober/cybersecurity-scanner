@@ -1,6 +1,6 @@
 {
   "name": "@jobersteadt/vibescan",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publishConfig": {
     "access": "public"
   },
@@ -28,7 +28,7 @@
     "templates"
   ],
   "scripts": {
-    "build": "node ./node_modules/typescript/lib/tsc.js",
+    "build": "tsc",
     "prepack": "npm run build && npm --prefix .. run build:arch && node scripts/vendor-secure-arch-into-vibescan.mjs",
     "test": "npm run build && npm run test:all",
     "test:all": "node --test tests/unit tests/smoke",
